@@ -1,0 +1,13 @@
+name: Greetings
+
+on: [pull_request, issues]
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/first-interaction@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        issue-message: 'Hello, and thanks for contributing at Android Boot Manager! As this is your first issie, we give you this message :) Please don't forget to make sure everything important is in the issue. Thanks!'
+        pr-message: 'Hello, and thanks for your first PR! We love to see that you help to develop Android Boot Manager! :)'
