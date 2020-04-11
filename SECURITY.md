@@ -9,4 +9,4 @@
 
 ## Reporting a Vulnerability
 
-Use GitHub issues for security issues that cannot leak data (for example crashing the system or making the phone reboot) bit for anything else, please email nift4@protonmail.com
+Use GitHub issues for security issues that cannot leak data (for example crashing the system or making the phone reboot) but for anything else, please email nift4@protonmail.com
