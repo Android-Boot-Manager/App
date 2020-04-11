@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:orientation="vertical">
+
+	<Button
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text="Install"
+		android:onClick="doInstall"/>
+
+	<RelativeLayout
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:id="@+id/mainnotinstallRelativeLayout1"
+		android:layout_gravity="center">
+
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Test Root"
+			android:id="@+id/mainnotinstallButton1"
+			android:layout_centerInParent="false"
+			android:onClick="testRoot"/>
+
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="README"
+			android:layout_toRightOf="@id/mainnotinstallButton1"
+			android:id="@+id/mainnotinstallButton2"
+			android:onClick="showLic"/>
+
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="License"
+			android:layout_toRightOf="@id/mainnotinstallButton2"
+			android:id="@+id/mainnotinstallButton3"
+			android:onClick="showLic"/>
+
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Source"
+			android:layout_toRightOf="@id/mainnotinstallButton3"
+			android:onClick="showLic"/>
+
+	</RelativeLayout>
+
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="Android Boot Manager is not installed on your device."/>
+
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="It is only available for the Moto G5 (cedric)!"/>
+
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="BE CAREFUL! YOU MAY LOOSE YOUR DATA! YOU MAY LOOSE YOUR IMEI (as with everything for cedric)! HAVE AN BACKUP!"/>
+
+	<View
+		android:background="?android:attr/dividerVertical"
+		android:layout_width="match_parent"
+		android:layout_height="1dp"/>
+
+	<RelativeLayout
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content">
+
+		<Switch
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/mainnotinstallSwitch1"/>
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Disable device check (if you spoof fingerprint)"
+			android:textAppearance="?android:attr/textAppearanceSmall"
+			android:layout_toRightOf="@id/mainnotinstallSwitch1"/>
+
+	</RelativeLayout>
+
+	<RelativeLayout
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content">
+
+		<CheckBox
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/mainnotinstallCheckBox1"/>
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="I accept the risk, allow installation"
+			android:layout_toRightOf="@id/mainnotinstallCheckBox1"/>
+
+	</RelativeLayout>
+
+</LinearLayout>
+
