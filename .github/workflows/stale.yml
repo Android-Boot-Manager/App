@@ -1,0 +1,19 @@
+name: Mark stale issues and pull requests
+
+on:
+  schedule:
+  - cron: "0 0 * * *"
+
+jobs:
+  stale:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/stale@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        stale-issue-message: 'Hi! This issue had no activity for some time. Is this a long-standing issue or is the user simply not replying anymore? To make sure our issue tracker is not spammed we close issues without activity after some time. If this issue should not be closed, please comment something! Thanks.'
+        stale-pr-message: 'Hi! This PR is open for some time but not merged yet. If there are no comments soon, it will be closed! Please comment if this PR is still useful.'
+        stale-issue-label: 'no-issue-activity'
+        stale-pr-label: 'no-pr-activity'
