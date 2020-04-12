@@ -20,6 +20,10 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import android.os.AsyncTask;
+import android.widget.EditText;
+import android.text.InputType;
+import android.content.DialogInterface;
 
 public class MainActivity extends Activity 
 {
@@ -49,19 +53,92 @@ public class MainActivity extends Activity
 			.show();
 			return;
 		}
-		ProgressDialog dialog = new ProgressDialog(this);
+		final ProgressDialog dialog = new ProgressDialog(this);
 		dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		dialog.setTitle("Installing...");
 		dialog.setMessage("Installing. Please wait...");
 		dialog.setIndeterminate(true);
 		dialog.setCanceledOnTouchOutside(false);
 		dialog.setCancelable(false);
-		dialog.show();
-		copyAssets();
+		final EditText input = new EditText(this);
+		final EditText input2 = new EditText(this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this).setTitle("Current ROM name");
+		input.setInputType(InputType.TYPE_CLASS_TEXT);
+		builder.setView(input);
+		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() { 
+				@Override
+				public void onClick(DialogInterface dialogif, int which) {
+					final String romname = input.getText().toString();
+					AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this).setTitle("Path to lk2nd.img");
+					input2.setInputType(InputType.TYPE_CLASS_TEXT);
+					builder.setView(input2);
+					builder.setPositiveButton("OK", new DialogInterface.OnClickListener() { 
+							@Override
+							public void onClick(DialogInterface dialogif, int which) {
+								final String path = input2.getText().toString();
+								dialog.show();
+								new AsyncTask(){
+									@Override
+									protected Object doInBackground(Object[] p1)
+									{
+										copyAssets();
+										return doRoot(assetsdir + "/app_install.sh " + path + " " + romname);
+									}
+									@Override
+									protected void onPostExecute(Object r) {
+										dialog.dismiss();
+										new AlertDialog.Builder(MainActivity.this)
+											.setTitle("Installation completed")
+											.setMessage("Return code is " + (String)r + "If it is ERROR, installation failed. Please give us /sdcard/abm/install.log in our telegram group @andbootmgr. If it is OK, installation was successful and you should reboot.")
+											.show();
+									}
+								}.execute();
+							}
+						});
+					builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								dialog.cancel();
+							}
+						});
+					builder.show();
+				}
+			});
+		builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.cancel();
+				}
+			});
+
+		builder.show();
 	}
 	
 	private void copyAssets() {
 		AssetManager assetManager = getAssets();
+		int apk_ver = 0;
+		int fs_ver = 0;
+		try
+		{
+			InputStream in = assetManager.open("cp/asset_ver");
+			byte[] buffer = new byte[1024];
+			String x = "";
+			int read;
+			while ((read = in.read(buffer)) != -1) {
+				x = x + new String(buffer,0,read);
+			}
+			apk_ver = Integer.valueOf(x.charAt(1));
+		}
+		catch (IOException e)
+		{
+			throw new RuntimeException(e);
+		}
+		try
+		{
+			fs_ver = Integer.valueOf(Files.readAllLines(Paths.get("/data/data/org.androidbootmanager.app/assets/asset_ver")).get(0));
+		}
+		catch (IOException e){}catch (NumberFormatException e) {}
+		if (fs_ver == apk_ver) return;
 		String[] files = null;
 		try {
 			files = assetManager.list("cp"); 
@@ -104,16 +181,26 @@ public class MainActivity extends Activity
 		.show();
 	}
 	public void testRoot(View v) {
-		copyAssets();
-		new AlertDialog.Builder(this)
-		.setTitle("Test Root")
-		.setMessage(doRoot("/data/data/org.androidbootmanager.app/assets/hello.sh"))
-		.show();
+		new AsyncTask(){
+			@Override
+			protected Object doInBackground(Object[] p1)
+			{
+				copyAssets();
+				return doRoot("/data/data/org.androidbootmanager.app/assets/hello.sh");
+			}
+			@Override
+			protected void onPostExecute(Object r) {
+				new AlertDialog.Builder(MainActivity.this)
+					.setTitle("Test Root")
+					.setMessage((String)r)
+					.show();
+			}
+		}.execute();
 	}
 	
 	public String doRoot(String cmd) {
 		File x = new File("/data/data/org.androidbootmanager.app/files/_run.sh");
-		try{x.createNewFile();}catch (IOException e){}
+		try{if(!x.exists())x.createNewFile();}catch (IOException e){throw new RuntimeException(e);}
 		x.setExecutable(true);
 		try{Files.write(Paths.get("/data/data/org.androidbootmanager.app/files/_run.sh"), ("#!/system/bin/sh\n" + cmd).getBytes());}catch (IOException e){throw new RuntimeException(e);}
 		return doShell("su -c '/data/data/org.androidbootmanager.app/files/_run.sh'");
