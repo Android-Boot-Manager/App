@@ -11,7 +11,7 @@ dd if="$1" of=/dev/block/bootdevice/by-name/boot
 
 # Mount bootset
 mkdir -p /data/bootset
-mount -t ext4 /dev/block/mmcblk0p51 /data/bootset
+mount -t ext4 /dev/block/bootdevice/by-name/oem /data/bootset
 
 # Create folder for current OS
 mkdir -p /data/bootset/lk2nd/entries
