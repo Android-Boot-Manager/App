@@ -8,8 +8,8 @@ android {
         applicationId "org.androidbootmanager.app"
         minSdkVersion 25
         targetSdkVersion 25
-        versionCode 4
-        versionName "0.0.3"
+        versionCode 8
+        versionName "0.0.7"
     }
     buildTypes {
         release {

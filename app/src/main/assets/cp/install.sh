@@ -9,6 +9,9 @@ dd if=/dev/block/bootdevice/by-name/boot of=/sdcard/abm/stockboot.img
 # Flash lk2nd to boot partition
 dd if="$1" of=/dev/block/bootdevice/by-name/boot
 
+# Format oem
+true | mke2fs /dev/block/bootdevice/by-name/oem
+
 # Mount bootset
 mkdir -p /data/bootset
 mount -t ext4 /dev/block/bootdevice/by-name/oem /data/bootset
@@ -34,6 +37,11 @@ cmdline=$(cat /proc/cmdline)
 cat << EOF >> /data/bootset/lk2nd/lk2nd.conf
    default    Entry 01
    timeout    5
+   bgcolor    0x808080
+   fcolor     0x000080
+   fscolor    0xFFFFFF
+   entcolor   0x808080
+   entscolor  0x808080
 EOF
 cat << EOF >> /data/bootset/lk2nd/entries/entry01.conf
   title      $3

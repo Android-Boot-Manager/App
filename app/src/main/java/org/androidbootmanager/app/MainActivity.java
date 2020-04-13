@@ -18,12 +18,12 @@ import android.widget.Switch;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import android.os.AsyncTask;
 import android.widget.EditText;
 import android.text.InputType;
 import android.content.DialogInterface;
+import java.io.PrintWriter;
+import java.io.FileReader;
 
 public class MainActivity extends Activity 
 {
@@ -135,7 +135,14 @@ public class MainActivity extends Activity
 		}
 		try
 		{
-			fs_ver = Integer.valueOf(Files.readAllLines(Paths.get("/data/data/org.androidbootmanager.app/assets/asset_ver")).get(0));
+			String out = "";
+			FileReader r = new FileReader(assetsdir + "/asset_ver");
+			int read;
+			char[] x = new char[1024];
+			while ((read = r.read(x)) != -1) {
+				out += new String(x,0,read);
+			}
+			fs_ver = Integer.valueOf(out);
 		}
 		catch (IOException e){}catch (NumberFormatException e) {}
 		if (fs_ver == apk_ver) return;
@@ -202,7 +209,12 @@ public class MainActivity extends Activity
 		File x = new File("/data/data/org.androidbootmanager.app/files/_run.sh");
 		try{if(!x.exists())x.createNewFile();}catch (IOException e){throw new RuntimeException(e);}
 		x.setExecutable(true);
-		try{Files.write(Paths.get("/data/data/org.androidbootmanager.app/files/_run.sh"), ("#!/system/bin/sh\n" + cmd).getBytes());}catch (IOException e){throw new RuntimeException(e);}
+		try{
+			PrintWriter w = new PrintWriter(filedir + "/_run.sh");
+			w.write("#!/system/bin/sh\n" + cmd);
+			w.flush();
+			w.close();
+		}catch (IOException e){throw new RuntimeException(e);}
 		return doShell("su -c '/data/data/org.androidbootmanager.app/files/_run.sh'");
 	}
 	
