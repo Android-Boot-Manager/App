@@ -3,32 +3,31 @@ package org.androidbootmanager.app;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.AssetManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.Switch;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import android.widget.CheckBox;
-import android.widget.ToggleButton;
-import android.widget.Switch;
 import java.io.InputStreamReader;
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import android.os.AsyncTask;
-import android.widget.EditText;
-import android.text.InputType;
-import android.content.DialogInterface;
+import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.io.FileReader;
 
 public class MainActivity extends Activity 
 {
 	File filedir = new File("/data/data/org.androidbootmanager.app/files");
-	File cfgfile = new File(filedir + "/cfg");
+	File cfgfile = new File("/data/abm-part.cfg");
 	File assetsdir = new File(filedir + "/../assets");
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -36,12 +35,27 @@ public class MainActivity extends Activity
         super.onCreate(savedInstanceState);
 		if (!filedir.exists()) filedir.mkdir();
 		if (!assetsdir.exists()) assetsdir.mkdir();
+		copyAssets();
 		if (cfgfile.exists()) {
       		setContentView(R.layout.main);
 		} else {
 			setContentView(R.layout.main_notinstall);
 		}
+		
     }
+	
+	public void configurator(View v) {
+		mount(v);
+		startActivity(new Intent(this, ConfiguratorActivity.class));
+	}
+	
+	public void mount(View v) {
+		doRootGlobal("mount -t ext4 /dev/block/bootdevice/by-name/oem /data/bootset");
+	}
+	
+	public void unmount(View v) {
+		doRootGlobal("umount /data/bootset");
+	}
 	
 	public void doInstall(View v){
 		if((!android.os.Build.DEVICE.equals("cedric"))&&(!((Switch) findViewById(R.id.mainnotinstallSwitch1)).isChecked())){new AlertDialog.Builder(this).setCancelable(true).setTitle("Wrong device").setMessage("Android Boot Manager is not available for this device (" + android.os.Build.DEVICE + ").").show(); return;}
@@ -205,12 +219,25 @@ public class MainActivity extends Activity
 		}.execute();
 	}
 	
+	public String doRootGlobal(String cmd) {
+		File x = new File("/data/data/org.androidbootmanager.app/files/_runw.sh");
+		try{if(!x.exists())x.createNewFile();}catch (IOException e){throw new RuntimeException(e);}
+		x.setExecutable(true);
+		try{
+			PrintWriter w = new PrintWriter(x);
+			w.write("#!/system/bin/sh\n" + cmd);
+			w.flush();
+			w.close();
+		}catch (IOException e){throw new RuntimeException(e);}
+		return doRoot("su -M -c '/data/data/org.androidbootmanager.app/files/_runw.sh'");
+	}
+	
 	public String doRoot(String cmd) {
 		File x = new File("/data/data/org.androidbootmanager.app/files/_run.sh");
 		try{if(!x.exists())x.createNewFile();}catch (IOException e){throw new RuntimeException(e);}
 		x.setExecutable(true);
 		try{
-			PrintWriter w = new PrintWriter(filedir + "/_run.sh");
+			PrintWriter w = new PrintWriter(x);
 			w.write("#!/system/bin/sh\n" + cmd);
 			w.flush();
 			w.close();
