@@ -1,15 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.+"
+    compileSdkVersion 25
+    buildToolsVersion "25.+"
 
     defaultConfig {
         applicationId "org.androidbootmanager.app"
-        minSdkVersion 26
-        targetSdkVersion 26
-        versionCode 3
-        versionName "0.0.2"
+        minSdkVersion 25
+        targetSdkVersion 25
+        versionCode 4
+        versionName "0.0.3"
     }
     buildTypes {
         release {

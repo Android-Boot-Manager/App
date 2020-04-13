@@ -82,7 +82,7 @@ public class MainActivity extends Activity
 									protected Object doInBackground(Object[] p1)
 									{
 										copyAssets();
-										return doRoot(assetsdir + "/app_install.sh " + path + " " + romname);
+										return doRoot(assetsdir + "/app_install.sh '" + path + "' '" + romname + "'");
 									}
 									@Override
 									protected void onPostExecute(Object r) {

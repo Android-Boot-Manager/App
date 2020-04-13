@@ -23,7 +23,7 @@ cp /sys/firmware/fdt /data/bootset/msm8937-motorola-cedric.dtb
 
 # Copy kernel
 mkdir -p /sdcard/abm/temp/boot
-unpackbootimg -i /sdcard/abm/stockboot.img -o /sdcard/abm/temp/boot > /dev/null 2>&1
+./unpackbootimg -i /sdcard/abm/stockboot.img -o /sdcard/abm/temp/boot 
 cp /sdcard/abm/temp/boot/stockboot.img-zImage "/data/bootset/$2/zImage"
 
 # Copy rd
@@ -48,4 +48,4 @@ umount /data/bootset
 sync
 
 # Clean up
-rm -r /sdcard/adm/temp
+rm -r /sdcard/abm/temp
