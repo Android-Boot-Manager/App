@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.+"
+    buildToolsVersion "25.0.0"
 
     defaultConfig {
         applicationId "org.androidbootmanager.app"
@@ -17,11 +17,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-	compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
     }
-}
+    dexOptions {
+        javaMaxHeapSize "2g"
+    }
+} 
 
 repositories {
     maven { url 'https://jitpack.io' }
