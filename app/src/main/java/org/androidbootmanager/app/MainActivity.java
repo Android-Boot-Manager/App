@@ -39,6 +39,7 @@ public class MainActivity extends Activity
 		copyAssets();
 		if (cfgfile.exists()) {
       		setContentView(R.layout.main);
+			configurator(null);
 		} else {
 			setContentView(R.layout.main_notinstall);
 		}
