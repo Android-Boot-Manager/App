@@ -20,6 +20,19 @@ public class ConfiguratorActivity extends Activity
 		setContentView(R.layout.cfg);
 	}
 	
+	public String doRootGlobal(String cmd) {
+		File x = new File("/data/data/org.androidbootmanager.app/files/_runw.sh");
+		try{if(!x.exists())x.createNewFile();}catch (IOException e){throw new RuntimeException(e);}
+		x.setExecutable(true);
+		try{
+			PrintWriter w = new PrintWriter(x);
+			w.write("#!/system/bin/sh\n" + cmd);
+			w.flush();
+			w.close();
+		}catch (IOException e){throw new RuntimeException(e);}
+		return doRoot("su -M -c '/data/data/org.androidbootmanager.app/files/_runw.sh'");
+	}
+	
 	public String doRoot(String cmd) {
 		File x = new File("/data/data/org.androidbootmanager.app/files/_run.sh");
 		try{if(!x.exists())x.createNewFile();}catch (IOException e){throw new RuntimeException(e);}

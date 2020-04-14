@@ -35,6 +35,7 @@ public class MainActivity extends Activity
         super.onCreate(savedInstanceState);
 		if (!filedir.exists()) filedir.mkdir();
 		if (!assetsdir.exists()) assetsdir.mkdir();
+		doRoot("/data/data/org.androidbootmanager.app/assets/app_is_installed.sh");
 		copyAssets();
 		if (cfgfile.exists()) {
       		setContentView(R.layout.main);
