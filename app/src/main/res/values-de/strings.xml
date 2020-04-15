@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	
+	<!-- Managed by nift4 -->
 
     <string name="app_name">Android-Startverwaltung</string>
 	<string name="wrong_device_title">Inkompatibles Gerät</string>
@@ -32,6 +34,6 @@
 	<string name="mount">Bootset einbinden</string>
 	<string name="umount">Bootset ausbinden</string>
 	<string name="open_configurator">Einbinden falls nötig und Konfigurator öffnen</string>
-	<string name="app_unfinished">Die Android ist erfolgreich installiert aber die App ist noch nicht fertig. Nutzlose Knöpfe und leere Seiten sind zu erwarten :(</string>
+	<string name="app_unfinished">Die Android-Startverwaltung ist erfolgreich installiert aber die App ist noch nicht fertig. Nutzlose Knöpfe und leere Seiten sind zu erwarten :(</string>
 
 </resources>
