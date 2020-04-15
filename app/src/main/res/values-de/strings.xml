@@ -25,8 +25,8 @@
 	<string name="license">Lizenz</string>
 	<string name="nodevcheck">Geräte-Check überspringen</string>
 	<string name="allow_install">Ich akzeptiere das Risiko, Installation erlauben!</string>
-	<string name="not_installed">Die Android-Startverwaltung ist nicbt installiert.</string>
-	<string name="devices">It is only available for the Moto G5 (cedric)!</string>
+	<string name="not_installed">Die Android-Startverwaltung ist nicht installiert.</string>
+	<string name="devices">Die Android-Startverwaltung ist nur für Moto G5 (cedric) verfügbar.</string>
 	<string name="be_careful">DU KANNST DEINE DATEN VERLIEREN! DU KANNST DEIN GERÄT ZERSTÖREN! DU KANNST DEINE IMEI VERLIEREN! DU KANNST SOGAR GELD VERLIEREN! NIEMAND IST DAFÜR VERANTWORTLICH AUSSER DU! BENUTZEN AUF EIGENE GEFAHR! SEI VORSICHTIG!</string>
 	<string name="configurator">Konfigurator</string>
 	<string name="mount">Bootset einbinden</string>

@@ -215,7 +215,7 @@ public class MainActivity extends Activity
 			protected void onPostExecute(Object r) {
 				new AlertDialog.Builder(MainActivity.this)
 					.setTitle(R.string.test_root)
-					.setMessage(getResources().getString((((String)r).equalsIgnoreCase("I am root, fine! :)"))?R.string.root:R.string.no_root))
+					.setMessage(getResources().getString((((String)r).contains("I am root, fine! :)"))?R.string.root:R.string.no_root))
 					.show();
 			}
 		}.execute();
