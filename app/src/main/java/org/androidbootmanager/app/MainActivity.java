@@ -131,6 +131,16 @@ public class MainActivity extends Activity
 	}
 	
 	private void copyAssets() {
+		File x = new File(assetsdir, "Toolkit");
+		File y = new File(assetsdir, "Scripts");
+		if (!x.exists())x.mkdir();
+		if (!y.exists())y.mkdir();
+		copyAssets("Toolkit","Toolkit");
+		copyAssets("Scripts","Scripts");
+		copyAssets("cp","");
+	}
+	
+	private void copyAssets(String src, String outp) {
 		AssetManager assetManager = getAssets();
 		int apk_ver = 0;
 		int fs_ver = 0;
@@ -164,7 +174,7 @@ public class MainActivity extends Activity
 		if (fs_ver == apk_ver) return;
 		String[] files = null;
 		try {
-			files = assetManager.list("cp"); 
+			files = assetManager.list(src); 
 		} catch (IOException e) {
 			Log.e("tag", "Failed to get asset file list.", e);
 		}
@@ -173,8 +183,8 @@ public class MainActivity extends Activity
 			InputStream in = null;
 			OutputStream out = null;
 			try {
-				in = assetManager.open("cp/" + filename);
-				File outFile = new File("/data/data/org.androidbootmanager.app/assets", filename);
+				in = assetManager.open(src + "/" + filename);
+				File outFile = new File("/data/data/org.androidbootmanager.app/assets/" + outp, filename);
 				out = new FileOutputStream(outFile);
 				copyFile(in, out);
 				in.close();

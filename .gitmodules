@@ -1,6 +1,6 @@
-[submodule "app/src/main/assets/cp/Toolkit"]
-	path = app/src/main/assets/cp/Toolkit
-	url = https://github.com/Android-Boot-Manager/Toolkit
-[submodule "app/src/main/assets/cp/Scripts"]
-	path = app/src/main/assets/cp/Scripts
+[submodule "app/src/main/assets/Scripts"]
+	path = app/src/main/assets/Scripts
 	url = https://github.com/Android-Boot-Manager/Scripts
+[submodule "app/src/main/assets/Toolkit"]
+	path = app/src/main/assets/Toolkit
+	url = https://github.com/Android-Boot-Manager/Toolkit
