@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	
+	<!-- Managed by nift4 -->
+
+    <string name="app_name">Android Boot Manager</string>
+	<string name="wrong_device_title">Nieodpowiednie urządzenie</string>
+	<string name="wrong_device_msg">Android Boot Manager nie jest dostępny dla tego urządzenia (%1$s).</string>
+	<string name="allow_install_unchecked_title">Nie zaznaczono pozwolenia na instalację.</string>
+	<string name="allow_install_unchecked_msg">Wygląda na to że nie zajrzałeś na tę stronę. To nie dobrze!</string>
+	<string name="ok">OK</string>
+	<string name="cancel">Przerwij</string>
+	<string name="installing_title">Instaluję...</string>
+	<string name="installing_msg">Instaluję. Proszę czekać...</string>
+	<string name="current_rom_name">Nazwa obecnego ROMu</string>
+	<string name="path_lk2nd">Ścieżka do pliku lk2nd.img</string>
+	<string name="install_finish_title">Instalacja zakończona</string>
+	<string name="install_finish_msg">Kod zwrotny to %1$sKiedy kod zwrotny to ERROR, coś poszło nie tak. Zflashuj deinstalator i zapytaj na naszej grupie na Telegramie @andbootmgr. Nie zapomnij o logu w /sdcard/abm/install.log! Jeżeli kod zwrotny to OK, instalacja zakończyła się powodzeniem. Powinieneś zrestartować urządzenie.</string>
+	<string name="root">Jestem rootem. Wszystko w porządku! :)</string>
+	<string name="no_root">NIE jestem rootem. Coś poszło nie tak!</string>
+	<string name="test_root">Testuj Root</string>
+	<string name="readme_title">Plik README, kod źródłowy i licencja</string>
+	<string name="readme_text">Kod źródłowy jest dostępny tutaj: %1$s\nPlik README jest dostępny tutaj:%2$s</string>
+	<string name="install">Zainstaluj</string>
+	<string name="readme">Plik README</string>
+	<string name="source">Kod źródłowy</string>
+	<string name="license">Licencja</string>
+	<string name="nodevcheck">Wyłącz sprawdzenie modelu urządzenia (jeżeli fałszujesz model urządzenia)</string>
+	<string name="allow_install">Akceptuję ryzyko, pozwól na instalację!</string>
+	<string name="not_installed">Android Boot Manager nie jest zainstalowany na twoim urządzeniu!</string>
+	<string name="devices">Aplikacja jest dostępna tylko dla Moto G5 (cedric)!</string>
+	<string name="be_careful">Możesz stracić dane, IMEI lub zbrickować urządzenie. Nikt nie jest odpowiedzialny oprócz ciebie. Wszystko wykonujesz na własne ryzyko. Bądź ostrożny.</string>
+	<string name="configurator">Konfigurator</string>
+	<string name="mount">Zamontuj Bootset</string>
+	<string name="umount">Odmontuj Bootset</string>
+	<string name="open_configurator">Zamontuj w razie potrzeby i otwórz Konfigurator</string>
+	<string name="app_unfinished">Android Boot Manager jest zainstalowany pomyślnie ale aplikacja jeszcze nie jest skończona; puste strony i przyciski które nic nie robią są normalne. :(</string>
+
+</resources>
