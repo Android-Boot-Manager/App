@@ -23,11 +23,11 @@
 	<string name="readme">README</string>
 	<string name="source">Source</string>
 	<string name="license">License</string>
-	<string name="nodevcheck">Disable debice check (if you spoof fingerprint)</string>
+	<string name="nodevcheck">Disable device check (if you spoof fingerprint)</string>
 	<string name="allow_install">I accept the risk, allow installation!</string>
 	<string name="not_installed">Android Boot Manager is not installed on your device!</string>
 	<string name="devices">It is only available for the Moto G5 (cedric)!</string>
-	<string name="be_careful">YOU CAN LOOSE YOUR DATA! YOU CAN BRICK YOUR DEVICE! YOU CAN USE YOUR IMEI (as with anything on cedric)! YOU CAN LOOSE YOUR MONEY! NOBODY IS RESPONSIBLE EXCEPT YOU! DO AT YOUR OWN RISK AND BE CAREFUL!</string>
+	<string name="be_careful">YOU CAN LOOSE YOUR DATA! YOU CAN BRICK YOUR DEVICE! YOU CAN LOOSE YOUR IMEI (as with anything on cedric)! YOU CAN LOOSE YOUR MONEY! NOBODY IS RESPONSIBLE EXCEPT YOU! DO AT YOUR OWN RISK AND BE CAREFUL!</string>
 	<string name="configurator">Configurator</string>
 	<string name="mount">Mount Bootset</string>
 	<string name="umount">Unmount Bootset</string>
