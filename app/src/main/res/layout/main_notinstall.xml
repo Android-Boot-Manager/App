@@ -8,7 +8,7 @@
 	<Button
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:text="Install"
+		android:text="@string/install"
 		android:onClick="doInstall"/>
 
 	<RelativeLayout
@@ -20,7 +20,7 @@
 		<Button
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="Test Root"
+			android:text="@string/test_root"
 			android:id="@+id/mainnotinstallButton1"
 			android:layout_centerInParent="false"
 			android:onClick="testRoot"/>
@@ -28,7 +28,7 @@
 		<Button
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="README"
+			android:text="@string/readme"
 			android:layout_toRightOf="@id/mainnotinstallButton1"
 			android:id="@+id/mainnotinstallButton2"
 			android:onClick="showLic"/>
@@ -36,7 +36,7 @@
 		<Button
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="License"
+			android:text="@string/license"
 			android:layout_toRightOf="@id/mainnotinstallButton2"
 			android:id="@+id/mainnotinstallButton3"
 			android:onClick="showLic"/>
@@ -44,7 +44,7 @@
 		<Button
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="Source"
+			android:text="@string/source"
 			android:layout_toRightOf="@id/mainnotinstallButton3"
 			android:onClick="showLic"/>
 
@@ -53,17 +53,17 @@
 	<TextView
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:text="Android Boot Manager is not installed on your device."/>
+		android:text="@string/not_installed"/>
 
 	<TextView
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:text="It is only available for the Moto G5 (cedric)!"/>
+		android:text="@string/devices"/>
 
 	<TextView
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:text="BE CAREFUL! YOU MAY LOOSE YOUR DATA! YOU MAY LOOSE YOUR IMEI (as with everything for cedric)! HAVE AN BACKUP!"/>
+		android:text="@string/be_careful"/>
 
 	<View
 		android:background="?android:attr/dividerVertical"
@@ -82,7 +82,7 @@
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="Disable device check (if you spoof fingerprint)"
+			android:text="@string/nodevcheck"
 			android:textAppearance="?android:attr/textAppearanceSmall"
 			android:layout_toRightOf="@id/mainnotinstallSwitch1"/>
 
@@ -100,7 +100,7 @@
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="I accept the risk, allow installation"
+			android:text="@string/allow_install"
 			android:layout_toRightOf="@id/mainnotinstallCheckBox1"/>
 
 	</RelativeLayout>

@@ -60,35 +60,35 @@ public class MainActivity extends Activity
 	}
 	
 	public void doInstall(View v){
-		if((!android.os.Build.DEVICE.equals("cedric"))&&(!((Switch) findViewById(R.id.mainnotinstallSwitch1)).isChecked())){new AlertDialog.Builder(this).setCancelable(true).setTitle("Wrong device").setMessage("Android Boot Manager is not available for this device (" + android.os.Build.DEVICE + ").").show(); return;}
+		if((!android.os.Build.DEVICE.equals("cedric"))&&(!((Switch) findViewById(R.id.mainnotinstallSwitch1)).isChecked())){new AlertDialog.Builder(this).setCancelable(true).setTitle(R.string.wrong_device_msg).setMessage(getResources().getString(R.string.wrong_device_msg, android.os.Build.DEVICE)).show(); return;}
 		if (!((CheckBox) findViewById(R.id.mainnotinstallCheckBox1)).isChecked()) {
 			new AlertDialog.Builder(this)
 			.setCancelable(true)
-			.setTitle("Allow install not checked")
-			.setMessage("Seems like you didn't look at this page. That's not good.")
+			.setTitle(R.string.allow_install_unchecked_title)
+			.setMessage(R.string.allow_install_unchecked_msg)
 			.show();
 			return;
 		}
 		final ProgressDialog dialog = new ProgressDialog(this);
 		dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		dialog.setTitle("Installing...");
-		dialog.setMessage("Installing. Please wait...");
+		dialog.setTitle(R.string.installing_title);
+		dialog.setMessage(getResources().getString(R.string.installing_msg));
 		dialog.setIndeterminate(true);
 		dialog.setCanceledOnTouchOutside(false);
 		dialog.setCancelable(false);
 		final EditText input = new EditText(this);
 		final EditText input2 = new EditText(this);
-		AlertDialog.Builder builder = new AlertDialog.Builder(this).setTitle("Current ROM name");
+		AlertDialog.Builder builder = new AlertDialog.Builder(this).setTitle(R.string.current_rom_name);
 		input.setInputType(InputType.TYPE_CLASS_TEXT);
 		builder.setView(input);
-		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() { 
+		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() { 
 				@Override
 				public void onClick(DialogInterface dialogif, int which) {
 					final String romname = input.getText().toString();
-					AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this).setTitle("Path to lk2nd.img");
+					AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this).setTitle(R.string.path_lk2nd);
 					input2.setInputType(InputType.TYPE_CLASS_TEXT);
 					builder.setView(input2);
-					builder.setPositiveButton("OK", new DialogInterface.OnClickListener() { 
+					builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() { 
 							@Override
 							public void onClick(DialogInterface dialogif, int which) {
 								final String path = input2.getText().toString();
@@ -104,14 +104,14 @@ public class MainActivity extends Activity
 									protected void onPostExecute(Object r) {
 										dialog.dismiss();
 										new AlertDialog.Builder(MainActivity.this)
-											.setTitle("Installation completed")
-											.setMessage("Return code is " + (String)r + "If it is ERROR, installation failed. Please give us /sdcard/abm/install.log in our telegram group @andbootmgr. If it is OK, installation was successful and you should reboot.")
+											.setTitle(R.string.install_finish_title)
+											.setMessage(getResources().getString(R.string.install_finish_msg,(String)r))
 											.show();
 									}
 								}.execute();
 							}
 						});
-					builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+					builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
 								dialog.cancel();
@@ -120,7 +120,7 @@ public class MainActivity extends Activity
 					builder.show();
 				}
 			});
-		builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+		builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.cancel();
@@ -199,8 +199,8 @@ public class MainActivity extends Activity
 	
 	public void showLic(View v) {
 		new AlertDialog.Builder(this)
-		.setTitle("README, License and Source")
-		.setMessage("The source is available here: https://github.com/Android-Boot-Manager\nThe README is available here: https://github.com/Android-Boot-Manager/App/wiki\n\n   Copyright 2020 The Android Boot Manager Project\nLicensed under the Apache License, Version 2.0 (the \"License\");\nyou may not use this file except in compliance with the License.\nYou may obtain a copy of the License at\n\nhttp://www.apache.org/licenses/LICENSE-2.0\n\nUnless required by applicable law or agreed to in writing, software\ndistributed under the License is distributed on an \"AS IS\" BASIS,\nWITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\nSee the License for the specific language governing permissions and\nlimitations under the License.")
+		.setTitle(R.string.readme_title)
+		.setMessage(getResources().getString(R.string.readme_text,"https://github.com/Android-Boot-Manager","https://github.com/Android-Boot-Manager/App/wiki")+"\n\n   Copyright 2020 The Android Boot Manager Project\nLicensed under the Apache License, Version 2.0 (the \"License\");\nyou may not use this file except in compliance with the License.\nYou may obtain a copy of the License at\n\nhttp://www.apache.org/licenses/LICENSE-2.0\n\nUnless required by applicable law or agreed to in writing, software\ndistributed under the License is distributed on an \"AS IS\" BASIS,\nWITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\nSee the License for the specific language governing permissions and\nlimitations under the License.")
 		.show();
 	}
 	public void testRoot(View v) {
@@ -214,8 +214,8 @@ public class MainActivity extends Activity
 			@Override
 			protected void onPostExecute(Object r) {
 				new AlertDialog.Builder(MainActivity.this)
-					.setTitle("Test Root")
-					.setMessage((String)r)
+					.setTitle(R.string.test_root)
+					.setMessage(getResources().getString((((String)r).equalsIgnoreCase("I am root, fine! :)"))?R.string.root:R.string.no_root))
 					.show();
 			}
 		}.execute();

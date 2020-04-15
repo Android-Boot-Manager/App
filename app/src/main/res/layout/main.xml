@@ -8,25 +8,25 @@
 	<Button
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:text="Mount Bootset"
+		android:text="@string/mount"
 		android:onClick="mount"/>
 
 	<Button
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:text="Unmount Bootset"
+		android:text="@string/umount"
 		android:onClick="unmount"/>
 
 	<Button
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:text="Mount if necessary and open Configurator"
+		android:text="@string/open_configurator"
 		android:onClick="configurator"/>
 
 	<TextView
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:text="Android Boot Manager is installed successfully (atleast it seems so) but the App is not yet finished :("
+		android:text="@string/app_unfinished"
 		android:textAppearance="?android:attr/textAppearanceLarge"/>
 
 </LinearLayout>

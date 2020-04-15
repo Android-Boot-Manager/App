@@ -18,7 +18,7 @@
         </activity>
 		<activity
 			android:name=".ConfiguratorActivity"
-			android:label="Configurator">
+			android:label="@string/configurator">
 		</activity>
     </application>
 
