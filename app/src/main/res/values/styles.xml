@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="AppTheme" parent="@android:style/Theme.Holo.Light">
+    <style name="AppTheme" parent="@style/Theme.AppCompat.Light.NoActionBar">
 	</style>
+	<style name="MyToolbarTheme"
+		parent="@style/ThemeOverlay.AppCompat.Light">
+		<item name="colorControlNormal">@color/white</item>
+		<item name="titleTextColor">@color/white</item>
+	</style>
+	<color name="colorPrimary">#FE9200</color>
+	<color name="colorAccent">#FE9200</color>
+	<color name="white">#FFFFFF</color>
 </resources>

@@ -23,8 +23,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Window;
+import android.view.WindowManager;
+import android.support.v4.content.ContextCompat;
 
-public class MainActivity extends Activity 
+public class MainActivity extends AppCompatActivity 
 {
 	File filedir = new File("/data/data/org.androidbootmanager.app/files");
 	File cfgfile = new File("/data/abm-part.cfg");
@@ -37,6 +41,10 @@ public class MainActivity extends Activity
 		if (!assetsdir.exists()) assetsdir.mkdir();
 		doRoot("/data/data/org.androidbootmanager.app/assets/app_is_installed.sh");
 		copyAssets();
+		Window window = this.getWindow();
+		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+		window.setStatusBarColor(ContextCompat.getColor(this,R.color.colorPrimary));
 		if (cfgfile.exists()) {
       		setContentView(R.layout.main);
 			configurator(null);
