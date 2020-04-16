@@ -1,10 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
 	android:orientation="vertical">
 
+	<android.support.v7.widget.Toolbar
+		android:layout_width="match_parent"
+		android:layout_height="?attr/actionBarSize"
+		android:background="@color/colorPrimary"
+		android:gravity="center_vertical"
+		app:layout_collapseMode="pin"
+		app:layout_scrollFlags="scroll|enterAlways"
+		app:theme="@style/MyToolbarTheme"
+		app:title="@string/app_name"/>
+	
+	
 	<Button
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
