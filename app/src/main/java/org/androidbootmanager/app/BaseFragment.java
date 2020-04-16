@@ -10,11 +10,12 @@ abstract public class BaseFragment extends Fragment {
 	protected int layout = 0;
 	protected ConfiguratorActivity xcontext = null;
 	abstract protected void onInit();
-	public BaseFragment(ConfiguratorActivity x) {
-		xcontext = x;
+	public BaseFragment() {
+		super();
 	}
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		xcontext = (ConfiguratorActivity) getActivity();
 		onInit();
 		return inflater.inflate(layout, container, false);
 	}

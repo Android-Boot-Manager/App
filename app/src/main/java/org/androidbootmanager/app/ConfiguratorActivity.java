@@ -34,8 +34,8 @@ public class ConfiguratorActivity extends AppCompatActivity
 		viewPager = (ViewPager) findViewById(R.id.viewPager);
 		tabLayout = (TabLayout) findViewById(R.id.tabLayout);
 		adapter = new TabAdapter(getSupportFragmentManager());
-		adapter.addFragment(new RomTabFragment(this), "ROMs");
-		adapter.addFragment(new ThemeTabFragment(this), "Themes");
+		adapter.addFragment(new RomTabFragment(), "ROMs");
+		adapter.addFragment(new ThemeTabFragment(), "Themes");
 		viewPager.setAdapter(adapter);
 		tabLayout.setupWithViewPager(viewPager);
 	}
