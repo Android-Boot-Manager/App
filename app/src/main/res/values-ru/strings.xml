@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Android Boot Manager</string>
-    <string name="wrong_device_title">Wrong device</string>
-    <string name="wrong_device_msg">Android Boot Manager is not available for this device (%1$s).</string>
-    <string name="allow_install_unchecked_title">Allow install not checked</string>
-    <string name="allow_install_unchecked_msg">It seems that you didn\'t look at this page. That\'s not good!</string>
-    <string name="ok">OK</string>
-    <string name="cancel">Cancel</string>
-    <string name="installing_title">Installing...</string>
-    <string name="installing_msg">Installing. Please wait...</string>
-    <string name="current_rom_name">Current ROM name</string>
-    <string name="path_lk2nd">Path to lk2nd.img</string>
-    <string name="install_finish_title">Installation completed</string>
-    <string name="install_finish_msg">Return code is %1$sWhen the Return Code is ERROR, something went wrong. Please flash the uninstaller and ask in our Telegram group @andbootmgr. Don\'t forget the log file at /sdcard/abm/install.log! If the Return Code is OK, the installation was sucessful. You should reboot now.</string>
-    <string name="root">I am root. Fine! :)</string>
-    <string name="no_root">I am NOT root. Something went wrong!</string>
-    <string name="test_root">Test Root</string>
+    <string name="app_name">Менеджер загрузок Android</string>
+    <string name="wrong_device_title">Неверное устройство</string>
+    <string name="wrong_device_msg">Android Boot Manager не доступен для этого устройства (%1$s).</string>
+    <string name="allow_install_unchecked_title">Разрешить установку не отмечено</string>
+    <string name="allow_install_unchecked_msg">Похоже, вы не смотрели на эту страницу. Это не хорошо!</string>
+    <string name="ok">ОК</string>
+    <string name="cancel">Отменить</string>
+    <string name="installing_title">Установка...</string>
+    <string name="installing_msg">Установка. Подождите...</string>
+    <string name="current_rom_name">Имя текущей прошивки</string>
+    <string name="path_lk2nd">Путь к lk2nd.img</string>
+    <string name="install_finish_title">Установка завершена</string>
+    <string name="install_finish_msg">Код возврата - %1$sКогда код возврата является ERROR, что-то пошло не так. Прошейте программу удаления и спросите у нас в Telegram группу @andbootmgr. Не забудьте указать лог в /sdcard/abm/install.log! Если код возврата OK, установка прошла успешно. Вы должны перезагрузиться.</string>
+    <string name="root">Я root. Хорошо! :)</string>
+    <string name="no_root">Я НЕ root-пользователю. Что-то пошло не так!</string>
+    <string name="test_root">Тест Root</string>
     <string name="readme_title">README, Source and Licence</string>
     <string name="readme_text">The source is available here: %1$s\nThe README is available here:%2$s</string>
     <string name="install">Install</string>
