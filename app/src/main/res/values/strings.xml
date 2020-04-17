@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	
-	<!-- Managed by nift4 -->
 
     <string name="app_name">Android Boot Manager</string>
 	<string name="wrong_device_title">Wrong device</string>
