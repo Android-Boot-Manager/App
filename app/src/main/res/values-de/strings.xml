@@ -7,7 +7,7 @@
     <string name="allow_install_unchecked_msg">Es sieht so aus als hättest du nicht auf diese Seite geschaut. Das ist nicht gut!</string>
     <string name="ok">OK</string>
     <string name="cancel">Abbrechen</string>
-    <string name="installing_title">Installiere..</string>
+    <string name="installing_title">Installiere...</string>
     <string name="installing_msg">Installiere, bitte warten...</string>
     <string name="current_rom_name">Name des installierten ROMs</string>
     <string name="path_lk2nd">Pfad zur lk2nd.img</string>
@@ -22,7 +22,7 @@
     <string name="readme">README</string>
     <string name="source">Quellcode</string>
     <string name="license">Lizenz</string>
-    <string name="nodevcheck">Geräte-Check überspringen</string>
+    <string name="nodevcheck">Geräte-Check überspringen (falls du das Gerät fälscht)</string>
     <string name="allow_install">Ich akzeptiere das Risiko, Installation erlauben!</string>
     <string name="not_installed">Die Android-Startverwaltung ist nicht installiert.</string>
     <string name="devices">Die Android-Startverwaltung ist nur für Moto G5 (cedric) verfügbar.</string>
