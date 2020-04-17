@@ -11,7 +11,9 @@
 
 <p align="center">
 
-  [![Crowdin](https://badges.crowdin.net/android-boot-manager/localized.svg)](https://crowdin.com/project/android-boot-manager)
+  <a href="https://crowdin.com/project/android-boot-manager">
+    <img src="https://badges.crowdin.net/android-boot-manager/localized.svg" alt="Crowdin"/>
+  </a>
 
   <a href="https://github.com/Android-Boot-Manager/App/actions">
     <img src=""
@@ -30,7 +32,7 @@
 
 <div align="center">
   <sub>Built with ❤︎ by
-  <a href="https://git.io/nift4">nift4</a>, <a href="https://github.com/luka177">Luka Panik</a> and
+  <a href="https://git.io/nift4">nift4</a>, <a href="https://github.com/luka177">Luka Panio</a> and
   <a href="https://github.com/Android-Boot-Manager/App/graphs/contributors">contributors </a>
 </div>
 <br>
