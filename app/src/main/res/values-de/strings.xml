@@ -1,39 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	
-	<!-- Managed by nift4 -->
-
     <string name="app_name">Android-Startverwaltung</string>
-	<string name="wrong_device_title">Inkompatibles Gerät</string>
-	<string name="wrong_device_msg">Die Android-Startverwaltung ist für dieses Gerät (%1$s) nicht verfügbar.</string>
-	<string name="allow_install_unchecked_title">Installation ist nicht erlaubt</string>
-	<string name="allow_install_unchecked_msg">Es sieht so aus als hättest du nicht auf diese Seite geschaut. Das ist nicht gut!</string>
-	<string name="ok">OK</string>
-	<string name="cancel">Abbrechen</string>
-	<string name="installing_title">Installiere..</string>
-	<string name="installing_msg">Installiere, bitte warten...</string>
-	<string name="current_rom_name">Name des installierten ROMs</string>
-	<string name="path_lk2nd">Pfad zur lk2nd.img</string>
-	<string name="install_finish_title">Installation abgeschlossen</string>
-	<string name="install_finish_msg">Rückgabe ist %1$sWenn die Rückgabe ERROR (Fehler) ist ist etwas schiefgelaufen. Bitte flashe den Deinstallierer und sag und in unserer Telegram-Gruppe @andbootmgr bescheid. Bitte bring das Log (/sdcard/abm/install.log) mit! Falls die Rückgabe OK ist war die Installation erfolgreich. Du solltest dein Gerät neustarten.</string>
-	<string name="root">Ich bin Root. Super! :)</string>
-	<string name="no_root">Ich bin NICHT Root. Etwas ist schiefgelaufen!</string>
-	<string name="test_root">Root testen</string>
-	<string name="readme_title">README, Quellcode und Lizenz</string>
-	<string name="readme_text">Der Quellcode ist hier: %1$s\nDas README ist hier:%2$s</string>
-	<string name="install">Installieren</string>
-	<string name="readme">README</string>
-	<string name="source">Quellcode</string>
-	<string name="license">Lizenz</string>
-	<string name="nodevcheck">Geräte-Check überspringen</string>
-	<string name="allow_install">Ich akzeptiere das Risiko, Installation erlauben!</string>
-	<string name="not_installed">Die Android-Startverwaltung ist nicht installiert.</string>
-	<string name="devices">Die Android-Startverwaltung ist nur für Moto G5 (cedric) verfügbar.</string>
-	<string name="be_careful">DU KANNST DEINE DATEN VERLIEREN! DU KANNST DEIN GERÄT ZERSTÖREN! DU KANNST DEINE IMEI VERLIEREN! DU KANNST SOGAR GELD VERLIEREN! NIEMAND IST DAFÜR VERANTWORTLICH AUSSER DU! BENUTZEN AUF EIGENE GEFAHR! SEI VORSICHTIG!</string>
-	<string name="configurator">Konfigurator</string>
-	<string name="mount">Bootset einbinden</string>
-	<string name="umount">Bootset ausbinden</string>
-	<string name="open_configurator">Einbinden falls nötig und Konfigurator öffnen</string>
-	<string name="app_unfinished">Die Android-Startverwaltung ist erfolgreich installiert aber die App ist noch nicht fertig. Nutzlose Knöpfe und leere Seiten sind zu erwarten :(</string>
-
+    <string name="wrong_device_title">Inkompatibles Gerät</string>
+    <string name="wrong_device_msg">Die Android-Startverwaltung ist für dieses Gerät (%1$s) nicht verfügbar.</string>
+    <string name="allow_install_unchecked_title">Installation ist nicht erlaubt</string>
+    <string name="allow_install_unchecked_msg">Es sieht so aus als hättest du nicht auf diese Seite geschaut. Das ist nicht gut!</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="installing_title">Installiere..</string>
+    <string name="installing_msg">Installiere, bitte warten...</string>
+    <string name="current_rom_name">Name des installierten ROMs</string>
+    <string name="path_lk2nd">Pfad zur lk2nd.img</string>
+    <string name="install_finish_title">Installation abgeschlossen</string>
+    <string name="install_finish_msg">Rückgabe ist %1$sWenn die Rückgabe ERROR (Fehler) ist ist etwas schiefgelaufen. Bitte flashe den Deinstallierer und sag und in unserer Telegram-Gruppe @andbootmgr bescheid. Bitte bring das Log (/sdcard/abm/install.log) mit! Falls die Rückgabe OK ist war die Installation erfolgreich. Du solltest dein Gerät neustarten.</string>
+    <string name="root">Ich bin Root. Super! :)</string>
+    <string name="no_root">Ich bin NICHT Root. Etwas ist schiefgelaufen!</string>
+    <string name="test_root">Root testen</string>
+    <string name="readme_title">README, Quellcode und Lizenz</string>
+    <string name="readme_text">Der Quellcode ist hier: %1$s\nDas README ist hier:%2$s</string>
+    <string name="install">Installieren</string>
+    <string name="readme">README</string>
+    <string name="source">Quellcode</string>
+    <string name="license">Lizenz</string>
+    <string name="nodevcheck">Geräte-Check überspringen</string>
+    <string name="allow_install">Ich akzeptiere das Risiko, Installation erlauben!</string>
+    <string name="not_installed">Die Android-Startverwaltung ist nicht installiert.</string>
+    <string name="devices">Die Android-Startverwaltung ist nur für Moto G5 (cedric) verfügbar.</string>
+    <string name="be_careful">DU KANNST DEINE DATEN VERLIEREN! DU KANNST DEIN GERÄT ZERSTÖREN! DU KANNST DEINE IMEI VERLIEREN! DU KANNST SOGAR GELD VERLIEREN! NIEMAND IST DAFÜR VERANTWORTLICH AUSSER DU! BENUTZEN AUF EIGENE GEFAHR! SEI VORSICHTIG!</string>
+    <string name="configurator">Konfigurator</string>
+    <string name="mount">Bootset einbinden</string>
+    <string name="umount">Bootset ausbinden</string>
+    <string name="open_configurator">Einbinden falls nötig und Konfigurator öffnen</string>
+    <string name="app_unfinished">Die Android-Startverwaltung ist erfolgreich installiert aber die App ist noch nicht fertig. Nutzlose Knöpfe und leere Seiten sind zu erwarten :(</string>
 </resources>
