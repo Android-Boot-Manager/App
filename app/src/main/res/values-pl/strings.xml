@@ -3,7 +3,7 @@
     <string name="app_name">Menedżer uruchamiania Androida</string>
     <string name="wrong_device_title">Nieodpowiednie urządzenie</string>
     <string name="wrong_device_msg">Menedżer uruchamiania Androida nie jest dostępny dla tego urządzenia (%1$s).</string>
-    <string name="allow_install_unchecked_title">Nie zaznaczono pozwolenia na instalację.</string>
+    <string name="allow_install_unchecked_title">Nie zaznaczono pozwolenia na instalację</string>
     <string name="allow_install_unchecked_msg">Wygląda na to że nie zajrzałeś na tę stronę. To nie dobrze!</string>
     <string name="ok">OK</string>
     <string name="cancel">Przerwij</string>
