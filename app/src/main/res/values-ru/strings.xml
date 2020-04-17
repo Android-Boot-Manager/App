@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Managed by nift4 -->
+    <string name="app_name">Android Boot Manager</string>
+    <string name="wrong_device_title">Wrong device</string>
+    <string name="wrong_device_msg">Android Boot Manager is not available for this device (%1$s).</string>
+    <string name="allow_install_unchecked_title">Allow install not checked</string>
+    <string name="allow_install_unchecked_msg">It seems that you didn\'t look at this page. That\'s not good!</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="installing_title">Installing...</string>
+    <string name="installing_msg">Installing. Please wait...</string>
+    <string name="current_rom_name">Current ROM name</string>
+    <string name="path_lk2nd">Path to lk2nd.img</string>
+    <string name="install_finish_title">Installation completed</string>
+    <string name="install_finish_msg">Return code is %1$sWhen the Return Code is ERROR, something went wrong. Please flash the uninstaller and ask in our Telegram group @andbootmgr. Don\'t forget the log file at /sdcard/abm/install.log! If the Return Code is OK, the installation was sucessful. You should reboot now.</string>
+    <string name="root">I am root. Fine! :)</string>
+    <string name="no_root">I am NOT root. Something went wrong!</string>
+    <string name="test_root">Test Root</string>
+    <string name="readme_title">README, Source and Licence</string>
+    <string name="readme_text">The source is available here: %1$s\nThe README is available here:%2$s</string>
+    <string name="install">Install</string>
+    <string name="readme">README</string>
+    <string name="source">Source</string>
+    <string name="license">License</string>
+    <string name="nodevcheck">Disable device check (if you spoof fingerprint)</string>
+    <string name="allow_install">I accept the risk, allow installation!</string>
+    <string name="not_installed">Android Boot Manager is not installed on your device!</string>
+    <string name="devices">It is only available for the Moto G5 (cedric)!</string>
+    <string name="be_careful">YOU CAN LOOSE YOUR DATA! YOU CAN BRICK YOUR DEVICE! YOU CAN LOOSE YOUR IMEI (as with anything on cedric)! YOU CAN LOOSE YOUR MONEY! NOBODY IS RESPONSIBLE EXCEPT YOU! DO AT YOUR OWN RISK AND BE CAREFUL!</string>
+    <string name="configurator">Configurator</string>
+    <string name="mount">Mount Bootset</string>
+    <string name="umount">Unmount Bootset</string>
+    <string name="open_configurator">Mount if necessary and open Configurator</string>
+    <string name="app_unfinished">Android Boot Manager is installed sucessfully but the app is not yet finished; blank pages and buttons that do nothing are excepted :(</string>
+</resources>
