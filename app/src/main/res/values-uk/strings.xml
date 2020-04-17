@@ -1,39 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	
-	<!-- Managed by luka177 (lukapanio) -->
-
     <string name="app_name">Android Boot Manager</string>
-	<string name="wrong_device_title">Непідтримуваний пристрій</string>
-	<string name="wrong_device_msg">Android Boot Manager ге доступний для цього приладу (%1$s).</string>
-	<string name="allow_install_unchecked_title">Дозволити інсталяцію не вказано</string>
-	<string name="allow_install_unchecked_msg">Схоже на то, що ви не прочитали інструкцію на сторінці. Це не добре!</string>
-	<string name="ok">OK</string>
-	<string name="cancel">Скасувати</string>
-	<string name="installing_title">Інсталяція триває...</string>
-	<string name="installing_msg">Інсталюється. Зачекайте будь ласка...</string>
-	<string name="current_rom_name">Назва цієї прошивки</string>
-	<string name="path_lk2nd">Шлях до lk2nd.img</string>
-	<string name="install_finish_title">Інсталяція завершена</string>
-	<string name="install_finish_msg">Результат %1$sКоли результат ERROR, щось пішло не так. Будь ласуа прошийте uninstaller деінсталятор і запитайте в нашій Телеграм групі @andbootmgr. Не забудьте лог файл /sdcard/abm/install.log! Якщо результат ОК, інсталяція успішна. Ви мусите перезагрузити пристрій зараз.</string>
-	<string name="root">Я рут, добре :)</string>
-	<string name="no_root">Я НЕ рут. Щось пішло не так!</string>
-	<string name="test_root">Перевірити рут</string>
-	<string name="readme_title">Прочитай мене, ліцензія і вихідні коди</string>
-	<string name="readme_text">Вихідні коди доступні тут: %1$s\nПрочитай мкене доступне тут:%2$s</string>
-	<string name="install">Інсталювати</string>
-	<string name="readme">Прочитай мене</string>
-	<string name="source">Вихідні коди</string>
-	<string name="license">Ліцензія</string>
-	<string name="nodevcheck">Відключити перевірку пристрою (якщо ви підміняєте цифровий відбитк)</string>
-	<string name="allow_install">Я згоден на ризик, дозволити інсталяцію!</string>
-	<string name="not_installed">Android Boot Manager не встановлений на вашому пристрої!</string>
-	<string name="devices">Це доступно тільки для Moto G5 (cedric)!</string>
-	<string name="be_careful">Ви можете втратити свої данні! Ви можете запороти свій пристрій! Ви можете загубити ІМЕІ (як і зі всім на cedric)! Ви можете загубити свої гроші! Ніхто не несе відповідальності за це! Робіть це на свій страх і ризик, ніхто не несе відповідальності за це!</string>
-	<string name="configurator">Настройщик</string>
-	<string name="mount">Змонтувати Bootset</string>
-	<string name="umount">Розмонтувати Bootset</string>
-	<string name="open_configurator">Змонтувати якщо потрібно і відкрити конфігуратор</string>
-	<string name="app_unfinished">Android Boot Manager встановлений успішно але програма ще недописана; порожні сторінки і кнопки, які нічого не роблять передбачені :(</string>
-
+    <string name="wrong_device_title">Непідтримуваний пристрій</string>
+    <string name="wrong_device_msg">Android Boot Manager ге доступний для цього приладу (%1$s).</string>
+    <string name="allow_install_unchecked_title">Дозволити інсталяцію не вказано</string>
+    <string name="allow_install_unchecked_msg">Схоже на то, що ви не прочитали інструкцію на сторінці. Це не добре!</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Скасувати</string>
+    <string name="installing_title">Інсталяція триває...</string>
+    <string name="installing_msg">Інсталюється. Зачекайте будь ласка...</string>
+    <string name="current_rom_name">Назва цієї прошивки</string>
+    <string name="path_lk2nd">Шлях до lk2nd.img</string>
+    <string name="install_finish_title">Інсталяція завершена</string>
+    <string name="install_finish_msg">Результат %1$sКоли результат ERROR, щось пішло не так. Будь ласуа прошийте uninstaller деінсталятор і запитайте в нашій Телеграм групі @andbootmgr. Не забудьте лог файл /sdcard/abm/install.log! Якщо результат ОК, інсталяція успішна. Ви мусите перезагрузити пристрій зараз.</string>
+    <string name="root">Я рут, добре :)</string>
+    <string name="no_root">Я НЕ рут. Щось пішло не так!</string>
+    <string name="test_root">Перевірити рут</string>
+    <string name="readme_title">Прочитай мене, ліцензія і вихідні коди</string>
+    <string name="readme_text">Вихідні коди доступні тут: %1$s\nПрочитай мкене доступне тут:%2$s</string>
+    <string name="install">Інсталювати</string>
+    <string name="readme">Прочитай мене</string>
+    <string name="source">Вихідні коди</string>
+    <string name="license">Ліцензія</string>
+    <string name="nodevcheck">Відключити перевірку пристрою (якщо ви підміняєте цифровий відбитк)</string>
+    <string name="allow_install">Я згоден на ризик, дозволити інсталяцію!</string>
+    <string name="not_installed">Android Boot Manager не встановлений на вашому пристрої!</string>
+    <string name="devices">Це доступно тільки для Moto G5 (cedric)!</string>
+    <string name="be_careful">Ви можете втратити свої данні! Ви можете запороти свій пристрій! Ви можете загубити ІМЕІ (як і зі всім на cedric)! Ви можете загубити свої гроші! Ніхто не несе відповідальності за це! Робіть це на свій страх і ризик, ніхто не несе відповідальності за це!</string>
+    <string name="configurator">Настройщик</string>
+    <string name="mount">Змонтувати Bootset</string>
+    <string name="umount">Розмонтувати Bootset</string>
+    <string name="open_configurator">Змонтувати якщо потрібно і відкрити конфігуратор</string>
+    <string name="app_unfinished">Android Boot Manager встановлений успішно але програма ще недописана; порожні сторінки і кнопки, які нічого не роблять передбачені :(</string>
 </resources>
