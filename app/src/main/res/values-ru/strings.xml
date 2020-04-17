@@ -9,7 +9,7 @@
     <string name="cancel">Отмена</string>
     <string name="installing_title">Идёт установка...</string>
     <string name="installing_msg">Идёт установка. Пожалуйста, подождите...</string>
-    <string name="current_rom_name">Название текущего ROM</string>
+    <string name="current_rom_name">Название текущей прошивки</string>
     <string name="path_lk2nd">Путь к lk2nd.img</string>
     <string name="install_finish_title">Установка завершена</string>
     <string name="install_finish_msg">Код возврата - %1$sКогда код возврата равен \"ERROR\", что-то пошло не так. Пожалуйста, прошейте деинсталлятор и сообщите нам об этом в Telegram группе @andbootmgr. Не забудьте прикрепить логи по пути /sdcard/abm/install.log! Если код возврата равен \"OK\", установка прошла успешно. Теперь вы должны перезагрузиться.</string>
@@ -26,7 +26,7 @@
     <string name="allow_install">Я понимаю риски, разрешить установку!</string>
     <string name="not_installed">Android Boot Manager не установлен на вашем устройстве!</string>
     <string name="devices">Android Boot Manager доступен только для Moto G5 (cedric)!</string>
-    <string name="be_careful">ВЫ МОЖЕТЕ ПОТЕРЯТЬ СВОИ ДАННЫЕ! ВЫ МОЖЕТЕ БРИКНУТЬ СВОЁ УСТРОЙСТВО! ВЫ МОЖЕТЕ ПОТЕРЯТЬ СВОЙ IMEI (как и со всем на cedric)! ВЫ МОЖЕТЕ ПОТЕРЯТЬ СВОИ ДЕНЬГИ! ТОЛЬКО ВЫ НЕСЁТЕ ОТВЕТСТВЕННОСТЬ ЗА СВОИ ДЕЙСТВИЯ! ВЫПОЛНЯЙТЕ НА СВОЙ СТРАХ И РИСК!</string>
+    <string name="be_careful">ВЫ МОЖЕТЕ ПОТЕРЯТЬ СВОИ ДАННЫЕ! ВЫ МОЖЕТЕ \"БРИКНУТЬ\" СВОЁ УСТРОЙСТВО! ВЫ МОЖЕТЕ ПОТЕРЯТЬ СВОЙ IMEI (как и со всем на cedric)! ВЫ МОЖЕТЕ ПОТЕРЯТЬ СВОИ ДЕНЬГИ! ТОЛЬКО ВЫ НЕСЁТЕ ОТВЕТСТВЕННОСТЬ ЗА СВОИ ДЕЙСТВИЯ! ВЫПОЛНЯЙТЕ НА СВОЙ СТРАХ И РИСК!</string>
     <string name="configurator">Конфигуратор</string>
     <string name="mount">Смонтировать Bootset</string>
     <string name="umount">Отмонтировать Bootset</string>
