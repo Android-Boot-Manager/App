@@ -16,7 +16,7 @@
   </a>
 
   <a href="https://github.com/Android-Boot-Manager/App/actions">
-    <img src=""
+    <img src="https://github.com/android-boot-manager/app/workflows/Android%20CI/badge.svg"
       alt="CI Status" />
   </a>
 </p>
