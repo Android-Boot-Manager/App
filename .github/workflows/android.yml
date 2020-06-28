@@ -14,9 +14,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Download submodules
-      run: ./buildscripts/checkout-submodules.sh
+      run: ./buildutils/clone-submodules.sh
     - name: Update submodules
-      run: ./buildscripts/update-submodules.sh
+      run: ./buildutils/update-submodules.sh
     - name: set up JDK 1.8
       uses: actions/setup-java@v1
       with:
@@ -25,5 +25,5 @@ jobs:
       run: ./gradlew build
     - uses: actions/upload-artifact@v1
       with:
-        name: apks.zip
+        name: apks
         path: app/build/outputs/apk/
