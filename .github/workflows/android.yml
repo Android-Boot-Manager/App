@@ -21,7 +21,6 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
-    - run: git log | cat
     - name: Build with Gradle
       run: ./gradlew build
     - uses: actions/upload-artifact@v1
