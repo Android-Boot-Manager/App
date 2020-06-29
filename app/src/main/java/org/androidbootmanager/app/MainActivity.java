@@ -238,7 +238,7 @@ public class MainActivity extends AppCompatActivity
 	public void showLic(View v) {
 		new AlertDialog.Builder(this)
 		.setTitle(R.string.readme_title)
-		.setMessage(getResources().getString(R.string.readme_text,"https://github.com/Android-Boot-Manager","https://github.com/Android-Boot-Manager/App/wiki")+"\n\n   Copyright 2020 The Android Boot Manager Project\nLicensed under the Apache License, Version 2.0 (the \"License\");\nyou may not use this file except in compliance with the License.\nYou may obtain a copy of the License at\n\nhttp://www.apache.org/licenses/LICENSE-2.0\n\nUnless required by applicable law or agreed to in writing, software\ndistributed under the License is distributed on an \"AS IS\" BASIS,\nWITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\nSee the License for the specific language governing permissions and\nlimitations under the License.")
+		.setMessage(getResources().getString(R.string.readme_text,"https://github.com/Android-Boot-Manager","https://github.com/Android-Boot-Manager/App/wiki")+"\n\n   Copyright 2020 The Android Boot Manager Project\nLicensed under the GNU General Public License Version 3 or later\n\nUnless required by applicable law or agreed to in writing, software\ndistributed under the License is distributed on an \"AS IS\" BASIS,\nWITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\nSee the License for the specific language governing permissions and\nlimitations under the License.")
 		.show();
 	}
 	public void testRoot(View v) {
