@@ -11,10 +11,21 @@ android {
         versionCode 9
         versionName "0.0.8"
     }
+    signingConfigs {
+        release {
+            if (project.hasProperty('ABM_RELEASE_KEY_ALIAS')) {
+                storeFile file(RELEASE_STORE_FILE)
+                storePassword RELEASE_STORE_PASSWORD
+                keyAlias ABM_RELEASE_KEY_ALIAS
+                keyPassword ABM_RELEASE_KEY_PASSWORD
+            }
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+	    signingConfig signingConfigs.release
         }
     }
     compileOptions {
