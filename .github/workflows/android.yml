@@ -23,6 +23,8 @@ jobs:
         java-version: 1.8
     - name: Build with Gradle
       run: ./gradlew build
+    - name: Prepare to sign apk
+      run: mkdir app/build/outputs/apk/release && cp app/build/outputs/apk/app-release-unsigned.apk app/build/outputs/apk/release/
     - name: Sign APK
       uses: r0adkll/sign-android-release@v1
       with:
@@ -32,7 +34,7 @@ jobs:
         keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
         keyPassword: ${{ secrets.KEY_PASSWORD }}
     - name: Copy signed apk to the right place
-      run: cp $SIGNED_RELEASE_FILE app/build/outputs/app-final.apk
+      run: cp $SIGNED_RELEASE_FILE app/build/outputs/apk/app-final.apk
     - uses: actions/upload-artifact@v1
       with:
         name: apks
