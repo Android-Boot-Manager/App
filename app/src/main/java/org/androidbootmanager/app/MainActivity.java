@@ -27,12 +27,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
 import android.view.WindowManager;
 import android.support.v4.content.ContextCompat;
+import android.net.Uri;
 
 public class MainActivity extends AppCompatActivity 
 {
 	File filedir = new File("/data/data/org.androidbootmanager.app/files");
 	File cfgfile = new File("/data/abm-part.cfg");
 	File assetsdir = new File(filedir + "/../assets");
+	String romname = "null";
+	ProgressDialog progdialog;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -68,7 +71,7 @@ public class MainActivity extends AppCompatActivity
 	}
 	
 	public void doInstall(View v){
-		if((!android.os.Build.DEVICE.equals("cedric"))&&(!((Switch) findViewById(R.id.mainnotinstallSwitch1)).isChecked())){new AlertDialog.Builder(this).setCancelable(true).setTitle(R.string.wrong_device_msg).setMessage(getResources().getString(R.string.wrong_device_msg, android.os.Build.DEVICE)).show(); return;}
+		if((!(android.os.Build.DEVICE.equals("cedric")||android.os.Build.DEVICE.equals("yggdrasil")))&&(!((Switch) findViewById(R.id.mainnotinstallSwitch1)).isChecked())){new AlertDialog.Builder(this).setCancelable(true).setTitle(R.string.wrong_device_msg).setMessage(getResources().getString(R.string.wrong_device_msg, android.os.Build.DEVICE)).show(); return;}
 		if (!((CheckBox) findViewById(R.id.mainnotinstallCheckBox1)).isChecked()) {
 			new AlertDialog.Builder(this)
 			.setCancelable(true)
@@ -77,13 +80,13 @@ public class MainActivity extends AppCompatActivity
 			.show();
 			return;
 		}
-		final ProgressDialog dialog = new ProgressDialog(this);
-		dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		dialog.setTitle(R.string.installing_title);
-		dialog.setMessage(getResources().getString(R.string.installing_msg));
-		dialog.setIndeterminate(true);
-		dialog.setCanceledOnTouchOutside(false);
-		dialog.setCancelable(false);
+		progdialog = new ProgressDialog(this);
+		progdialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		progdialog.setTitle(R.string.installing_title);
+		progdialog.setMessage(getResources().getString(R.string.installing_msg));
+		progdialog.setIndeterminate(true);
+		progdialog.setCanceledOnTouchOutside(false);
+		progdialog.setCancelable(false);
 		final EditText input = new EditText(this);
 		final EditText input2 = new EditText(this);
 		AlertDialog.Builder builder = new AlertDialog.Builder(this).setTitle(R.string.current_rom_name);
@@ -92,40 +95,12 @@ public class MainActivity extends AppCompatActivity
 		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() { 
 				@Override
 				public void onClick(DialogInterface dialogif, int which) {
-					final String romname = input.getText().toString();
-					AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this).setTitle(R.string.path_lk2nd);
-					input2.setInputType(InputType.TYPE_CLASS_TEXT);
-					builder.setView(input2);
-					builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() { 
-							@Override
-							public void onClick(DialogInterface dialogif, int which) {
-								final String path = input2.getText().toString();
-								dialog.show();
-								new AsyncTask(){
-									@Override
-									protected Object doInBackground(Object[] p1)
-									{
-										copyAssets();
-										return doRoot(assetsdir + "/app_install.sh '" + path + "' '" + romname + "'");
-									}
-									@Override
-									protected void onPostExecute(Object r) {
-										dialog.dismiss();
-										new AlertDialog.Builder(MainActivity.this)
-											.setTitle(R.string.install_finish_title)
-											.setMessage(getResources().getString(R.string.install_finish_msg,(String)r))
-											.show();
-									}
-								}.execute();
-							}
-						});
-					builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								dialog.cancel();
-							}
-						});
-					builder.show();
+					romname = input.getText().toString();
+					Intent intent = new Intent();
+					intent.setType("*/*");
+					intent.setAction(Intent.ACTION_GET_CONTENT);
+					startActivityForResult(intent,5207);
+
 				}
 			});
 		builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -137,6 +112,48 @@ public class MainActivity extends AppCompatActivity
 
 		builder.show();
 	}
+
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode == RESULT_OK) {
+			if (requestCode == 5207) {
+				Uri selectedUri = data.getData();
+				try {
+					InputStream initialStream = getContentResolver().openInputStream(selectedUri);
+					File targetFile = new File("/data/data/org.androidbootmanager.app/files/lk2nd.img");
+					OutputStream outStream = new FileOutputStream(targetFile);
+					copyFile(initialStream, outStream);
+					initialStream.close();
+					outStream.close();
+				} catch (IOException e) {
+					progdialog.dismiss();
+					new AlertDialog.Builder(MainActivity.this)
+							.setTitle(R.string.install_finish_title)
+							.setMessage(getResources().getString(R.string.install_finish_msg,"error_cpfail"))
+							.show();
+					return;
+				}
+
+				progdialog.show();
+				new AsyncTask(){
+					@Override
+					protected Object doInBackground(Object[] p1)
+					{
+						copyAssets();
+						return doRoot(assetsdir + "/app_install.sh '" + "/data/data/org.androidbootmanager.app/files/lk2nd.img" + "' '" + romname + "'");
+					}
+					@Override
+					protected void onPostExecute(Object r) {
+						progdialog.dismiss();
+						new AlertDialog.Builder(MainActivity.this)
+								.setTitle(R.string.install_finish_title)
+								.setMessage(getResources().getString(R.string.install_finish_msg,(String)r))
+								.show();
+					}
+				}.execute();
+			}
+		}
+	}
+
 	
 	private void copyAssets() {
 		File x = new File(assetsdir, "Toolkit");
