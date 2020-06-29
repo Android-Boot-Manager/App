@@ -35,7 +35,13 @@ jobs:
         keyPassword: ${{ secrets.KEY_PASSWORD }}
     - name: Copy signed apk to the right place
       run: cp $SIGNED_RELEASE_FILE app/build/outputs/apk/app-final.apk
-    - uses: actions/upload-artifact@v1
+    - name: Upload apks (1/2)
+      uses: actions/upload-artifact@v2
       with:
-        name: apks
+        name: other_apks
         path: app/build/outputs/apk/
+    - name: Upload apks (2/2)
+      uses: actions/upload-artifact@v2
+      with:
+        name: app-final.apk
+        path: app/build/outputs/apk/app-final.apk
