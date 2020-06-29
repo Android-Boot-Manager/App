@@ -14,8 +14,8 @@ android {
     signingConfigs {
         release {
             if (project.hasProperty('ABM_RELEASE_KEY_ALIAS')) {
-                storeFile file(RELEASE_STORE_FILE)
-                storePassword RELEASE_STORE_PASSWORD
+                storeFile file(ABM_RELEASE_STORE_FILE)
+                storePassword ABM_RELEASE_STORE_PASSWORD
                 keyAlias ABM_RELEASE_KEY_ALIAS
                 keyPassword ABM_RELEASE_KEY_PASSWORD
             }
