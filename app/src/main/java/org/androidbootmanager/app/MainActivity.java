@@ -28,6 +28,9 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.support.v4.content.ContextCompat;
 import android.net.Uri;
+import static org.androidbootmanager.app.Shell.doShell;
+import static org.androidbootmanager.app.Shell.doRoot;
+import static org.androidbootmanager.app.Shell.doRootGlobal;
 
 public class MainActivity extends AppCompatActivity 
 {
@@ -254,70 +257,5 @@ public class MainActivity extends AppCompatActivity
 					.show();
 			}
 		}.execute();
-	}
-	
-	public String doRootGlobal(String cmd) {
-		File x = new File("/data/data/org.androidbootmanager.app/files/_runw.sh");
-		try{if(!x.exists())x.createNewFile();}catch (IOException e){throw new RuntimeException(e);}
-		x.setExecutable(true);
-		try{
-			PrintWriter w = new PrintWriter(x);
-			w.write("#!/system/bin/sh\n" + cmd);
-			w.flush();
-			w.close();
-		}catch (IOException e){throw new RuntimeException(e);}
-		return doRoot("su -M -c '/data/data/org.androidbootmanager.app/files/_runw.sh'");
-	}
-	
-	public String doRoot(String cmd) {
-		File x = new File("/data/data/org.androidbootmanager.app/files/_run.sh");
-		try{if(!x.exists())x.createNewFile();}catch (IOException e){throw new RuntimeException(e);}
-		x.setExecutable(true);
-		try{
-			PrintWriter w = new PrintWriter(x);
-			w.write("#!/system/bin/sh\n" + cmd);
-			w.flush();
-			w.close();
-		}catch (IOException e){throw new RuntimeException(e);}
-		return doShell("su -c '/data/data/org.androidbootmanager.app/files/_run.sh'");
-	}
-	
-	public String doShell(String cmd) {
-		Process p;
-		try
-		{
-			p = Runtime.getRuntime().exec(cmd);
-		}
-		catch (IOException e)
-		{
-			throw new RuntimeException(e);
-		}
-		try
-		{
-			p.waitFor();
-		}
-		catch (InterruptedException e)
-		{
-			throw new RuntimeException(e);
-		}
-
-
-		BufferedReader reader = 
-			new BufferedReader(new InputStreamReader(p.getInputStream()));
-
-		String line = "";
-		String out = "";
-		try
-		{
-			while ((line = reader.readLine()) != null)
-			{
-				out += line + "\n";
-			}
-		}
-		catch (IOException e)
-		{
-			throw new RuntimeException(e);
-		}
-		return out;
 	}
 }

@@ -13,9 +13,49 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
 import android.view.WindowManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.Fragment;
+import java.util.List;
+import android.support.v4.app.FragmentManager;
+import java.util.ArrayList;
+import android.support.annotation.Nullable;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.LayoutInflater;
 
 public class ConfiguratorActivity extends AppCompatActivity
 {
+	
+	public class TabAdapter extends FragmentStatePagerAdapter {
+		private final List<Fragment> flist = new ArrayList<>();
+		private final List<String> tlist = new ArrayList<>();
+
+		TabAdapter(FragmentManager fm) {
+			super(fm);
+		}
+
+		@Override
+		public Fragment getItem(int position) {
+			return flist.get(position);
+		}
+
+		public void addFragment(Fragment fragment, String title) {
+			flist.add(fragment);
+			tlist.add(title);
+		}
+
+		@Nullable
+		@Override
+		public CharSequence getPageTitle(int position) {
+			return tlist.get(position);
+		}
+
+		@Override
+		public int getCount() {
+			return flist.size();
+		}
+	} 
+	
 	public File filedir = new File("/data/data/org.androidbootmanager.app/files");
 	public File assetsdir = new File(filedir + "/../assets");
 	private TabLayout tabLayout;
@@ -34,74 +74,9 @@ public class ConfiguratorActivity extends AppCompatActivity
 		viewPager = (ViewPager) findViewById(R.id.viewPager);
 		tabLayout = (TabLayout) findViewById(R.id.tabLayout);
 		adapter = new TabAdapter(getSupportFragmentManager());
-		adapter.addFragment(new RomTabFragment(), "ROMs");
-		adapter.addFragment(new ThemeTabFragment(), "Themes");
+		BaseFragment.registerTabs(adapter);
 		viewPager.setAdapter(adapter);
 		tabLayout.setupWithViewPager(viewPager);
 	}
-	
-	public String doRootGlobal(String cmd) {
-		File x = new File("/data/data/org.androidbootmanager.app/files/_runw.sh");
-		try{if(!x.exists())x.createNewFile();}catch (IOException e){throw new RuntimeException(e);}
-		x.setExecutable(true);
-		try{
-			PrintWriter w = new PrintWriter(x);
-			w.write("#!/system/bin/sh\n" + cmd);
-			w.flush();
-			w.close();
-		}catch (IOException e){throw new RuntimeException(e);}
-		return doRoot("su -M -c '/data/data/org.androidbootmanager.app/files/_runw.sh'");
-	}
-	
-	public String doRoot(String cmd) {
-		File x = new File("/data/data/org.androidbootmanager.app/files/_run.sh");
-		try{if(!x.exists())x.createNewFile();}catch (IOException e){throw new RuntimeException(e);}
-		x.setExecutable(true);
-		try{
-			PrintWriter w = new PrintWriter(filedir + "/_run.sh");
-			w.write("#!/system/bin/sh\n" + cmd);
-			w.flush();
-			w.close();
-		}catch (IOException e){throw new RuntimeException(e);}
-		return doShell("su -c '/data/data/org.androidbootmanager.app/files/_run.sh'");
-	}
 
-	public String doShell(String cmd) {
-		Process p;
-		try
-		{
-			p = Runtime.getRuntime().exec(cmd);
-		}
-		catch (IOException e)
-		{
-			throw new RuntimeException(e);
-		}
-		try
-		{
-			p.waitFor();
-		}
-		catch (InterruptedException e)
-		{
-			throw new RuntimeException(e);
-		}
-
-
-		BufferedReader reader = 
-			new BufferedReader(new InputStreamReader(p.getInputStream()));
-
-		String line = "";
-		String out = "";
-		try
-		{
-			while ((line = reader.readLine()) != null)
-			{
-				out += line + "\n";
-			}
-		}
-		catch (IOException e)
-		{
-			throw new RuntimeException(e);
-		}
-		return out;
-	}
 }
