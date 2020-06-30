@@ -15,8 +15,7 @@
 		app:layout_scrollFlags="scroll|enterAlways"
 		app:theme="@style/MyToolbarTheme"
 		app:title="@string/app_name"/>
-	
-	
+
 	<Button
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"

@@ -31,6 +31,9 @@ import android.net.Uri;
 import static org.androidbootmanager.app.Shell.doShell;
 import static org.androidbootmanager.app.Shell.doRoot;
 import static org.androidbootmanager.app.Shell.doRootGlobal;
+import java.util.ArrayList;
+import android.widget.RadioButton;
+import android.widget.ArrayAdapter;
 
 public class MainActivity extends AppCompatActivity 
 {
@@ -38,6 +41,7 @@ public class MainActivity extends AppCompatActivity
 	File cfgfile = new File("/data/abm-part.cfg");
 	File assetsdir = new File(filedir + "/../assets");
 	String romname = "null";
+	String currentDevice;
 	ProgressDialog progdialog;
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -45,8 +49,16 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
 		if (!filedir.exists()) filedir.mkdir();
 		if (!assetsdir.exists()) assetsdir.mkdir();
-		doRoot("/data/data/org.androidbootmanager.app/assets/app_is_installed.sh");
-		copyAssets();
+		try
+		{ copyAssets(); doRoot("/data/data/org.androidbootmanager.app/assets/app_is_installed.sh");}
+		catch (RuntimeException e)
+		{e.printStackTrace(); new AlertDialog.Builder(this).setCancelable(true).setOnCancelListener(new DialogInterface.OnCancelListener(){
+					@Override
+					public void onCancel(DialogInterface p1)
+					{
+						MainActivity.this.finish();
+					}
+				}).setTitle(R.string.fatal).setMessage(R.string.cp_err_msg).show();}
 		Window window = this.getWindow();
 		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -74,7 +86,11 @@ public class MainActivity extends AppCompatActivity
 	}
 	
 	public void doInstall(View v){
-		if((!(android.os.Build.DEVICE.equals("cedric")||android.os.Build.DEVICE.equals("yggdrasil")))&&(!((Switch) findViewById(R.id.mainnotinstallSwitch1)).isChecked())){new AlertDialog.Builder(this).setCancelable(true).setTitle(R.string.wrong_device_msg).setMessage(getResources().getString(R.string.wrong_device_msg, android.os.Build.DEVICE)).show(); return;}
+		ArrayList<String> deviceList = new ArrayList<String>();
+		deviceList.add("cedric");
+		deviceList.add("yggdrasil");
+		currentDevice = android.os.Build.DEVICE;
+		if((!(deviceList.contains(android.os.Build.DEVICE)))&&(!((Switch) findViewById(R.id.mainnotinstallSwitch1)).isChecked())){new AlertDialog.Builder(this).setCancelable(true).setTitle(R.string.wrong_device_msg).setMessage(getResources().getString(R.string.wrong_device_msg, android.os.Build.DEVICE)).show(); return;}
 		if (!((CheckBox) findViewById(R.id.mainnotinstallCheckBox1)).isChecked()) {
 			new AlertDialog.Builder(this)
 			.setCancelable(true)
@@ -91,18 +107,37 @@ public class MainActivity extends AppCompatActivity
 		progdialog.setCanceledOnTouchOutside(false);
 		progdialog.setCancelable(false);
 		final EditText input = new EditText(this);
-		final EditText input2 = new EditText(this);
-		AlertDialog.Builder builder = new AlertDialog.Builder(this).setTitle(R.string.current_rom_name);
+		final AlertDialog.Builder builder = new AlertDialog.Builder(this).setTitle(R.string.current_rom_name);
 		input.setInputType(InputType.TYPE_CLASS_TEXT);
 		builder.setView(input);
 		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() { 
 				@Override
 				public void onClick(DialogInterface dialogif, int which) {
 					romname = input.getText().toString();
-					Intent intent = new Intent();
-					intent.setType("*/*");
-					intent.setAction(Intent.ACTION_GET_CONTENT);
-					startActivityForResult(intent,5207);
+					new AlertDialog.Builder(MainActivity.this)
+					.setTitle(R.string.select_droidboot_title)
+					.setMessage(R.string.select_droidboot_msg)
+					.setCancelable(true)
+						.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener(){
+
+							@Override
+							public void onClick(DialogInterface p1, int p2)
+							{
+								p1.dismiss();
+							}
+						})
+						.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener(){
+
+							@Override
+							public void onClick(DialogInterface p1, int p2)
+							{
+								Intent intent = new Intent();
+								intent.setType("*/*");
+								intent.setAction(Intent.ACTION_GET_CONTENT);
+								startActivityForResult(intent,5207);
+							}
+						})
+					.show();
 
 				}
 			});
@@ -112,47 +147,84 @@ public class MainActivity extends AppCompatActivity
 					dialog.cancel();
 				}
 			});
-
-		builder.show();
+		if (((Switch)findViewById(R.id.mainnotinstallSwitch1)).isChecked()) {
+			final ArrayAdapter<String> arr = new ArrayAdapter<String>(this,android.R.layout.select_dialog_singlechoice);
+			arr.add("cedric");
+			arr.add("yggdrasil");
+			new AlertDialog.Builder(this)
+			.setTitle(R.string.choose_device)
+				.setAdapter(arr, new DialogInterface.OnClickListener(){
+					@Override
+					public void onClick(DialogInterface p1, int p2)
+					{
+						p1.dismiss();
+						String device = arr.getItem(p2);
+						currentDevice = device;
+						builder.show();
+					}
+				})
+			.show();
+		} else {
+			builder.show();
+		}
 	}
 
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+	public void onActivityResult(int requestCode, int resultCode, final Intent data) {
 		if (resultCode == RESULT_OK) {
 			if (requestCode == 5207) {
-				Uri selectedUri = data.getData();
-				try {
-					InputStream initialStream = getContentResolver().openInputStream(selectedUri);
-					File targetFile = new File("/data/data/org.androidbootmanager.app/files/lk2nd.img");
-					OutputStream outStream = new FileOutputStream(targetFile);
-					copyFile(initialStream, outStream);
-					initialStream.close();
-					outStream.close();
-				} catch (IOException e) {
-					progdialog.dismiss();
-					new AlertDialog.Builder(MainActivity.this)
-							.setTitle(R.string.install_finish_title)
-							.setMessage(getResources().getString(R.string.install_finish_msg,"error_cpfail"))
-							.show();
-					return;
-				}
+				new AlertDialog.Builder(this)
+				.setTitle(R.string.sure_title)
+				.setMessage(R.string.sure_msg)
+				.setCancelable(true)
+					.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener(){
 
-				progdialog.show();
-				new AsyncTask(){
-					@Override
-					protected Object doInBackground(Object[] p1)
-					{
-						copyAssets();
-						return doRoot(assetsdir + "/app_install.sh '" + "/data/data/org.androidbootmanager.app/files/lk2nd.img" + "' '" + romname + "'");
-					}
-					@Override
-					protected void onPostExecute(Object r) {
-						progdialog.dismiss();
-						new AlertDialog.Builder(MainActivity.this)
-								.setTitle(R.string.install_finish_title)
-								.setMessage(getResources().getString(R.string.install_finish_msg,(String)r))
-								.show();
-					}
-				}.execute();
+						@Override
+						public void onClick(DialogInterface p1, int p2)
+						{
+							p1.dismiss();
+						}
+					})
+					.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener(){
+
+						@Override
+						public void onClick(DialogInterface p1, int p2)
+						{
+							progdialog.show();
+							Uri selectedUri = data.getData();
+							try {
+								InputStream initialStream = getContentResolver().openInputStream(selectedUri);
+								File targetFile = new File("/data/data/org.androidbootmanager.app/files/lk2nd.img");
+								OutputStream outStream = new FileOutputStream(targetFile);
+								copyFile(initialStream, outStream);
+								initialStream.close();
+								outStream.close();
+							} catch (IOException e) {
+								progdialog.dismiss();
+								new AlertDialog.Builder(MainActivity.this)
+									.setTitle(R.string.install_finish_title)
+									.setMessage(getResources().getString(R.string.install_finish_msg,"error_cpfail"))
+									.show();
+								return;
+							}
+							new AsyncTask(){
+								@Override
+								protected Object doInBackground(Object[] p1)
+								{
+									copyAssets();
+									return doRoot(assetsdir + "/app_install.sh '" + "/data/data/org.androidbootmanager.app/files/lk2nd.img" + "' '" + romname + "'");
+								}
+								@Override
+								protected void onPostExecute(Object r) {
+									progdialog.dismiss();
+									new AlertDialog.Builder(MainActivity.this)
+										.setTitle(R.string.install_finish_title)
+										.setMessage(getResources().getString(R.string.install_finish_msg,(String)r))
+										.show();
+								}
+							}.execute();
+						}
+					})
+				.show();
 			}
 		}
 	}
