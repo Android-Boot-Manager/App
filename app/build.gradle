@@ -8,7 +8,7 @@ android {
         applicationId "org.androidbootmanager.app"
         minSdkVersion 25
         targetSdkVersion 25
-        versionCode 00900
+        versionCode 900
         versionName "0.0.9"
     }
     signingConfigs {
