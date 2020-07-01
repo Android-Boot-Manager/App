@@ -1,31 +1,22 @@
 package org.androidbootmanager.app;
 
-import android.app.Activity;
 import android.os.Bundle;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
 import android.view.WindowManager;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.app.Fragment;
-import java.util.List;
-import android.support.v4.app.FragmentManager;
+import java.io.File;
 import java.util.ArrayList;
-import android.support.annotation.Nullable;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.LayoutInflater;
+import java.util.List;
 
-public class ConfiguratorActivity extends AppCompatActivity
-{
-	
+public class ConfiguratorActivity extends AppCompatActivity {
+
 	public class TabAdapter extends FragmentStatePagerAdapter {
 		private final List<Fragment> flist = new ArrayList<>();
 		private final List<String> tlist = new ArrayList<>();
@@ -55,7 +46,7 @@ public class ConfiguratorActivity extends AppCompatActivity
 			return flist.size();
 		}
 	} 
-	
+
 	public File filedir = new File("/data/data/org.androidbootmanager.app/files");
 	public File assetsdir = new File(filedir + "/../assets");
 	private TabLayout tabLayout;
@@ -63,13 +54,12 @@ public class ConfiguratorActivity extends AppCompatActivity
 	private TabAdapter adapter;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState)
-	{
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Window window = this.getWindow();
 		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-		window.setStatusBarColor(ContextCompat.getColor(this,R.color.colorPrimary));
+		window.setStatusBarColor(ContextCompat.getColor(this, R.color.colorPrimary));
 		setContentView(R.layout.cfg);
 		viewPager = (ViewPager) findViewById(R.id.viewPager);
 		tabLayout = (TabLayout) findViewById(R.id.tabLayout);

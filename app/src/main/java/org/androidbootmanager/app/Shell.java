@@ -5,51 +5,44 @@ import java.io.PrintWriter;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
-public class Shell
-{
+public class Shell {
 	public static String doRootGlobal(String cmd) {
 		File x = new File("/data/data/org.androidbootmanager.app/files/_run.sh");
-		try{if(!x.exists())x.createNewFile();}catch (IOException e){throw new RuntimeException(e);}
+		try {if (!x.exists())x.createNewFile();} catch (IOException e) {throw new RuntimeException(e);}
 		x.setExecutable(true);
-		try{
+		try {
 			PrintWriter w = new PrintWriter(x);
 			w.write("#!/system/bin/sh\n" + cmd);
 			w.flush();
 			w.close();
-		}catch (IOException e){throw new RuntimeException(e);}
+		} catch (IOException e) {throw new RuntimeException(e);}
 		return doShell("su -M -c '/data/data/org.androidbootmanager.app/files/_run.sh'");
 	}
-	
+
 	public static String doRoot(String cmd) {
 		File x = new File("/data/data/org.androidbootmanager.app/files/_run.sh");
-		try{if(!x.exists())x.createNewFile();}catch (IOException e){throw new RuntimeException(e);}
+		try {if (!x.exists())x.createNewFile();} catch (IOException e) {throw new RuntimeException(e);}
 		x.setExecutable(true);
-		try{
+		try {
 			PrintWriter w = new PrintWriter(x);
 			w.write("#!/system/bin/sh\n" + cmd);
 			w.flush();
 			w.close();
-		}catch (IOException e){throw new RuntimeException(e);}
+		} catch (IOException e) {throw new RuntimeException(e);}
 		return doShell("su -c '/data/data/org.androidbootmanager.app/files/_run.sh'");
 	}
-	
+
 	public static String doShell(String cmd) {
 		Process p;
-		try
-		{
+		try {
 			p = Runtime.getRuntime().exec(cmd);
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e) {
 			e.printStackTrace();
 			return "exec failed: io exception";
 		}
-		try
-		{
+		try {
 			p.waitFor();
-		}
-		catch (InterruptedException e)
-		{
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 			return "exec failed: waitFor was interrupted";
 		}
@@ -60,15 +53,11 @@ public class Shell
 
 		String line = "";
 		String out = "";
-		try
-		{
-			while ((line = reader.readLine()) != null)
-			{
+		try {
+			while ((line = reader.readLine()) != null) {
 				out += line + "\n";
 			}
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e) {
 			e.printStackTrace();
 			return "exec failed: io exception (write)";
 		}

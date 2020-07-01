@@ -1,9 +1,9 @@
 package org.androidbootmanager.app;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.view.ViewGroup;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.os.Bundle;
+import android.view.ViewGroup;
 
 abstract public class BaseFragment extends Fragment {
 	protected int layout = 0;
@@ -18,7 +18,7 @@ abstract public class BaseFragment extends Fragment {
 		onInit();
 		return inflater.inflate(layout, container, false);
 	}
-	
+
 	public static void registerTabs(ConfiguratorActivity.TabAdapter adapter) {
 		adapter.addFragment(new RomTabFragment(), "ROMs");
 		adapter.addFragment(new ThemeTabFragment(), "Themes");
