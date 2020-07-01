@@ -46,10 +46,3 @@ jobs:
       with:
         name: app-final.apk
         path: app/build/outputs/apk/app-final.apk
-    - name: send custom message
-      env:
-        TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-      run: | 
-        sudo apt-get update
-        sudo apt-get install -y curl
-        curl -s "https://api.telegram.org/bot$TOKEN/sendMessage?chat_id=-1001367413201&text=New app build is ready. Check it here https://github.com/Android-Boot-Manager/App/actions/runs/$GITHUB_RUN_ID"
