@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Android-Startverwaltung</string>
+    <string name="fatal">SCHWERWIEGENDER FEHLER</string>
+    <string name="cp_err_msg">Haben Sie die App auf einer SD-Karte installiert?</string>
     <string name="wrong_device_title">Inkompatibles Gerät</string>
     <string name="wrong_device_msg">Die Android-Startverwaltung ist für dieses Gerät (%1$s) nicht verfügbar.</string>
     <string name="allow_install_unchecked_title">Installation ist nicht erlaubt</string>
@@ -10,7 +12,11 @@
     <string name="installing_title">Installiere...</string>
     <string name="installing_msg">Installiere, bitte warten...</string>
     <string name="current_rom_name">Name des installierten ROMs</string>
-    <string name="path_lk2nd">Pfad zur lk2nd.img</string>
+    <string name="select_droidboot_title">DroidBoot auswählen</string>
+    <string name="select_droidboot_msg">Du wirst nun nach der DroidBoot-Datei gefragt. Stelle sicher, dass sie die richtige für dein Gerät ist!</string>
+    <string name="sure_title">Bist du sicher?</string>
+    <string name="sure_msg">Wenn Sie jetzt OK drücken, wird ABM installiert. Dies ist die letzte Bestätigung!</string>
+    <string name="choose_device">Wählen Sie Ihr Gerät aus</string>
     <string name="install_finish_title">Installation abgeschlossen</string>
     <string name="install_finish_msg">Rückgabe ist %1$sWenn die Rückgabe ERROR (Fehler) ist ist etwas schiefgelaufen. Bitte flashe den Deinstallierer und sag und in unserer Telegram-Gruppe @andbootmgr bescheid. Bitte bring das Log (/sdcard/abm/install.log) mit! Falls die Rückgabe OK ist war die Installation erfolgreich. Du solltest dein Gerät neustarten.</string>
     <string name="root">Ich bin Root. Super! :)</string>
@@ -25,7 +31,7 @@
     <string name="nodevcheck">Geräte-Check überspringen (falls du das Gerät fälscht)</string>
     <string name="allow_install">Ich akzeptiere das Risiko, Installation erlauben!</string>
     <string name="not_installed">Die Android-Startverwaltung ist nicht installiert.</string>
-    <string name="devices">Die Android-Startverwaltung ist nur für Moto G5 (cedric) verfügbar.</string>
+    <string name="devices">Es ist nur für das Moto G5 (cedric) und für das Volla Phone (yggdrasil) verfügbar!</string>
     <string name="be_careful">DU KANNST DEINE DATEN VERLIEREN! DU KANNST DEIN GERÄT ZERSTÖREN! DU KANNST DEINE IMEI VERLIEREN! DU KANNST SOGAR GELD VERLIEREN! NIEMAND IST DAFÜR VERANTWORTLICH AUSSER DU! BENUTZEN AUF EIGENE GEFAHR! SEI VORSICHTIG!</string>
     <string name="configurator">Konfigurator</string>
     <string name="mount">Bootset einbinden</string>
