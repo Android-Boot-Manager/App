@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Android-Startverwaltung</string>
-    <string name="fatal">FATAL ERROR</string>
-    <string name="cp_err_msg">Did you install the app on a SD card?</string>
+    <string name="fatal">SCHWERWIEGENDER FEHLER</string>
+    <string name="cp_err_msg">Haben Sie die App auf einer SD-Karte installiert?</string>
     <string name="wrong_device_title">Inkompatibles Gerät</string>
     <string name="wrong_device_msg">Die Android-Startverwaltung ist für dieses Gerät (%1$s) nicht verfügbar.</string>
     <string name="allow_install_unchecked_title">Installation ist nicht erlaubt</string>
@@ -12,9 +12,9 @@
     <string name="installing_title">Installiere...</string>
     <string name="installing_msg">Installiere, bitte warten...</string>
     <string name="current_rom_name">Name des installierten ROMs</string>
-    <string name="select_droidboot_title">Select DroidBoot</string>
-    <string name="select_droidboot_msg">You will now be asked for the DroidBoot file. Make sure it is the right for your device!</string>
-    <string name="sure_title">Are you sure?</string>
+    <string name="select_droidboot_title">DroidBoot auswählen</string>
+    <string name="select_droidboot_msg">Du wirst nun nach der DroidBoot-Datei gefragt. Stelle sicher, dass sie die richtige für dein Gerät ist!</string>
+    <string name="sure_title">Bist du sicher?</string>
     <string name="sure_msg">If you now press OK, ABM will install. This the last confirmation!</string>
     <string name="choose_device">Choose your device</string>
     <string name="install_finish_title">Installation abgeschlossen</string>
