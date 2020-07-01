@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Android Önyükleme Yöneticisi</string>
+    <string name="fatal">FATAL ERROR</string>
+    <string name="cp_err_msg">Did you install the app on a SD card?</string>
     <string name="wrong_device_title">Yanlış Cihaz</string>
     <string name="wrong_device_msg">Android Önyükleme Yöneticisi bu cihaz için kullanılabilir değil (%1$s).</string>
     <string name="allow_install_unchecked_title">Yüklemeye izin ver kutusunu işaretlemediniz</string>
@@ -10,7 +12,11 @@
     <string name="installing_title">Yükleniyor...</string>
     <string name="installing_msg">Yükleniyor. Lütfen bekleyiniz...</string>
     <string name="current_rom_name">Geçerli ROM ismi</string>
-    <string name="path_lk2nd">lk2nd.img yolu</string>
+    <string name="select_droidboot_title">Select DroidBoot</string>
+    <string name="select_droidboot_msg">You will now be asked for the DroidBoot file. Make sure it is the right for your device!</string>
+    <string name="sure_title">Are you sure?</string>
+    <string name="sure_msg">If you now press OK, ABM will install. This the last confirmation!</string>
+    <string name="choose_device">Choose your device</string>
     <string name="install_finish_title">Yükleme tamamlandı</string>
     <string name="install_finish_msg">Hata mesajı %1$sHata mesajı bir şeylerin ters gittiğini gösterir.Lütfen geri alma dosyasını kurun ve Telegram @andbootmgr grubunda sorun. Sakın /sdcard/abm/install.log log dosyasını unutmayın! Hata Kodu Tamam ise,yükleme başarılı demektir. Cihazınızı yeniden başlatmalısınız.</string>
     <string name="root">Root iznim var. Güzel! :)</string>
@@ -25,7 +31,7 @@
     <string name="nodevcheck">Cihaz desteğini devre dışı bırak (fingerprint normalden farklıysa)</string>
     <string name="allow_install">Riski kabul ediyorum, yüklemeye izin ver!</string>
     <string name="not_installed">Android Önyükleme Yöneticisi cihazınızda yüklü değil!</string>
-    <string name="devices">Sadece Moto G5 (cedric) için kullanılabilir!</string>
+    <string name="devices">It is only available for the Moto G5 (cedric) and for the Volla Phone (yggdrasil)!</string>
     <string name="be_careful">VERİLERİNİZİ KAYBEDEBİLİRSİNİZ! CİHAZINIZI BRICK EDEBILIRSINIZ! IMEI NUMARANIZI KAYBEDEBİLİRSİNİZ (her şeyde olduğu gibi cedric)! PARANIZI KAYBEDEBİLİRSİNZ! SİZ HARİÇ KİMSE SORUMLU DEĞİLDİR! DİKKATLİ OLUN!</string>
     <string name="configurator">Yapılandırıcı</string>
     <string name="mount">Bootset bağla</string>
