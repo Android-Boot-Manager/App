@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Menedżer uruchamiania Androida</string>
-    <string name="fatal">FATAL ERROR</string>
-    <string name="cp_err_msg">Did you install the app on a SD card?</string>
+    <string name="fatal">BŁĄD KRYTYCZNY</string>
+    <string name="cp_err_msg">Czy zainstalowałeś aplikację na karcie SD?</string>
     <string name="wrong_device_title">Nieodpowiednie urządzenie</string>
     <string name="wrong_device_msg">Menedżer uruchamiania Androida nie jest dostępny dla tego urządzenia (%1$s).</string>
     <string name="allow_install_unchecked_title">Nie zaznaczono pozwolenia na instalację</string>
@@ -12,11 +12,11 @@
     <string name="installing_title">Instaluję...</string>
     <string name="installing_msg">Instaluję. Proszę czekać...</string>
     <string name="current_rom_name">Nazwa obecnego ROMu</string>
-    <string name="select_droidboot_title">Select DroidBoot</string>
-    <string name="select_droidboot_msg">You will now be asked for the DroidBoot file. Make sure it is the right for your device!</string>
-    <string name="sure_title">Are you sure?</string>
-    <string name="sure_msg">If you now press OK, ABM will install. This the last confirmation!</string>
-    <string name="choose_device">Choose your device</string>
+    <string name="select_droidboot_title">Wybierz DroidBoot</string>
+    <string name="select_droidboot_msg">Zostaniesz teraz poproszony o plik DroidBoot. Upewnij się, że jest on właściwy dla twojego urządzenia!</string>
+    <string name="sure_title">Na pewno?</string>
+    <string name="sure_msg">Jeśli teraz naciśniesz OK, ABM się zainstaluje. To ostatnie potwierdzenie!</string>
+    <string name="choose_device">Wybierz swoje urządzenie</string>
     <string name="install_finish_title">Instalacja zakończona</string>
     <string name="install_finish_msg">Kod zwrotny to %1$sKiedy kod zwrotny to ERROR, coś poszło nie tak. Zflashuj deinstalator i zapytaj na naszej grupie na Telegramie @andbootmgr. Nie zapomnij o logu w /sdcard/abm/install.log! Jeżeli kod zwrotny to OK, instalacja zakończyła się powodzeniem. Powinieneś zrestartować urządzenie.</string>
     <string name="root">Jestem rootem. Wszystko w porządku! :)</string>
@@ -31,7 +31,7 @@
     <string name="nodevcheck">Wyłącz sprawdzenie modelu urządzenia (jeżeli fałszujesz model urządzenia)</string>
     <string name="allow_install">Akceptuję ryzyko, pozwól na instalację!</string>
     <string name="not_installed">Menedżer uruchamiania Androida nie jest zainstalowany na twoim urządzeniu!</string>
-    <string name="devices">It is only available for the Moto G5 (cedric) and for the Volla Phone (yggdrasil)!</string>
+    <string name="devices">Jest on dostępny tylko dla Moto G5 (cedric) i Volla Phone (yggdrasil)!</string>
     <string name="be_careful">Możesz stracić dane, IMEI lub zbrickować urządzenie. Nikt nie jest odpowiedzialny oprócz ciebie. Wszystko wykonujesz na własne ryzyko. Bądź ostrożny.</string>
     <string name="configurator">Konfigurator</string>
     <string name="mount">Zamontuj Bootset</string>

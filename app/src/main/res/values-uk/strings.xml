@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Менеджер завантаження Android</string>
-    <string name="fatal">FATAL ERROR</string>
-    <string name="cp_err_msg">Did you install the app on a SD card?</string>
+    <string name="fatal">КРИТИЧНА ПОМИЛКА</string>
+    <string name="cp_err_msg">Ви встановили додаток на SD-карту?</string>
     <string name="wrong_device_title">Неправильний пристрій</string>
     <string name="wrong_device_msg">Android Boot Manager не доступний для цього приладу (%1$s).</string>
     <string name="allow_install_unchecked_title">Інсталяція не дозволена</string>
@@ -12,11 +12,11 @@
     <string name="installing_title">Інсталяція...</string>
     <string name="installing_msg">Встановлення. Будь ласка, зачекайте...</string>
     <string name="current_rom_name">Ім\'я поточної прошивки</string>
-    <string name="select_droidboot_title">Select DroidBoot</string>
-    <string name="select_droidboot_msg">You will now be asked for the DroidBoot file. Make sure it is the right for your device!</string>
-    <string name="sure_title">Are you sure?</string>
-    <string name="sure_msg">If you now press OK, ABM will install. This the last confirmation!</string>
-    <string name="choose_device">Choose your device</string>
+    <string name="select_droidboot_title">Виберіть DroidBoot</string>
+    <string name="select_droidboot_msg">Ви повинні вибрати DroidBoot файл. Перевірте чи він для вашого пристрою!</string>
+    <string name="sure_title">Ви впевнені?</string>
+    <string name="sure_msg">Якщо ви натиснете ОК, ABM буде встановлено. Остання перевірка!</string>
+    <string name="choose_device">Виберіть ваш пристрій</string>
     <string name="install_finish_title">Установку завершено</string>
     <string name="install_finish_msg">Результат %1$sКоли результат ERROR, щось пішло не так. Будь ласуа прошийте uninstaller деінсталятор і запитайте в нашій Телеграм групі @andbootmgr. Не забудьте лог файл /sdcard/abm/install.log! Якщо результат ОК, інсталяція успішна. Ви мусите перезагрузити пристрій зараз.</string>
     <string name="root">Я рут, добре :)</string>
@@ -31,7 +31,7 @@
     <string name="nodevcheck">Відключити перевірку пристрою (якщо ви підміняєте цифровий відбиток)</string>
     <string name="allow_install">Я приймаю ризик, дозволю встановлення!</string>
     <string name="not_installed">Менеджер завантаження Android не встановлено на вашому пристрої!</string>
-    <string name="devices">It is only available for the Moto G5 (cedric) and for the Volla Phone (yggdrasil)!</string>
+    <string name="devices">Це доступно лише для Moto G5 (cedric) і Volla Phone (yggdrasil)!</string>
     <string name="be_careful">YOU CAN LOOSE YOUR DATA! YOU CAN BRICK YOUR DEVICE! YOU CAN LOOSE YOUR IMEI (as with anything on cedric)! YOU CAN LOOSE YOUR MONEY! NOBODY IS RESPONSIBLE EXCEPT YOU! DO AT YOUR OWN RISK AND BE CAREFUL!</string>
     <string name="configurator">Настройщик</string>
     <string name="mount">Змонтувати Bootset</string>
