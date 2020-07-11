@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
 		deviceList.add("cedric");
 		deviceList.add("yggdrasil");
 		currentDevice = android.os.Build.DEVICE;
-		if ((!(deviceList.contains(android.os.Build.DEVICE))) && (!((Switch) findViewById(R.id.mainnotinstallSwitch1)).isChecked())) {new AlertDialog.Builder(this).setCancelable(true).setTitle(R.string.wrong_device_msg).setMessage(getResources().getString(R.string.wrong_device_msg, android.os.Build.DEVICE)).show(); return;}
+		if ((!(deviceList.contains(android.os.Build.DEVICE))) && (!((Switch) findViewById(R.id.mainnotinstallSwitch1)).isChecked())) {new AlertDialog.Builder(this).setCancelable(true).setTitle(R.string.wrong_device_title).setMessage(getResources().getString(R.string.wrong_device_msg, android.os.Build.DEVICE)).show(); return;}
 		if (!((CheckBox) findViewById(R.id.mainnotinstallCheckBox1)).isChecked()) {
 			new AlertDialog.Builder(this)
 				.setCancelable(true)
