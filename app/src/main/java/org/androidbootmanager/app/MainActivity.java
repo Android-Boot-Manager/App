@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
 		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() { 
 				@Override
 				public void onClick(DialogInterface dialogif, int which) {
-					romname = input.getText().toString();
+					romname = input.getText().toString(); System.out.println("installing abm for " + currentDevice);
 					new AlertDialog.Builder(MainActivity.this)
 						.setTitle(R.string.select_droidboot_title)
 						.setMessage(R.string.select_droidboot_msg)
@@ -146,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
 					public void onClick(DialogInterface p1, int p2) {
 						p1.dismiss();
 						String device = arr.getItem(p2);
-						currentDevice = device;
+						MainActivity.this.currentDevice = device;
 						builder.show();
 					}
 				})
