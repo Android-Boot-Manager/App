@@ -217,11 +217,14 @@ public class MainActivity extends AppCompatActivity {
 	private void copyAssets() {
 		File x = new File(assetsdir, "Toolkit");
 		File y = new File(assetsdir, "Scripts");
+		File z = new File(assetsdir, "Scripts/install");
 		if (!x.exists())x.mkdir();
 		if (!y.exists())y.mkdir();
+		if (!z.exists())z.mkdir();
 		copyAssets("Toolkit", "Toolkit");
 		copyAssets("Scripts", "Scripts");
-		copyAssets("cp", "");
+		copyAssets("Scripts/install", "Scripts/install");
+		copyAssets("cp", ""); 
 	}
 
 	private void copyAssets(String src, String outp) {
