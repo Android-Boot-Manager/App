@@ -195,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
 								@Override
 								protected Object doInBackground(Object[] p1) {
 									copyAssets();
-									return doRoot(assetsdir + "/app_install.sh '" + romname + "' " + currentDevice);
+									return doRootGlobal(assetsdir + "/app_install.sh '" + romname + "' " + currentDevice);
 								}
 								@Override
 								protected void onPostExecute(Object r) {
