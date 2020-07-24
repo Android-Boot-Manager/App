@@ -26,8 +26,6 @@
     <string name="readme_text">Kaynak burada kullanılabilir%1$s\nBENİOKU burada kullanılabilir:%2$s</string>
     <string name="install">Yükle</string>
     <string name="readme">Beni Oku</string>
-    <string name="source">Kaynak</string>
-    <string name="license">Lisans</string>
     <string name="nodevcheck">Cihaz desteğini devre dışı bırak (fingerprint normalden farklıysa)</string>
     <string name="allow_install">Riski kabul ediyorum, yüklemeye izin ver!</string>
     <string name="not_installed">Android Önyükleme Yöneticisi cihazınızda yüklü değil!</string>
