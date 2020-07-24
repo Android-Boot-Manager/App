@@ -26,8 +26,6 @@
     <string name="readme_text">Kod źródłowy jest dostępny tutaj: %1$s\nPlik README jest dostępny tutaj:%2$s</string>
     <string name="install">Zainstaluj</string>
     <string name="readme">Plik README</string>
-    <string name="source">Kod źródłowy</string>
-    <string name="license">Licencja</string>
     <string name="nodevcheck">Wyłącz sprawdzenie modelu urządzenia (jeżeli fałszujesz model urządzenia)</string>
     <string name="allow_install">Akceptuję ryzyko, pozwól na instalację!</string>
     <string name="not_installed">Menedżer uruchamiania Androida nie jest zainstalowany na twoim urządzeniu!</string>
