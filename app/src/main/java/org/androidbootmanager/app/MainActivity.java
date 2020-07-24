@@ -68,11 +68,11 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	public void mount(View v) {
-		doRootGlobal("mount -t ext4 /dev/block/bootdevice/by-name/oem /data/bootset");
+		doRootGlobal("sh /data/abm-part.cfg");
 	}
 
 	public void unmount(View v) {
-		doRootGlobal("umount /data/bootset");
+		doRootGlobal("sh /data/abm-part.2.cfg");
 	}
 
 	public void doInstall(View v) {
