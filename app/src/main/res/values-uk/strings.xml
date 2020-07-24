@@ -26,8 +26,6 @@
     <string name="readme_text">Джерело доступне тут: %1$s\nREADME доступна тут:%2$s</string>
     <string name="install">Установити</string>
     <string name="readme">README</string>
-    <string name="source">Source</string>
-    <string name="license">Ліцензія</string>
     <string name="nodevcheck">Відключити перевірку пристрою (якщо ви підміняєте цифровий відбиток)</string>
     <string name="allow_install">Я приймаю ризик, дозволю встановлення!</string>
     <string name="not_installed">Менеджер завантаження Android не встановлено на вашому пристрої!</string>
