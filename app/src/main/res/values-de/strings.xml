@@ -26,8 +26,6 @@
     <string name="readme_text">Der Quellcode ist hier: %1$s\nDas README ist hier:%2$s</string>
     <string name="install">Installieren</string>
     <string name="readme">README</string>
-    <string name="source">Quellcode</string>
-    <string name="license">Lizenz</string>
     <string name="nodevcheck">Geräte-Check überspringen (falls du das Gerät fälscht)</string>
     <string name="allow_install">Ich akzeptiere das Risiko, Installation erlauben!</string>
     <string name="not_installed">Die Android-Startverwaltung ist nicht installiert.</string>
