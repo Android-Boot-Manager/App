@@ -21,6 +21,7 @@ abstract public class BaseFragment extends Fragment {
 
 	public static void registerTabs(ConfiguratorActivity.TabAdapter adapter) {
 		adapter.addFragment(new RomTabFragment(), "ROMs");
-		adapter.addFragment(new ThemeTabFragment(), "Themes");
+		adapter.addFragment(new EntryTabFragment(), "Entries");
+		adapter.addFragment(new GeneralTabFragment(), "General");
 	}
 }
