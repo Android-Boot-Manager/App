@@ -27,8 +27,6 @@
 	<string name="readme_text">The source is available here: %1$s\nThe README is available here:%2$s</string>
 	<string name="install">Install</string>
 	<string name="readme">README</string>
-	<string name="source">Source</string>
-	<string name="license">License</string>
 	<string name="nodevcheck">Disable device check (if you spoof fingerprint)</string>
 	<string name="allow_install">I accept the risk, allow installation!</string>
 	<string name="not_installed">Android Boot Manager is not installed on your device!</string>

@@ -37,26 +37,11 @@
 			android:onClick="testRoot"/>
 
 		<Button
-			android:layout_width="wrap_content"
+			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:text="@string/readme"
 			android:layout_toRightOf="@id/mainnotinstallButton1"
 			android:id="@+id/mainnotinstallButton2"
-			android:onClick="showLic"/>
-
-		<Button
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/license"
-			android:layout_toRightOf="@id/mainnotinstallButton2"
-			android:id="@+id/mainnotinstallButton3"
-			android:onClick="showLic"/>
-
-		<Button
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/source"
-			android:layout_toRightOf="@id/mainnotinstallButton3"
 			android:onClick="showLic"/>
 
 	</RelativeLayout>
