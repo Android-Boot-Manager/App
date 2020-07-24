@@ -26,8 +26,6 @@
     <string name="readme_text">Исходный код доступен здесь: %1$s\nREADME доступен здесь: %2$s</string>
     <string name="install">Установить</string>
     <string name="readme">README</string>
-    <string name="source">Исходный код</string>
-    <string name="license">Лицензия</string>
     <string name="nodevcheck">Отключить проверку на устройство (если вы подменили fingerprint)</string>
     <string name="allow_install">Я понимаю риски, разрешить установку!</string>
     <string name="not_installed">Android Boot Manager не установлен на вашем устройстве!</string>
