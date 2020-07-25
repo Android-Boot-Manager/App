@@ -35,5 +35,11 @@
     <string name="mount">Bootset einbinden</string>
     <string name="umount">Bootset ausbinden</string>
     <string name="open_configurator">Einbinden falls nötig und Konfigurator öffnen</string>
+    <string name="roms">ROMs</string>
+    <string name="entries">Entries</string>
+    <string name="general">General</string>
+    <string name="timeout">Timeout</string>
+    <string name="default_entry">Default Entry</string>
+    <string name="save">Save</string>
     <string name="app_unfinished">Die Android-Startverwaltung ist erfolgreich installiert aber die App ist noch nicht fertig. Nutzlose Knöpfe und leere Seiten sind zu erwarten :(</string>
 </resources>
