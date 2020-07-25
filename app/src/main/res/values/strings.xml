@@ -36,6 +36,12 @@
 	<string name="mount">Mount Bootset</string>
 	<string name="umount">Unmount Bootset</string>
 	<string name="open_configurator">Mount if necessary and open Configurator</string>
+	<string name="roms">ROMs</string>
+	<string name="entries">Entries</string>
+	<string name="general">General</string>
+	<string name="timeout">Timeout</string>
+	<string name="default_entry">Default Entry</string>
+	<string name="save">Save</string>
 	<string name="app_unfinished">Android Boot Manager is installed sucessfully but the app is not yet finished; blank pages and buttons that do nothing are excepted :(</string>
 
 </resources>

@@ -4,6 +4,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.content.res.Resources;
 
 abstract public class BaseFragment extends Fragment {
 	protected int layout = 0;
@@ -26,9 +27,9 @@ abstract public class BaseFragment extends Fragment {
 		super.onViewCreated(view, savedInstanceState);
 	}
 
-	public static void registerTabs(ConfiguratorActivity.TabAdapter adapter) {
-		adapter.addFragment(new RomTabFragment(), "ROMs");
-		adapter.addFragment(new EntryTabFragment(), "Entries");
-		adapter.addFragment(new GeneralTabFragment(), "General");
+	public static void registerTabs(Resources res, ConfiguratorActivity.TabAdapter adapter) {
+		adapter.addFragment(new RomTabFragment(), res.getString(R.string.roms));
+		adapter.addFragment(new EntryTabFragment(), res.getString(R.string.entries));
+		adapter.addFragment(new GeneralTabFragment(), res.getString(R.string.general));
 	}
 }

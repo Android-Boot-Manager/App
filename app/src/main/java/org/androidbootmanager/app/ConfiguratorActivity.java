@@ -64,7 +64,7 @@ public class ConfiguratorActivity extends AppCompatActivity {
 		viewPager = (ViewPager) findViewById(R.id.viewPager);
 		tabLayout = (TabLayout) findViewById(R.id.tabLayout);
 		adapter = new TabAdapter(getSupportFragmentManager());
-		BaseFragment.registerTabs(adapter);
+		BaseFragment.registerTabs(getResources(), adapter);
 		viewPager.setAdapter(adapter);
 		tabLayout.setupWithViewPager(viewPager);
 	}
