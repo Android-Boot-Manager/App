@@ -35,5 +35,11 @@
     <string name="mount">Змонтувати Bootset</string>
     <string name="umount">Розмонтувати Bootset</string>
     <string name="open_configurator">Змонтувати якщо потрібно і відкрити конфігуратор</string>
+    <string name="roms">ROMs</string>
+    <string name="entries">Entries</string>
+    <string name="general">General</string>
+    <string name="timeout">Timeout</string>
+    <string name="default_entry">Default Entry</string>
+    <string name="save">Save</string>
     <string name="app_unfinished">Android Boot Manager встановлений успішно але програма ще недописана; порожні сторінки і кнопки, які нічого не роблять передбачені :(</string>
 </resources>
