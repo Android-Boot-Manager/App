@@ -35,5 +35,11 @@
     <string name="mount">Bootset bağla</string>
     <string name="umount">Bootset çıkar</string>
     <string name="open_configurator">Yapılandırıcıyı açmak gerekli ise bağla</string>
+    <string name="roms">ROMs</string>
+    <string name="entries">Entries</string>
+    <string name="general">General</string>
+    <string name="timeout">Timeout</string>
+    <string name="default_entry">Default Entry</string>
+    <string name="save">Save</string>
     <string name="app_unfinished">Android Önyükleme Yöneticisi başarıyla yüklendi ancak uygulama geliştirmesi henüz bitmedi; boş sayfalar ve düğmeler beklenmedik şeyler yapabilir :(</string>
 </resources>

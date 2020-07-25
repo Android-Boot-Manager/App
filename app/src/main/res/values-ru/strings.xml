@@ -35,5 +35,11 @@
     <string name="mount">Смонтировать Bootset</string>
     <string name="umount">Отмонтировать Bootset</string>
     <string name="open_configurator">Смонтировать (при необходимости) и открыть конфигуратор</string>
+    <string name="roms">ROMs</string>
+    <string name="entries">Entries</string>
+    <string name="general">General</string>
+    <string name="timeout">Timeout</string>
+    <string name="default_entry">Default Entry</string>
+    <string name="save">Save</string>
     <string name="app_unfinished">Android Boot Manager установлен успешно, но приложение всё ещё в разработке, пустые разделы и бесполезные кнопки не исключены. :(</string>
 </resources>

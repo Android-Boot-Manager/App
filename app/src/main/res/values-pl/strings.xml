@@ -35,5 +35,11 @@
     <string name="mount">Zamontuj Bootset</string>
     <string name="umount">Odmontuj Bootset</string>
     <string name="open_configurator">Zamontuj w razie potrzeby i otwórz Konfigurator</string>
+    <string name="roms">ROMs</string>
+    <string name="entries">Entries</string>
+    <string name="general">General</string>
+    <string name="timeout">Timeout</string>
+    <string name="default_entry">Default Entry</string>
+    <string name="save">Save</string>
     <string name="app_unfinished">Menedżer uruchamiania Androida jest zainstalowany pomyślnie ale aplikacja jeszcze nie jest skończona; puste strony i przyciski które nic nie robią są normalne. :(</string>
 </resources>
