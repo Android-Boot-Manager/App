@@ -4,8 +4,12 @@ public class EntryTabFragment extends BaseFragment
 {
 
 	@Override
-	protected void onInit()
+	protected void onPreInit()
 	{
 		layout = R.layout.tab_entry;
+	}
+	
+	@Override
+	protected void onInit() {
 	}
 }

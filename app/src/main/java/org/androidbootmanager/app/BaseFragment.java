@@ -8,15 +8,22 @@ import android.view.ViewGroup;
 abstract public class BaseFragment extends Fragment {
 	protected int layout = 0;
 	protected ConfiguratorActivity xcontext = null;
+	abstract protected void onPreInit();
 	abstract protected void onInit();
 	public BaseFragment() {
 		super();
 	}
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		onPreInit();
+		return inflater.inflate(layout, container, false);
+	}
+
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
 		xcontext = (ConfiguratorActivity) getActivity();
 		onInit();
-		return inflater.inflate(layout, container, false);
+		super.onViewCreated(view, savedInstanceState);
 	}
 
 	public static void registerTabs(ConfiguratorActivity.TabAdapter adapter) {
