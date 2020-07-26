@@ -50,7 +50,7 @@
 	<string name="initrd">Initrd</string>
 	<string name="cmdline">Cmdline</string>
 	<string name="delete">Delete</string>
-	<string name="filename">File name (No spaces, no file extension)</string>
+	<string name="filename">Config file name (No spaces, no file extension)</string>
 	<string name="app_unfinished">Android Boot Manager is installed sucessfully but the app is not yet finished; blank pages and buttons that do nothing are excepted :(</string>
 
 </resources>
