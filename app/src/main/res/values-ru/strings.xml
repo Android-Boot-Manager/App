@@ -49,6 +49,6 @@
     <string name="initrd">Initrd</string>
     <string name="cmdline">Cmdline</string>
     <string name="delete">Delete</string>
-    <string name="filename">File name (No spaces, no file extension)</string>
+    <string name="filename">Config file name (No spaces, no file extension)</string>
     <string name="app_unfinished">Android Boot Manager установлен успешно, но приложение всё ещё в разработке, пустые разделы и бесполезные кнопки не исключены. :(</string>
 </resources>
