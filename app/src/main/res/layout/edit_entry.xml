@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:orientation="vertical">
+
+	<LinearLayout
+		android:orientation="horizontal"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/title"
+			android:textAppearance="?android:attr/textAppearanceMedium"
+			android:layout_gravity="center_vertical"/>
+
+		<EditText
+			android:layout_width="wrap_content"
+			android:ems="10"
+			android:layout_height="wrap_content"
+			android:id="@+id/editentryTitle"/>
+
+	</LinearLayout>
+
+	<LinearLayout
+		android:orientation="horizontal"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/kernel"
+			android:textAppearance="?android:attr/textAppearanceMedium"
+			android:layout_gravity="center_vertical"/>
+
+		<EditText
+			android:layout_width="wrap_content"
+			android:ems="10"
+			android:layout_height="wrap_content"
+			android:id="@+id/editentryKernel"/>
+
+	</LinearLayout>
+
+	<LinearLayout
+		android:orientation="horizontal"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/dtb"
+			android:textAppearance="?android:attr/textAppearanceMedium"
+			android:layout_gravity="center_vertical"/>
+
+		<EditText
+			android:layout_width="wrap_content"
+			android:ems="10"
+			android:layout_height="wrap_content"
+			android:id="@+id/editentryDtb"/>
+
+	</LinearLayout>
+
+	<LinearLayout
+		android:orientation="horizontal"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/initrd"
+			android:textAppearance="?android:attr/textAppearanceMedium"
+			android:layout_gravity="center_vertical"/>
+
+		<EditText
+			android:layout_width="wrap_content"
+			android:ems="10"
+			android:layout_height="wrap_content"
+			android:id="@+id/editentryInitrd"/>
+
+	</LinearLayout>
+
+	<LinearLayout
+		android:orientation="horizontal"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/cmdline"
+			android:textAppearance="?android:attr/textAppearanceMedium"
+			android:layout_gravity="center_vertical"/>
+
+		<EditText
+			android:layout_width="wrap_content"
+			android:ems="10"
+			android:layout_height="wrap_content"
+			android:id="@+id/editentryCmdline"/>
+
+	</LinearLayout>
+
+</LinearLayout>
+

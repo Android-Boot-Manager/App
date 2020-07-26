@@ -24,7 +24,7 @@
 	<string name="no_root">I am NOT root. Something went wrong!</string>
 	<string name="test_root">Test Root</string>
 	<string name="readme_title">README, Source and Licence</string>
-	<string name="readme_text">The source is available here: %1$s\nThe README is available here:%2$s</string>
+	<string name="readme_text">The source is available here: %1$s\nThe README is available here: %2$s</string>
 	<string name="install">Install</string>
 	<string name="readme">README</string>
 	<string name="nodevcheck">Disable device check (if you spoof fingerprint)</string>
@@ -42,6 +42,15 @@
 	<string name="timeout">Timeout</string>
 	<string name="default_entry">Default Entry</string>
 	<string name="save">Save</string>
+	<string name="edit_entry">Edit Entry</string>
+	<string name="entry_create">Create new...</string>
+	<string name="title">Title</string>
+	<string name="kernel">Kernel</string>
+	<string name="dtb">DTB</string>
+	<string name="initrd">Initrd</string>
+	<string name="cmdline">Cmdline</string>
+	<string name="delete">Delete</string>
+	<string name="filename">File name (No spaces, no file extension)</string>
 	<string name="app_unfinished">Android Boot Manager is installed sucessfully but the app is not yet finished; blank pages and buttons that do nothing are excepted :(</string>
 
 </resources>

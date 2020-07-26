@@ -26,18 +26,8 @@ public class GeneralTabFragment extends BaseFragment
 		generalConfig.exportToPrivFile("lk2nd.conf", fileName);
 		((EditText) getView().findViewById(R.id.tabgeneralSettingTimeout)).setText(generalConfig.get("timeout"));
 		((EditText) getView().findViewById(R.id.tabgeneralSettingDefaultEntry)).setText(generalConfig.get("default"));
-		((EditText) getView().findViewById(R.id.tabgeneralSettingTimeout)).addTextChangedListener(new TextWatcher(){@Override public void beforeTextChanged(CharSequence p1, int p2, int p3, int p4) {} @Override public void onTextChanged(CharSequence p1, int p2, int p3, int p4) {}
-				@Override
-				public void afterTextChanged(Editable p1) {
-					generalConfig.set("timeout",p1.toString());
-				}
-			});
-		((EditText) getView().findViewById(R.id.tabgeneralSettingDefaultEntry)).addTextChangedListener(new TextWatcher(){@Override public void beforeTextChanged(CharSequence p1, int p2, int p3, int p4) {} @Override public void onTextChanged(CharSequence p1, int p2, int p3, int p4) {}
-				@Override
-				public void afterTextChanged(Editable p1) {
-					generalConfig.set("default",p1.toString());
-				}
-			});
+		((EditText) getView().findViewById(R.id.tabgeneralSettingTimeout)).addTextChangedListener(new ConfigTextWatcher(generalConfig, "timeout"));
+		((EditText) getView().findViewById(R.id.tabgeneralSettingDefaultEntry)).addTextChangedListener(new ConfigTextWatcher(generalConfig, "default"));
 			
 		((Button) getView().findViewById(R.id.tabgeneralSave)).setOnClickListener(new OnClickListener(){
 				@Override
