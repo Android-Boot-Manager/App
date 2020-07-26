@@ -23,7 +23,7 @@
     <string name="no_root">Ich bin NICHT Root. Etwas ist schiefgelaufen!</string>
     <string name="test_root">Root testen</string>
     <string name="readme_title">README, Quellcode und Lizenz</string>
-    <string name="readme_text">The source is available here: %1$s\nThe README is available here: %2$s</string>
+    <string name="readme_text">Der Quellcode ist hier: %1$s\nDas README ist hier: %2$s</string>
     <string name="install">Installieren</string>
     <string name="readme">README</string>
     <string name="nodevcheck">Geräte-Check überspringen (falls du das Gerät fälscht)</string>
@@ -41,14 +41,14 @@
     <string name="timeout">Wartezeit</string>
     <string name="default_entry">Standardeintrag</string>
     <string name="save">Speichern</string>
-    <string name="edit_entry">Edit Entry</string>
-    <string name="entry_create">Create new...</string>
-    <string name="title">Title</string>
+    <string name="edit_entry">Eintrag bearbeiten</string>
+    <string name="entry_create">Neuen Eintrag erstellen...</string>
+    <string name="title">Name</string>
     <string name="kernel">Kernel</string>
     <string name="dtb">DTB</string>
     <string name="initrd">Initrd</string>
-    <string name="cmdline">Cmdline</string>
-    <string name="delete">Delete</string>
-    <string name="filename">File name (No spaces, no file extension)</string>
+    <string name="cmdline">Optionen</string>
+    <string name="delete">Löschen</string>
+    <string name="filename">Dateiname (keine Leerzeichen, keine Dateiendung)</string>
     <string name="app_unfinished">Die Android-Startverwaltung ist erfolgreich installiert aber die App ist noch nicht fertig. Nutzlose Knöpfe und leere Seiten sind zu erwarten :(</string>
 </resources>
