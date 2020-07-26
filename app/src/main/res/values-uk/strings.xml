@@ -41,14 +41,14 @@
     <string name="timeout">Таймаут</string>
     <string name="default_entry">Запис за замовчуванням</string>
     <string name="save">Зберегти</string>
-    <string name="edit_entry">Edit Entry</string>
-    <string name="entry_create">Create new...</string>
-    <string name="title">Title</string>
+    <string name="edit_entry">Редагування запису</string>
+    <string name="entry_create">Створити новий...</string>
+    <string name="title">Назва</string>
     <string name="kernel">Kernel</string>
     <string name="dtb">DTB</string>
     <string name="initrd">Initrd</string>
     <string name="cmdline">Cmdline</string>
-    <string name="delete">Delete</string>
-    <string name="filename">File name (No spaces, no file extension)</string>
+    <string name="delete">Видалити</string>
+    <string name="filename">Ім\'я файлу (без пробілів, немає розширення)</string>
     <string name="app_unfinished">Android Boot Manager встановлений успішно але програма ще недописана; порожні сторінки і кнопки, які нічого не роблять передбачені :(</string>
 </resources>
