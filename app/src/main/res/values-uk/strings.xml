@@ -23,7 +23,7 @@
     <string name="no_root">Я НЕ рут. Щось пішло не так!</string>
     <string name="test_root">Перевірити рут доступу</string>
     <string name="readme_title">README, Source та ліцензія</string>
-    <string name="readme_text">Джерело доступне тут: %1$s\nREADME доступна тут:%2$s</string>
+    <string name="readme_text">The source is available here: %1$s\nThe README is available here: %2$s</string>
     <string name="install">Установити</string>
     <string name="readme">README</string>
     <string name="nodevcheck">Відключити перевірку пристрою (якщо ви підміняєте цифровий відбиток)</string>
@@ -41,5 +41,14 @@
     <string name="timeout">Таймаут</string>
     <string name="default_entry">Запис за замовчуванням</string>
     <string name="save">Зберегти</string>
+    <string name="edit_entry">Edit Entry</string>
+    <string name="entry_create">Create new...</string>
+    <string name="title">Title</string>
+    <string name="kernel">Kernel</string>
+    <string name="dtb">DTB</string>
+    <string name="initrd">Initrd</string>
+    <string name="cmdline">Cmdline</string>
+    <string name="delete">Delete</string>
+    <string name="filename">File name (No spaces, no file extension)</string>
     <string name="app_unfinished">Android Boot Manager встановлений успішно але програма ще недописана; порожні сторінки і кнопки, які нічого не роблять передбачені :(</string>
 </resources>
