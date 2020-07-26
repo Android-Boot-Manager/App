@@ -34,7 +34,7 @@ public class EntryTabFragment extends BaseFragment {
 
 	@Override
 	protected void onInit() {
-		myList = getView().findViewById(R.id.tabentryListView);
+		myList = (ListView) getView().findViewById(R.id.tabentryListView);
 		entries = new ArrayList<>();
 		entriesListView = new ArrayList<>();
 		for (String entryFile : Shell.doRoot("find /data/bootset/lk2nd/entries -type f").split("\n")) {
