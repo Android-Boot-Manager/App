@@ -23,7 +23,7 @@
     <string name="no_root">NIE jestem rootem. Coś poszło nie tak!</string>
     <string name="test_root">Testuj Root</string>
     <string name="readme_title">Plik README, kod źródłowy i licencja</string>
-    <string name="readme_text">The source is available here: %1$s\nThe README is available here: %2$s</string>
+    <string name="readme_text">Kod źródłowy jest dostępny tutaj: %1$s\nPlik README jest dostępny tutaj:%2$s</string>
     <string name="install">Zainstaluj</string>
     <string name="readme">Plik README</string>
     <string name="nodevcheck">Wyłącz sprawdzenie modelu urządzenia (jeżeli fałszujesz model urządzenia)</string>
@@ -41,14 +41,14 @@
     <string name="timeout">Upłynął limit czasu</string>
     <string name="default_entry">Domyślny wpis</string>
     <string name="save">Zapisz</string>
-    <string name="edit_entry">Edit Entry</string>
-    <string name="entry_create">Create new...</string>
-    <string name="title">Title</string>
+    <string name="edit_entry">Edytuj wpis</string>
+    <string name="entry_create">Utwórz nowy...</string>
+    <string name="title">Tytuł</string>
     <string name="kernel">Kernel</string>
     <string name="dtb">DTB</string>
     <string name="initrd">Initrd</string>
     <string name="cmdline">Cmdline</string>
-    <string name="delete">Delete</string>
-    <string name="filename">File name (No spaces, no file extension)</string>
+    <string name="delete">Usuń</string>
+    <string name="filename">Nazwa pliku (bez spacji, bez rozszerzenia pliku)</string>
     <string name="app_unfinished">Menedżer uruchamiania Androida jest zainstalowany pomyślnie ale aplikacja jeszcze nie jest skończona; puste strony i przyciski które nic nie robią są normalne. :(</string>
 </resources>
