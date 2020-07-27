@@ -50,5 +50,8 @@
     <string name="cmdline">Cmdline</string>
     <string name="delete">Sil</string>
     <string name="filename">Config file name (No spaces, no file extension)</string>
+    <string name="add_rom">Add ROM</string>
+    <string name="data_partition">Data Partition</string>
+    <string name="system_partition">System Partition</string>
     <string name="app_unfinished">Android Önyükleme Yöneticisi başarıyla yüklendi ancak uygulama geliştirmesi henüz bitmedi; boş sayfalar ve düğmeler beklenmedik şeyler yapabilir :(</string>
 </resources>
