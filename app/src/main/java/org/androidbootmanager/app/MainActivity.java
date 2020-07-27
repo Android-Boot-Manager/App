@@ -220,6 +220,7 @@ public class MainActivity extends AppCompatActivity {
 		File z = new File(assetsdir, "Scripts/install");
 		File z2 = new File(assetsdir, "Scripts/add_os");
 		File z3 = new File(assetsdir, "Scripts/add_os/cedric");
+		File z4 = new File(assetsdir, "Scripts/add_os/yggdrasil");
 		if (!x.exists())x.mkdir();
 		if (!y.exists())y.mkdir();
 		if (!z.exists())z.mkdir();
@@ -229,6 +230,7 @@ public class MainActivity extends AppCompatActivity {
 		copyAssets("Scripts", "Scripts");
 		copyAssets("Scripts/install", "Scripts/install");
 		copyAssets("Scripts/add_os/cedric", "Scripts/add_os/cedric");
+		copyAssets("Scripts/add_os/yggdrasil", "Scripts/add_os/yggdrasil");
 		copyAssets("cp", ""); 
 	}
 
