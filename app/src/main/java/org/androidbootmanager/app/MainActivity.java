@@ -226,6 +226,7 @@ public class MainActivity extends AppCompatActivity {
 		if (!z.exists())z.mkdir();
 		if (!z2.exists())z2.mkdir();
 		if (!z3.exists())z3.mkdir();
+		if (!z4.exists())z4.mkdir();
 		copyAssets("Toolkit", "Toolkit");
 		copyAssets("Scripts", "Scripts");
 		copyAssets("Scripts/install", "Scripts/install");
