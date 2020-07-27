@@ -228,7 +228,6 @@ public class MainActivity extends AppCompatActivity {
 		copyAssets("Toolkit", "Toolkit");
 		copyAssets("Scripts", "Scripts");
 		copyAssets("Scripts/install", "Scripts/install");
-		copyAssets("Scripts/add_rom", "Scripts/add_rom");
 		copyAssets("Scripts/add_rom/cedric", "Scripts/add_rom/cedric");
 		copyAssets("cp", ""); 
 	}
