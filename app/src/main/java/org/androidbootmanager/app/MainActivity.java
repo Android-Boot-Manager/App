@@ -218,12 +218,18 @@ public class MainActivity extends AppCompatActivity {
 		File x = new File(assetsdir, "Toolkit");
 		File y = new File(assetsdir, "Scripts");
 		File z = new File(assetsdir, "Scripts/install");
+		File z2 = new File(assetsdir, "Scripts/add_rom");
+		File z3 = new File(assetsdir, "Scripts/add_rom/cedric");
 		if (!x.exists())x.mkdir();
 		if (!y.exists())y.mkdir();
 		if (!z.exists())z.mkdir();
+		if (!z2.exists())z2.mkdir();
+		if (!z3.exists())z3.mkdir();
 		copyAssets("Toolkit", "Toolkit");
 		copyAssets("Scripts", "Scripts");
 		copyAssets("Scripts/install", "Scripts/install");
+		copyAssets("Scripts/add_rom", "Scripts/add_rom");
+		copyAssets("Scripts/add_rom/cedric", "Scripts/add_rom/cedric");
 		copyAssets("cp", ""); 
 	}
 
