@@ -49,6 +49,6 @@
     <string name="initrd">Initrd</string>
     <string name="cmdline">Optionen</string>
     <string name="delete">Löschen</string>
-    <string name="filename">Dateiname (keine Leerzeichen, keine Dateiendung)</string>
+    <string name="filename">Konfigurationsdateiname (keine Leerzeichen, keine Dateiendung)</string>
     <string name="app_unfinished">Die Android-Startverwaltung ist erfolgreich installiert aber die App ist noch nicht fertig. Nutzlose Knöpfe und leere Seiten sind zu erwarten :(</string>
 </resources>

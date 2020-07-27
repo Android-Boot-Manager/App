@@ -49,6 +49,6 @@
     <string name="initrd">Initrd</string>
     <string name="cmdline">Cmdline</string>
     <string name="delete">Sil</string>
-    <string name="filename">Dosya adı (Boşluk, uzantı içermeyecek)</string>
+    <string name="filename">Config file name (No spaces, no file extension)</string>
     <string name="app_unfinished">Android Önyükleme Yöneticisi başarıyla yüklendi ancak uygulama geliştirmesi henüz bitmedi; boş sayfalar ve düğmeler beklenmedik şeyler yapabilir :(</string>
 </resources>
