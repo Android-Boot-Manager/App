@@ -50,5 +50,8 @@
     <string name="cmdline">Cmdline</string>
     <string name="delete">Usuń</string>
     <string name="filename">Nazwa pliku konfiguracyjnego (bez spacji, bez rozszerzenia pliku)</string>
+    <string name="add_rom">Add ROM</string>
+    <string name="data_partition">Data Partition</string>
+    <string name="system_partition">System Partition</string>
     <string name="app_unfinished">Menedżer uruchamiania Androida jest zainstalowany pomyślnie ale aplikacja jeszcze nie jest skończona; puste strony i przyciski które nic nie robią są normalne. :(</string>
 </resources>
