@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
 	android:orientation="vertical">
@@ -26,9 +27,11 @@
 				android:inputType="number"
 				android:layout_height="wrap_content"
 				android:ems="10"
-				android:layout_gravity="right"
+				android:layout_gravity="end"
 				android:layout_column="2"
-				android:id="@+id/tabgeneralSettingTimeout"/>
+				android:id="@+id/tabgeneralSettingTimeout"
+				android:importantForAutofill="no"
+				tools:ignore="LabelFor" />
 
 		</TableRow>
 
@@ -49,7 +52,10 @@
 				android:ems="10"
 				android:layout_height="wrap_content"
 				android:layout_column="2"
-				android:id="@+id/tabgeneralSettingDefaultEntry"/>
+				android:id="@+id/tabgeneralSettingDefaultEntry"
+				android:importantForAutofill="no"
+				tools:ignore="LabelFor"
+				android:inputType="text" />
 
 		</TableRow>
 

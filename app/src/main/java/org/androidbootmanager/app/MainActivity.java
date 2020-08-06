@@ -1,15 +1,13 @@
 package org.androidbootmanager.app;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
@@ -19,18 +17,23 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Switch;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
-import static org.androidbootmanager.app.Shell.doShell;
 import static org.androidbootmanager.app.Shell.doRoot;
 import static org.androidbootmanager.app.Shell.doRootGlobal;
+import static org.androidbootmanager.app.Shell.doShell;
 
+@SuppressLint("SdCardPath")
+@SuppressWarnings({"ResultOfMethodCallIgnored", "deprecation"})
 public class MainActivity extends AppCompatActivity {
 	File filedir = new File("/data/data/org.androidbootmanager.app/files");
 	File cfgfile = new File("/data/abm-part.cfg");
@@ -43,12 +46,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 		if (!filedir.exists()) filedir.mkdir();
 		if (!assetsdir.exists()) assetsdir.mkdir();
-		try { copyAssets(); doRoot("/data/data/org.androidbootmanager.app/assets/app_is_installed.sh");} catch (RuntimeException e) {e.printStackTrace(); new AlertDialog.Builder(this).setCancelable(true).setOnCancelListener(new DialogInterface.OnCancelListener(){
-					@Override
-					public void onCancel(DialogInterface p1) {
-						MainActivity.this.finish();
-					}
-				}).setTitle(R.string.fatal).setMessage(R.string.cp_err_msg).show();}
+		try { copyAssets(); doRoot("/data/data/org.androidbootmanager.app/assets/app_is_installed.sh");} catch (RuntimeException e) {e.printStackTrace(); new AlertDialog.Builder(this).setCancelable(true).setOnCancelListener(p1 -> MainActivity.this.finish()).setTitle(R.string.fatal).setMessage(R.string.cp_err_msg).show();}
 		Window window = this.getWindow();
 		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -56,9 +54,7 @@ public class MainActivity extends AppCompatActivity {
 		if (cfgfile.exists()) {
       		setContentView(R.layout.main);
 			configurator(null);
-		} else {
-			setContentView(R.layout.main_notinstall);
-		}
+		} else setContentView(R.layout.main_notinstall);
 
     }
 
@@ -76,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	public void doInstall(View v) {
-		ArrayList<String> deviceList = new ArrayList<String>();
+		ArrayList<String> deviceList = new ArrayList<>();
 		deviceList.add("cedric");
 		deviceList.add("yggdrasil");
 		currentDevice = android.os.Build.DEVICE;
@@ -100,55 +96,33 @@ public class MainActivity extends AppCompatActivity {
 		final AlertDialog.Builder builder = new AlertDialog.Builder(this).setTitle(R.string.current_rom_name);
 		input.setInputType(InputType.TYPE_CLASS_TEXT);
 		builder.setView(input);
-		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() { 
-				@Override
-				public void onClick(DialogInterface dialogif, int which) {
-					romname = input.getText().toString(); System.out.println("installing abm for " + currentDevice);
-					new AlertDialog.Builder(MainActivity.this)
-						.setTitle(R.string.select_droidboot_title)
-						.setMessage(R.string.select_droidboot_msg)
-						.setCancelable(true)
-						.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener(){
+		builder.setPositiveButton(R.string.ok, (dialogif, which) -> {
+			romname = input.getText().toString(); System.out.println("installing abm for " + currentDevice);
+			new AlertDialog.Builder(MainActivity.this)
+				.setTitle(R.string.select_droidboot_title)
+				.setMessage(R.string.select_droidboot_msg)
+				.setCancelable(true)
+				.setNegativeButton(R.string.cancel, (p1, p2) -> p1.dismiss())
+				.setPositiveButton(R.string.ok, (p1, p2) -> {
+					Intent intent = new Intent();
+					intent.setType("*/*");
+					intent.setAction(Intent.ACTION_GET_CONTENT);
+					startActivityForResult(intent, 5207);
+				})
+				.show();
 
-							@Override
-							public void onClick(DialogInterface p1, int p2) {
-								p1.dismiss();
-							}
-						})
-						.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener(){
-
-							@Override
-							public void onClick(DialogInterface p1, int p2) {
-								Intent intent = new Intent();
-								intent.setType("*/*");
-								intent.setAction(Intent.ACTION_GET_CONTENT);
-								startActivityForResult(intent, 5207);
-							}
-						})
-						.show();
-
-				}
-			});
-		builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					dialog.cancel();
-				}
-			});
+		});
+		builder.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.cancel());
 		if (((Switch)findViewById(R.id.mainnotinstallSwitch1)).isChecked()) {
-			final ArrayAdapter<String> arr = new ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice);
+			final ArrayAdapter<String> arr = new ArrayAdapter<>(this, android.R.layout.select_dialog_singlechoice);
 			arr.add("cedric");
 			arr.add("yggdrasil");
 			new AlertDialog.Builder(this)
 				.setTitle(R.string.choose_device)
-				.setAdapter(arr, new DialogInterface.OnClickListener(){
-					@Override
-					public void onClick(DialogInterface p1, int p2) {
-						p1.dismiss();
-						String device = arr.getItem(p2);
-						MainActivity.this.currentDevice = device;
-						builder.show();
-					}
+				.setAdapter(arr, (p1, p2) -> {
+					p1.dismiss();
+					MainActivity.this.currentDevice = arr.getItem(p2);
+					builder.show();
 				})
 				.show();
 		} else {
@@ -160,57 +134,49 @@ public class MainActivity extends AppCompatActivity {
 		if (resultCode == RESULT_OK) {
 			if (requestCode == 5207) {
 				new AlertDialog.Builder(this)
-					.setTitle(R.string.sure_title)
-					.setMessage(R.string.sure_msg)
-					.setCancelable(true)
-					.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener(){
-
-						@Override
-						public void onClick(DialogInterface p1, int p2) {
-							p1.dismiss();
-						}
-					})
-					.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener(){
-
-						@Override
-						public void onClick(DialogInterface p1, int p2) {
+						.setTitle(R.string.sure_title)
+						.setMessage(R.string.sure_msg)
+						.setCancelable(true)
+						.setNegativeButton(R.string.cancel, (p1, p2) -> p1.dismiss())
+						.setPositiveButton(R.string.ok, (DialogInterface.OnClickListener) (p1, p2) -> {
 							progdialog.show();
 							Uri selectedUri = data.getData();
 							try {
-								InputStream initialStream = getContentResolver().openInputStream(selectedUri);
+								InputStream initialStream;
+								if (selectedUri != null) {
+									initialStream = getContentResolver().openInputStream(selectedUri);
+								} else {
+									throw new IOException("null selected");
+								}
 								File targetFile = new File("/data/data/org.androidbootmanager.app/files/lk2nd.img");
 								OutputStream outStream = new FileOutputStream(targetFile);
+								assert initialStream != null;
 								copyFile(initialStream, outStream);
 								initialStream.close();
 								outStream.close();
 							} catch (IOException e) {
 								progdialog.dismiss();
 								new AlertDialog.Builder(MainActivity.this)
-									.setTitle(R.string.install_finish_title)
-									.setMessage(getResources().getString(R.string.install_finish_msg, "error_cpfail"))
-									.show();
+										.setTitle(R.string.install_finish_title)
+										.setMessage(getResources().getString(R.string.install_finish_msg, "ERROR_java (IOException)"))
+										.show();
 								return;
 							}
-							new AsyncTask(){
-								@Override
-								protected Object doInBackground(Object[] p1) {
-									copyAssets();
-									return doRootGlobal(assetsdir + "/app_install.sh '" + romname + "' " + currentDevice);
-								}
-								@Override
-								protected void onPostExecute(Object r) {
+							new Thread((Runnable) () -> {
+								copyAssets();
+								final String r = doRootGlobal(assetsdir + "/app_install.sh '" + romname + "' " + currentDevice);
+								runOnUiThread((Runnable) () -> {
 									progdialog.dismiss();
 									new AlertDialog.Builder(MainActivity.this)
-										.setTitle(R.string.install_finish_title)
-										.setMessage(getResources().getString(R.string.install_finish_msg, (String)r))
-										.show();
-								}
-							}.execute();
-						}
-					})
-					.show();
+											.setTitle(R.string.install_finish_title)
+											.setMessage(getResources().getString(R.string.install_finish_msg, r))
+											.show();
+								});
+							}).start();
+						})
+						.show();
 			}
-		}
+		} else super.onActivityResult(requestCode, resultCode, data);
 	}
 
 
@@ -237,31 +203,6 @@ public class MainActivity extends AppCompatActivity {
 
 	private void copyAssets(String src, String outp) {
 		AssetManager assetManager = getAssets();
-		int apk_ver = 0;
-		int fs_ver = 0;
-		try {
-			InputStream in = assetManager.open("cp/asset_ver");
-			byte[] buffer = new byte[1024];
-			String x = "";
-			int read;
-			while ((read = in.read(buffer)) != -1) {
-				x = x + new String(buffer, 0, read);
-			}
-			apk_ver = Integer.valueOf(x.charAt(1));
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		try {
-			String out = "";
-			FileReader r = new FileReader(assetsdir + "/asset_ver");
-			int read;
-			char[] x = new char[1024];
-			while ((read = r.read(x)) != -1) {
-				out += new String(x, 0, read);
-			}
-			fs_ver = Integer.valueOf(out);
-		} catch (IOException e) {} catch (NumberFormatException e) {}
-		if (fs_ver == apk_ver) return;
 		String[] files = null;
 		try {
 			files = assetManager.list(src); 
@@ -269,19 +210,18 @@ public class MainActivity extends AppCompatActivity {
 			Log.e("tag", "Failed to get asset file list.", e);
 		}
 
+		assert files != null;
 		for (String filename : files) {
-			InputStream in = null;
-			OutputStream out = null;
+			InputStream in;
+			OutputStream out;
 			try {
 				in = assetManager.open(src + "/" + filename);
 				File outFile = new File("/data/data/org.androidbootmanager.app/assets/" + outp, filename);
 				out = new FileOutputStream(outFile);
 				copyFile(in, out);
 				in.close();
-				in = null;
 				out.flush();
 				out.close();
-				out = null;
 			} catch (IOException e) {
 				Log.e("tag", "Failed to copy asset file: " + filename, e);
 			}
@@ -304,19 +244,13 @@ public class MainActivity extends AppCompatActivity {
 			.show();
 	}
 	public void testRoot(View v) {
-		new AsyncTask(){
-			@Override
-			protected Object doInBackground(Object[] p1) {
-				copyAssets();
-				return doRoot("/data/data/org.androidbootmanager.app/assets/hello.sh");
-			}
-			@Override
-			protected void onPostExecute(Object r) {
-				new AlertDialog.Builder(MainActivity.this)
+		new Thread((Runnable) () -> {
+			copyAssets();
+			final String r = doRoot("/data/data/org.androidbootmanager.app/assets/hello.sh");
+			runOnUiThread((Runnable) () -> new AlertDialog.Builder(MainActivity.this)
 					.setTitle(R.string.test_root)
-					.setMessage(getResources().getString((((String)r).contains("I am root, fine! :)")) ?R.string.root: R.string.no_root))
-					.show();
-			}
-		}.execute();
+					.setMessage(getResources().getString((r.contains("I am root, fine! :)")) ?R.string.root: R.string.no_root))
+					.show());
+		}).start();
 	}
 }

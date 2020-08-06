@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
 	android:orientation="vertical">
@@ -21,7 +22,10 @@
 			android:layout_width="wrap_content"
 			android:ems="10"
 			android:layout_height="wrap_content"
-			android:id="@+id/editromTitle"/>
+			android:id="@+id/editromTitle"
+			android:importantForAutofill="no"
+			android:inputType="text"
+			tools:ignore="LabelFor" />
 
 	</LinearLayout>
 
@@ -41,7 +45,8 @@
 			android:layout_height="wrap_content"
 			android:text="[error]"
 			android:textAppearance="?android:attr/textAppearanceMedium"
-			android:id="@+id/editromDataPart"/>
+			android:id="@+id/editromDataPart"
+			tools:ignore="HardcodedText" />
 
 	</LinearLayout>
 
@@ -61,7 +66,8 @@
 			android:layout_height="wrap_content"
 			android:text="[error]"
 			android:textAppearance="?android:attr/textAppearanceMedium"
-			android:id="@+id/editromSystemPart"/>
+			android:id="@+id/editromSystemPart"
+			tools:ignore="HardcodedText" />
 
 	</LinearLayout>
 

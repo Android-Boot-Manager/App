@@ -1,10 +1,13 @@
 package org.androidbootmanager.app;
+import android.annotation.SuppressLint;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
+@SuppressLint("SdCardPath")
 public class Shell {
 	public static String doRootGlobal(String cmd) {
 		File x = new File("/data/data/org.androidbootmanager.app/files/_run.sh");
@@ -51,16 +54,16 @@ public class Shell {
 		BufferedReader reader = 
 			new BufferedReader(new InputStreamReader(p.getInputStream()));
 
-		String line = "";
-		String out = "";
+		String line;
+		StringBuilder out = new StringBuilder();
 		try {
 			while ((line = reader.readLine()) != null) {
-				out += line + "\n";
+				out.append(line).append("\n");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			return "exec failed: io exception (write)";
 		}
-		return out;
+		return out.toString();
 	}
 }

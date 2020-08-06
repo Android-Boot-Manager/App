@@ -1,26 +1,21 @@
 package org.androidbootmanager.app;
-import android.widget.ArrayAdapter;
-import java.util.HashMap;
-import android.content.Context;
-import java.util.List;
-import android.widget.ListView;
-import java.util.ArrayList;
-import android.widget.AdapterView.OnItemClickListener;
+
+import android.annotation.SuppressLint;
+import android.text.InputType;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Adapter;
-import android.widget.Toast;
-import android.widget.ExpandableListView;
-import android.support.v7.app.AlertDialog;
-import android.view.View.OnClickListener;
-import android.content.DialogInterface;
-import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.text.InputType;
-import android.widget.Button;
+import android.widget.ListView;
 
-public class EntryTabFragment extends BaseFragment {
+import androidx.appcompat.app.AlertDialog;
+
+import java.util.ArrayList;
+import java.util.Objects;
+
+public class EntryTabFragment extends ConfiguratorActivity.BaseFragment {
 	
 	ListView myList;
 	ArrayAdapter<String> adapter;
@@ -34,7 +29,7 @@ public class EntryTabFragment extends BaseFragment {
 
 	@Override
 	protected void onInit() {
-		myList = (ListView) getView().findViewById(R.id.tabentryListView);
+		myList = (ListView) Objects.requireNonNull(getView()).findViewById(R.id.tabentryListView);
 		entries = new ArrayList<>();
 		entriesListView = new ArrayList<>();
 		for (String entryFile : Shell.doRoot("find /data/bootset/lk2nd/entries -type f").split("\n")) {
@@ -54,6 +49,7 @@ public class EntryTabFragment extends BaseFragment {
 						return;
 					}
 					final Entry entry = findEntry((String) parent.getItemAtPosition(position));
+					assert entry != null;
 					final ConfigFile proposed = ConfigFile.importFromString(Shell.doRoot("cat " + entry.file));
 					View dialog = LayoutInflater.from(xcontext).inflate(R.layout.edit_entry,null);
 					((EditText) dialog.findViewById(R.id.editentryTitle)).setText(entry.config.get("title"));
@@ -68,70 +64,44 @@ public class EntryTabFragment extends BaseFragment {
 					((EditText) dialog.findViewById(R.id.editentryCmdline)).addTextChangedListener(new ConfigTextWatcher(proposed, "options"));
 					new AlertDialog.Builder(xcontext)
 						.setCancelable(true)
-						.setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener(){
-							@Override
-							public void onClick(DialogInterface p1, int p2) {
-								p1.dismiss();
-							}
+						.setNeutralButton(R.string.cancel, (p1, p2) -> p1.dismiss())
+						.setNegativeButton(R.string.delete, (p1, p2) -> {
+							p1.dismiss();
+							new AlertDialog.Builder(xcontext)
+							.setTitle(R.string.delete)
+							.setMessage(R.string.sure_title)
+								.setNegativeButton(R.string.cancel, (p11, p21) -> p11.dismiss())
+								.setPositiveButton(R.string.ok, (p112, p212) -> {
+									p112.dismiss();
+									Shell.doRoot("rm " + entry.file);
+									entries.remove(entry);
+									regenListView();
+								})
+							.show();
 						})
-						.setNegativeButton(R.string.delete, new DialogInterface.OnClickListener(){
-							@Override
-							public void onClick(DialogInterface p1, int p2) {
-								p1.dismiss();
-								new AlertDialog.Builder(xcontext)
-								.setTitle(R.string.delete)
-								.setMessage(R.string.sure_title)
-									.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener(){
-										@Override
-										public void onClick(DialogInterface p1, int p2) {
-											p1.dismiss();
-										}
-									})
-									.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener(){
-										@Override
-										public void onClick(DialogInterface p1, int p2) {
-											p1.dismiss();
-											Shell.doRoot("rm " + entry.file);
-											entries.remove(entry);
-											regenListView();
-										}
-									})
-								.show();
-							}
-						})
-						.setPositiveButton(R.string.save, new DialogInterface.OnClickListener(){
-							@Override
-							public void onClick(DialogInterface p1, int p2) {
-								entry.config = proposed;
-								entry.save();
-								regenListView();
-							}
+						.setPositiveButton(R.string.save, (p1, p2) -> {
+							entry.config = proposed;
+							entry.save();
+							regenListView();
 						})
 						.setTitle(R.string.edit_entry)
 						.setView(dialog)
 						.show();
 				}
 				
+				@SuppressLint("SdCardPath")
 				private void mkNewEntry() {
 					final EditText input = new EditText(xcontext);
 					input.setInputType(InputType.TYPE_CLASS_TEXT);
 					new AlertDialog.Builder(xcontext)
 					.setTitle(R.string.filename)
-						.setPositiveButton(R.string.save, new DialogInterface.OnClickListener(){
-							@Override
-							public void onClick(DialogInterface p1, int p2) {
-								p1.dismiss();
-								Shell.doRoot("/data/data/org.androidbootmanager.app/assets/mkentryfile.sh > /data/bootset/lk2nd/entries/" + input.getText().toString() + ".conf");
-								entries.add(new Entry("/data/bootset/lk2nd/entries/" +input.getText().toString() + ".conf"));
-								regenListView();
-							}
+						.setPositiveButton(R.string.save, (p1, p2) -> {
+							p1.dismiss();
+							Shell.doRoot("/data/data/org.androidbootmanager.app/assets/mkentryfile.sh > /data/bootset/lk2nd/entries/" + input.getText().toString() + ".conf");
+							entries.add(new Entry("/data/bootset/lk2nd/entries/" + input.getText().toString() + ".conf"));
+							regenListView();
 						})
-						.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener(){
-							@Override
-							public void onClick(DialogInterface p1, int p2) {
-								p1.dismiss();
-							}
-						})
+						.setNegativeButton(R.string.cancel, (p1, p2) -> p1.dismiss())
 					.setCancelable(true)
 					.setView(input)
 					.show();
@@ -155,7 +125,7 @@ public class EntryTabFragment extends BaseFragment {
 		return null;
 	}
 
-	private class Entry {
+	private static class Entry {
 		public String file;
 		public ConfigFile config;
 		public Entry(String outFile) {

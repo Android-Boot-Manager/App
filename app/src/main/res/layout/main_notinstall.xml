@@ -6,7 +6,7 @@
 	android:layout_height="fill_parent"
 	android:orientation="vertical">
 
-	<android.support.v7.widget.Toolbar
+	<com.google.android.material.appbar.MaterialToolbar
 		android:layout_width="match_parent"
 		android:layout_height="?attr/actionBarSize"
 		android:background="@color/colorPrimary"
@@ -40,7 +40,7 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:text="@string/readme"
-			android:layout_toRightOf="@id/mainnotinstallButton1"
+			android:layout_toEndOf="@id/mainnotinstallButton1"
 			android:id="@+id/mainnotinstallButton2"
 			android:onClick="showLic"/>
 
@@ -70,7 +70,7 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content">
 
-		<Switch
+		<com.google.android.material.switchmaterial.SwitchMaterial
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:id="@+id/mainnotinstallSwitch1"/>
@@ -80,7 +80,7 @@
 			android:layout_height="wrap_content"
 			android:text="@string/nodevcheck"
 			android:textAppearance="?android:attr/textAppearanceSmall"
-			android:layout_toRightOf="@id/mainnotinstallSwitch1"/>
+			android:layout_toEndOf="@id/mainnotinstallSwitch1"/>
 
 	</RelativeLayout>
 
@@ -97,7 +97,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="@string/allow_install"
-			android:layout_toRightOf="@id/mainnotinstallCheckBox1"/>
+			android:layout_toEndOf="@id/mainnotinstallCheckBox1"/>
 
 	</RelativeLayout>
 

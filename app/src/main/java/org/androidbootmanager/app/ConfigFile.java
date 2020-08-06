@@ -1,10 +1,13 @@
 package org.androidbootmanager.app;
+import android.annotation.SuppressLint;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class ConfigFile
 {
 	Map<String,String> data = new HashMap<>();
@@ -15,11 +18,11 @@ public class ConfigFile
 		data.put(name, value);
 	}
 	String exportToString() {
-		String out = "";
+		StringBuilder out = new StringBuilder();
 		for (String key : data.keySet()) {
-			out += key + " " + get(key) + "\n";
+			out.append(key).append(" ").append(get(key)).append("\n");
 		}
-		return out;
+		return out.toString();
 	}
 	void exportToFile(File file) {
 		try {
@@ -32,6 +35,7 @@ public class ConfigFile
 			throw new RuntimeException(e);
 		}
 	}
+	@SuppressLint("SdCardPath")
 	void exportToPrivFile(String tempfilename, String fullPath) {
 		exportToFile(new File("/data/data/org.androidbootmanager.app/files/" + tempfilename));
 		Shell.doRoot("cp /data/data/org.androidbootmanager.app/files/" + tempfilename + " " + fullPath);

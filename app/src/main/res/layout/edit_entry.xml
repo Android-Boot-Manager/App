@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
 	android:orientation="vertical">
@@ -21,7 +22,10 @@
 			android:layout_width="wrap_content"
 			android:ems="10"
 			android:layout_height="wrap_content"
-			android:id="@+id/editentryTitle"/>
+			android:id="@+id/editentryTitle"
+			android:importantForAutofill="no"
+			tools:ignore="LabelFor"
+			android:inputType="text" />
 
 	</LinearLayout>
 
@@ -41,7 +45,10 @@
 			android:layout_width="wrap_content"
 			android:ems="10"
 			android:layout_height="wrap_content"
-			android:id="@+id/editentryKernel"/>
+			android:id="@+id/editentryKernel"
+			android:importantForAutofill="no"
+			tools:ignore="LabelFor"
+			android:inputType="text" />
 
 	</LinearLayout>
 
@@ -61,7 +68,10 @@
 			android:layout_width="wrap_content"
 			android:ems="10"
 			android:layout_height="wrap_content"
-			android:id="@+id/editentryDtb"/>
+			android:id="@+id/editentryDtb"
+			android:importantForAutofill="no"
+			tools:ignore="LabelFor"
+			android:inputType="text" />
 
 	</LinearLayout>
 
@@ -81,7 +91,10 @@
 			android:layout_width="wrap_content"
 			android:ems="10"
 			android:layout_height="wrap_content"
-			android:id="@+id/editentryInitrd"/>
+			android:id="@+id/editentryInitrd"
+			android:importantForAutofill="no"
+			tools:ignore="LabelFor"
+			android:inputType="text" />
 
 	</LinearLayout>
 
@@ -101,7 +114,10 @@
 			android:layout_width="wrap_content"
 			android:ems="10"
 			android:layout_height="wrap_content"
-			android:id="@+id/editentryCmdline"/>
+			android:id="@+id/editentryCmdline"
+			android:importantForAutofill="no"
+			tools:ignore="LabelFor"
+			android:inputType="text" />
 
 	</LinearLayout>
 
