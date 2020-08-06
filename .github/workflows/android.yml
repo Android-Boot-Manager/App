@@ -24,8 +24,6 @@ jobs:
         java-version: 1.8
     - name: Build with Gradle
       run: ./gradlew build
-    - name: Prepare to sign apk
-      run: mkdir app/build/outputs/apk/release && cp app/build/outputs/apk/app-release-unsigned.apk app/build/outputs/apk/release/
     - name: Sign APK
       uses: r0adkll/sign-android-release@v1
       with:
