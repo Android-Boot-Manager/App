@@ -38,7 +38,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: other_apks
-        path: app/build/outputs/apk/*.apk
+        path: app/build/outputs/apk/*/*.apk
     - name: Upload apks (2/2)
       uses: actions/upload-artifact@v2
       with:
