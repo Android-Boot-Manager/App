@@ -9,8 +9,8 @@
     <string name="allow_install_unchecked_msg">Görünüşe göre bu sayfaya bakmadınız. Bu iyi değil!</string>
     <string name="ok">Tamam</string>
     <string name="cancel">İptal</string>
-    <string name="installing_title">Yükleniyor...</string>
-    <string name="installing_msg">Yükleniyor. Lütfen bekleyiniz...</string>
+    <string name="installing_title">Installing…</string>
+    <string name="installing_msg">Installing. Please wait…</string>
     <string name="current_rom_name">Geçerli ROM ismi</string>
     <string name="select_droidboot_title">DroidBoot\'u seçin</string>
     <string name="select_droidboot_msg">Birazdan DroidBoot dosyası isteyenecektir. Doğruyu seçtiğinizden emin olun!</string>
@@ -18,7 +18,7 @@
     <string name="sure_msg">Tamama basarsanız, ABM yüklenecektir. Bu son uyarıdır!</string>
     <string name="choose_device">Cihazınızı seçiniz</string>
     <string name="install_finish_title">Yükleme tamamlandı</string>
-    <string name="install_finish_msg">Hata mesajı %1$sHata mesajı bir şeylerin ters gittiğini gösterir.Lütfen geri alma dosyasını kurun ve Telegram @andbootmgr grubunda sorun. Sakın /sdcard/abm/install.log log dosyasını unutmayın! Hata Kodu Tamam ise,yükleme başarılı demektir. Cihazınızı yeniden başlatmalısınız.</string>
+    <string name="install_finish_msg">Return code is %1$sWhen the Return Code is ERROR, something went wrong. Please flash the uninstaller and ask in our Telegram group @andbootmgr. Don\'t forget the log file at /sdcard/abm/install.log! If the Return Code is OK, the installation was successful. You should reboot now.</string>
     <string name="root">Root iznim var. Güzel! :)</string>
     <string name="no_root">Root iznim YOK. Bir şeyler yanlış gitti!</string>
     <string name="test_root">Rootu Test Et</string>
@@ -42,7 +42,7 @@
     <string name="default_entry">Varsayılan Girdi</string>
     <string name="save">Kaydet</string>
     <string name="edit_entry">Girdiyi Düzenle</string>
-    <string name="entry_create">Yeni oluştur...</string>
+    <string name="entry_create">Create new…</string>
     <string name="title">Başlık</string>
     <string name="kernel">Kernel</string>
     <string name="dtb">DTB</string>
@@ -53,5 +53,5 @@
     <string name="add_rom">ROM ekle</string>
     <string name="data_partition">Veri Bölümü</string>
     <string name="system_partition">Sistem Bölümü</string>
-    <string name="app_unfinished">Android Önyükleme Yöneticisi başarıyla yüklendi ancak uygulama geliştirmesi henüz bitmedi; boş sayfalar ve düğmeler beklenmedik şeyler yapabilir :(</string>
+    <string name="app_unfinished">Android Boot Manager is installed successfully but the app is not yet finished; blank pages and buttons that do nothing are excepted :(</string>
 </resources>
