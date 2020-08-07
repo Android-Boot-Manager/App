@@ -11,18 +11,18 @@
     <string name="cancel">Annulla</string>
     <string name="installing_title">Installazione…</string>
     <string name="installing_msg">Installazione. Per favore attendi…</string>
-    <string name="current_rom_name">Current ROM name</string>
-    <string name="select_droidboot_title">Select DroidBoot</string>
-    <string name="select_droidboot_msg">You will now be asked for the DroidBoot file. Make sure it is the right for your device!</string>
+    <string name="current_rom_name">Nome della ROM attuale</string>
+    <string name="select_droidboot_title">Seleziona DroidBoot</string>
+    <string name="select_droidboot_msg">Ti verrà chiesto di selezionare il file DroidBoot. Assicurati che sia corretto per il tuo dispositivo!</string>
     <string name="sure_title">Sei sicuro?</string>
     <string name="sure_msg">If you now press OK, ABM will install. This the last confirmation!</string>
     <string name="choose_device">Scegli il tuo dispositivo</string>
     <string name="install_finish_title">Installazione completata</string>
     <string name="install_finish_msg">Return code is %1$sWhen the Return Code is ERROR, something went wrong. Please flash the uninstaller and ask in our Telegram group @andbootmgr. Don\'t forget the log file at /sdcard/abm/install.log! If the Return Code is OK, the installation was successful. You should reboot now.</string>
-    <string name="root">I am root. Fine! :)</string>
-    <string name="no_root">I am NOT root. Something went wrong!</string>
-    <string name="test_root">Test Root</string>
-    <string name="readme_title">README, Source and Licence</string>
+    <string name="root">Ho i permessi root. Ottimo! :)</string>
+    <string name="no_root">Non ho i permessi root. Qualcosa è andato storto!</string>
+    <string name="test_root">Test root</string>
+    <string name="readme_title">LEGGIMI (README), Sorgente e Licenza</string>
     <string name="readme_text">I codici sorgenti sono disponibili qui: %1$s\nIl file LEGGIMI(README) è disponibile qui: %2$s</string>
     <string name="install">Installa</string>
     <string name="readme">LEGGIMI(README)</string>
@@ -49,9 +49,9 @@
     <string name="initrd">Initrd</string>
     <string name="cmdline">Cmdline</string>
     <string name="delete">Elimina</string>
-    <string name="filename">Config file name (No spaces, no file extension)</string>
+    <string name="filename">Nome file Config (Nessun spazio, no estensione file)</string>
     <string name="add_rom">Aggiungi ROM</string>
     <string name="data_partition">Partizione data</string>
     <string name="system_partition">Partizione system</string>
-    <string name="app_unfinished">Android Boot Manager is installed successfully but the app is not yet finished; blank pages and buttons that do nothing are excepted :(</string>
+    <string name="app_unfinished">Android Boot Manager è stato installato con successo ma quest’applicazione non è ancora finita; aspettati di trovare pagine vuote e pulsanti che non funzionano :(</string>
 </resources>
