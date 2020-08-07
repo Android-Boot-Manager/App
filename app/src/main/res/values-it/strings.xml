@@ -5,7 +5,7 @@
     <string name="cp_err_msg">Hai installato l\'applicazione su una scheda SD?</string>
     <string name="wrong_device_title">Dispositivo errato</string>
     <string name="wrong_device_msg">Android Boot Manager non è disponibile per questo dispositivo (%1$s).</string>
-    <string name="allow_install_unchecked_title">Allow install not checked</string>
+    <string name="allow_install_unchecked_title">La casella Consenti Installazione non è stata selezionata</string>
     <string name="allow_install_unchecked_msg">Sembra che tu non abbia guardato a questa pagina. Non va bene!</string>
     <string name="ok">OK</string>
     <string name="cancel">Annulla</string>
@@ -15,7 +15,7 @@
     <string name="select_droidboot_title">Seleziona DroidBoot</string>
     <string name="select_droidboot_msg">Ti verrà chiesto di selezionare il file DroidBoot. Assicurati che sia corretto per il tuo dispositivo!</string>
     <string name="sure_title">Sei sicuro?</string>
-    <string name="sure_msg">If you now press OK, ABM will install. This the last confirmation!</string>
+    <string name="sure_msg">Se premi OK, ABM verrà installato. Questa è l\'ultima conferma!</string>
     <string name="choose_device">Scegli il tuo dispositivo</string>
     <string name="install_finish_title">Installazione completata</string>
     <string name="install_finish_msg">Return code is %1$sWhen the Return Code is ERROR, something went wrong. Please flash the uninstaller and ask in our Telegram group @andbootmgr. Don\'t forget the log file at /sdcard/abm/install.log! If the Return Code is OK, the installation was successful. You should reboot now.</string>
@@ -51,7 +51,7 @@
     <string name="delete">Elimina</string>
     <string name="filename">Nome file Config (Nessun spazio, no estensione file)</string>
     <string name="add_rom">Aggiungi ROM</string>
-    <string name="data_partition">Partizione data</string>
-    <string name="system_partition">Partizione system</string>
+    <string name="data_partition">Partizione Data</string>
+    <string name="system_partition">Partizione System</string>
     <string name="app_unfinished">Android Boot Manager è stato installato con successo ma quest’applicazione non è ancora finita; aspettati di trovare pagine vuote e pulsanti che non funzionano :(</string>
 </resources>
