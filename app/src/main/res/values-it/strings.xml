@@ -18,7 +18,7 @@
     <string name="sure_msg">Se premi OK, ABM verrà installato. Questa è l\'ultima conferma!</string>
     <string name="choose_device">Scegli il tuo dispositivo</string>
     <string name="install_finish_title">Installazione completata</string>
-    <string name="install_finish_msg">Return code is %1$sWhen the Return Code is ERROR, something went wrong. Please flash the uninstaller and ask in our Telegram group @andbootmgr. Don\'t forget the log file at /sdcard/abm/install.log! If the Return Code is OK, the installation was successful. You should reboot now.</string>
+    <string name="install_finish_msg">Il codice di ritorno è %1$sQuando il codice di ritorno è ERROR, qualcosa è andato storto. Per favore esegui il flash del programma di disinstallazione e chiedi nel nostro gruppo Telegram @andbootmgr. Non dimenticarti il file di log situato in /sdcard/abm/install.log! Se il codice di ritorno è OK, l\'installazione è stata completata con successo. Riavvia il sistema ora.</string>
     <string name="root">Ho i permessi root. Ottimo! :)</string>
     <string name="no_root">Non ho i permessi root. Qualcosa è andato storto!</string>
     <string name="test_root">Test root</string>
@@ -26,7 +26,8 @@
     <string name="readme_text">I codici sorgenti sono disponibili qui: %1$s\nIl file LEGGIMI(README) è disponibile qui: %2$s</string>
     <string name="install">Installa</string>
     <string name="readme">LEGGIMI(README)</string>
-    <string name="nodevcheck">Disable device check (if you spoof fingerprint)</string>
+    <string name="nodevcheck">Disabilita il controllo del dispositivo (
+se falsifichi il fingerprint)</string>
     <string name="allow_install">Accetto il rischio, permetti l\'installazione!</string>
     <string name="not_installed">Android Boot Manager non è installato sul tuo dispositivo!</string>
     <string name="devices">É disponibile per il Moto G5 (cedric) e per il Volla Phone (yggdrasil)!</string>
@@ -36,12 +37,12 @@
     <string name="umount">Smonta il Bootset</string>
     <string name="open_configurator">Monta se necessario ed apri il Configuratore</string>
     <string name="roms">ROMs</string>
-    <string name="entries">Entries</string>
+    <string name="entries">Voci</string>
     <string name="general">Generale</string>
     <string name="timeout">Timeout</string>
-    <string name="default_entry">Default Entry</string>
+    <string name="default_entry">Voce Predefinita</string>
     <string name="save">Salva</string>
-    <string name="edit_entry">Edit Entry</string>
+    <string name="edit_entry">Modifica voce</string>
     <string name="entry_create">Crea nuovo…</string>
     <string name="title">Titolo</string>
     <string name="kernel">Kernel</string>
