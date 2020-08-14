@@ -18,11 +18,11 @@
     <string name="sure_msg">Se você aperta OK, o ABM será instalado. Essa é a última confirmação!</string>
     <string name="choose_device">Escolha o seu dispositivo</string>
     <string name="install_finish_title">Instalação completa</string>
-    <string name="install_finish_msg">Return code is %1$sWhen the Return Code is ERROR, something went wrong. Please flash the uninstaller and ask in our Telegram group @andbootmgr. Don\'t forget the log file at /sdcard/abm/install.log! If the Return Code is OK, the installation was successful. You should reboot now.</string>
-    <string name="root">I am root. Fine! :)</string>
-    <string name="no_root">I am NOT root. Something went wrong!</string>
-    <string name="test_root">Test Root</string>
-    <string name="readme_title">README, Source and Licence</string>
+    <string name="install_finish_msg">Código de retorno %1$s é Quando o código de retorno for ERRO algo deu errado. Porfavor instale o desinstalador e pergunte no nosso grupo do Telegram @andbootmgr. Não se esqueça do arquivo do log em /sdcard/abm/install.log! se o código de retorno for OK, a instalação de certo. Você deve reiniciar agora.</string>
+    <string name="root">Eu estou com root. Tudo bem :)</string>
+    <string name="no_root">Não estou com root, algo deu errado!</string>
+    <string name="test_root">Testar Root</string>
+    <string name="readme_title">LEIA-ME, Código e Licença</string>
     <string name="readme_text">The source is available here: %1$s\nThe README is available here: %2$s</string>
     <string name="install">Install</string>
     <string name="readme">README</string>
