@@ -9,8 +9,8 @@
     <string name="allow_install_unchecked_msg">Wygląda na to że nie zajrzałeś na tę stronę. To nie dobrze!</string>
     <string name="ok">OK</string>
     <string name="cancel">Przerwij</string>
-    <string name="installing_title">Instaluję...</string>
-    <string name="installing_msg">Instaluję. Proszę czekać...</string>
+    <string name="installing_title">Instaluję…</string>
+    <string name="installing_msg">Instaluję. Proszę czekać…</string>
     <string name="current_rom_name">Nazwa obecnego ROMu</string>
     <string name="select_droidboot_title">Wybierz DroidBoot</string>
     <string name="select_droidboot_msg">Zostaniesz teraz poproszony o plik DroidBoot. Upewnij się, że jest on właściwy dla twojego urządzenia!</string>
@@ -42,7 +42,7 @@
     <string name="default_entry">Domyślny wpis</string>
     <string name="save">Zapisz</string>
     <string name="edit_entry">Edytuj wpis</string>
-    <string name="entry_create">Utwórz nowy...</string>
+    <string name="entry_create">Utwórz nowy…</string>
     <string name="title">Tytuł</string>
     <string name="kernel">Kernel</string>
     <string name="dtb">DTB</string>
@@ -51,7 +51,7 @@
     <string name="delete">Usuń</string>
     <string name="filename">Nazwa pliku konfiguracyjnego (bez spacji, bez rozszerzenia pliku)</string>
     <string name="add_rom">Dodaj ROM</string>
-    <string name="data_partition">Partycja data</string>
-    <string name="system_partition">Partycja system</string>
+    <string name="rom_location">Lokalizacja ROMu</string>
+    <string name="delete_real_rom">Nie możesz usunąć swojego głównego ROMu!</string>
     <string name="app_unfinished">Menedżer uruchamiania Androida jest zainstalowany pomyślnie ale aplikacja jeszcze nie jest skończona; puste strony i przyciski które nic nie robią są normalne. :(</string>
 </resources>

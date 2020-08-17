@@ -9,8 +9,8 @@
     <string name="allow_install_unchecked_msg">Здається, що ви не прочитали інструкцію на сторінці. Це не добре!</string>
     <string name="ok">OK</string>
     <string name="cancel">Скасувати</string>
-    <string name="installing_title">Інсталяція...</string>
-    <string name="installing_msg">Встановлення. Будь ласка, зачекайте...</string>
+    <string name="installing_title">Інсталяція…</string>
+    <string name="installing_msg">Встановлення. Будь ласка, зачекайте…</string>
     <string name="current_rom_name">Ім\'я поточної прошивки</string>
     <string name="select_droidboot_title">Виберіть DroidBoot</string>
     <string name="select_droidboot_msg">Ви повинні вибрати DroidBoot файл. Перевірте чи він для вашого пристрою!</string>
@@ -42,7 +42,7 @@
     <string name="default_entry">Запис за замовчуванням</string>
     <string name="save">Зберегти</string>
     <string name="edit_entry">Редагування запису</string>
-    <string name="entry_create">Створити новий...</string>
+    <string name="entry_create">Створити новий…</string>
     <string name="title">Назва</string>
     <string name="kernel">Kernel</string>
     <string name="dtb">DTB</string>
@@ -51,7 +51,7 @@
     <string name="delete">Видалити</string>
     <string name="filename">Ім\'я файлу конфігурації (без пробілів, немає розширення)</string>
     <string name="add_rom">Додати прошивку</string>
-    <string name="data_partition">Розділ Data</string>
-    <string name="system_partition">Системний розділ</string>
-    <string name="app_unfinished">Android Boot Manager встановлений успішно але програма ще недописана; порожні сторінки і кнопки, які нічого не роблять передбачені :(</string>
+    <string name="rom_location">ROM location</string>
+    <string name="delete_real_rom">You cannot delete your primary ROM!</string>
+    <string name="app_unfinished">Android Boot Manager is installed successfully but the app is not yet finished; blank pages and buttons that do nothing are excepted :(</string>
 </resources>

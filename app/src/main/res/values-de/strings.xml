@@ -9,8 +9,8 @@
     <string name="allow_install_unchecked_msg">Es sieht so aus als hättest du nicht auf diese Seite geschaut. Das ist nicht gut!</string>
     <string name="ok">OK</string>
     <string name="cancel">Abbrechen</string>
-    <string name="installing_title">Installiere...</string>
-    <string name="installing_msg">Installiere, bitte warten...</string>
+    <string name="installing_title">Installiere…</string>
+    <string name="installing_msg">Installiere, bitte warten…</string>
     <string name="current_rom_name">Name des installierten ROMs</string>
     <string name="select_droidboot_title">DroidBoot auswählen</string>
     <string name="select_droidboot_msg">Du wirst nun nach der DroidBoot-Datei gefragt. Stelle sicher, dass sie die richtige für dein Gerät ist!</string>
@@ -42,7 +42,7 @@
     <string name="default_entry">Standardeintrag</string>
     <string name="save">Speichern</string>
     <string name="edit_entry">Eintrag bearbeiten</string>
-    <string name="entry_create">Neuen Eintrag erstellen...</string>
+    <string name="entry_create">Neuen Eintrag erstellen…</string>
     <string name="title">Name</string>
     <string name="kernel">Kernel</string>
     <string name="dtb">DTB</string>
@@ -51,7 +51,7 @@
     <string name="delete">Löschen</string>
     <string name="filename">Konfigurationsdateiname (keine Leerzeichen, keine Dateiendung)</string>
     <string name="add_rom">ROM hinzufügen</string>
-    <string name="data_partition">Datenpartition</string>
-    <string name="system_partition">System-Partition</string>
+    <string name="rom_location">ROM-Standort</string>
+    <string name="delete_real_rom">Sie können das primäre ROM nicht löschen!</string>
     <string name="app_unfinished">Die Android-Startverwaltung ist erfolgreich installiert aber die App ist noch nicht fertig. Nutzlose Knöpfe und leere Seiten sind zu erwarten :(</string>
 </resources>
