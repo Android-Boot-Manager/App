@@ -51,7 +51,7 @@
     <string name="delete">Sil</string>
     <string name="filename">Yapılandırma dosyasının adı (Boşluk, uzantı içermeyecek)</string>
     <string name="add_rom">ROM ekle</string>
-    <string name="data_partition">Veri Bölümü</string>
-    <string name="system_partition">Sistem Bölümü</string>
+    <string name="rom_location">ROM location</string>
+    <string name="delete_real_rom">You cannot delete your primary ROM!</string>
     <string name="app_unfinished">Android Boot Manager başarıyla yüklendi ancak uygulama yapımı henüz bitmedi; hiç bir şey yapmayan boş sayfalar ve düğmeler olabilir :(</string>
 </resources>
