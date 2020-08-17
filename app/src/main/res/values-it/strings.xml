@@ -52,7 +52,7 @@ se falsifichi il fingerprint)</string>
     <string name="delete">Elimina</string>
     <string name="filename">Nome file Config (Nessun spazio, no estensione file)</string>
     <string name="add_rom">Aggiungi ROM</string>
-    <string name="data_partition">Partizione Data</string>
-    <string name="system_partition">Partizione System</string>
+    <string name="rom_location">ROM location</string>
+    <string name="delete_real_rom">You cannot delete your primary ROM!</string>
     <string name="app_unfinished">Android Boot Manager è stato installato con successo ma quest’applicazione non è ancora finita; aspettati di trovare pagine vuote e pulsanti che non funzionano :(</string>
 </resources>
