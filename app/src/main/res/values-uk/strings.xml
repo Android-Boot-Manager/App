@@ -9,8 +9,8 @@
     <string name="allow_install_unchecked_msg">Здається, що ви не прочитали інструкцію на сторінці. Це не добре!</string>
     <string name="ok">OK</string>
     <string name="cancel">Скасувати</string>
-    <string name="installing_title">Installing…</string>
-    <string name="installing_msg">Installing. Please wait…</string>
+    <string name="installing_title">Інсталяція…</string>
+    <string name="installing_msg">Встановлення. Будь ласка, зачекайте…</string>
     <string name="current_rom_name">Ім\'я поточної прошивки</string>
     <string name="select_droidboot_title">Виберіть DroidBoot</string>
     <string name="select_droidboot_msg">Ви повинні вибрати DroidBoot файл. Перевірте чи він для вашого пристрою!</string>
@@ -18,7 +18,7 @@
     <string name="sure_msg">Якщо ви натиснете ОК, ABM буде встановлено. Остання перевірка!</string>
     <string name="choose_device">Виберіть ваш пристрій</string>
     <string name="install_finish_title">Установку завершено</string>
-    <string name="install_finish_msg">Return code is %1$sWhen the Return Code is ERROR, something went wrong. Please flash the uninstaller and ask in our Telegram group @andbootmgr. Don\'t forget the log file at /sdcard/abm/install.log! If the Return Code is OK, the installation was successful. You should reboot now.</string>
+    <string name="install_finish_msg">Результат %1$sКоли результат ERROR, щось пішло не так. Будь ласуа прошийте uninstaller деінсталятор і запитайте в нашій Телеграм групі @andbootmgr. Не забудьте лог файл /sdcard/abm/install.log! Якщо результат ОК, інсталяція успішна. Ви мусите перезагрузити пристрій зараз.</string>
     <string name="root">Я рут, добре :)</string>
     <string name="no_root">Я НЕ рут. Щось пішло не так!</string>
     <string name="test_root">Перевірити рут доступу</string>
@@ -42,7 +42,7 @@
     <string name="default_entry">Запис за замовчуванням</string>
     <string name="save">Зберегти</string>
     <string name="edit_entry">Редагування запису</string>
-    <string name="entry_create">Create new…</string>
+    <string name="entry_create">Створити новий…</string>
     <string name="title">Назва</string>
     <string name="kernel">Kernel</string>
     <string name="dtb">DTB</string>
