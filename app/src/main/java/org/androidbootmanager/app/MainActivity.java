@@ -3,7 +3,6 @@ package org.androidbootmanager.app;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.net.Uri;
@@ -16,10 +15,11 @@ import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.Switch;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+
+import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
 		deviceList.add("cedric");
 		deviceList.add("yggdrasil");
 		currentDevice = android.os.Build.DEVICE;
-		if ((!(deviceList.contains(android.os.Build.DEVICE))) && (!((Switch) findViewById(R.id.mainnotinstallSwitch1)).isChecked())) {new AlertDialog.Builder(this).setCancelable(true).setTitle(R.string.wrong_device_title).setMessage(getResources().getString(R.string.wrong_device_msg, android.os.Build.DEVICE)).show(); return;}
+		if ((!(deviceList.contains(android.os.Build.DEVICE))) && (!((SwitchMaterial) findViewById(R.id.mainnotinstallSwitch1)).isChecked())) {new AlertDialog.Builder(this).setCancelable(true).setTitle(R.string.wrong_device_title).setMessage(getResources().getString(R.string.wrong_device_msg, android.os.Build.DEVICE)).show(); return;}
 		if (!((CheckBox) findViewById(R.id.mainnotinstallCheckBox1)).isChecked()) {
 			new AlertDialog.Builder(this)
 				.setCancelable(true)
@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
 
 		});
 		builder.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.cancel());
-		if (((Switch)findViewById(R.id.mainnotinstallSwitch1)).isChecked()) {
+		if (((SwitchMaterial)findViewById(R.id.mainnotinstallSwitch1)).isChecked()) {
 			final ArrayAdapter<String> arr = new ArrayAdapter<>(this, android.R.layout.select_dialog_singlechoice);
 			arr.add("cedric");
 			arr.add("yggdrasil");
@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
 						.setMessage(R.string.sure_msg)
 						.setCancelable(true)
 						.setNegativeButton(R.string.cancel, (p1, p2) -> p1.dismiss())
-						.setPositiveButton(R.string.ok, (DialogInterface.OnClickListener) (p1, p2) -> {
+						.setPositiveButton(R.string.ok, (p1, p2) -> {
 							progdialog.show();
 							Uri selectedUri = data.getData();
 							try {
@@ -162,10 +162,10 @@ public class MainActivity extends AppCompatActivity {
 										.show();
 								return;
 							}
-							new Thread((Runnable) () -> {
+							new Thread(() -> {
 								copyAssets();
 								final String r = doRootGlobal(assetsdir + "/app_install.sh '" + romname + "' " + currentDevice);
-								runOnUiThread((Runnable) () -> {
+								runOnUiThread(() -> {
 									progdialog.dismiss();
 									new AlertDialog.Builder(MainActivity.this)
 											.setTitle(R.string.install_finish_title)
@@ -244,10 +244,10 @@ public class MainActivity extends AppCompatActivity {
 			.show();
 	}
 	public void testRoot(View v) {
-		new Thread((Runnable) () -> {
+		new Thread(() -> {
 			copyAssets();
 			final String r = doRoot("/data/data/org.androidbootmanager.app/assets/hello.sh");
-			runOnUiThread((Runnable) () -> new AlertDialog.Builder(MainActivity.this)
+			runOnUiThread(() -> new AlertDialog.Builder(MainActivity.this)
 					.setTitle(R.string.test_root)
 					.setMessage(getResources().getString((r.contains("I am root, fine! :)")) ?R.string.root: R.string.no_root))
 					.show());

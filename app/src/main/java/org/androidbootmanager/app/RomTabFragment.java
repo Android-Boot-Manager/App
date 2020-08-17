@@ -3,7 +3,6 @@ package org.androidbootmanager.app;
 import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -31,7 +30,7 @@ public class RomTabFragment extends ConfiguratorActivity.BaseFragment
 	@SuppressLint("SetTextI18n")
 	@Override
 	protected void onInit() {
-		myList = (ListView) Objects.requireNonNull(getView()).findViewById(R.id.tabromListView);
+		myList = Objects.requireNonNull(getView()).findViewById(R.id.tabromListView);
 		roms = new ArrayList<>();
 		romsListView = new ArrayList<>();
 		for (String romFile : Shell.doRoot("find /data/bootset/lk2nd/entries -type f").split("\n")) {
@@ -41,8 +40,8 @@ public class RomTabFragment extends ConfiguratorActivity.BaseFragment
 		adapter = new ArrayAdapter<>(xcontext, android.R.layout.simple_list_item_1, romsListView);
 		regenListView();
 		myList.setAdapter(adapter);
-		myList.setOnItemClickListener((OnItemClickListener) (parent, view, position, p4) -> {
-			if (((String) parent.getItemAtPosition(position)).equals(xcontext.getResources().getString(R.string.entry_create))) {
+		myList.setOnItemClickListener((parent, view, position, p4) -> {
+			if (parent.getItemAtPosition(position).equals(xcontext.getResources().getString(R.string.entry_create))) {
 				// TODO: Implement adding a ROM
 			} else {
 				final ROM rom = findEntry((String) parent.getItemAtPosition(position));
@@ -51,8 +50,7 @@ public class RomTabFragment extends ConfiguratorActivity.BaseFragment
 				View dialog = LayoutInflater.from(xcontext).inflate(R.layout.edit_rom,null);
 				((EditText) dialog.findViewById(R.id.editromTitle)).setText(rom.config.get("title"));
 				((EditText) dialog.findViewById(R.id.editromTitle)).addTextChangedListener(new ConfigTextWatcher(proposed, "title"));
-				((TextView) dialog.findViewById(R.id.editromDataPart)).setText(": " + rom.config.get("xRomData"));
-				((TextView) dialog.findViewById(R.id.editromSystemPart)).setText(": " + rom.config.get("xRomSystem"));
+				((TextView) dialog.findViewById(R.id.editromDataPart)).setText(": " + rom.config.get("xRom"));
 				new AlertDialog.Builder(xcontext)
 				.setTitle(R.string.add_rom)
 				.setPositiveButton(R.string.save, (p1, p2) -> {
@@ -61,6 +59,14 @@ public class RomTabFragment extends ConfiguratorActivity.BaseFragment
 				})
 				.setNegativeButton(R.string.delete, (p1, p2) -> {
 					p1.dismiss();
+					if (rom.config.get("xRom").equals("real")) {
+						new AlertDialog.Builder(xcontext)
+								.setTitle(R.string.fatal)
+								.setMessage(R.string.delete_real_rom)
+								.setCancelable(true)
+								.show();
+						return;
+					}
 					new AlertDialog.Builder(xcontext)
 						.setTitle(R.string.delete)
 						.setMessage(R.string.sure_title)
@@ -70,7 +76,7 @@ public class RomTabFragment extends ConfiguratorActivity.BaseFragment
 							Shell.doRoot("rm " + rom.file);
 							roms.remove(rom);
 							regenListView();
-							// TODO: Implement deleting partitions
+							System.out.println(Shell.doRoot("sgdisk /dev/block/mmcblk1 --delete " + rom.config.get("xRomData") + " --delete " + rom.config.get("xRomSystem")));
 						})
 						.show();
 				})
