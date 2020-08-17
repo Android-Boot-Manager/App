@@ -51,7 +51,7 @@
     <string name="delete">Delete</string>
     <string name="filename">Config file name (No spaces, no file extension)</string>
     <string name="add_rom">Add ROM</string>
-    <string name="data_partition">Data Partition</string>
-    <string name="system_partition">System Partition</string>
+    <string name="rom_location">ROM location</string>
+    <string name="delete_real_rom">You cannot delete your primary ROM!</string>
     <string name="app_unfinished">Android Boot Manager is installed successfully but the app is not yet finished; blank pages and buttons that do nothing are excepted :(</string>
 </resources>
