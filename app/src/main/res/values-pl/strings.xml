@@ -51,7 +51,7 @@
     <string name="delete">Usuń</string>
     <string name="filename">Nazwa pliku konfiguracyjnego (bez spacji, bez rozszerzenia pliku)</string>
     <string name="add_rom">Dodaj ROM</string>
-    <string name="data_partition">Partycja data</string>
-    <string name="system_partition">Partycja system</string>
+    <string name="rom_location">ROM location</string>
+    <string name="delete_real_rom">You cannot delete your primary ROM!</string>
     <string name="app_unfinished">Android Boot Manager is installed successfully but the app is not yet finished; blank pages and buttons that do nothing are excepted :(</string>
 </resources>
