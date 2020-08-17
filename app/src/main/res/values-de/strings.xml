@@ -9,8 +9,8 @@
     <string name="allow_install_unchecked_msg">Es sieht so aus als hättest du nicht auf diese Seite geschaut. Das ist nicht gut!</string>
     <string name="ok">OK</string>
     <string name="cancel">Abbrechen</string>
-    <string name="installing_title">Installing…</string>
-    <string name="installing_msg">Installing. Please wait…</string>
+    <string name="installing_title">Installiere…</string>
+    <string name="installing_msg">Installiere, bitte warten…</string>
     <string name="current_rom_name">Name des installierten ROMs</string>
     <string name="select_droidboot_title">DroidBoot auswählen</string>
     <string name="select_droidboot_msg">Du wirst nun nach der DroidBoot-Datei gefragt. Stelle sicher, dass sie die richtige für dein Gerät ist!</string>
@@ -18,7 +18,7 @@
     <string name="sure_msg">Wenn Sie jetzt OK drücken, wird ABM installiert. Dies ist die letzte Bestätigung!</string>
     <string name="choose_device">Wählen Sie Ihr Gerät aus</string>
     <string name="install_finish_title">Installation abgeschlossen</string>
-    <string name="install_finish_msg">Return code is %1$sWhen the Return Code is ERROR, something went wrong. Please flash the uninstaller and ask in our Telegram group @andbootmgr. Don\'t forget the log file at /sdcard/abm/install.log! If the Return Code is OK, the installation was successful. You should reboot now.</string>
+    <string name="install_finish_msg">Rückgabe ist %1$sWenn die Rückgabe ERROR (Fehler) ist ist etwas schiefgelaufen. Bitte flashe den Deinstallierer und sag und in unserer Telegram-Gruppe @andbootmgr bescheid. Bitte bring das Log (/sdcard/abm/install.log) mit! Falls die Rückgabe OK ist war die Installation erfolgreich. Du solltest dein Gerät neustarten.</string>
     <string name="root">Ich bin Root. Super! :)</string>
     <string name="no_root">Ich bin NICHT Root. Etwas ist schiefgelaufen!</string>
     <string name="test_root">Root testen</string>
@@ -42,7 +42,7 @@
     <string name="default_entry">Standardeintrag</string>
     <string name="save">Speichern</string>
     <string name="edit_entry">Eintrag bearbeiten</string>
-    <string name="entry_create">Create new…</string>
+    <string name="entry_create">Neuen Eintrag erstellen…</string>
     <string name="title">Name</string>
     <string name="kernel">Kernel</string>
     <string name="dtb">DTB</string>
@@ -51,7 +51,7 @@
     <string name="delete">Löschen</string>
     <string name="filename">Konfigurationsdateiname (keine Leerzeichen, keine Dateiendung)</string>
     <string name="add_rom">ROM hinzufügen</string>
-    <string name="rom_location">ROM location</string>
-    <string name="delete_real_rom">You cannot delete your primary ROM!</string>
-    <string name="app_unfinished">Android Boot Manager is installed successfully but the app is not yet finished; blank pages and buttons that do nothing are excepted :(</string>
+    <string name="rom_location">ROM-Standort</string>
+    <string name="delete_real_rom">Sie können das primäre ROM nicht löschen!</string>
+    <string name="app_unfinished">Die Android-Startverwaltung ist erfolgreich installiert aber die App ist noch nicht fertig. Nutzlose Knöpfe und leere Seiten sind zu erwarten :(</string>
 </resources>
