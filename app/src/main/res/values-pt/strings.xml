@@ -51,7 +51,7 @@
     <string name="delete">Deletar</string>
     <string name="filename">Configurar nome do arquivo (sem espaços, ou extensões)</string>
     <string name="add_rom">Adicionar ROM</string>
-    <string name="rom_location">ROM location</string>
-    <string name="delete_real_rom">You cannot delete your primary ROM!</string>
+    <string name="rom_location">Local da ROM</string>
+    <string name="delete_real_rom">Você não pode deletar sua ROM principal!</string>
     <string name="app_unfinished">O Android Boot Manager está instalado corretamente mais o app não está terminado; páginas em branco e botões sem função são esperados :(</string>
 </resources>
