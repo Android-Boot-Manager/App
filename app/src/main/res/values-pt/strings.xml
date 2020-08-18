@@ -51,8 +51,8 @@
     <string name="format">Formatar</string>
     <string name="format_msg">ATENÇÃO: Se você apertar em OK, todos os arquivos no seu cartão SD serão PERDIDOS</string>
     <string name="unsupported_os">Esse instalador do sistema operacional não é suportado.</string>
-    <string name="storage_in_use">The storage is currently in use. Often does Android auto-mounting or your SD card is formatted as Internal Storage. Please make sure it is not used (mounted or even modified)</string>
-    <string name="no_storage_found">No storage device with ABM metadata was found but you need one for this. If you have one, press \"Format\". If there is no \"Format\" button there was no compatible storage found.</string>
+    <string name="storage_in_use">Este armazenamento está atualmente em uso. Muitas vezes o Android automaticamente monta ou seu cartão SD está formatado como Memória Interna. porfavor tenha certeza que não está sendo usado (montado ou sequer modificado)</string>
+    <string name="no_storage_found">Nenhum dispositivo de armazenamento com a metadata do ABM foi encontrado mas você precisa de um pra isso. Se você tem um, pressione \"Formatar\". Se não tem nenhum botão de \"Formatar\" nenhum armazenamento compatível foi encontrado.</string>
     <string name="delete">Deletar</string>
     <string name="filename">Configurar nome do arquivo (sem espaços, ou extensões)</string>
     <string name="add_rom">Adicionar ROM</string>
@@ -60,6 +60,6 @@
     <string name="delete_real_rom">Você não pode deletar sua ROM principal!</string>
     <string name="app_unfinished">O Android Boot Manager está instalado corretamente mais o app não está terminado; páginas em branco e botões sem função são esperados :(</string>
     <string name="rom_type_add_rom_zip">Android (ROM zip)</string>
-    <string name="rom_type_add_ut_sysimg_halium_rootfs">Ubuntu Touch (System image, Halium Boot image, Rootfs)</string>
-    <string name="rom_type_add_ut_sysimg_halium">Ubuntu Touch (System image, Halium Boot image)</string>
+    <string name="rom_type_add_ut_sysimg_halium_rootfs">Ubuntu Touch (System image, Helium Boot image, Rootfs)</string>
+    <string name="rom_type_add_ut_sysimg_halium">Ubuntu Touch (System image, Helium Boot image)</string>
 </resources>
