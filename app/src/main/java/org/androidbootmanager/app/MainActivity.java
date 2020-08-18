@@ -98,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
 		builder.setView(input);
 		builder.setPositiveButton(R.string.ok, (dialogif, which) -> {
 			romname = input.getText().toString(); System.out.println("installing abm for " + currentDevice);
+			Shell.doRoot("echo " + currentDevice + " >/data/abm-codename.cfg");
 			new AlertDialog.Builder(MainActivity.this)
 				.setTitle(R.string.select_droidboot_title)
 				.setMessage(R.string.select_droidboot_msg)
