@@ -48,9 +48,9 @@
     <string name="dtb">DTB</string>
     <string name="initrd">Initrd</string>
     <string name="cmdline">Cmdline</string>
-    <string name="format">Format</string>
-    <string name="format_msg">ATTENTION: If you now click OK, all data on that SD card will be LOST</string>
-    <string name="unsupported_os">This operating system installer is unsupported.</string>
+    <string name="format">Форматувати</string>
+    <string name="format_msg">УВАГА: Якщо ви натиснете кнопку ОК, всі дані на цій SD-карті будуть видалені</string>
+    <string name="unsupported_os">Цей інсталятор операційної системи не підтримується.</string>
     <string name="storage_in_use">The storage is currently in use. Often does Android auto-mounting or your SD card is formatted as Internal Storage. Please make sure it is not used (mounted or even modified)</string>
     <string name="no_storage_found">No storage device with ABM metadata was found but you need one for this. If you have one, press \"Format\". If there is no \"Format\" button there was no compatible storage found.</string>
     <string name="delete">Видалити</string>
