@@ -48,10 +48,16 @@
     <string name="dtb">DTB</string>
     <string name="initrd">Initrd</string>
     <string name="cmdline">Cmdline</string>
+    <string name="format">Format</string>
+    <string name="format_msg">ATTENTION: If you now click OK, all data on that SD card will be LOST</string>
+    <string name="storage_in_use">The storage is currently in use. Often does Android auto-mounting or your SD card is formatted as Internal Storage. Please make sure it is not used (mounted or even modified)</string>
+    <string name="no_storage_found">No storage device with ABM metadata was found but you need one for this. If you have one, press \"Format\". If there is no \"Format\" button there was no compatible storage found.</string>
     <string name="delete">Видалити</string>
     <string name="filename">Ім\'я файлу конфігурації (без пробілів, немає розширення)</string>
     <string name="add_rom">Додати прошивку</string>
     <string name="rom_location">Шлях файлу прошивки</string>
     <string name="delete_real_rom">Ви не можете видалити основну прщшивку!</string>
     <string name="app_unfinished">Android Boot Manager встановлений успішно але програма ще недописана; порожні сторінки і кнопки, які нічого не роблять передбачені :(</string>
+    <string name="rom_type_add_rom_zip">Android (ROM zip)</string>
+    <string name="rom_type_add_ut_sysimg_halium_rootfs">Ubuntu Touch (System image, Halium Boot image, Rootfs)</string>
 </resources>
