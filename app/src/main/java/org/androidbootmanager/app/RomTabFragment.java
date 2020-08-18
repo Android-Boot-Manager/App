@@ -1,7 +1,6 @@
 package org.androidbootmanager.app;
 
 import android.annotation.SuppressLint;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -78,6 +77,9 @@ public class RomTabFragment extends ConfiguratorActivity.BaseFragment {
                             case "add_ubuntutouch_sytemimage_haliumboot_rootfs.sh":
                                 items.add(getString(R.string.rom_type_add_ut_sysimg_halium_rootfs));
                                 break;
+                            case "add_ubuntutouch_sytemimage_haliumboot.sh":
+                                items.add(getString(R.string.rom_type_add_ut_sysimg_halium));
+                                break;
                         }
                     }
                 	new AlertDialog.Builder(xcontext)
@@ -86,7 +88,22 @@ public class RomTabFragment extends ConfiguratorActivity.BaseFragment {
 							.setCancelable(true)
 							.setNegativeButton(R.string.cancel, (p1,p2) -> p1.dismiss())
 							.setItems(items.toArray(new String[]{}), (dialog, which) -> {
-							    // TODO: Implement actually installing ROMs
+							    dialog.dismiss();
+							    switch (oses.get(which)) {
+                                    case "add_ubuntutouch_sytemimage_haliumboot_rootfs.sh":
+                                        // TODO: Add UT installer
+                                        break;
+                                    case "add_ubuntutouch_sytemimage_haliumboot.sh":
+                                        // TODO: Add yggdrasil UT installer
+                                        break;
+                                    default:
+                                        new AlertDialog.Builder(xcontext)
+                                                .setTitle(R.string.fatal)
+                                                .setMessage(R.string.unsupported_os)
+                                                .setNegativeButton(R.string.cancel, (p1,p2) -> p1.dismiss())
+                                                .show();
+                                        break;
+							    }
                             })
 							.show();
 				}
