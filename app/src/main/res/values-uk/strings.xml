@@ -51,7 +51,7 @@
     <string name="delete">Видалити</string>
     <string name="filename">Ім\'я файлу конфігурації (без пробілів, немає розширення)</string>
     <string name="add_rom">Додати прошивку</string>
-    <string name="rom_location">ROM location</string>
-    <string name="delete_real_rom">You cannot delete your primary ROM!</string>
-    <string name="app_unfinished">Android Boot Manager is installed successfully but the app is not yet finished; blank pages and buttons that do nothing are excepted :(</string>
+    <string name="rom_location">Шлях файлу прошивки</string>
+    <string name="delete_real_rom">Ви не можете видалити основну прщшивку!</string>
+    <string name="app_unfinished">Android Boot Manager встановлений успішно але програма ще недописана; порожні сторінки і кнопки, які нічого не роблять передбачені :(</string>
 </resources>
