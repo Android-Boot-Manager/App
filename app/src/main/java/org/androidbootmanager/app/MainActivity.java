@@ -22,6 +22,7 @@ import androidx.core.content.ContextCompat;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -182,23 +183,8 @@ public class MainActivity extends AppCompatActivity {
 
 
 	private void copyAssets() {
-		File x = new File(assetsdir, "Toolkit");
-		File y = new File(assetsdir, "Scripts");
-		File z = new File(assetsdir, "Scripts/install");
-		File z2 = new File(assetsdir, "Scripts/add_os");
-		File z3 = new File(assetsdir, "Scripts/add_os/cedric");
-		File z4 = new File(assetsdir, "Scripts/add_os/yggdrasil");
-		if (!x.exists())x.mkdir();
-		if (!y.exists())y.mkdir();
-		if (!z.exists())z.mkdir();
-		if (!z2.exists())z2.mkdir();
-		if (!z3.exists())z3.mkdir();
-		if (!z4.exists())z4.mkdir();
 		copyAssets("Toolkit", "Toolkit");
 		copyAssets("Scripts", "Scripts");
-		copyAssets("Scripts/install", "Scripts/install");
-		copyAssets("Scripts/add_os/cedric", "Scripts/add_os/cedric");
-		copyAssets("Scripts/add_os/yggdrasil", "Scripts/add_os/yggdrasil");
 		copyAssets("cp", ""); 
 	}
 
@@ -213,21 +199,35 @@ public class MainActivity extends AppCompatActivity {
 
 		assert files != null;
 		for (String filename : files) {
-			InputStream in;
-			OutputStream out;
-			try {
-				in = assetManager.open(src + "/" + filename);
-				File outFile = new File("/data/data/org.androidbootmanager.app/assets/" + outp, filename);
-				out = new FileOutputStream(outFile);
-				copyFile(in, out);
-				in.close();
-				out.flush();
-				out.close();
-			} catch (IOException e) {
-				Log.e("tag", "Failed to copy asset file: " + filename, e);
-			}
+			copyAssets(src, outp, assetManager, filename);
 		}
 		doShell("chmod -R +x /data/data/org.androidbootmanager.app/assets");
+	}
+
+	private void copyAssets(String src, String outp, AssetManager assetManager, String filename) {
+		InputStream in;
+		OutputStream out;
+		try {
+			in = assetManager.open(src + "/" + filename);
+			File outFile = new File("/data/data/org.androidbootmanager.app/assets/" + outp, filename);
+			out = new FileOutputStream(outFile);
+			copyFile(in, out);
+			in.close();
+			out.flush();
+			out.close();
+		} catch (FileNotFoundException e) {
+			Log.e("tag",assetsdir + File.separator + outp + File.separator + filename);
+			new File(assetsdir + File.separator + outp + File.separator).mkdir();
+			try {
+				assetManager.open(src + File.separator + filename).close();
+				copyAssets(src, outp, assetManager, filename);
+			} catch(FileNotFoundException e2) {
+				new File(assetsdir + File.separator + outp + File.separator + filename).mkdir();
+				copyAssets(src + File.separator + filename, outp + File.separator + filename);
+			} catch (IOException ex) {ex.printStackTrace();}
+		} catch (IOException e) {
+			Log.e("tag", "Failed to copy asset file: " + filename, e);
+		}
 	}
 
 	private void copyFile(InputStream in, OutputStream out) throws IOException {
