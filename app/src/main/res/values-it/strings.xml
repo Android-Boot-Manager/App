@@ -26,7 +26,8 @@
     <string name="readme_text">I codici sorgenti sono disponibili qui: %1$s\nIl file LEGGIMI(README) è disponibile qui: %2$s</string>
     <string name="install">Installa</string>
     <string name="readme">LEGGIMI(README)</string>
-    <string name="nodevcheck">Disabilita il controllo del dispositivo (se falsifichi il fingerprint)</string>
+    <string name="nodevcheck">Disabilita il controllo del dispositivo (
+se falsifichi il fingerprint)</string>
     <string name="allow_install">Accetto il rischio, permetti l\'installazione!</string>
     <string name="not_installed">Android Boot Manager non è installato sul tuo dispositivo!</string>
     <string name="devices">É disponibile per il Moto G5 (cedric) e per il Volla Phone (yggdrasil)!</string>
