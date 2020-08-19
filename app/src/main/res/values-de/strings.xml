@@ -48,18 +48,18 @@
     <string name="dtb">DTB</string>
     <string name="initrd">Initrd</string>
     <string name="cmdline">Optionen</string>
-    <string name="format">Format</string>
-    <string name="format_msg">ATTENTION: If you now click OK, all data on that SD card will be LOST</string>
-    <string name="unsupported_os">This operating system installer is unsupported.</string>
-    <string name="storage_in_use">The storage is currently in use. Often does Android auto-mounting or your SD card is formatted as Internal Storage. Please make sure it is not used (mounted or even modified)</string>
-    <string name="no_storage_found">No storage device with ABM metadata was found but you need one for this. If you have one, press \"Format\". If there is no \"Format\" button there was no compatible storage found.</string>
+    <string name="format">Formatieren</string>
+    <string name="format_msg">ACHTUNG: Wenn du jetzt auf OK klickst, werden alle Daten auf dieser SD-Karte GELÖSCHT</string>
+    <string name="unsupported_os">Dieses Betriebssystem ist nicht unterstützt.</string>
+    <string name="storage_in_use">Der Speicher wird gerade verwendet. Oft hängt Android ihn automatisch ein oder die SD-Karte ist als interner Speicher formatiert. Bitte stelle sicher das er nicht verwendet wird</string>
+    <string name="no_storage_found">Es wurde kein Speichergerät mit ABM-Metadaten gefunden, aber Sie benötigen hierfür eines. Wenn Sie eines haben, drücken Sie \"Formatieren\". Wenn kein \"Formatieren\"-Knopf vorhanden ist, wurde kein kompatibler Speicher gefunden.</string>
     <string name="delete">Löschen</string>
     <string name="filename">Konfigurationsdateiname (keine Leerzeichen, keine Dateiendung)</string>
     <string name="add_rom">ROM hinzufügen</string>
     <string name="rom_location">ROM-Standort</string>
     <string name="delete_real_rom">Sie können das primäre ROM nicht löschen!</string>
     <string name="app_unfinished">Die Android-Startverwaltung ist erfolgreich installiert aber die App ist noch nicht fertig. Nutzlose Knöpfe und leere Seiten sind zu erwarten :(</string>
-    <string name="rom_type_add_rom_zip">Android (ROM zip)</string>
+    <string name="rom_type_add_rom_zip">Android (ROM Zip)</string>
     <string name="rom_type_add_ut_sysimg_halium_rootfs">Ubuntu Touch (System image, Halium Boot image, Rootfs)</string>
     <string name="rom_type_add_ut_sysimg_halium">Ubuntu Touch (System image, Halium Boot image)</string>
 </resources>
