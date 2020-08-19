@@ -216,7 +216,6 @@ public class MainActivity extends AppCompatActivity {
 			out.flush();
 			out.close();
 		} catch (FileNotFoundException e) {
-			Log.e("tag",assetsdir + File.separator + outp + File.separator + filename);
 			new File(assetsdir + File.separator + outp + File.separator).mkdir();
 			try {
 				assetManager.open(src + File.separator + filename).close();
