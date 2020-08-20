@@ -61,6 +61,7 @@
 	<string name="delete_real_rom">You cannot delete your primary ROM!</string>
 	<string name="app_unfinished">Android Boot Manager is installed successfully but the app is not yet finished; blank pages and buttons that do nothing are excepted :(</string>
 	<string name="rom_type_add_rom_zip">Android (ROM zip)</string>
+	<string name="updated">I updated my main ROM</string>
 	<string name="rom_type_add_ut_sysimg_halium_rootfs">Ubuntu Touch (System image, Halium Boot image, Rootfs)</string>
 	<string name="rom_type_add_ut_sysimg_halium">Ubuntu Touch (System image, Halium Boot image)</string>
 

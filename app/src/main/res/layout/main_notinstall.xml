@@ -101,5 +101,12 @@
 
 	</RelativeLayout>
 
+	<Button
+		android:id="@+id/mainnotinstallButtonUpdate"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:onClick="doUpdate"
+		android:text="@string/updated" />
+
 </LinearLayout>
 

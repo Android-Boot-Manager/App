@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
@@ -38,6 +39,7 @@ import static org.androidbootmanager.app.Shell.doShell;
 public class MainActivity extends AppCompatActivity {
 	File filedir = new File("/data/data/org.androidbootmanager.app/files");
 	File cfgfile = new File("/data/abm-part.cfg");
+	File cndfile = new File("/data/abm-codename.cfg");
 	File assetsdir = new File(filedir + "/../assets");
 	String romname = "null";
 	String currentDevice;
@@ -55,13 +57,50 @@ public class MainActivity extends AppCompatActivity {
 		if (cfgfile.exists()) {
       		setContentView(R.layout.main);
 			configurator(null);
-		} else setContentView(R.layout.main_notinstall);
+		} else {
+			setContentView(R.layout.main_notinstall);
+			if (!cndfile.exists())
+				findViewById(R.id.mainnotinstallButtonUpdate).setVisibility(Button.INVISIBLE);
+		}
 
     }
 
 	public void configurator(View v) {
 		mount(v);
 		startActivity(new Intent(this, ConfiguratorActivity.class));
+	}
+
+	public void doUpdate(View v) {
+    	if (!new File("/data/data/org.androidbootmanager.app/files/lk2nd.img").exists())
+    		new AlertDialog.Builder(MainActivity.this)
+				.setTitle(R.string.select_droidboot_title)
+				.setMessage(R.string.select_droidboot_msg)
+				.setCancelable(true)
+				.setNegativeButton(R.string.cancel, (p1, p2) -> p1.dismiss())
+				.setPositiveButton(R.string.ok, (p1, p2) -> {
+					Intent intent = new Intent();
+					intent.setType("*/*");
+					intent.setAction(Intent.ACTION_GET_CONTENT);
+					startActivityForResult(intent, 5208);
+				})
+				.show();
+    	else {
+			progdialog = new ProgressDialog(this);
+			progdialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+			progdialog.setTitle(R.string.installing_title);
+			progdialog.setMessage(getResources().getString(R.string.installing_msg));
+			progdialog.setIndeterminate(true);
+			progdialog.setCanceledOnTouchOutside(false);
+			progdialog.setCancelable(false);
+			progdialog.show();
+    		new Thread(() -> {
+    			Log.i("abm",Shell.doRootGlobal("cd /data/data/org.androidbootmanager.app/assets/Toolkit && /data/data/org.androidbootmanager.app/assets/Scripts/update/`cat /data/abm-codename.cfg`.sh 2>&1"));
+    			runOnUiThread(() -> {
+    				progdialog.dismiss();
+    				finish();
+    			});
+			}).start();
+    	}
 	}
 
 	public void mount(View v) {
@@ -177,6 +216,29 @@ public class MainActivity extends AppCompatActivity {
 							}).start();
 						})
 						.show();
+			} else if(requestCode == 5208) {
+				Uri selectedUri = data.getData();
+				try {
+					InputStream initialStream;
+					if (selectedUri != null) {
+						initialStream = getContentResolver().openInputStream(selectedUri);
+					} else {
+						throw new IOException("null selected");
+					}
+					File targetFile = new File("/data/data/org.androidbootmanager.app/files/lk2nd.img");
+					OutputStream outStream = new FileOutputStream(targetFile);
+					assert initialStream != null;
+					copyFile(initialStream, outStream);
+					initialStream.close();
+					outStream.close();
+					doUpdate(null);
+				} catch (IOException e) {
+					progdialog.dismiss();
+					new AlertDialog.Builder(MainActivity.this)
+							.setTitle(R.string.install_finish_title)
+							.setMessage(getResources().getString(R.string.install_finish_msg, "ERROR_java (IOException)"))
+							.show();
+				}
 			}
 		} else super.onActivityResult(requestCode, resultCode, data);
 	}
