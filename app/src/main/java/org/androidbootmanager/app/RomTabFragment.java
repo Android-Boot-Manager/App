@@ -94,7 +94,7 @@ public class RomTabFragment extends ConfiguratorActivity.BaseFragment {
                                         xcontext.runVM(Shell.doShell("cat /data/data/org.androidbootmanager.app/assets/Scripts/add_os/META-INF/add_ubuntutouch_sytemimage_haliumboot_rootfs.sh"));
                                         break;
                                     case "add_ubuntutouch_sytemimage_haliumboot.sh":
-                                        xcontext.runVM(Shell.doShell("cat /data/data/org.androidbootmanager.app/assets/Scripts/add_os/META-INF/add_ubuntutouch_sytemimage_haliumboot.sh"))
+                                        xcontext.runVM(Shell.doShell("cat /data/data/org.androidbootmanager.app/assets/Scripts/add_os/META-INF/add_ubuntutouch_sytemimage_haliumboot.sh"));
                                         break;
                                     default:
                                         new AlertDialog.Builder(xcontext)
