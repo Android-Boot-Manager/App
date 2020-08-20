@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.androidbootmanager.app" >
+    xmlns:tools="http://schemas.android.com/tools"
+    package="org.androidbootmanager.app">
 
     <application
+        tools:replace="android:allowBackup"
         android:allowBackup="false"
         android:supportsRtl="false"
         android:icon="@drawable/ic_launcher"
@@ -23,5 +25,7 @@
 			android:label="@string/configurator">
 		</activity>
     </application>
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
 </manifest>

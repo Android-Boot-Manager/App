@@ -91,7 +91,7 @@ public class RomTabFragment extends ConfiguratorActivity.BaseFragment {
 							    dialog.dismiss();
 							    switch (oses.get(which)) {
                                     case "add_ubuntutouch_sytemimage_haliumboot_rootfs.sh":
-                                        // TODO: Add UT installer
+                                        xcontext.runVM(Shell.doShell("cat /data/data/org.androidbootmanager.app/assets/Scripts/add_os/META-INF/add_ubuntutouch_sytemimage_haliumboot_rootfs.sh"));
                                         break;
                                     case "add_ubuntutouch_sytemimage_haliumboot.sh":
                                         // TODO: Add yggdrasil UT installer

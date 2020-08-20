@@ -46,9 +46,5 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.google.android.material:material:1.3.0-alpha02'
     implementation 'androidx.cardview:cardview:1.0.0'
-    
-    // DONT REMOVE THIS, AVOID CRASH
-    implementation 'androidx.lifecycle:lifecycle-livedata:2.2.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.2.0'
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+    implementation 'com.github.hedzr:android-file-chooser:v1.2.0-final'
 }
