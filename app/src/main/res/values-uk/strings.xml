@@ -60,6 +60,7 @@
     <string name="delete_real_rom">Ви не можете видалити основну прщшивку!</string>
     <string name="app_unfinished">Android Boot Manager встановлений успішно але програма ще недописана; порожні сторінки і кнопки, які нічого не роблять передбачені :(</string>
     <string name="rom_type_add_rom_zip">Андроїд (ROM zip)</string>
+    <string name="updatelk">Update DroidBoot</string>
     <string name="updated">I updated my main ROM</string>
     <string name="rom_type_add_ut_sysimg_halium_rootfs">Ubuntu Touch (System image, Halium Boot image, Rootfs)</string>
     <string name="rom_type_add_ut_sysimg_halium">Ubuntu Touch (System image, Halium Boot image)</string>
