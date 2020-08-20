@@ -68,5 +68,12 @@
 		android:id="@+id/tabgeneralSave"
 		android:layout_gravity="bottom"/>
 
+	<Button
+		android:id="@+id/mainnotinstallbuttonLk"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:onClick="doLkUpdate"
+		android:text="@string/updatelk" />
+
 </LinearLayout>
 
