@@ -49,10 +49,10 @@
     <string name="initrd">Initrd</string>
     <string name="cmdline">Cmdline</string>
     <string name="format">Format</string>
-    <string name="format_msg">ATTENTION: If you now click OK, all data on that SD card will be LOST</string>
-    <string name="unsupported_os">This operating system installer is unsupported.</string>
-    <string name="storage_in_use">The storage is currently in use. Often does Android auto-mounting or your SD card is formatted as Internal Storage. Please make sure it is not used (mounted or even modified)</string>
-    <string name="no_storage_found">No storage device with ABM metadata was found but you need one for this. If you have one, press \"Format\". If there is no \"Format\" button there was no compatible storage found.</string>
+    <string name="format_msg">UWAGA: Jeśli teraz klikniesz OK, wszystkie dane na tej karcie SD zostaną utracone</string>
+    <string name="unsupported_os">Instalator tego systemu operacyjnego nie jest obsługiwany.</string>
+    <string name="storage_in_use">Pamięć jest obecnie w użyciu. Często Android montuje ją automatycznie lub karta SD jest sformatowana jako pamięć wewnętrzna. Upewnij się, że nie jest używana (montowana lub nawet zmodyfikowana)</string>
+    <string name="no_storage_found">Nie znaleziono urządzenia magazynującego z metadanymi ABM, ale potrzebujesz ich. Jeśli posiadasz je, naciśnij \"Format\". Jeśli nie ma przycisku \"Format\" nie znaleziono kompatybilnej pamięci.</string>
     <string name="delete">Usuń</string>
     <string name="filename">Nazwa pliku konfiguracyjnego (bez spacji, bez rozszerzenia pliku)</string>
     <string name="add_rom">Dodaj ROM</string>
@@ -60,6 +60,8 @@
     <string name="delete_real_rom">Nie możesz usunąć swojego głównego ROMu!</string>
     <string name="app_unfinished">Menedżer uruchamiania Androida jest zainstalowany pomyślnie ale aplikacja jeszcze nie jest skończona; puste strony i przyciski które nic nie robią są normalne. :(</string>
     <string name="rom_type_add_rom_zip">Android (ROM zip)</string>
+    <string name="updatelk">Aktualizuj DroidBoot</string>
+    <string name="updated">Zaktualizowałem główny ROM</string>
     <string name="rom_type_add_ut_sysimg_halium_rootfs">Ubuntu Touch (System image, Halium Boot image, Rootfs)</string>
     <string name="rom_type_add_ut_sysimg_halium">Ubuntu Touch (System image, Halium Boot image)</string>
 </resources>

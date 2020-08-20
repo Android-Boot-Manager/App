@@ -60,6 +60,8 @@
     <string name="delete_real_rom">Sie können das primäre ROM nicht löschen!</string>
     <string name="app_unfinished">Die Android-Startverwaltung ist erfolgreich installiert aber die App ist noch nicht fertig. Nutzlose Knöpfe und leere Seiten sind zu erwarten :(</string>
     <string name="rom_type_add_rom_zip">Android (ROM Zip)</string>
+    <string name="updatelk">Update DroidBoot</string>
+    <string name="updated">I updated my main ROM</string>
     <string name="rom_type_add_ut_sysimg_halium_rootfs">Ubuntu Touch (System, Halium-Boot, Rootfs)</string>
     <string name="rom_type_add_ut_sysimg_halium">Ubuntu Touch (System, Halium-Boot)</string>
 </resources>
