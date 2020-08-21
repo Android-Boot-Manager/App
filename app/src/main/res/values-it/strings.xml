@@ -65,4 +65,8 @@ se falsifichi il fingerprint)</string>
     <string name="updated">I updated my main ROM</string>
     <string name="rom_type_add_ut_sysimg_halium_rootfs">Ubuntu Touch (System image, Halium Boot image, Rootfs)</string>
     <string name="rom_type_add_ut_sysimg_halium">Ubuntu Touch (System image, Halium Boot image)</string>
+    <string name="install_ut_halium_boot_systemimage">You are going to install ubuntu touch, using sytem image and halium boot. Are you sure?</string>
+    <string name="select_halium_boot">Please select halium boot file</string>
+    <string name="select_system_image">Please select systemimage</string>
+    <string name="enter_rom_name">Enter ROM name</string>
 </resources>
