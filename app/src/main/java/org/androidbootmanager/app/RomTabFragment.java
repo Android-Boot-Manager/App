@@ -67,7 +67,7 @@ public class RomTabFragment extends ConfiguratorActivity.BaseFragment {
                     }
                     d.show();
                 } else {
-                	ArrayList<String> oses = new ArrayList<>(Arrays.asList(Shell.doRoot("ls /data/data/org.androidbootmanager.app/assets/Scripts/add_os/" + codename).split("\\s")));
+                	ArrayList<String> oses = new ArrayList<>(Arrays.asList(Shell.doShell("ls /data/data/org.androidbootmanager.app/assets/Scripts/add_os/" + codename).split("\\s")));
                 	ArrayList<String> items = new ArrayList<>();
                     for (String x : oses) {
                         switch(x) {
