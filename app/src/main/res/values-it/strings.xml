@@ -49,7 +49,7 @@ se falsifichi il fingerprint)</string>
     <string name="dtb">DTB</string>
     <string name="initrd">Initrd</string>
     <string name="cmdline">Cmdline</string>
-    <string name="format">Format</string>
+    <string name="format">Formatta</string>
     <string name="format_msg">ATTENTION: If you now click OK, all data on that SD card will be LOST</string>
     <string name="unsupported_os">This operating system installer is unsupported.</string>
     <string name="storage_in_use">The storage is currently in use. Often does Android auto-mounting or your SD card is formatted as Internal Storage. Please make sure it is not used (mounted or even modified)</string>
@@ -61,12 +61,12 @@ se falsifichi il fingerprint)</string>
     <string name="delete_real_rom">Non puoi eliminare la tua ROM primaria!</string>
     <string name="app_unfinished">Android Boot Manager è stato installato con successo ma quest’applicazione non è ancora finita; aspettati di trovare pagine vuote e pulsanti che non funzionano :(</string>
     <string name="rom_type_add_rom_zip">Android (ROM zip)</string>
-    <string name="updatelk">Update DroidBoot</string>
-    <string name="updated">I updated my main ROM</string>
-    <string name="rom_type_add_ut_sysimg_halium_rootfs">Ubuntu Touch (System image, Halium Boot image, Rootfs)</string>
-    <string name="rom_type_add_ut_sysimg_halium">Ubuntu Touch (System image, Halium Boot image)</string>
-    <string name="install_ut_halium_boot_systemimage">You are going to install ubuntu touch, using sytem image and halium boot. Are you sure?</string>
-    <string name="select_halium_boot">Please select halium boot file</string>
-    <string name="select_system_image">Please select systemimage</string>
-    <string name="enter_rom_name">Enter ROM name</string>
+    <string name="updatelk">Aggiorna DroidBoot</string>
+    <string name="updated">Ho aggiornato la ROM principale</string>
+    <string name="rom_type_add_ut_sysimg_halium_rootfs">Ubuntu Touch (Systemimage, Halium boot, Rootfs)</string>
+    <string name="rom_type_add_ut_sysimg_halium">Ubuntu Touch (Systemimage, Halium boot)</string>
+    <string name="install_ut_halium_boot_systemimage">Stai per installare il ubuntu touch, usando l\'immagine system (systemimage) e halium boot. Sei sicuro?</string>
+    <string name="select_halium_boot">Selezionare il file halium boot</string>
+    <string name="select_system_image">Selezionare l\'immagine di sistema (systemimage)</string>
+    <string name="enter_rom_name">Inserisci il nome della ROM</string>
 </resources>
