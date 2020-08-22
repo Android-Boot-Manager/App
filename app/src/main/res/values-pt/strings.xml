@@ -60,12 +60,12 @@
     <string name="delete_real_rom">Você não pode deletar sua ROM principal!</string>
     <string name="app_unfinished">O Android Boot Manager está instalado corretamente mais o app não está terminado; páginas em branco e botões sem função são esperados :(</string>
     <string name="rom_type_add_rom_zip">Android (ROM zip)</string>
-    <string name="updatelk">Update DroidBoot</string>
-    <string name="updated">I updated my main ROM</string>
+    <string name="updatelk">Atualizar DroidBoot</string>
+    <string name="updated">Eu atualizei minha ROM principal</string>
     <string name="rom_type_add_ut_sysimg_halium_rootfs">Ubuntu Touch (System image, Helium Boot image, Rootfs)</string>
     <string name="rom_type_add_ut_sysimg_halium">Ubuntu Touch (System image, Helium Boot image)</string>
-    <string name="install_ut_halium_boot_systemimage">You are going to install ubuntu touch, using sytem image and halium boot. Are you sure?</string>
-    <string name="select_halium_boot">Please select halium boot file</string>
-    <string name="select_system_image">Please select systemimage</string>
+    <string name="install_ut_halium_boot_systemimage">Você está prestes a instalar o Ubuntu Touch, usando a System Image e o Halium Boot. Você tem certeza?</string>
+    <string name="select_halium_boot">Porfavor selecione o arquivo do Halium Boot</string>
+    <string name="select_system_image">Porfavor selecione a System Image</string>
     <string name="enter_rom_name">Enter ROM name</string>
 </resources>
