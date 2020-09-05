@@ -64,8 +64,8 @@
     <string name="updated">I updated my main ROM</string>
     <string name="rom_type_add_ut_sysimg_halium_rootfs">Ubuntu Touch (System, Halium-Boot, Rootfs)</string>
     <string name="rom_type_add_ut_sysimg_halium">Ubuntu Touch (System, Halium-Boot)</string>
-    <string name="install_ut_halium_boot_systemimage">You are going to install ubuntu touch, using sytem image and halium boot. Are you sure?</string>
-    <string name="select_halium_boot">Please select halium boot file</string>
-    <string name="select_system_image">Please select systemimage</string>
+    <string name="install_ut_halium_boot_systemimage">Ubuntu Touch wird jetzt durch Auswahl des System-Images und der halium-boot Datei installiert. Bist Du sicher?</string>
+    <string name="select_halium_boot">Bitte die halium-boot Datei auswählen (boot.img)</string>
+    <string name="select_system_image">Bitte das System-Image auswählen (system.img)</string>
     <string name="enter_rom_name">ROM Name eingeben</string>
 </resources>
