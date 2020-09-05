@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Android Boot Manager</string>
-    <string name="fatal">FATAL ERROR</string>
+    <string name="fatal">Критическая ошибка!</string>
     <string name="cp_err_msg">Did you install the app on a SD card?</string>
     <string name="wrong_device_title">Несовместимое устройство</string>
     <string name="wrong_device_msg">Android Boot Manager не доступен для этого устройства (%1$s).</string>
