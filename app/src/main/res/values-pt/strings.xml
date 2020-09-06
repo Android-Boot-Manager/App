@@ -67,5 +67,5 @@
     <string name="install_ut_halium_boot_systemimage">Você está prestes a instalar o Ubuntu Touch, usando a System Image e o Halium Boot. Você tem certeza?</string>
     <string name="select_halium_boot">Porfavor selecione o arquivo do Halium Boot</string>
     <string name="select_system_image">Porfavor selecione a System Image</string>
-    <string name="enter_rom_name">Enter ROM name</string>
+    <string name="enter_rom_name">Insira o nome da ROM</string>
 </resources>
