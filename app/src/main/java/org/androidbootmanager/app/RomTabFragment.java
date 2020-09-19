@@ -91,7 +91,7 @@ public class RomTabFragment extends ConfiguratorActivity.BaseFragment {
 							    dialog.dismiss();
 							    switch (oses.get(which)) {
                                     default:
-					if(new File("/data/data/org.androidbootmanager.app/assets/Scripts/add_os/META-INF/"+oses.get(which).exists())
+					if(new File("/data/data/org.androidbootmanager.app/assets/Scripts/add_os/META-INF/"+oses.get(which)).exists())
 					   xcontext.runVM(Shell.doShell("cat /data/data/org.androidbootmanager.app/assets/Scripts/add_os/META-INF/"+oses.get(which)));
 					else
                                         new AlertDialog.Builder(xcontext)
