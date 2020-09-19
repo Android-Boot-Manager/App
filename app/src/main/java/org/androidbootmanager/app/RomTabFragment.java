@@ -90,13 +90,10 @@ public class RomTabFragment extends ConfiguratorActivity.BaseFragment {
 							.setItems(items.toArray(new String[]{}), (dialog, which) -> {
 							    dialog.dismiss();
 							    switch (oses.get(which)) {
-                                    case "add_ubuntutouch_sytemimage_haliumboot_rootfs.sh":
-                                        xcontext.runVM(Shell.doShell("cat /data/data/org.androidbootmanager.app/assets/Scripts/add_os/META-INF/add_ubuntutouch_sytemimage_haliumboot_rootfs.sh"));
-                                        break;
-                                    case "add_ubuntutouch_sytemimage_haliumboot.sh":
-                                        xcontext.runVM(Shell.doShell("cat /data/data/org.androidbootmanager.app/assets/Scripts/add_os/META-INF/add_ubuntutouch_sytemimage_haliumboot.sh"));
-                                        break;
                                     default:
+					if(new File("/data/data/org.androidbootmanager.app/assets/Scripts/add_os/META-INF/"+oses.get(which).exists())
+					   xcontext.runVM(Shell.doShell("cat /data/data/org.androidbootmanager.app/assets/Scripts/add_os/META-INF/"+oses.get(which)));
+					else
                                         new AlertDialog.Builder(xcontext)
                                                 .setTitle(R.string.fatal)
                                                 .setMessage(R.string.unsupported_os)
