@@ -68,4 +68,6 @@
     <string name="select_halium_boot">Bitte die halium-boot Datei auswählen (boot.img)</string>
     <string name="select_system_image">Bitte das System-Image auswählen (system.img)</string>
     <string name="enter_rom_name">ROM Name eingeben</string>
+    <string name="install_ut_halium_boot_systemimage_rootfs">Ubuntu Touch wird jetzt durch Auswahl des System-Images, rootfs und der halium-boot Datei installiert. Bist Du sicher?</string>
+    <string name="select_rootfs">Bitte rootfs auswählen</string>
 </resources>
