@@ -71,4 +71,6 @@ se falsifichi il fingerprint)</string>
     <string name="enter_rom_name">Inserisci il nome della ROM</string>
     <string name="install_ut_halium_boot_systemimage_rootfs">You are going to install ubuntu touch, using sytem image, rootfs and halium boot. Are you sure?</string>
     <string name="select_rootfs">Please select rootfs</string>
+    <string name="install_sailfish">You are going to install SailfishOS, using zip. Are you sure?</string>
+    <string name="select_sfos_zip">Please select SailfishOS zip</string>
 </resources>
