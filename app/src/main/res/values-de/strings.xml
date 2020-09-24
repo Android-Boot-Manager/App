@@ -70,6 +70,6 @@
     <string name="enter_rom_name">ROM Name eingeben</string>
     <string name="install_ut_halium_boot_systemimage_rootfs">Ubuntu Touch wird jetzt durch Auswahl des System-Images, rootfs und der halium-boot Datei installiert. Bist Du sicher?</string>
     <string name="select_rootfs">Bitte rootfs auswählen</string>
-    <string name="install_sailfish">You are going to install SailfishOS, using zip. Are you sure?</string>
-    <string name="select_sfos_zip">Please select SailfishOS zip</string>
+    <string name="install_sailfish">Du wirst nun SailfishOS mit einer zip-Datei installieren. Bist Du sicher?</string>
+    <string name="select_sfos_zip">Bitte wähle die SailfishOS zip-Datei aus</string>
 </resources>
