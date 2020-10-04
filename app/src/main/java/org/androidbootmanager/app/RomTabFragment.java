@@ -8,8 +8,12 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
+
+import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.io.SuFile;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -23,7 +27,7 @@ public class RomTabFragment extends ConfiguratorActivity.BaseFragment {
     ArrayAdapter<String> adapter;
     ArrayList<String> romsListView;
     ArrayList<ROM> roms;
-    String codename = Shell.doRoot("cat /data/abm-codename.cfg");
+    String codename;
 
     @Override
     protected void onPreInit() {
@@ -36,8 +40,15 @@ public class RomTabFragment extends ConfiguratorActivity.BaseFragment {
         myList = Objects.requireNonNull(getView()).findViewById(R.id.tabromListView);
         roms = new ArrayList<>();
         romsListView = new ArrayList<>();
-        for (String romFile : Shell.doRoot("find /data/bootset/lk2nd/entries -type f").split("\n")) {
-            ROM r = new ROM(romFile);
+        for (String romFile : String.join("", Shell.su("find /data/bootset/lk2nd/entries -type f").exec().getOut()).split("\n")) {
+            ROM r;
+            try {
+                r = new ROM(romFile);
+            } catch (ActionAbortedCleanlyError actionAbortedCleanlyError) {
+                actionAbortedCleanlyError.printStackTrace();
+                Toast.makeText(xcontext, "Loading entry: Error. Action aborted cleanly.", Toast.LENGTH_LONG).show();
+                continue;
+            }
             if (r.config.get("xRom") != null) roms.add(r);
         }
         adapter = new ArrayAdapter<>(xcontext, android.R.layout.simple_list_item_1, romsListView);
@@ -45,12 +56,12 @@ public class RomTabFragment extends ConfiguratorActivity.BaseFragment {
         myList.setAdapter(adapter);
         myList.setOnItemClickListener((parent, view, position, p4) -> {
             if (parent.getItemAtPosition(position).equals(xcontext.getResources().getString(R.string.entry_create))) {
-                if (!Shell.doRoot("/data/data/org.androidbootmanager.app/assets/Scripts/detect_abm_storage.sh").contains("sd")) {
+                if (!String.join("", Shell.su("/data/data/org.androidbootmanager.app/assets/Scripts/detect_abm_storage.sh").exec().getOut()).contains("sd")) {
                     AlertDialog.Builder d = new AlertDialog.Builder(xcontext)
                             .setTitle(R.string.add_rom)
                             .setMessage(R.string.no_storage_found)
                             .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
-                    if (Shell.doRoot("/data/data/org.androidbootmanager.app/assets/Scripts/storage_detect.sh").contains("sd")) {
+                    if (String.join("", Shell.su("/data/data/org.androidbootmanager.app/assets/Scripts/storage_detect.sh").exec().getOut()).contains("sd")) {
                         d.setPositiveButton(R.string.format, (dialog, which) -> {
                             if (sdIsMounted())
                                 new AlertDialog.Builder(xcontext)
@@ -59,48 +70,57 @@ public class RomTabFragment extends ConfiguratorActivity.BaseFragment {
                                         .setNegativeButton(R.string.cancel, (dialog1, which1) -> dialog1.dismiss())
                                         .show();
                             else
-                            	new AlertDialog.Builder(xcontext)
-										.setTitle(R.string.sure_title)
-										.setMessage(R.string.format_msg)
-										.setNegativeButton(R.string.cancel, (dialog1, which1) -> dialog1.dismiss())
-										.setPositiveButton(R.string.ok, (dialog1, which1) -> new Thread(() -> Shell.doRoot("/data/data/org.androidbootmanager.app/assets/Scripts/format_device.sh sd")).start())
-										.show();
+                                new AlertDialog.Builder(xcontext)
+                                        .setTitle(R.string.sure_title)
+                                        .setMessage(R.string.format_msg)
+                                        .setNegativeButton(R.string.cancel, (dialog1, which1) -> dialog1.dismiss())
+                                        .setPositiveButton(R.string.ok, (dialog1, which1) -> Shell.su("/data/data/org.androidbootmanager.app/assets/Scripts/format_device.sh sd").submit())
+                                        .show();
                         });
                     }
                     d.show();
                 } else {
-                	ArrayList<String> oses = new ArrayList<>(Arrays.asList(Shell.doShell("ls /data/data/org.androidbootmanager.app/assets/Scripts/add_os/" + codename).split("\\s")));
-                	ArrayList<String> items = new ArrayList<>();
-                	ArrayMap<String, String> x = new ArrayMap<>();
-                	x.put("add_rom_zip.sh",getString(R.string.rom_type_add_rom_zip));
-                	x.put("add_ubuntutouch_sytemimage_haliumboot_rootfs.sh",getString(R.string.rom_type_add_ut_sysimg_halium_rootfs));
-                	x.put("add_ubuntutouch_sytemimage_haliumboot.sh",getString(R.string.rom_type_add_ut_sysimg_halium));
-                	x.put("add_sailfish.sh",getString(R.string.rom_type_add_sailfish));
+                    ArrayList<String> oses = new ArrayList<>(Arrays.asList(String.join("", Shell.sh("ls /data/data/org.androidbootmanager.app/assets/Scripts/add_os/" + codename).exec().getOut()).split("\\s")));
+                    ArrayList<String> items = new ArrayList<>();
+                    ArrayMap<String, String> x = new ArrayMap<>();
+                    x.put("add_rom_zip.sh", getString(R.string.rom_type_add_rom_zip));
+                    x.put("add_ubuntutouch_sytemimage_haliumboot_rootfs.sh", getString(R.string.rom_type_add_ut_sysimg_halium_rootfs));
+                    x.put("add_ubuntutouch_sytemimage_haliumboot.sh", getString(R.string.rom_type_add_ut_sysimg_halium));
+                    x.put("add_sailfish.sh", getString(R.string.rom_type_add_sailfish));
                     for (String y : oses)
-                        if (x.containsKey(y)) items.add(x.get(y)); else items.add(y);
-                	new AlertDialog.Builder(xcontext)
-							.setIcon(R.drawable.ic_launcher)
-							.setTitle(R.string.add_rom)
-							.setCancelable(true)
-							.setNegativeButton(R.string.cancel, (p1,p2) -> p1.dismiss())
-							.setItems(items.toArray(new String[]{}), (dialog, which) -> {
-							    dialog.dismiss();
+                        if (x.containsKey(y)) items.add(x.get(y));
+                        else items.add(y);
+                    new AlertDialog.Builder(xcontext)
+                            .setIcon(R.drawable.ic_launcher)
+                            .setTitle(R.string.add_rom)
+                            .setCancelable(true)
+                            .setNegativeButton(R.string.cancel, (p1, p2) -> p1.dismiss())
+                            .setItems(items.toArray(new String[]{}), (dialog, which) -> {
+                                dialog.dismiss();
 
-					if(new File("/data/data/org.androidbootmanager.app/assets/Scripts/add_os/META-INF/"+oses.get(which)).exists())
-					   xcontext.runVM(Shell.doShell("cat /data/data/org.androidbootmanager.app/assets/Scripts/add_os/META-INF/"+oses.get(which)));
-					else
-                                        new AlertDialog.Builder(xcontext)
-                                                .setTitle(R.string.fatal)
-                                                .setMessage(R.string.unsupported_os)
-                                                .setNegativeButton(R.string.cancel, (p1,p2) -> p1.dismiss())
-                                                .show();
+                                if (new File("/data/data/org.androidbootmanager.app/assets/Scripts/add_os/META-INF/" + oses.get(which)).exists())
+                                    throw new RuntimeException("metascript removed, to be replaced soon(tm)");
+                                else
+                                    new AlertDialog.Builder(xcontext)
+                                            .setTitle(R.string.fatal)
+                                            .setMessage(R.string.unsupported_os)
+                                            .setNegativeButton(R.string.cancel, (p1, p2) -> p1.dismiss())
+                                            .show();
                             })
-							.show();
-				}
+                            .show();
+                }
             } else {
                 final ROM rom = findEntry((String) parent.getItemAtPosition(position));
                 assert rom != null;
-                final ConfigFile proposed = ConfigFile.importFromString(Shell.doRoot("cat " + rom.file + " 2>/dev/null"));
+                ConfigFile proposed_;
+                try {
+                    proposed_ = ConfigFile.importFromFile(rom.file);
+                } catch (ActionAbortedCleanlyError actionAbortedCleanlyError) {
+                    actionAbortedCleanlyError.printStackTrace();
+                    Toast.makeText(xcontext, "Loading configuration file: Error. Action aborted cleanly. Creating new.", Toast.LENGTH_LONG).show();
+                    proposed_ = new ConfigFile();
+                }
+                final ConfigFile proposed = proposed_;
                 View dialog = LayoutInflater.from(xcontext).inflate(R.layout.edit_rom, null);
                 ((EditText) dialog.findViewById(R.id.editromTitle)).setText(rom.config.get("title"));
                 ((EditText) dialog.findViewById(R.id.editromTitle)).addTextChangedListener(new ConfigTextWatcher(proposed, "title"));
@@ -134,11 +154,11 @@ public class RomTabFragment extends ConfiguratorActivity.BaseFragment {
                                         .setNegativeButton(R.string.cancel, (p11, p21) -> p11.dismiss())
                                         .setPositiveButton(R.string.ok, (p112, p212) -> {
                                             p112.dismiss();
-                                            Shell.doRoot("rm " + rom.file);
+                                            SuFile.open(rom.file).delete();
                                             roms.remove(rom);
                                             regenListView();
                                             if ((!rom.config.get("xRomSystem").equals("")) && (!rom.config.get("xRomData").equals("")))
-                                                System.out.println(Shell.doRoot("sgdisk /dev/block/mmcblk1 --delete " + rom.config.get("xRomData") + " --delete " + rom.config.get("xRomSystem")));
+                                                Shell.su("sgdisk /dev/block/mmcblk1 --delete " + rom.config.get("xRomData") + " --delete " + rom.config.get("xRomSystem")).exec();
                                         })
                                         .show();
                             }
@@ -169,16 +189,16 @@ public class RomTabFragment extends ConfiguratorActivity.BaseFragment {
     }
 
     private boolean sdIsMounted() {
-        return Shell.doRoot("blockdev --rereadpt /dev/block/mmcblk1 2>&1").contains("busy");
+        return String.join("", Shell.su("blockdev --rereadpt /dev/block/mmcblk1 2>&1").exec().getOut()).contains("busy");
     }
 
     private static class ROM {
         public String file;
         public ConfigFile config;
 
-        public ROM(String outFile) {
+        public ROM(String outFile) throws ActionAbortedCleanlyError {
             file = outFile;
-            config = ConfigFile.importFromString(Shell.doRoot("cat " + file + " 2>/dev/null"));
+            config = ConfigFile.importFromFile(file);
         }
 
         public void save() {

@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "org.androidbootmanager.app"
-        minSdkVersion 25
+        minSdkVersion 26
         //noinspection OldTargetApi
         targetSdkVersion 27
         versionCode 1010
@@ -47,4 +47,8 @@ dependencies {
     implementation 'com.google.android.material:material:1.3.0-alpha02'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.github.hedzr:android-file-chooser:v1.2.0-final'
+    def libsuVersion = '3.0.2'
+    implementation "com.github.topjohnwu.libsu:core:${libsuVersion}"
+    implementation "com.github.topjohnwu.libsu:service:${libsuVersion}"
+    implementation "com.github.topjohnwu.libsu:io:${libsuVersion}"
 }

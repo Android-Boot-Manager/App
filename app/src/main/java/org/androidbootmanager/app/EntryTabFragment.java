@@ -9,8 +9,12 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
+
+import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.io.SuFile;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -32,8 +36,13 @@ public class EntryTabFragment extends ConfiguratorActivity.BaseFragment {
 		myList = (ListView) Objects.requireNonNull(getView()).findViewById(R.id.tabentryListView);
 		entries = new ArrayList<>();
 		entriesListView = new ArrayList<>();
-		for (String entryFile : Shell.doRoot("find /data/bootset/lk2nd/entries -type f").split("\n")) {
-			entries.add(new Entry(entryFile));
+		for (String entryFile : String.join("",Shell.su("find /data/bootset/lk2nd/entries -type f").exec().getOut()).split("\n")) {
+			try {
+				entries.add(new Entry(entryFile));
+			} catch (ActionAbortedCleanlyError actionAbortedCleanlyError) {
+				actionAbortedCleanlyError.printStackTrace();
+				Toast.makeText(xcontext, "Loading entry: Error. Action aborted cleanly.", Toast.LENGTH_LONG).show();
+			}
 		}
 		for (Entry entry : entries) {
 			entriesListView.add(entry.config.get("title"));
@@ -50,7 +59,15 @@ public class EntryTabFragment extends ConfiguratorActivity.BaseFragment {
 					}
 					final Entry entry = findEntry((String) parent.getItemAtPosition(position));
 					assert entry != null;
-					final ConfigFile proposed = ConfigFile.importFromString(Shell.doRoot("cat " + entry.file));
+					ConfigFile proposed_;
+					try {
+						proposed_ = ConfigFile.importFromFile(entry.file);
+					} catch (ActionAbortedCleanlyError actionAbortedCleanlyError) {
+						actionAbortedCleanlyError.printStackTrace();
+						Toast.makeText(xcontext,"Loading configuration file: Error. Action aborted cleanly. Creating new.",Toast.LENGTH_LONG).show();
+						proposed_ = new ConfigFile();
+					}
+					final ConfigFile proposed = proposed_;
 					View dialog = LayoutInflater.from(xcontext).inflate(R.layout.edit_entry,null);
 					((EditText) dialog.findViewById(R.id.editentryTitle)).setText(entry.config.get("title"));
 					((EditText) dialog.findViewById(R.id.editentryTitle)).addTextChangedListener(new ConfigTextWatcher(proposed, "title"));
@@ -73,8 +90,8 @@ public class EntryTabFragment extends ConfiguratorActivity.BaseFragment {
 								.setNegativeButton(R.string.cancel, (p11, p21) -> p11.dismiss())
 								.setPositiveButton(R.string.ok, (p112, p212) -> {
 									p112.dismiss();
-									Shell.doRoot("rm " + entry.file);
-									entries.remove(entry);
+									if(!SuFile.open(entry.file).delete()) Toast.makeText(xcontext, "Failed to delete entry.", Toast.LENGTH_LONG).show();
+									else entries.remove(entry);
 									regenListView();
 								})
 							.show();
@@ -97,8 +114,13 @@ public class EntryTabFragment extends ConfiguratorActivity.BaseFragment {
 					.setTitle(R.string.filename)
 						.setPositiveButton(R.string.save, (p1, p2) -> {
 							p1.dismiss();
-							Shell.doRoot("/data/data/org.androidbootmanager.app/assets/mkentryfile.sh > /data/bootset/lk2nd/entries/" + input.getText().toString() + ".conf");
-							entries.add(new Entry("/data/bootset/lk2nd/entries/" + input.getText().toString() + ".conf"));
+							Shell.su("/data/data/org.androidbootmanager.app/assets/mkentryfile.sh > /data/bootset/lk2nd/entries/" + input.getText().toString() + ".conf").exec();
+							try {
+								entries.add(new Entry("/data/bootset/lk2nd/entries/" + input.getText().toString() + ".conf"));
+							} catch (ActionAbortedCleanlyError actionAbortedCleanlyError) {
+								actionAbortedCleanlyError.printStackTrace();
+								Toast.makeText(xcontext,"Failed to add newly created entry. This should not happen.",Toast.LENGTH_LONG).show();
+							}
 							regenListView();
 						})
 						.setNegativeButton(R.string.cancel, (p1, p2) -> p1.dismiss())
@@ -128,9 +150,9 @@ public class EntryTabFragment extends ConfiguratorActivity.BaseFragment {
 	private static class Entry {
 		public String file;
 		public ConfigFile config;
-		public Entry(String outFile) {
+		public Entry(String outFile) throws ActionAbortedCleanlyError {
 			file = outFile;
-			config = ConfigFile.importFromString(Shell.doRoot("cat " + file + " 2>/dev/null"));
+			config = ConfigFile.importFromFile(file);
 		}
 		public void save() {
 			config.exportToPrivFile("entry.conf",file);
