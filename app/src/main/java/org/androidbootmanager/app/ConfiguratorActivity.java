@@ -157,7 +157,7 @@ public class ConfiguratorActivity extends FragmentActivity {
                     initialStream.close();
                     outStream.close();
                     new Thread(() -> {
-                        Shell.su("cd /data/data/org.androidbootmanager.app/assets/Toolkit && /data/data/org.androidbootmanager.app/assets/Scripts/update/`cat /data/abm-codename.cfg`.droid.sh 2>&1");
+                        Shell.su("cd /data/data/org.androidbootmanager.app/assets/Toolkit && /data/data/org.androidbootmanager.app/assets/Scripts/update/`cat /data/abm-codename.cfg`.droid.sh 2>&1").exec();
                         runOnUiThread(() -> Toast.makeText(this, R.string.ok, Toast.LENGTH_LONG).show());
                     }).start();
                 } catch (IOException e) {
