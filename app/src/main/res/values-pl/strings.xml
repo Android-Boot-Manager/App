@@ -72,4 +72,5 @@
     <string name="select_rootfs">Proszę wybrać rootfs</string>
     <string name="install_sailfish">You are going to install SailfishOS, using zip. Are you sure?</string>
     <string name="select_sfos_zip">Please select SailfishOS zip</string>
+    <string name="rom_type_add_sailfish">Sailfish OS</string>
 </resources>
