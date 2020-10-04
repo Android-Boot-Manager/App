@@ -70,6 +70,7 @@
     <string name="enter_rom_name">Введіть ім\'я прошивки</string>
     <string name="install_ut_halium_boot_systemimage_rootfs">Ви збираєтеся встановити Ubuntu Touch, використовуючи образ sytem, rootfs і halium-boot, ви впевнені?</string>
     <string name="select_rootfs">Будь ласка виберіть rootfs</string>
-    <string name="install_sailfish">You are going to install SailfishOS, using zip. Are you sure?</string>
-    <string name="select_sfos_zip">Please select SailfishOS zip</string>
+    <string name="install_sailfish">Ви збираєтеся встановити SailfishOS, використовуючи zip. Ви впевнені?</string>
+    <string name="select_sfos_zip">Будь ласка, виберіть zip SailfishOS</string>
+    <string name="rom_type_add_sailfish">Sailfish OS</string>
 </resources>
