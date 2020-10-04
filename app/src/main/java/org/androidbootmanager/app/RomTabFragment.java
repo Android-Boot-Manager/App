@@ -1,6 +1,7 @@
 package org.androidbootmanager.app;
 
 import android.annotation.SuppressLint;
+import android.util.ArrayMap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -70,19 +71,13 @@ public class RomTabFragment extends ConfiguratorActivity.BaseFragment {
                 } else {
                 	ArrayList<String> oses = new ArrayList<>(Arrays.asList(Shell.doShell("ls /data/data/org.androidbootmanager.app/assets/Scripts/add_os/" + codename).split("\\s")));
                 	ArrayList<String> items = new ArrayList<>();
-                    for (String x : oses) {
-                        switch(x) {
-                            case "add_rom_zip.sh":
-                                items.add(getString(R.string.rom_type_add_rom_zip));
-                                break;
-                            case "add_ubuntutouch_sytemimage_haliumboot_rootfs.sh":
-                                items.add(getString(R.string.rom_type_add_ut_sysimg_halium_rootfs));
-                                break;
-                            case "add_ubuntutouch_sytemimage_haliumboot.sh":
-                                items.add(getString(R.string.rom_type_add_ut_sysimg_halium));
-                                break;
-                        }
-                    }
+                	ArrayMap<String, String> x = new ArrayMap<>();
+                	x.put("add_rom_zip.sh",getString(R.string.rom_type_add_rom_zip));
+                	x.put("add_ubuntutouch_sytemimage_haliumboot_rootfs.sh",getString(R.string.rom_type_add_ut_sysimg_halium_rootfs));
+                	x.put("add_ubuntutouch_sytemimage_haliumboot.sh",getString(R.string.rom_type_add_ut_sysimg_halium));
+                	x.put("add_sailfish.sh",getString(R.string.rom_type_add_sailfish));
+                    for (String y : oses)
+                        if (x.containsKey(y)) items.add(x.get(y)); else items.add(y);
                 	new AlertDialog.Builder(xcontext)
 							.setIcon(R.drawable.ic_launcher)
 							.setTitle(R.string.add_rom)
@@ -90,8 +85,7 @@ public class RomTabFragment extends ConfiguratorActivity.BaseFragment {
 							.setNegativeButton(R.string.cancel, (p1,p2) -> p1.dismiss())
 							.setItems(items.toArray(new String[]{}), (dialog, which) -> {
 							    dialog.dismiss();
-							    switch (oses.get(which)) {
-                                    default:
+
 					if(new File("/data/data/org.androidbootmanager.app/assets/Scripts/add_os/META-INF/"+oses.get(which)).exists())
 					   xcontext.runVM(Shell.doShell("cat /data/data/org.androidbootmanager.app/assets/Scripts/add_os/META-INF/"+oses.get(which)));
 					else
@@ -100,8 +94,6 @@ public class RomTabFragment extends ConfiguratorActivity.BaseFragment {
                                                 .setMessage(R.string.unsupported_os)
                                                 .setNegativeButton(R.string.cancel, (p1,p2) -> p1.dismiss())
                                                 .show();
-                                        break;
-							    }
                             })
 							.show();
 				}
