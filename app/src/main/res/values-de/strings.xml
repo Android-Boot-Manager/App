@@ -72,4 +72,5 @@
     <string name="select_rootfs">Bitte rootfs auswählen</string>
     <string name="install_sailfish">Du wirst nun SailfishOS mit einer zip-Datei installieren. Bist Du sicher?</string>
     <string name="select_sfos_zip">Bitte wähle die SailfishOS zip-Datei aus</string>
+    <string name="rom_type_add_sailfish">Sailfish OS</string>
 </resources>
