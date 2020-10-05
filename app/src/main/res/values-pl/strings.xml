@@ -70,7 +70,7 @@
     <string name="enter_rom_name">Wprowadź nazwę ROMu</string>
     <string name="install_ut_halium_boot_systemimage_rootfs">Zamierzasz zainstalować Ubuntu Touch, używając system.img, rootfs i halium-boot. Czy jesteś pewien?</string>
     <string name="select_rootfs">Proszę wybrać rootfs</string>
-    <string name="install_sailfish">You are going to install SailfishOS, using zip. Are you sure?</string>
-    <string name="select_sfos_zip">Please select SailfishOS zip</string>
+    <string name="install_sailfish">Zamierzasz zainstalować SailfishOS, używając zip. Jesteś pewien?</string>
+    <string name="select_sfos_zip">Proszę wybrać plik zip SailfishOS</string>
     <string name="rom_type_add_sailfish">Sailfish OS</string>
 </resources>
