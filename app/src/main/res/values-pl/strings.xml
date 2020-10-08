@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Menedżer uruchamiania Androida</string>
     <string name="fatal">BŁĄD KRYTYCZNY</string>
-    <string name="cp_err_msg">Czy zainstalowałeś aplikację na karcie SD?</string>
+    <string name="cp_err_msg">Failed to extract some data. Did you install the app on a SD card? Pressing OK will take you to the app, do not do anything without investigating first!</string>
     <string name="wrong_device_title">Nieodpowiednie urządzenie</string>
     <string name="wrong_device_msg">Menedżer uruchamiania Androida nie jest dostępny dla tego urządzenia (%1$s).</string>
     <string name="allow_install_unchecked_title">Nie zaznaczono pozwolenia na instalację</string>
@@ -84,4 +84,8 @@
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
     <string name="aboutLibraries_description_text">@string/nav_header_subtitle</string>
+    <string name="home_installedWorking_img">Checkmark/Cross to represent installed state</string>
+    <string name="home_installedWorking_text">Failed to load state</string>
+    <string name="home_installedWorking_ok">Installed &amp; working</string>
+    <string name="home_installedWorking_no">Not installed</string>
 </resources>
