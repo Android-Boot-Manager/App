@@ -60,8 +60,8 @@
     <string name="delete_real_rom">Sie können das primäre ROM nicht löschen!</string>
     <string name="app_unfinished">Die Android-Startverwaltung ist erfolgreich installiert aber die App ist noch nicht fertig. Nutzlose Knöpfe und leere Seiten sind zu erwarten :(</string>
     <string name="rom_type_add_rom_zip">Android (ROM Zip)</string>
-    <string name="updatelk">Aktualisierung von DroidBoot (lk.img)</string>
-    <string name="updated">Ich habe mein ROM aktualisiert</string>
+    <string name="updatelk">Aktualisierung von DroidBoot</string>
+    <string name="updated">Ich habe mein Haupt-ROM aktualisiert</string>
     <string name="rom_type_add_ut_sysimg_halium_rootfs">Ubuntu Touch (System, Halium-Boot, Rootfs)</string>
     <string name="rom_type_add_ut_sysimg_halium">Ubuntu Touch (System, Halium-Boot)</string>
     <string name="install_ut_halium_boot_systemimage">Ubuntu Touch wird jetzt durch Auswahl des System-Images und der halium-boot Datei installiert. Bist Du sicher?</string>
