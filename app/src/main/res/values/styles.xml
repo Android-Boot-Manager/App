@@ -1,13 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="AppTheme" parent="@style/Theme.AppCompat.Light.NoActionBar">
-	</style>
-	<style name="MyToolbarTheme"
-		parent="@style/ThemeOverlay.AppCompat.Light">
-		<item name="colorControlNormal">@color/white</item>
-		<item name="titleTextColor">@color/white</item>
-	</style>
-	<color name="colorPrimary">#FE9200</color>
-	<color name="colorAccent" tools:ignore="UnusedResources">#FE9200</color>
-	<color name="white">#FFFFFF</color>
+
+    <style name="AppTheme" parent="@style/Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorSecondary">@color/colorSecondary</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="aboutLibrariesStyle">@style/CustomAboutLibrariesStyle</item>
+    </style>
+
+    <style name="MyToolbarTheme" parent="@style/ThemeOverlay.AppCompat.Light">
+        <item name="colorControlNormal">@color/white</item>
+        <item name="titleTextColor">@color/white</item>
+    </style>
+
+    <color name="colorPrimary">#FE9200</color>
+    <color name="colorSecondary">#FE9200</color>
+    <color name="colorAccent" tools:ignore="UnusedResources">#FE9F11</color>
+    <color name="white">#FFFFFF</color>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="CustomAboutLibrariesStyle" parent="AppTheme">
+        <!-- AboutLibraries specific values -->
+        <item name="aboutLibrariesCardBackground">#FFFFFF</item>
+        <item name="aboutLibrariesDescriptionTitle">?android:textColorPrimary</item>
+        <item name="aboutLibrariesDescriptionText">?android:textColorSecondary</item>
+        <item name="aboutLibrariesDescriptionDivider">@color/opensource_divider</item>
+        <item name="aboutLibrariesOpenSourceTitle">?android:textColorPrimary</item>
+        <item name="aboutLibrariesOpenSourceText">?android:textColorSecondary</item>
+        <item name="aboutLibrariesSpecialButtonText">?android:textColorPrimary</item>
+        <item name="aboutLibrariesOpenSourceDivider">@color/opensource_divider</item>
+    </style>
 </resources>

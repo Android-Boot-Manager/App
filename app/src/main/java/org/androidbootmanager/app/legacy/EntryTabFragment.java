@@ -16,9 +16,9 @@ import androidx.appcompat.app.AlertDialog;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.io.SuFile;
 
-import org.androidbootmanager.app.ActionAbortedCleanlyError;
-import org.androidbootmanager.app.ConfigFile;
-import org.androidbootmanager.app.ConfigTextWatcher;
+import org.androidbootmanager.app.util.ActionAbortedCleanlyError;
+import org.androidbootmanager.app.util.ConfigFile;
+import org.androidbootmanager.app.util.ConfigTextWatcher;
 import org.androidbootmanager.app.R;
 
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ public class EntryTabFragment extends ConfiguratorActivity.BaseFragment {
 
 	@Override
 	protected void onPreInit() {
-		layout = R.layout.tab_entry;
+		layout = R.layout.legacy_tab_entry;
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class EntryTabFragment extends ConfiguratorActivity.BaseFragment {
 						proposed_ = new ConfigFile();
 					}
 					final ConfigFile proposed = proposed_;
-					View dialog = LayoutInflater.from(xcontext).inflate(R.layout.edit_entry,null);
+					View dialog = LayoutInflater.from(xcontext).inflate(R.layout.legacy_edit_entry,null);
 					((EditText) dialog.findViewById(R.id.editentryTitle)).setText(entry.config.get("title"));
 					((EditText) dialog.findViewById(R.id.editentryTitle)).addTextChangedListener(new ConfigTextWatcher(proposed, "title"));
 					((EditText) dialog.findViewById(R.id.editentryKernel)).setText(entry.config.get("linux"));

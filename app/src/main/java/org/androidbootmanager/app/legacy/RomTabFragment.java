@@ -15,9 +15,9 @@ import androidx.appcompat.app.AlertDialog;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.io.SuFile;
 
-import org.androidbootmanager.app.ActionAbortedCleanlyError;
-import org.androidbootmanager.app.ConfigFile;
-import org.androidbootmanager.app.ConfigTextWatcher;
+import org.androidbootmanager.app.util.ActionAbortedCleanlyError;
+import org.androidbootmanager.app.util.ConfigFile;
+import org.androidbootmanager.app.util.ConfigTextWatcher;
 import org.androidbootmanager.app.R;
 
 import java.io.File;
@@ -36,7 +36,7 @@ public class RomTabFragment extends ConfiguratorActivity.BaseFragment {
 
     @Override
     protected void onPreInit() {
-        layout = R.layout.tab_rom;
+        layout = R.layout.legacy_tab_rom;
     }
 
     @SuppressLint("SetTextI18n")
@@ -96,7 +96,7 @@ public class RomTabFragment extends ConfiguratorActivity.BaseFragment {
                         if (x.containsKey(y)) items.add(x.get(y));
                         else items.add(y);
                     new AlertDialog.Builder(xcontext)
-                            .setIcon(R.drawable.ic_launcher)
+                            .setIcon(R.mipmap.ic_launcher)
                             .setTitle(R.string.add_rom)
                             .setCancelable(true)
                             .setNegativeButton(R.string.cancel, (p1, p2) -> p1.dismiss())
@@ -126,7 +126,7 @@ public class RomTabFragment extends ConfiguratorActivity.BaseFragment {
                     proposed_ = new ConfigFile();
                 }
                 final ConfigFile proposed = proposed_;
-                View dialog = LayoutInflater.from(xcontext).inflate(R.layout.edit_rom, null);
+                View dialog = LayoutInflater.from(xcontext).inflate(R.layout.legacy_edit_rom, null);
                 ((EditText) dialog.findViewById(R.id.editromTitle)).setText(rom.config.get("title"));
                 ((EditText) dialog.findViewById(R.id.editromTitle)).addTextChangedListener(new ConfigTextWatcher(proposed, "title"));
                 ((TextView) dialog.findViewById(R.id.editromDataPart)).setText(": " + rom.config.get("xRom"));

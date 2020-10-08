@@ -3,29 +3,37 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="org.androidbootmanager.app">
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
-        tools:replace="android:allowBackup"
         android:allowBackup="false"
-        android:supportsRtl="false"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:installLocation="internalOnly"
         android:label="@string/app_name"
+        android:resizeableActivity="true"
+        android:supportsRtl="false"
         android:theme="@style/AppTheme"
-	    android:resizeableActivity = "true"
-		android:installLocation="internalOnly">
+        tools:replace="android:allowBackup">
         <activity
-            android:name=".legacy.MainActivity"
-            android:label="@string/app_name" >
+            android:name=".ui.activities.MainActivity"
+            android:label="@string/title_activity_main"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-		<activity
-			android:name=".legacy.ConfiguratorActivity"
-			android:label="@string/configurator">
-		</activity>
+        <activity
+            android:name=".legacy.MainActivity"
+            android:label="@string/app_name">
+            <intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".legacy.ConfiguratorActivity"
+            android:label="@string/configurator" />
     </application>
-
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
 </manifest>

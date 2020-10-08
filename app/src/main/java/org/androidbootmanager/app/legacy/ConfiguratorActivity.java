@@ -113,7 +113,7 @@ public class ConfiguratorActivity extends FragmentActivity {
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(ContextCompat.getColor(this, R.color.colorPrimary));
-        setContentView(R.layout.cfg);
+        setContentView(R.layout.legacy_cfg);
         ViewPager2 viewPager = findViewById(R.id.viewPager);
         TabLayout tabLayout = findViewById(R.id.tabLayout);
         adapter = new TabAdapter(this);
@@ -159,7 +159,7 @@ public class ConfiguratorActivity extends FragmentActivity {
                     initialStream.close();
                     outStream.close();
                     new Thread(() -> {
-                        Shell.su("cd /data/data/org.androidbootmanager.app/assets/Toolkit && /data/data/org.androidbootmanager.app/assets/Scripts/update/`cat /data/abm-codename.cfg`.droid.sh 2>&1").exec();
+                        Shell.su("cd /data/data/org.androidbootmanager.app/assets/Toolkit && /data/data/org.androidbootmanager.app/assets/Scripts/update/`cat /data/abm-codename.legacy_cfg`.droid.sh 2>&1").exec();
                         runOnUiThread(() -> Toast.makeText(this, R.string.ok, Toast.LENGTH_LONG).show());
                     }).start();
                 } catch (IOException e) {

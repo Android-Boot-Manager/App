@@ -7,9 +7,9 @@ import android.widget.Toast;
 
 import com.topjohnwu.superuser.io.SuFile;
 
-import org.androidbootmanager.app.ActionAbortedCleanlyError;
-import org.androidbootmanager.app.ConfigFile;
-import org.androidbootmanager.app.ConfigTextWatcher;
+import org.androidbootmanager.app.util.ActionAbortedCleanlyError;
+import org.androidbootmanager.app.util.ConfigFile;
+import org.androidbootmanager.app.util.ConfigTextWatcher;
 import org.androidbootmanager.app.R;
 
 import java.util.Objects;
@@ -21,7 +21,7 @@ public class GeneralTabFragment extends ConfiguratorActivity.BaseFragment {
 
     @Override
     protected void onPreInit() {
-        layout = R.layout.tab_general;
+        layout = R.layout.legacy_tab_general;
     }
 
     @Override

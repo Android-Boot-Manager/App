@@ -23,7 +23,6 @@ import androidx.core.content.ContextCompat;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.topjohnwu.superuser.Shell;
 
-import org.androidbootmanager.app.BuildConfig;
 import org.androidbootmanager.app.R;
 
 import java.io.File;
@@ -38,8 +37,8 @@ import java.util.ArrayList;
 @SuppressWarnings({"ResultOfMethodCallIgnored", "deprecation"})
 public class MainActivity extends AppCompatActivity {
     File filedir = new File("/data/data/org.androidbootmanager.app/files");
-    File cfgfile = new File("/data/abm-part.cfg");
-    File cndfile = new File("/data/abm-codename.cfg");
+    File cfgfile = new File("/data/abm-part.legacy_cfg");
+    File cndfile = new File("/data/abm-codename.legacy_cfg");
     File assetsdir = new File(filedir + "/../assets");
     String romname = "null";
     String currentDevice;
@@ -67,10 +66,10 @@ public class MainActivity extends AppCompatActivity {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(ContextCompat.getColor(this, R.color.colorPrimary));
         if (cfgfile.exists()) {
-            setContentView(R.layout.main);
+            setContentView(R.layout.legacy_main);
             configurator(null);
         } else {
-            setContentView(R.layout.main_notinstall);
+            setContentView(R.layout.legacy_main_notinstall);
             if (!cndfile.exists())
                 findViewById(R.id.mainnotinstallButtonUpdate).setVisibility(Button.INVISIBLE);
         }
@@ -106,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
             progdialog.setCancelable(false);
             progdialog.show();
             new Thread(() -> {
-                Shell.su("cd /data/data/org.androidbootmanager.app/assets/Toolkit && /data/data/org.androidbootmanager.app/assets/Scripts/update/`cat /data/abm-codename.cfg`.sh 2>&1").exec();
+                Shell.su("cd /data/data/org.androidbootmanager.app/assets/Toolkit && /data/data/org.androidbootmanager.app/assets/Scripts/update/`cat /data/abm-codename.legacy_cfg`.sh 2>&1").exec();
                 runOnUiThread(() -> {
                     progdialog.dismiss();
                     finish();
@@ -116,11 +115,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void mount(View v) {
-        Shell.su("sh /data/abm-part.cfg").exec();
+        Shell.su("sh /data/abm-part.legacy_cfg").exec();
     }
 
     public void unmount(View v) {
-        Shell.su("sh /data/abm-part.2.cfg").exec();
+        Shell.su("sh /data/abm-part.2.legacy_cfg").exec();
     }
 
     public void doInstall(View v) {
@@ -154,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
         builder.setPositiveButton(R.string.ok, (dialogif, which) -> {
             romname = input.getText().toString();
             System.out.println("installing abm for " + currentDevice);
-            Shell.su("echo " + currentDevice + " >/data/abm-codename.cfg").exec();
+            Shell.su("echo " + currentDevice + " >/data/abm-codename.legacy_cfg").exec();
             new AlertDialog.Builder(MainActivity.this)
                     .setTitle(R.string.select_droidboot_title)
                     .setMessage(R.string.select_droidboot_msg)
@@ -335,10 +334,4 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
-    static {
-        Shell.enableVerboseLogging = BuildConfig.DEBUG;
-        Shell.setDefaultBuilder(Shell.Builder.create()
-                .setFlags(Shell.FLAG_REDIRECT_STDERR | Shell.FLAG_MOUNT_MASTER)
-                .setTimeout(10));
-    }
 }
