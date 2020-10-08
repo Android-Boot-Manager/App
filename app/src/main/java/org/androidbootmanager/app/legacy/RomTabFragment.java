@@ -42,7 +42,7 @@ public class RomTabFragment extends ConfiguratorActivity.BaseFragment {
     @SuppressLint("SetTextI18n")
     @Override
     protected void onInit() {
-        myList = Objects.requireNonNull(getView()).findViewById(R.id.tabromListView);
+        myList = requireView().findViewById(R.id.tabromListView);
         roms = new ArrayList<>();
         romsListView = new ArrayList<>();
         for (String romFile : String.join("", Shell.su("find /data/bootset/lk2nd/entries -type f").exec().getOut()).split("\n")) {
