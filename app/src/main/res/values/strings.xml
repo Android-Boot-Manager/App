@@ -3,7 +3,7 @@
 
     <string name="app_name">Android Boot Manager</string>
     <string name="fatal">FATAL ERROR</string>
-    <string name="cp_err_msg">Did you install the app on a SD card?</string>
+    <string name="cp_err_msg">Failed to extract some data. Did you install the app on a SD card? Pressing OK will take you to the app, do not do anything without investigating first!</string>
     <string name="wrong_device_title">Wrong device</string>
     <string name="wrong_device_msg">Android Boot Manager is not available for this device (%1$s).</string>
     <string name="allow_install_unchecked_title">Allow install not checked</string>
@@ -88,4 +88,8 @@
     <string name="aboutLibraries_description_showIcon" translatable="false">true</string>
     <string name="aboutLibraries_description_showVersion" translatable="false">true</string>
     <string name="aboutLibraries_description_text">@string/nav_header_subtitle</string>
+    <string name="home_installedWorking_img">Checkmark/Cross to represent installed state</string>
+    <string name="home_installedWorking_text">Failed to load state</string>
+    <string name="home_installedWorking_ok">Installed &amp; working</string>
+    <string name="home_installedWorking_no">Not installed</string>
 </resources>
