@@ -9,8 +9,8 @@ android {
         minSdkVersion 26
         //noinspection OldTargetApi
         targetSdkVersion 27
-        versionCode 1010
-        versionName "0.1.1-pre1"
+        versionCode 2001
+        versionName "0.2.0-pre1"
     }
     signingConfigs {
         release {
@@ -44,7 +44,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 	implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'com.google.android.material:material:1.3.0-alpha02'
+    implementation 'com.google.android.material:material:1.3.0-alpha03'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.github.hedzr:android-file-chooser:v1.2.0-final'
     def libsuVersion = '3.0.2'
