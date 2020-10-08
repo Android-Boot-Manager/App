@@ -71,7 +71,7 @@
     <string name="install_ut_halium_boot_systemimage_rootfs">Você está prestes a instalar o Ubuntu Touch, usando a System Image, rootfs e o Halium Boot. você tem certeza?</string>
     <string name="select_rootfs">Por favor selecione o rootfs</string>
     <string name="install_sailfish">Você está prestes a instalar o SailfishOS, usando um zip. Você tem certeza?</string>
-    <string name="select_sfos_zip">Please select SailfishOS zip</string>
+    <string name="select_sfos_zip">Por favor selecione o zip do SailfishOS</string>
     <string name="rom_type_add_sailfish">Sailfish OS</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
