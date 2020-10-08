@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Android Boot Manager</string>
     <string name="fatal">ERRORE FATALE</string>
-    <string name="cp_err_msg">Failed to extract some data. Did you install the app on a SD card? Pressing OK will take you to the app, do not do anything without investigating first!</string>
+    <string name="cp_err_msg">Impossibile estrarre alcuni dati. Hai installato l\'app su una scheda SD? Premere OK ti porterà all\'app, non fare nulla senza prima indagare!</string>
     <string name="wrong_device_title">Dispositivo errato</string>
     <string name="wrong_device_msg">Android Boot Manager non è disponibile per questo dispositivo (%1$s).</string>
     <string name="allow_install_unchecked_title">La casella Consenti Installazione non è stata selezionata</string>
@@ -86,7 +86,7 @@ se falsifichi il fingerprint)</string>
     <string name="menu_slideshow">Slideshow</string>
     <string name="aboutLibraries_description_text">@string/nav_header_subtitle</string>
     <string name="home_installedWorking_img">Checkmark/Cross to represent installed state</string>
-    <string name="home_installedWorking_text">Failed to load state</string>
-    <string name="home_installedWorking_ok">Installed &amp; working</string>
-    <string name="home_installedWorking_no">Not installed</string>
+    <string name="home_installedWorking_text">Impossibile caricare lo stato</string>
+    <string name="home_installedWorking_ok">&amp; installato, funziona</string>
+    <string name="home_installedWorking_no">Non installato</string>
 </resources>
