@@ -17,15 +17,15 @@ import java.io.PrintWriter;
 public class ConfigFile {
     Map<String, String> data = new HashMap<>();
 
-    String get(String name) {
+    public String get(String name) {
         return data.get(name);
     }
 
-    void set(String name, String value) {
+    public void set(String name, String value) {
         data.put(name, value);
     }
 
-    String exportToString() {
+    public String exportToString() {
         StringBuilder out = new StringBuilder();
         for (String key : data.keySet()) {
             out.append(key).append(" ").append(get(key)).append("\n");
@@ -33,7 +33,7 @@ public class ConfigFile {
         return out.toString();
     }
 
-    void exportToFile(File file) {
+    public void exportToFile(File file) {
         try {
             if (!file.exists()) file.createNewFile();
             PrintWriter out = new PrintWriter(file);
@@ -46,12 +46,12 @@ public class ConfigFile {
     }
 
     @SuppressLint("SdCardPath")
-    void exportToPrivFile(String tempfilename, String fullPath) {
+    public void exportToPrivFile(String tempfilename, String fullPath) {
         exportToFile(new File("/data/data/org.androidbootmanager.app/files/" + tempfilename));
         SuFile.open("/data/data/org.androidbootmanager.app/files/" + tempfilename).renameTo(new File(fullPath));
     }
 
-    static ConfigFile importFromString(String s) {
+    public static ConfigFile importFromString(String s) {
         ConfigFile out = new ConfigFile();
         for (String line : s.split("\n")) {
             line = line.trim();
@@ -60,7 +60,7 @@ public class ConfigFile {
         return out;
     }
 
-    static ConfigFile importFromFile(File f) throws ActionAbortedCleanlyError {
+    public static ConfigFile importFromFile(File f) throws ActionAbortedCleanlyError {
         StringBuilder s = new StringBuilder();
         SuFileInputStream i;
         byte[] b = new byte[1024];
@@ -80,7 +80,7 @@ public class ConfigFile {
         return importFromString(s.toString());
     }
 
-    static ConfigFile importFromFile(String s) throws ActionAbortedCleanlyError {
+    public static ConfigFile importFromFile(String s) throws ActionAbortedCleanlyError {
         return importFromFile(new File(s));
     }
 }

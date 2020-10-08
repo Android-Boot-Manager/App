@@ -5,7 +5,7 @@ import android.text.Editable;
 import android.view.View;
 import android.widget.EditText;
 
-class ConfigTextWatcher implements TextWatcher {
+public class ConfigTextWatcher implements TextWatcher {
     ConfigFile config;
     String key;
 
@@ -32,6 +32,6 @@ class ConfigTextWatcher implements TextWatcher {
     }
 
     public static void attachTo(int e, View v, ConfigFile config, String key) {
-        attachTo((EditText) v.findViewById(e), config, key);
+        attachTo(v.findViewById(e), config, key);
     }
 }

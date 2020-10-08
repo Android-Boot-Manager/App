@@ -1,4 +1,4 @@
-package org.androidbootmanager.app;
+package org.androidbootmanager.app.legacy;
 
 import android.annotation.SuppressLint;
 import android.util.ArrayMap;
@@ -14,6 +14,11 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.io.SuFile;
+
+import org.androidbootmanager.app.ActionAbortedCleanlyError;
+import org.androidbootmanager.app.ConfigFile;
+import org.androidbootmanager.app.ConfigTextWatcher;
+import org.androidbootmanager.app.R;
 
 import java.io.File;
 import java.util.ArrayList;

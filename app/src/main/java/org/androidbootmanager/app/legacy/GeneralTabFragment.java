@@ -1,13 +1,16 @@
-package org.androidbootmanager.app;
+package org.androidbootmanager.app.legacy;
 
-import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.io.SuFile;
+
+import org.androidbootmanager.app.ActionAbortedCleanlyError;
+import org.androidbootmanager.app.ConfigFile;
+import org.androidbootmanager.app.ConfigTextWatcher;
+import org.androidbootmanager.app.R;
 
 import java.util.Objects;
 

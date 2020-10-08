@@ -1,4 +1,4 @@
-package org.androidbootmanager.app;
+package org.androidbootmanager.app.legacy;
 
 import android.annotation.SuppressLint;
 import android.text.InputType;
@@ -15,6 +15,11 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.io.SuFile;
+
+import org.androidbootmanager.app.ActionAbortedCleanlyError;
+import org.androidbootmanager.app.ConfigFile;
+import org.androidbootmanager.app.ConfigTextWatcher;
+import org.androidbootmanager.app.R;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -33,7 +38,7 @@ public class EntryTabFragment extends ConfiguratorActivity.BaseFragment {
 
 	@Override
 	protected void onInit() {
-		myList = (ListView) Objects.requireNonNull(getView()).findViewById(R.id.tabentryListView);
+		myList = Objects.requireNonNull(getView()).findViewById(R.id.tabentryListView);
 		entries = new ArrayList<>();
 		entriesListView = new ArrayList<>();
 		for (String entryFile : String.join("",Shell.su("find /data/bootset/lk2nd/entries -type f").exec().getOut()).split("\n")) {
@@ -53,7 +58,7 @@ public class EntryTabFragment extends ConfiguratorActivity.BaseFragment {
 		myList.setOnItemClickListener(new OnItemClickListener(){
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long p4) {
-					if (((String) parent.getItemAtPosition(position)).equals(xcontext.getResources().getString(R.string.entry_create))) {
+					if (parent.getItemAtPosition(position).equals(xcontext.getResources().getString(R.string.entry_create))) {
 						mkNewEntry();
 						return;
 					}

@@ -1,4 +1,4 @@
-package org.androidbootmanager.app;
+package org.androidbootmanager.app.legacy;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -22,6 +22,9 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.topjohnwu.superuser.Shell;
+
+import org.androidbootmanager.app.BuildConfig;
+import org.androidbootmanager.app.R;
 
 import java.io.File;
 import java.io.FileNotFoundException;

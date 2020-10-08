@@ -1,4 +1,4 @@
-package org.androidbootmanager.app;
+package org.androidbootmanager.app.legacy;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -24,6 +24,8 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.topjohnwu.superuser.Shell;
+
+import org.androidbootmanager.app.R;
 
 import java.io.File;
 import java.io.FileOutputStream;
