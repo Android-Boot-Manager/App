@@ -38,7 +38,7 @@ public class EntryTabFragment extends ConfiguratorActivity.BaseFragment {
 
 	@Override
 	protected void onInit() {
-		myList = Objects.requireNonNull(getView()).findViewById(R.id.tabentryListView);
+		myList = requireView().findViewById(R.id.tabentryListView);
 		entries = new ArrayList<>();
 		entriesListView = new ArrayList<>();
 		for (String entryFile : String.join("",Shell.su("find /data/bootset/lk2nd/entries -type f").exec().getOut()).split("\n")) {
