@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Android Boot Manager</string>
     <string name="fatal">ERRO FATAL</string>
-    <string name="cp_err_msg">Failed to extract some data. Did you install the app on a SD card? Pressing OK will take you to the app, do not do anything without investigating first!</string>
+    <string name="cp_err_msg">Falha ao pegar alguns dados. você instalou o app em um cartão SD? Pressionando OK levará você ao app, não faça nada sem investigar primeiro!</string>
     <string name="wrong_device_title">Dispositivo errado</string>
     <string name="wrong_device_msg">O Android Boot Manager não está disponível para este dispositivo (%1$s).</string>
     <string name="allow_install_unchecked_title">Permitir instalação não checada</string>
