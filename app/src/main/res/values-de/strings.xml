@@ -73,4 +73,15 @@
     <string name="install_sailfish">Du wirst nun SailfishOS mit einer zip-Datei installieren. Bist Du sicher?</string>
     <string name="select_sfos_zip">Bitte wähle die SailfishOS zip-Datei aus</string>
     <string name="rom_type_add_sailfish">Sailfish OS</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">@string/app_name</string>
+    <string name="nav_header_subtitle">Multiboot for Android - the other way</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="aboutLibraries_description_text">@string/nav_header_subtitle</string>
 </resources>
