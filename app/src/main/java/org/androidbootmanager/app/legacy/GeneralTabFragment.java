@@ -35,12 +35,11 @@ public class GeneralTabFragment extends ConfiguratorActivity.BaseFragment {
             generalConfig = new ConfigFile();
         }
         generalConfig.exportToPrivFile("lk2nd.conf", fileName);
-        Objects.requireNonNull(getView());
-        ((EditText) getView().findViewById(R.id.tabgeneralSettingTimeout)).setText(generalConfig.get("timeout"));
-        ((EditText) getView().findViewById(R.id.tabgeneralSettingDefaultEntry)).setText(generalConfig.get("default"));
+        ((EditText) requireView().findViewById(R.id.tabgeneralSettingTimeout)).setText(generalConfig.get("timeout"));
+        ((EditText) requireView().findViewById(R.id.tabgeneralSettingDefaultEntry)).setText(generalConfig.get("default"));
         ConfigTextWatcher.attachTo(R.id.tabgeneralSettingTimeout, getView(), generalConfig, "timeout");
         ConfigTextWatcher.attachTo(R.id.tabgeneralSettingDefaultEntry, getView(), generalConfig, "default");
 
-        ((Button) getView().findViewById(R.id.tabgeneralSave)).setOnClickListener((OnClickListener) p1 -> generalConfig.exportToPrivFile("lk2nd.conf", fileName));
+        ((Button) requireView().findViewById(R.id.tabgeneralSave)).setOnClickListener((OnClickListener) p1 -> generalConfig.exportToPrivFile("lk2nd.conf", fileName));
     }
 }
