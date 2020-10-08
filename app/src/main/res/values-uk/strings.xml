@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Менеджер завантаження Android</string>
     <string name="fatal">КРИТИЧНА ПОМИЛКА</string>
-    <string name="cp_err_msg">Failed to extract some data. Did you install the app on a SD card? Pressing OK will take you to the app, do not do anything without investigating first!</string>
+    <string name="cp_err_msg">Не вдалося розархівувати деякі дані. Ви встановили додаток на SD-карту? Натискання \"ОК\" перенаправить вас до застосунку, нічого не робити без попереднього виправлення проблеми!</string>
     <string name="wrong_device_title">Неправильний пристрій</string>
     <string name="wrong_device_msg">Android Boot Manager не доступний для цього приладу (%1$s).</string>
     <string name="allow_install_unchecked_title">Інсталяція не дозволена</string>
@@ -74,18 +74,18 @@
     <string name="select_sfos_zip">Будь ласка, виберіть zip SailfishOS</string>
     <string name="rom_type_add_sailfish">Sailfish OS</string>
     <string name="title_activity_main">MainActivity</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="navigation_drawer_open">Відкрити панель навігації</string>
+    <string name="navigation_drawer_close">Закрити вікно навігації</string>
     <string name="nav_header_title">@string/app_name</string>
-    <string name="nav_header_subtitle">Multiboot for Android - the other way</string>
-    <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Settings</string>
-    <string name="menu_home">Home</string>
-    <string name="menu_gallery">Gallery</string>
-    <string name="menu_slideshow">Slideshow</string>
+    <string name="nav_header_subtitle">Multiboot для Android - ще один шлях</string>
+    <string name="nav_header_desc">Заголовок панелі навігації</string>
+    <string name="action_settings">Налаштування</string>
+    <string name="menu_home">Головна</string>
+    <string name="menu_gallery">Галерея</string>
+    <string name="menu_slideshow">Слайд-шоу</string>
     <string name="aboutLibraries_description_text">@string/nav_header_subtitle</string>
-    <string name="home_installedWorking_img">Checkmark/Cross to represent installed state</string>
-    <string name="home_installedWorking_text">Failed to load state</string>
-    <string name="home_installedWorking_ok">Installed &amp; working</string>
-    <string name="home_installedWorking_no">Not installed</string>
+    <string name="home_installedWorking_img">Позначка представляють інстальований стан</string>
+    <string name="home_installedWorking_text">Не вдалося завантажити стан</string>
+    <string name="home_installedWorking_ok">Встановлено &amp; робота</string>
+    <string name="home_installedWorking_no">Не встановлено</string>
 </resources>
