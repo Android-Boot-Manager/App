@@ -76,7 +76,6 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="navigation_drawer_open">Відкрити панель навігації</string>
     <string name="navigation_drawer_close">Закрити вікно навігації</string>
-    <string name="nav_header_title">@string/app_name</string>
     <string name="nav_header_subtitle">Multiboot для Android - ще один шлях</string>
     <string name="nav_header_desc">Заголовок панелі навігації</string>
     <string name="action_settings">Налаштування</string>
@@ -93,4 +92,5 @@
     <string name="installcheck3">Install check #3:</string>
     <string name="superuser">Root:</string>
     <string name="failure">Failure</string>
+    <string name="about">About</string>
 </resources>
