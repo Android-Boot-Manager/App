@@ -83,7 +83,6 @@
     <string name="menu_home">Головна</string>
     <string name="menu_gallery">Галерея</string>
     <string name="menu_slideshow">Слайд-шоу</string>
-    <string name="aboutLibraries_description_text">@string/nav_header_subtitle</string>
     <string name="home_installedWorking_img">Позначка представляють інстальований стан</string>
     <string name="home_installedWorking_text">Не вдалося завантажити стан</string>
     <string name="home_installedWorking_ok">Встановлено &amp; робота</string>
