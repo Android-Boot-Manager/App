@@ -83,7 +83,6 @@
     <string name="menu_home">Lar</string>
     <string name="menu_gallery">Galeria</string>
     <string name="menu_slideshow">Slideshow</string>
-    <string name="aboutLibraries_description_text">@string/nav_header_subtitle</string>
     <string name="home_installedWorking_img">Marca/Cruz pra representar o estado instalado</string>
     <string name="home_installedWorking_text">Falha ao carregar estado</string>
     <string name="home_installedWorking_ok">Instalado &amp; funcionando</string>
