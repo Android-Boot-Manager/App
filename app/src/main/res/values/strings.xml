@@ -77,7 +77,7 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">@string/app_name</string>
+    <string name="nav_header_title" translatable="false">@string/app_name</string>
     <string name="nav_header_subtitle">Multiboot for Android - the other way</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
@@ -86,17 +86,7 @@
     <string name="menu_slideshow">Slideshow</string>
     <string name="aboutLibraries_description_showIcon" translatable="false">true</string>
     <string name="aboutLibraries_description_showVersion" translatable="false">true</string>
-    <string name="aboutLibraries_description_text" translatable="false">Android Boot Manager
-Multiboot for Android - the other way
-
-Copyright 2020 The Android Boot Manager Project
-Licensed under the GNU General Public License Version 3 or later
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.</string>
+    <string name="aboutLibraries_description_text" translatable="false">@string/nav_header_subtitle</string>
     <string name="home_installedWorking_img">Checkmark/Cross to represent installed state</string>
     <string name="home_installedWorking_text">Failed to load state</string>
     <string name="home_installedWorking_ok">Installed &amp; working</string>
@@ -107,4 +97,5 @@ limitations under the License.</string>
     <string name="installcheck3">Install check #3:</string>
     <string name="superuser">Root:</string>
     <string name="failure">Failure</string>
+    <string name="about">About</string>
 </resources>
