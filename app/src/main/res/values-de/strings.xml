@@ -64,11 +64,11 @@
     <string name="updated">Ich habe mein Haupt-ROM aktualisiert</string>
     <string name="rom_type_add_ut_sysimg_halium_rootfs">Ubuntu Touch (System, Halium-Boot, Rootfs)</string>
     <string name="rom_type_add_ut_sysimg_halium">Ubuntu Touch (System, Halium-Boot)</string>
-    <string name="install_ut_halium_boot_systemimage">You are going to install ubuntu touch, using system image and halium boot. Are you sure?</string>
+    <string name="install_ut_halium_boot_systemimage">Ubuntu Touch wird jetzt durch Auswahl des System-Images und der halium-boot Datei installiert. Bist Du sicher?</string>
     <string name="select_halium_boot">Bitte die halium-boot Datei auswählen (boot.img)</string>
     <string name="select_system_image">Bitte das System-Image auswählen (system.img)</string>
     <string name="enter_rom_name">ROM Name eingeben</string>
-    <string name="install_ut_halium_boot_systemimage_rootfs">You are going to install ubuntu touch, using system image, rootfs and halium boot. Are you sure?</string>
+    <string name="install_ut_halium_boot_systemimage_rootfs">Ubuntu Touch wird jetzt durch Auswahl des System-Images, rootfs und der halium-boot Datei installiert. Bist Du sicher?</string>
     <string name="select_rootfs">Bitte rootfs auswählen</string>
     <string name="install_sailfish">Du wirst nun SailfishOS mit einer zip-Datei installieren. Bist Du sicher?</string>
     <string name="select_sfos_zip">Bitte wähle die SailfishOS zip-Datei aus</string>
@@ -88,10 +88,10 @@
     <string name="home_installedWorking_text">Fehler beim Laden des Status</string>
     <string name="home_installedWorking_ok">Installiert &amp; funktioniert</string>
     <string name="home_installedWorking_no">Nicht installiert</string>
-    <string name="loading">Loading…</string>
-    <string name="installcheck1">Install check #1:</string>
-    <string name="installcheck2">Install check #2:</string>
-    <string name="installcheck3">Install check #3:</string>
+    <string name="loading">Laden…</string>
+    <string name="installcheck1">Installationsüberprüfung #1:</string>
+    <string name="installcheck2">Installationsüberprüfung #2:</string>
+    <string name="installcheck3">Installationsüberprüfung #3:</string>
     <string name="superuser">Root:</string>
-    <string name="failure">Failure</string>
+    <string name="failure">Ein Fehler ist aufgetreten</string>
 </resources>
