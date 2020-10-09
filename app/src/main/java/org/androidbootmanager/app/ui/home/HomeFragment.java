@@ -33,11 +33,11 @@ public class HomeFragment extends Fragment {
         ImageView statusImg = root.findViewById(R.id.home_installedWorking_image);
         Shell.su(Constants.scriptDir + "is_installed.sh").submit((result) -> {
             check0.set(Shell.rootAccess());
-            statusText0.setText(getString(R.string.superuser) + " " + getString(check0.get() ? R.string.ok : R.string.failure));
+            statusText0.setText(check0.get() ? R.string.ok : R.string.failure);
             check1.set(result.getCode() == 0);
-            statusText1.setText(getString(R.string.installcheck1) + " " + getString(check1.get() ? R.string.ok : R.string.failure));
+            statusText1.setText(check1.get() ? R.string.ok : R.string.failure);
             check2.set(result.getOut().contains("ABM.bootloader=1"));
-            statusText2.setText(getString(R.string.installcheck2) + " " + getString(check2.get() ? R.string.ok : R.string.failure));
+            statusText2.setText(check2.get() ? R.string.ok : R.string.failure);
         });
         return root;
     }
