@@ -51,6 +51,9 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void copyAssets() {
+        if (!new File(Constants.assetDir).exists()) fail = fail | !new File(Constants.assetDir).mkdir();
+        if (!new File(Constants.filesDir).exists()) fail = fail | !new File(Constants.filesDir).mkdir();
+        if (!new File(Constants.tempDir).exists()) fail = fail | !new File(Constants.tempDir).mkdir();
         copyAssets("Toolkit", "Toolkit");
         copyAssets("Scripts", "Scripts");
         copyAssets("cp", "");
