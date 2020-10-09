@@ -1,6 +1,9 @@
 package org.androidbootmanager.app.util;
 
+import android.annotation.SuppressLint;
+
 public class Constants {
+    @SuppressLint("SdCardPath")
     public static String appDir = "/data/data/org.androidbootmanager.app/";
     public static String assetDir = appDir + "assets/";
     public static String filesDir = appDir + "files/";
