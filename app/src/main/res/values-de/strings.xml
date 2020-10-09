@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="app_name">Android-Startverwaltung</string>
+    <string name="app_name">Android Boot Manager</string>
     <string name="fatal">SCHWERWIEGENDER FEHLER</string>
     <string name="cp_err_msg">Fehler beim Extrahieren der Daten. Haben Sie die App auf einer SD-Karte installiert? Das Drücken von OK bringt Sie zur App, tun Sie nichts ohne den Fehler vorher zu untersuchen!</string>
     <string name="wrong_device_title">Inkompatibles Gerät</string>
@@ -19,8 +19,8 @@
     <string name="choose_device">Wählen Sie Ihr Gerät aus</string>
     <string name="install_finish_title">Installation abgeschlossen</string>
     <string name="install_finish_msg">Rückgabe ist %1$sWenn die Rückgabe ERROR (Fehler) ist ist etwas schiefgelaufen. Bitte flashe den Deinstallierer und sag und in unserer Telegram-Gruppe @andbootmgr bescheid. Bitte bring das Log (/sdcard/abm/install.log) mit! Falls die Rückgabe OK ist war die Installation erfolgreich. Du solltest dein Gerät neustarten.</string>
-    <string name="root">Ich bin Root. Super! :)</string>
-    <string name="no_root">Ich bin NICHT Root. Etwas ist schiefgelaufen!</string>
+    <string name="root">Rootzugriff erlangt. Super! :)</string>
+    <string name="no_root">Rootzugriff verweigert. Etwas ist schiefgelaufen!</string>
     <string name="test_root">Root testen</string>
     <string name="readme_title">README, Quellcode und Lizenz</string>
     <string name="readme_text">Der Quellcode ist hier: %1$s\nDas README ist hier: %2$s</string>
@@ -28,7 +28,7 @@
     <string name="readme">README</string>
     <string name="nodevcheck">Geräte-Check überspringen (falls du das Gerät fälscht)</string>
     <string name="allow_install">Ich akzeptiere das Risiko, Installation erlauben!</string>
-    <string name="not_installed">Die Android-Startverwaltung ist nicht installiert.</string>
+    <string name="not_installed">Der Android Boot Manager ist auf Deinem Gerät nicht installiert!</string>
     <string name="devices">ABM ist nur für das Moto G5 (cedric) und für das Volla Phone (yggdrasil) verfügbar!</string>
     <string name="be_careful">DU KANNST DEINE DATEN VERLIEREN! DU KANNST DEIN GERÄT ZERSTÖREN! DU KANNST DEINE IMEI VERLIEREN! DU KANNST SOGAR GELD VERLIEREN! NIEMAND IST DAFÜR VERANTWORTLICH AUSSER DU! BENUTZEN AUF EIGENE GEFAHR! SEI VORSICHTIG!</string>
     <string name="configurator">Konfigurator</string>
@@ -56,14 +56,14 @@
     <string name="delete">Löschen</string>
     <string name="filename">Konfigurationsdateiname (keine Leerzeichen, keine Dateiendung)</string>
     <string name="add_rom">ROM hinzufügen</string>
-    <string name="rom_location">ROM-Standort</string>
+    <string name="rom_location">ROM Speicherort</string>
     <string name="delete_real_rom">Sie können das primäre ROM nicht löschen!</string>
     <string name="app_unfinished">Die Android-Startverwaltung ist erfolgreich installiert aber die App ist noch nicht fertig. Nutzlose Knöpfe und leere Seiten sind zu erwarten :(</string>
     <string name="rom_type_add_rom_zip">Android (ROM Zip)</string>
     <string name="updatelk">Aktualisierung von DroidBoot</string>
     <string name="updated">Ich habe mein Haupt-ROM aktualisiert</string>
-    <string name="rom_type_add_ut_sysimg_halium_rootfs">Ubuntu Touch (System, Halium-Boot, Rootfs)</string>
-    <string name="rom_type_add_ut_sysimg_halium">Ubuntu Touch (System, Halium-Boot)</string>
+    <string name="rom_type_add_ut_sysimg_halium_rootfs">Ubuntu Touch (System Image, Halium-Boot Image, Rootfs)</string>
+    <string name="rom_type_add_ut_sysimg_halium">Ubuntu Touch (System Image, Halium-Boot Image)</string>
     <string name="install_ut_halium_boot_systemimage">Ubuntu Touch wird jetzt durch Auswahl des System-Images und der halium-boot Datei installiert. Bist Du sicher?</string>
     <string name="select_halium_boot">Bitte die halium-boot Datei auswählen (boot.img)</string>
     <string name="select_system_image">Bitte das System-Image auswählen (system.img)</string>
@@ -89,9 +89,9 @@
     <string name="home_installedWorking_ok">Installiert &amp; funktioniert</string>
     <string name="home_installedWorking_no">Nicht installiert</string>
     <string name="loading">Laden…</string>
-    <string name="installcheck1">Installationsüberprüfung #1:</string>
-    <string name="installcheck2">Installationsüberprüfung #2:</string>
-    <string name="installcheck3">Installationsüberprüfung #3:</string>
+    <string name="installcheck1">Installationstest #1:</string>
+    <string name="installcheck2">Installationstest #2:</string>
+    <string name="installcheck3">Installationstest #3:</string>
     <string name="superuser">Root:</string>
-    <string name="failure">Ein Fehler ist aufgetreten</string>
+    <string name="failure">Fehler</string>
 </resources>
