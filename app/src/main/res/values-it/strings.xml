@@ -84,7 +84,6 @@ se falsifichi il fingerprint)</string>
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
-    <string name="aboutLibraries_description_text">@string/nav_header_subtitle</string>
     <string name="home_installedWorking_img">Checkmark/Cross to represent installed state</string>
     <string name="home_installedWorking_text">Impossibile caricare lo stato</string>
     <string name="home_installedWorking_ok">&amp; installato, funziona</string>
