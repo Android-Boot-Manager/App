@@ -85,13 +85,13 @@ public class SplashActivity extends AppCompatActivity {
             out.flush();
             out.close();
         } catch (FileNotFoundException e) {
-            // result ignored on purpose as it often fails, but is does it's job if needed
+            // result ignored on purpose as it often fails, but it does it's job if needed
             new File(Constants.assetDir + outp + File.separator).mkdir();
             try {
                 assetManager.open(src + File.separator + filename).close();
                 copyAssets(src, outp, assetManager, filename);
             } catch (FileNotFoundException e2) {
-                // result ignored on purpose as it often fails, but is does it's job if needed
+                // result ignored on purpose as it often fails, but it does it's job if needed
                 new File(Constants.assetDir + outp + File.separator + filename).mkdir();
                 copyAssets(src + File.separator + filename, outp + File.separator + filename);
             } catch (IOException ex) {
