@@ -83,7 +83,6 @@
     <string name="menu_home">Startseite</string>
     <string name="menu_gallery">Galerie</string>
     <string name="menu_slideshow">Diashow</string>
-    <string name="aboutLibraries_description_text">Untertitel @string/nav_header</string>
     <string name="home_installedWorking_img">Checkmark um den installierten Zustand darzustellen</string>
     <string name="home_installedWorking_text">Fehler beim Laden des Status</string>
     <string name="home_installedWorking_ok">Installiert &amp; funktioniert</string>
