@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">Android Boot Manager</string>
     <string name="fatal">ERRORE FATALE</string>
-    <string name="cp_err_msg">Failed to extract some data. Did you install the app on a SD card? Pressing OK will take you to the app, do not do anything without investigating first!</string>
+    <string name="cp_err_msg">Impossibile estrarre alcuni dati. Hai installato l\'app su una scheda SD? Premere OK ti porterà all\'app, non fare nulla senza prima indagare!</string>
     <string name="wrong_device_title">Dispositivo errato</string>
     <string name="wrong_device_msg">Android Boot Manager non è disponibile per questo dispositivo (%1$s).</string>
     <string name="allow_install_unchecked_title">La casella Consenti Installazione non è stata selezionata</string>
@@ -65,11 +65,11 @@ se falsifichi il fingerprint)</string>
     <string name="updated">Ho aggiornato la ROM principale</string>
     <string name="rom_type_add_ut_sysimg_halium_rootfs">Ubuntu Touch (Systemimage, Halium boot, Rootfs)</string>
     <string name="rom_type_add_ut_sysimg_halium">Ubuntu Touch (Systemimage, Halium boot)</string>
-    <string name="install_ut_halium_boot_systemimage">Stai per installare il ubuntu touch, usando l\'immagine system (systemimage) e halium boot. Sei sicuro?</string>
+    <string name="install_ut_halium_boot_systemimage">You are going to install ubuntu touch, using system image and halium boot. Are you sure?</string>
     <string name="select_halium_boot">Selezionare il file halium boot</string>
     <string name="select_system_image">Selezionare l\'immagine di sistema (systemimage)</string>
     <string name="enter_rom_name">Inserisci il nome della ROM</string>
-    <string name="install_ut_halium_boot_systemimage_rootfs">Stai per installare ubuntu touch, utilizzando l\'immagine system, rootfs e halium boot. Sei sicuro?</string>
+    <string name="install_ut_halium_boot_systemimage_rootfs">You are going to install ubuntu touch, using system image, rootfs and halium boot. Are you sure?</string>
     <string name="select_rootfs">Per favore seleziona la rootfs</string>
     <string name="install_sailfish">Stai per installare SailfishOS utilizzando lo zip. Sei sicuro?</string>
     <string name="select_sfos_zip">Per favore seleziona lo zip di SailfishOS</string>
@@ -86,7 +86,13 @@ se falsifichi il fingerprint)</string>
     <string name="menu_slideshow">Slideshow</string>
     <string name="aboutLibraries_description_text">@string/nav_header_subtitle</string>
     <string name="home_installedWorking_img">Checkmark/Cross to represent installed state</string>
-    <string name="home_installedWorking_text">Failed to load state</string>
-    <string name="home_installedWorking_ok">Installed &amp; working</string>
-    <string name="home_installedWorking_no">Not installed</string>
+    <string name="home_installedWorking_text">Impossibile caricare lo stato</string>
+    <string name="home_installedWorking_ok">&amp; installato, funziona</string>
+    <string name="home_installedWorking_no">Non installato</string>
+    <string name="loading">Loading…</string>
+    <string name="installcheck1">Install check #1:</string>
+    <string name="installcheck2">Install check #2:</string>
+    <string name="installcheck3">Install check #3:</string>
+    <string name="superuser">Root:</string>
+    <string name="failure">Failure</string>
 </resources>
