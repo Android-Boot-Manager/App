@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">Менеджер завантаження Android</string>
     <string name="fatal">КРИТИЧНА ПОМИЛКА</string>
     <string name="cp_err_msg">Не вдалося розархівувати деякі дані. Ви встановили додаток на SD-карту? Натискання \"ОК\" перенаправить вас до застосунку, нічого не робити без попереднього виправлення проблеми!</string>
@@ -64,11 +64,11 @@
     <string name="updated">Я оновив свою основну прошивку</string>
     <string name="rom_type_add_ut_sysimg_halium_rootfs">Ubuntu Touch (System image, Halium Boot image, Rootfs)</string>
     <string name="rom_type_add_ut_sysimg_halium">Ubuntu Touch (System image, Halium Boot image)</string>
-    <string name="install_ut_halium_boot_systemimage">Ви збираєтеся встановити Ubuntu Touch, використовуючи образ sytem і halium-boot, ви впевнені?</string>
+    <string name="install_ut_halium_boot_systemimage">You are going to install ubuntu touch, using system image and halium boot. Are you sure?</string>
     <string name="select_halium_boot">Будь ласка, виберіть файл halium-boot</string>
     <string name="select_system_image">Будь ласка, виберіть system.img</string>
     <string name="enter_rom_name">Введіть ім\'я прошивки</string>
-    <string name="install_ut_halium_boot_systemimage_rootfs">Ви збираєтеся встановити Ubuntu Touch, використовуючи образ sytem, rootfs і halium-boot, ви впевнені?</string>
+    <string name="install_ut_halium_boot_systemimage_rootfs">You are going to install ubuntu touch, using system image, rootfs and halium boot. Are you sure?</string>
     <string name="select_rootfs">Будь ласка виберіть rootfs</string>
     <string name="install_sailfish">Ви збираєтеся встановити SailfishOS, використовуючи zip. Ви впевнені?</string>
     <string name="select_sfos_zip">Будь ласка, виберіть zip SailfishOS</string>
@@ -88,4 +88,10 @@
     <string name="home_installedWorking_text">Не вдалося завантажити стан</string>
     <string name="home_installedWorking_ok">Встановлено &amp; робота</string>
     <string name="home_installedWorking_no">Не встановлено</string>
+    <string name="loading">Loading…</string>
+    <string name="installcheck1">Install check #1:</string>
+    <string name="installcheck2">Install check #2:</string>
+    <string name="installcheck3">Install check #3:</string>
+    <string name="superuser">Root:</string>
+    <string name="failure">Failure</string>
 </resources>
