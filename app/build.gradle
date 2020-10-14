@@ -25,6 +25,7 @@ android {
     }
     buildTypes {
         release {
+            zipAlignEnabled true
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 	        if (project.hasProperty('ABM_RELEASE_KEY_ALIAS')) {
