@@ -25,7 +25,7 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 	        if (project.hasProperty('ABM_RELEASE_KEY_ALIAS')) {
 	    	    signingConfig signingConfigs.release
