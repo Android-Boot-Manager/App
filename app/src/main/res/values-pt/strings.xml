@@ -93,6 +93,6 @@
     <string name="superuser">Root:</string>
     <string name="failure">Falha</string>
     <string name="about">Sobre</string>
-    <string name="welcome">Welcome!</string>
-    <string name="installerWelcome">Welcome to the Android Boot Manager installer. This will install Android Boot Manager on your device. Not easily undoable modifications are being done, please do not install without knowledge about it. Disclaimer follows:</string>
+    <string name="welcome">Bem-vindo!</string>
+    <string name="installerWelcome">Bem-vindo ao instalador do Android Boot Manager. Isso irá instalar o Android Boot Manager no seu aparelho. Modificações que não são fáceis de desfazer estão sendo feitas, por favor não instale sem conhecimento sobre. Aviso seguinte:</string>
 </resources>
