@@ -12,15 +12,15 @@ import androidx.lifecycle.ViewModelProvider;
 
 import org.androidbootmanager.app.R;
 
-public class WizardPage2Fragment extends WizardPageFragment {
+public class ExampleWizardPage2Fragment extends ExampleWizardPageFragment {
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         model = new ViewModelProvider(requireActivity()).get(WizardViewModel.class);
-        model.setPositiveFragment(WizardPageFragment.class);
-        model.setNegativeFragment(WizardPageFragment.class);
+        model.setPositiveFragment(ExampleWizardPageFragment.class);
+        model.setNegativeFragment(ExampleWizardPageFragment.class);
         final View root = inflater.inflate(R.layout.wizardpage_fragment, container, false);
         final TextView message = (TextView) root.findViewById(R.id.wizardpage_message);
         message.setText("ho.");

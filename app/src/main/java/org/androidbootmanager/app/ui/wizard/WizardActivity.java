@@ -1,13 +1,12 @@
-package org.androidbootmanager.app.ui.activities;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
+package org.androidbootmanager.app.ui.wizard;
 
 import android.os.Bundle;
-import android.view.View;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import org.androidbootmanager.app.R;
-import org.androidbootmanager.app.ui.wizard.WizardPageFragment;
 import org.androidbootmanager.app.ui.wizard.WizardViewModel;
 
 public class WizardActivity extends AppCompatActivity {
@@ -20,9 +19,13 @@ public class WizardActivity extends AppCompatActivity {
         model = new ViewModelProvider(this).get(WizardViewModel.class);
         setContentView(R.layout.wizard_activity);
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.wizard_container, new WizardPageFragment())
-                    .commitNow();
+            try {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.wizard_container, ((Class<? extends Fragment>) getIntent().getSerializableExtra("StartFragment")).newInstance())
+                        .commitNow();
+            } catch (IllegalAccessException | InstantiationException e) {
+                throw new RuntimeException(e);
+            }
         }
         findViewById(R.id.wizard_positiveButton).setOnClickListener(v -> {
             if (model.getPositiveFragment() != null) {
