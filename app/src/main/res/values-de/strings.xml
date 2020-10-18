@@ -93,4 +93,6 @@
     <string name="superuser">Root:</string>
     <string name="failure">Fehler</string>
     <string name="about">Über</string>
+    <string name="welcome">Welcome!</string>
+    <string name="installerWelcome">Welcome to the Android Boot Manager installer. This will install Android Boot Manager on your device. Not easily undoable modifications are being done, please do not install without knowledge about it. Disclaimer follows:</string>
 </resources>
