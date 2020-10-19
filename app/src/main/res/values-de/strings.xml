@@ -95,7 +95,7 @@
     <string name="about">Über</string>
     <string name="welcome">Willkommen!</string>
     <string name="installerWelcome">Willkommen beim Android Boot Manager Installer. Damit wird Android Boot Manager auf Ihrem Gerät installiert. Es werden nicht leicht rückgängig zu machende Änderungen vorgenommen, bitte installieren Sie dies nicht ohne zu wissen was Sie tun. Haftungsausschluss:</string>
-    <string name="next">Next</string>
+    <string name="next">Weiter</string>
     <!-- Assistant page navigation -->
-    <string name="prev">Prev</string>
+    <string name="prev">Zurück</string>
 </resources>
