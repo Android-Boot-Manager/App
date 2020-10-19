@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 import org.androidbootmanager.app.R;
 import org.androidbootmanager.app.ui.wizard.WizardViewModel;
 
-public class InstallerWelcomeWizardPageFragment extends Fragment {
+public class DeviceTestWizardPageFragment extends Fragment {
 
 
     protected WizardViewModel model;
@@ -23,13 +23,13 @@ public class InstallerWelcomeWizardPageFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         model = new ViewModelProvider(requireActivity()).get(WizardViewModel.class);
-        model.setPositiveFragment(DeviceTestWizardPageFragment.class);
-        model.setNegativeFragment(null);
+        model.setPositiveFragment(null);
+        model.setNegativeFragment(InstallerWelcomeWizardPageFragment.class);
         model.setPositiveAction(null);
-        model.setNegativeAction(() -> requireActivity().finish());
+        model.setNegativeAction(null);
         model.setPositiveText(getString(R.string.next));
-        model.setNegativeText(getString(R.string.cancel));
-        final View root = inflater.inflate(R.layout.wizard_installer_welcome, container, false);
+        model.setNegativeText(getString(R.string.prev));
+        final View root = inflater.inflate(R.layout.wizard_installer_devicetest, container, false);
         return root;
     }
 

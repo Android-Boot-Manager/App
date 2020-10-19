@@ -1,13 +1,15 @@
 package org.androidbootmanager.app.ui.wizard;
 
 import android.os.Bundle;
+import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import org.androidbootmanager.app.R;
-import org.androidbootmanager.app.ui.wizard.WizardViewModel;
+
+import java.util.Objects;
 
 public class WizardActivity extends AppCompatActivity {
 
@@ -21,7 +23,7 @@ public class WizardActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             try {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.wizard_container, ((Class<? extends Fragment>) getIntent().getSerializableExtra("StartFragment")).newInstance())
+                        .replace(R.id.wizard_container, ((Class<? extends Fragment>) Objects.requireNonNull(getIntent().getSerializableExtra("StartFragment"))).newInstance())
                         .commitNow();
             } catch (IllegalAccessException | InstantiationException e) {
                 throw new RuntimeException(e);
@@ -36,8 +38,11 @@ public class WizardActivity extends AppCompatActivity {
                 } catch (IllegalAccessException | InstantiationException e) {
                     e.printStackTrace();
                 }
+            } else {
+                if (model.getPositiveAction().getValue() != null) model.getPositiveAction().getValue().run();
             }
         });
+        model.getPositiveText().observe(this,((Button) findViewById(R.id.wizard_positiveButton))::setText);
         findViewById(R.id.wizard_negativeButton).setOnClickListener(v -> {
             if (model.getNegativeFragment() != null) {
                 try {
@@ -47,7 +52,10 @@ public class WizardActivity extends AppCompatActivity {
                 } catch (IllegalAccessException | InstantiationException e) {
                     e.printStackTrace();
                 }
+            } else {
+                if (model.getNegativeAction().getValue() != null) model.getNegativeAction().getValue().run();
             }
         });
+        model.getNegativeText().observe(this,((Button) findViewById(R.id.wizard_negativeButton))::setText);
     }
 }
