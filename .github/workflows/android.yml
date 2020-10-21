@@ -25,9 +25,9 @@ jobs:
       with:
         java-version: 1.8
     - name: Extract signing keystore
-      run: echo ${{ secrets.SIGNING_KEY }} | base64 -d > ~/abm.keystore
+      run: echo "${{ secrets.SIGNING_KEY }}" | base64 -d > ~/abm.keystore
     - name: Set signing configuration
-      run: echo ${{ secrets.KEY_SETTINGS }} | base64 -d > ~/.gradle/gradle.properties
+      run: echo "${{ secrets.KEY_SETTINGS }}" | base64 -d > ~/.gradle/gradle.properties
     - name: Build with Gradle
       run: ./gradlew build
     - name: Upload apks (1/2)
