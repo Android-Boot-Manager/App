@@ -76,7 +76,6 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">@string/app_name</string>
     <string name="nav_header_subtitle">Multiboot for Android - the other way</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
@@ -93,4 +92,10 @@
     <string name="installcheck3">Install check #3:</string>
     <string name="superuser">Root:</string>
     <string name="failure">Failure</string>
+    <string name="about">About</string>
+    <string name="welcome">Welcome!</string>
+    <string name="installerWelcome">Welcome to the Android Boot Manager installer. This will install Android Boot Manager on your device. Not easily undoable modifications are being done, please do not install without knowledge about it. Disclaimer follows:</string>
+    <string name="next">Next</string>
+    <!-- Assistant page navigation -->
+    <string name="prev">Prev</string>
 </resources>

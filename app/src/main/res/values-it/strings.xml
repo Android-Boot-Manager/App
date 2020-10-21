@@ -74,17 +74,16 @@ se falsifichi il fingerprint)</string>
     <string name="install_sailfish">Stai per installare SailfishOS utilizzando lo zip. Sei sicuro?</string>
     <string name="select_sfos_zip">Per favore seleziona lo zip di SailfishOS</string>
     <string name="rom_type_add_sailfish">Sailfish OS</string>
-    <string name="title_activity_main">MainActivity</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">@string/app_name</string>
-    <string name="nav_header_subtitle">Multiboot for Android - the other way</string>
-    <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Settings</string>
-    <string name="menu_home">Home</string>
-    <string name="menu_gallery">Gallery</string>
-    <string name="menu_slideshow">Slideshow</string>
-    <string name="home_installedWorking_img">Checkmark/Cross to represent installed state</string>
+    <string name="title_activity_main">Attività principale</string>
+    <string name="navigation_drawer_open">Apri menù di navigazione</string>
+    <string name="navigation_drawer_close">Chiudi menù di navigazione</string>
+    <string name="nav_header_subtitle">Multiboot per Android - l\'altra via</string>
+    <string name="nav_header_desc">Header di navigazione</string>
+    <string name="action_settings">Impostazioni</string>
+    <string name="menu_home">Pagina principale</string>
+    <string name="menu_gallery">Galleria</string>
+    <string name="menu_slideshow">Presentazione</string>
+    <string name="home_installedWorking_img">Checkmark/Croce per rappresentare stato di installazione</string>
     <string name="home_installedWorking_text">Impossibile caricare lo stato</string>
     <string name="home_installedWorking_ok">&amp; installato, funziona</string>
     <string name="home_installedWorking_no">Non installato</string>
@@ -94,4 +93,10 @@ se falsifichi il fingerprint)</string>
     <string name="installcheck3">Install check #3:</string>
     <string name="superuser">Root:</string>
     <string name="failure">Errore</string>
+    <string name="about">Informazioni</string>
+    <string name="welcome">Welcome!</string>
+    <string name="installerWelcome">Welcome to the Android Boot Manager installer. This will install Android Boot Manager on your device. Not easily undoable modifications are being done, please do not install without knowledge about it. Disclaimer follows:</string>
+    <string name="next">Next</string>
+    <!-- Assistant page navigation -->
+    <string name="prev">Prev</string>
 </resources>
