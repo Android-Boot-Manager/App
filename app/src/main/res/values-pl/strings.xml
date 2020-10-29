@@ -5,6 +5,9 @@
     <string name="cp_err_msg">Failed to extract some data. Did you install the app on a SD card? Pressing OK will take you to the app, do not do anything without investigating first!</string>
     <string name="wrong_device_title">Nieodpowiednie urządzenie</string>
     <string name="wrong_device_msg">Menedżer uruchamiania Androida nie jest dostępny dla tego urządzenia (%1$s).</string>
+    <string name="device_msg">Android Boot Manager is available for this device (%1$s).</string>
+    <string name="device_btn">Not your device?</string>
+    <string name="bsp_msg">Your device uses an BSP codename (%1$s). That means we are not able to identify your device and you need to select yours.</string>
     <string name="allow_install_unchecked_title">Nie zaznaczono pozwolenia na instalację</string>
     <string name="allow_install_unchecked_msg">Wygląda na to że nie zajrzałeś na tę stronę. To nie dobrze!</string>
     <string name="ok">OK</string>
@@ -94,6 +97,7 @@
     <string name="failure">Failure</string>
     <string name="about">About</string>
     <string name="welcome">Welcome!</string>
+    <string name="wizard_deviceinstaller_text">Ready! Please follow the next steps for installing Android Boot Manager. If you redecided, you can click cancel. Nothing was changed until now.</string>
     <string name="installerWelcome">Welcome to the Android Boot Manager installer. This will install Android Boot Manager on your device. Not easily undoable modifications are being done, please do not install without knowledge about it. Disclaimer follows:</string>
     <string name="next">Next</string>
     <!-- Assistant page navigation -->
