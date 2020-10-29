@@ -5,9 +5,9 @@
     <string name="cp_err_msg">Falha ao pegar alguns dados. você instalou o app em um cartão SD? Pressionando OK levará você ao app, não faça nada sem investigar primeiro!</string>
     <string name="wrong_device_title">Dispositivo errado</string>
     <string name="wrong_device_msg">O Android Boot Manager não está disponível para este dispositivo (%1$s).</string>
-    <string name="device_msg">Android Boot Manager is available for this device (%1$s).</string>
-    <string name="device_btn">Not your device?</string>
-    <string name="bsp_msg">Your device uses an BSP codename (%1$s). That means we are not able to identify your device and you need to select yours.</string>
+    <string name="device_msg">Android Boot Manager está disponível pra este aparelho (%1$s)</string>
+    <string name="device_btn">Não é o seu aparelho?</string>
+    <string name="bsp_msg">Seu aparelho usa um codinome BSP (%1$s). Isso significa que não somos capazes de identificar o seu aparelho e você precisa selecionar o seu.</string>
     <string name="allow_install_unchecked_title">Permitir instalação não checada</string>
     <string name="allow_install_unchecked_msg">Parece que você não olhou está página, isso não é bom!</string>
     <string name="ok">OK</string>
@@ -97,7 +97,7 @@
     <string name="failure">Falha</string>
     <string name="about">Sobre</string>
     <string name="welcome">Bem-vindo!</string>
-    <string name="wizard_deviceinstaller_text">Ready! Please follow the next steps for installing Android Boot Manager. If you redecided, you can click cancel. Nothing was changed until now.</string>
+    <string name="wizard_deviceinstaller_text">Pronto! Por favor siga os próximos pra instalar o Android Boot Manager. Se você mudar de ideia, você pode apertar em cancelar. Nada foi alterado ate agora.</string>
     <string name="installerWelcome">Bem-vindo ao instalador do Android Boot Manager. Isso irá instalar o Android Boot Manager no seu aparelho. Modificações que não são fáceis de desfazer estão sendo feitas, por favor não instale sem conhecimento sobre. Aviso seguinte:</string>
     <string name="next">Próximo</string>
     <!-- Assistant page navigation -->
