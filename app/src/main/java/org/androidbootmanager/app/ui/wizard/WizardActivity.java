@@ -16,6 +16,7 @@ public class WizardActivity extends AppCompatActivity {
     WizardViewModel model;
 
     @Override
+    @SuppressWarnings("unchecked")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         model = new ViewModelProvider(this).get(WizardViewModel.class);

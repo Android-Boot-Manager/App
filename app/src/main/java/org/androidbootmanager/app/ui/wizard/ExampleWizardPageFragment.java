@@ -26,6 +26,10 @@ public class ExampleWizardPageFragment extends Fragment {
         model = new ViewModelProvider(requireActivity()).get(WizardViewModel.class);
         model.setPositiveFragment(ExampleWizardPage2Fragment.class);
         model.setNegativeFragment(ExampleWizardPage2Fragment.class);
+        model.setPositiveAction(null);
+        model.setNegativeAction(null);
+        model.setPositiveText(getString(R.string.next));
+        model.setNegativeText(getString(R.string.prev));
         final View root = inflater.inflate(R.layout.wizardpage_fragment, container, false);
         final TextView message = (TextView) root.findViewById(R.id.wizardpage_message);
         message.setText("hi.");

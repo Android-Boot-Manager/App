@@ -29,8 +29,7 @@ public class InstallerWelcomeWizardPageFragment extends Fragment {
         model.setNegativeAction(() -> requireActivity().finish());
         model.setPositiveText(getString(R.string.next));
         model.setNegativeText(getString(R.string.cancel));
-        final View root = inflater.inflate(R.layout.wizard_installer_welcome, container, false);
-        return root;
+        return inflater.inflate(R.layout.wizard_installer_welcome, container, false);
     }
 
     @Override
