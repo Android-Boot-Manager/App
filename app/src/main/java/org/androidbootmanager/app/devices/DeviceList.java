@@ -1,7 +1,9 @@
 package org.androidbootmanager.app.devices;
 
+import android.bluetooth.BluetoothClass;
+
 import org.androidbootmanager.app.ui.installer.DeviceInstallerWizardPageFragment;
-import org.androidbootmanager.app.ui.wizard.ExampleWizardPage2Fragment;
+import org.androidbootmanager.app.ui.installer.DroidBootSelectorWizardPageFragment;
 import org.androidbootmanager.app.ui.wizard.ExampleWizardPageFragment;
 
 import java.util.ArrayList;
@@ -25,13 +27,12 @@ public class DeviceList {
                 d = new DeviceModel();
                 d.codename = "yggdrasil";
                 d.viewname = "Volla Phone";
-                d.splashFragment = ExampleWizardPageFragment.class;
                 break;
             case "cedric":
                 d = new DeviceModel();
                 d.codename = "cedric";
                 d.viewname = "Moto G5";
-                d.splashFragment = ExampleWizardPage2Fragment.class;
+                d.flow = Arrays.asList(DeviceInstallerWizardPageFragment.class, DroidBootSelectorWizardPageFragment.class, ExampleWizardPageFragment.class);
                 break;
             default:
                 throw new RuntimeException(new IllegalStateException("DeviceModel not found: unknown device '" + codename + "'"));

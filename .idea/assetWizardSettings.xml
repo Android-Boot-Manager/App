@@ -24,7 +24,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="/tmp/baseline_cancel_24.xml" />
+                                                <entry key="imagePath" value="/tmp/baseline_developer_mode_24.xml" />
                                                 <entry key="opacityPercent" value="80" />
                                               </map>
                                             </option>
@@ -36,7 +36,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/home/nick/.local/bin/android-studio/plugins/android/lib/android.jar!/images/material/icons/materialicons/cancel/baseline_cancel_24.xml" />
+                                                <entry key="url" value="jar:file:/home/nick/.local/bin/android-studio/plugins/android/lib/android.jar!/images/material/icons/materialicons/developer_mode/baseline_developer_mode_24.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -68,8 +68,8 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="outputName" value="ic_no" />
-                                      <entry key="theme" value="CUSTOM" />
+                                      <entry key="outputName" value="ic_droidbooticon" />
+                                      <entry key="theme" value="HOLO_DARK" />
                                       <entry key="themeColor" value="ff0000" />
                                     </map>
                                   </option>

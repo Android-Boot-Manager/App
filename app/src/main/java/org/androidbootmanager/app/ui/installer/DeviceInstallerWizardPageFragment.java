@@ -26,7 +26,7 @@ public class DeviceInstallerWizardPageFragment extends Fragment {
                                  @Nullable Bundle savedInstanceState) {
             model = new ViewModelProvider(requireActivity()).get(WizardViewModel.class);
             imodel = new ViewModelProvider(requireActivity()).get(DeviceInstallerViewModel.class);
-            model.setPositiveFragment(DeviceList.getModel(imodel.getCodename().getValue()).splashFragment);
+            model.setPositiveFragment(DeviceList.getModel(imodel.getCodename().getValue()).flow.get(1));
             model.setNegativeFragment(null);
             model.setPositiveAction(null);
             model.setNegativeAction(() -> requireActivity().finish());
