@@ -32,6 +32,7 @@ public class DeviceInstallerWizardPageFragment extends Fragment {
             model.setNegativeAction(() -> requireActivity().finish());
             model.setPositiveText(getString(R.string.next));
             model.setNegativeText(getString(R.string.cancel));
+            imodel.flow.addAll(DeviceList.getModel(imodel.getCodename().getValue()).flow);
             return inflater.inflate(R.layout.wizard_installer_deviceinstaller, container, false);
         }
 

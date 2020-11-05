@@ -25,13 +25,13 @@ public class DroidBootSelectorWizardPageFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         model = new ViewModelProvider(requireActivity()).get(WizardViewModel.class);
         imodel = new ViewModelProvider(requireActivity()).get(DeviceInstallerViewModel.class);
-        model.setPositiveFragment(imodel.flow.get(++imodel.flowPos));
-        model.setNegativeFragment(imodel.flow.get(imodel.flowPos-1));
+        model.setPositiveFragment(imodel.flow.get(++imodel.flowPos+1));
+        model.setNegativeFragment(null);
         model.setPositiveAction(null);
-        model.setNegativeAction(null);
+        model.setNegativeAction(() -> requireActivity().finish());
         model.setPositiveText(getString(R.string.next));
-        model.setNegativeText(getString(R.string.prev));
-        final View root = inflater.inflate(R.layout.wizardpage_fragment, container, false);
+        model.setNegativeText(getString(R.string.cancel));
+        final View root = inflater.inflate(R.layout.wizard_installer_droidboot, container, false);
         return root;
     }
 

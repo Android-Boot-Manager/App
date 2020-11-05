@@ -12,7 +12,7 @@ import java.util.Arrays;
 public class DeviceInstallerViewModel extends ViewModel {
     MutableLiveData<String> codename;
     public ArrayList<Class<? extends Fragment>> flow = new ArrayList<>(Arrays.asList(DeviceInstallerWizardPageFragment.class));
-    public int flowPos = 0;
+    public int flowPos = 1;
     public File droidboot;
 
     public LiveData<String> getCodename() {
