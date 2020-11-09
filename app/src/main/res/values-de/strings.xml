@@ -5,6 +5,9 @@
     <string name="cp_err_msg">Fehler beim Extrahieren der Daten. Haben Sie die App auf einer SD-Karte installiert? Das Drücken von OK bringt Sie zur App, tun Sie nichts ohne den Fehler vorher zu untersuchen!</string>
     <string name="wrong_device_title">Inkompatibles Gerät</string>
     <string name="wrong_device_msg">Die Android-Startverwaltung ist für dieses Gerät (%1$s) nicht verfügbar.</string>
+    <string name="device_msg">Android Boot Manager ist für dieses Gerät verfügbar (%1$s).</string>
+    <string name="device_btn">Nicht dein Gerät?</string>
+    <string name="bsp_msg">Dein Gerät verwendet einen BSP-Codenamen (%1$s). Das bedeutet, dass wir dein Gerät nicht identifizieren können und du es auswählen musst.</string>
     <string name="allow_install_unchecked_title">Installation ist nicht erlaubt</string>
     <string name="allow_install_unchecked_msg">Es sieht so aus als hättest du nicht auf diese Seite geschaut. Das ist nicht gut!</string>
     <string name="ok">OK</string>
@@ -94,6 +97,7 @@
     <string name="failure">Fehler</string>
     <string name="about">Über</string>
     <string name="welcome">Willkommen!</string>
+    <string name="wizard_deviceinstaller_text">Fertig! Bitte befolge die nächsten Schritte um den Android Boot Manager zu installieren. Wenn du es dir anders überlegst kannst du auf Abbrechen klicken. Bis jetzt wurde nichts geändert.</string>
     <string name="installerWelcome">Willkommen beim Android Boot Manager Installer. Damit wird Android Boot Manager auf Ihrem Gerät installiert. Es werden nicht leicht rückgängig zu machende Änderungen vorgenommen, bitte installieren Sie dies nicht ohne zu wissen was Sie tun. Haftungsausschluss:</string>
     <string name="next">Weiter</string>
     <!-- Assistant page navigation -->
