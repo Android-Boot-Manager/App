@@ -4,18 +4,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:theme="@style/AppTheme">
 
     <ImageView
         android:id="@+id/wizard_installer_droidboot_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:theme="@style/AppTheme"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.3"
-        app:srcCompat="@drawable/ic_droidbooticon" />
+        app:srcCompat="@drawable/ic_droidbooticon"
+        tools:srcCompat="@drawable/ic_droidbooticon" />
 
     <TextView
         android:id="@+id/wizard_installer_droidboot_text"
@@ -32,7 +35,7 @@
         android:id="@+id/wizard_installer_droidboot_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Button"
+        android:text="@string/next"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

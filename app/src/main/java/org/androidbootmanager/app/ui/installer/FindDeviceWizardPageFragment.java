@@ -69,6 +69,7 @@ public class FindDeviceWizardPageFragment extends Fragment {
                     notifyDataSetChanged();
                     Toast.makeText(DeviceRecyclerViewAdapter.this.context, "selected device is " + devicesList.get(lastSelectedPosition).codename, Toast.LENGTH_LONG).show();
                     FindDeviceWizardPageFragment.this.imodel.setCodename(devicesList.get(lastSelectedPosition).codename);
+                    FindDeviceWizardPageFragment.this.model.setPositiveFragment(DeviceInstallerWizardPageFragment.class);
                 });
             }
         }
@@ -82,9 +83,9 @@ public class FindDeviceWizardPageFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         model = new ViewModelProvider(requireActivity()).get(WizardViewModel.class);
         imodel = new ViewModelProvider(requireActivity()).get(DeviceInstallerViewModel.class);
-        model.setPositiveFragment(DeviceInstallerWizardPageFragment.class);
+        model.setPositiveFragment(null);
         model.setNegativeFragment(DeviceTestWizardPageFragment.class);
-        model.setPositiveAction(null);
+        model.setPositiveAction(() -> {});
         model.setNegativeAction(null);
         model.setPositiveText(getString(R.string.next));
         model.setNegativeText(getString(R.string.prev));

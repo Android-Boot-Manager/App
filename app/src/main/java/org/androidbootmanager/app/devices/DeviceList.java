@@ -3,6 +3,7 @@ package org.androidbootmanager.app.devices;
 import android.bluetooth.BluetoothClass;
 
 import org.androidbootmanager.app.ui.installer.DeviceInstallerWizardPageFragment;
+import org.androidbootmanager.app.ui.installer.DoInstallWizardPageFragment;
 import org.androidbootmanager.app.ui.installer.DroidBootSelectorWizardPageFragment;
 import org.androidbootmanager.app.ui.wizard.ExampleWizardPageFragment;
 
@@ -27,6 +28,7 @@ public class DeviceList {
                 d = new DeviceModel();
                 d.codename = "yggdrasil";
                 d.viewname = "Volla Phone";
+                d.flow = Arrays.asList(DeviceInstallerWizardPageFragment.class, DroidBootSelectorWizardPageFragment.class, DoInstallWizardPageFragment.class);
                 break;
             case "cedric":
                 d = new DeviceModel();
