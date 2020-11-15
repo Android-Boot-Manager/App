@@ -17,6 +17,9 @@
     <string name="current_rom_name">Ім\'я поточної прошивки</string>
     <string name="select_droidboot_title">Виберіть DroidBoot</string>
     <string name="select_droidboot_msg">Ви повинні вибрати DroidBoot файл. Перевірте чи він для вашого пристрою!</string>
+    <string name="select_droidboot_ok">DroidBoot is selected.</string>
+    <string name="select_droidboot_unzip">This looks like a zip file. You need to extract lk.img!</string>
+    <string name="select_droidboot_invalid">That does not look like an DroidBoot!</string>
     <string name="sure_title">Ви впевнені?</string>
     <string name="sure_msg">Якщо ви натиснете ОК, ABM буде встановлено. Остання перевірка!</string>
     <string name="choose_device">Виберіть ваш пристрій</string>
@@ -102,4 +105,5 @@
     <string name="next">Next</string>
     <!-- Assistant page navigation -->
     <string name="prev">Prev</string>
+    <string name="help">Help</string>
 </resources>
