@@ -5,8 +5,8 @@
     <string name="cp_err_msg">Не вдалося розархівувати деякі дані. Ви встановили додаток на SD-карту? Натискання \"ОК\" перенаправить вас до застосунку, нічого не робити без попереднього виправлення проблеми!</string>
     <string name="wrong_device_title">Неправильний пристрій</string>
     <string name="wrong_device_msg">Android Boot Manager не доступний для цього приладу (%1$s).</string>
-    <string name="device_msg">Android Boot Manager is available for this device (%1$s).</string>
-    <string name="device_btn">Not your device?</string>
+    <string name="device_msg">Android Boot Manager не доступний для цього приладу (%1$s).</string>
+    <string name="device_btn">Не той пристрій?</string>
     <string name="bsp_msg">Your device uses an BSP codename (%1$s). That means we are not able to identify your device and you need to select yours.</string>
     <string name="allow_install_unchecked_title">Інсталяція не дозволена</string>
     <string name="allow_install_unchecked_msg">Здається, що ви не прочитали інструкцію на сторінці. Це не добре!</string>
