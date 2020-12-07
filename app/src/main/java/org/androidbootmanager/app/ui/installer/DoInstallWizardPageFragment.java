@@ -1,5 +1,6 @@
 package org.androidbootmanager.app.ui.installer;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -26,6 +27,7 @@ public class DoInstallWizardPageFragment extends Fragment {
     protected DeviceInstallerViewModel imodel;
     Handler handler = new Handler();
 
+    @SuppressLint("SdCardPath")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -42,7 +44,7 @@ public class DoInstallWizardPageFragment extends Fragment {
         final TextView log = root.findViewById(R.id.wizard_installer_do_log);
         final LinkedList<String> queue = new LinkedList<>();
         AtomicBoolean hdone = new AtomicBoolean(false);
-        Shell.sh("for i in $(seq 1 1000); do echo $i; done").to(queue).submit((out)-> {
+        Shell.sh("/data/data/org.androidbootmanager.app/assets/app_install.sh").to(queue).submit((out)-> {
             hdone.set(true);
         });
         handler.post(new Runnable() {
