@@ -1,7 +1,5 @@
 package org.androidbootmanager.app.devices;
 
-import android.bluetooth.BluetoothClass;
-
 import org.androidbootmanager.app.ui.installer.DeviceInstallerWizardPageFragment;
 import org.androidbootmanager.app.ui.installer.DoInstallWizardPageFragment;
 import org.androidbootmanager.app.ui.installer.DroidBootSelectorWizardPageFragment;
