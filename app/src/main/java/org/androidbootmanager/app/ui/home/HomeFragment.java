@@ -47,7 +47,7 @@ public class HomeFragment extends Fragment {
             statusText2.setText(check2.get() ? R.string.ok : R.string.failure);
             check3.set(SuFile.open("/data/abm/codename.cfg").exists());
             statusText3.setText(check3.get() ? R.string.ok : R.string.failure);
-            statusImg.setImageDrawable(ContextCompat.getDrawable(requireActivity(),check3.get() ? R.drawable.ic_ok : R.drawable.ic_no));
+            statusImg.setImageDrawable(ContextCompat.getDrawable(requireActivity(),check1.get() && check2.get() && check3.get() ? R.drawable.ic_ok : R.drawable.ic_no));
             installButton.setVisibility((!(check1.get() && check2.get()) && (!check3.get())) ? View.VISIBLE : View.INVISIBLE);
             installButton.setOnClickListener((v) -> startActivity(new Intent(requireActivity(), WizardActivity.class).putExtra("StartFragment", InstallerWelcomeWizardPageFragment.class)));
         });
