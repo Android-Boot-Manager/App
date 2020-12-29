@@ -87,8 +87,11 @@ se falsifichi il fingerprint)</string>
     <string name="nav_header_desc">Header di navigazione</string>
     <string name="action_settings">Impostazioni</string>
     <string name="menu_home">Pagina principale</string>
-    <string name="menu_gallery">Galleria</string>
-    <string name="menu_slideshow">Presentazione</string>
+    <string name="menu_roms">ROMs</string>
+    <string name="menu_sd">SD card</string>
+    <string name="menu_generalcfg">General settings</string>
+    <string name="wizard_updatelk_intro">You are about to update the bootloader.</string>
+    <string name="aboutLibraries">About Libraries</string>
     <string name="home_installedWorking_img">Checkmark/Croce per rappresentare stato di installazione</string>
     <string name="home_installedWorking_text">Impossibile caricare lo stato</string>
     <string name="home_installedWorking_ok">&amp; installato, funziona</string>
