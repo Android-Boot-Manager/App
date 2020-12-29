@@ -86,8 +86,11 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
     <string name="menu_home">Home</string>
-    <string name="menu_gallery">Gallery</string>
-    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_roms">ROMs</string>
+    <string name="menu_sd">SD card</string>
+    <string name="menu_generalcfg">General settings</string>
+    <string name="wizard_updatelk_intro">You are about to update the bootloader.</string>
+    <string name="aboutLibraries">About Libraries</string>
     <string name="home_installedWorking_img">Checkmark/Cross to represent installed state</string>
     <string name="home_installedWorking_text">Failed to load state</string>
     <string name="home_installedWorking_ok">Installed &amp; working</string>
