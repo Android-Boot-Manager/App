@@ -87,10 +87,10 @@
     <string name="action_settings">Einstellungen</string>
     <string name="menu_home">Startseite</string>
     <string name="menu_roms">ROMs</string>
-    <string name="menu_sd">SD card</string>
-    <string name="menu_generalcfg">General settings</string>
-    <string name="wizard_updatelk_intro">You are about to update the bootloader.</string>
-    <string name="aboutLibraries">About Libraries</string>
+    <string name="menu_sd">SD-Karte</string>
+    <string name="menu_generalcfg">Allgemeine Einstellungen</string>
+    <string name="wizard_updatelk_intro">Sie sind dabei, den Bootloader zu aktualisieren.</string>
+    <string name="aboutLibraries">Über die Bibliotheken</string>
     <string name="home_installedWorking_img">Checkmark um den installierten Zustand darzustellen</string>
     <string name="home_installedWorking_text">Fehler beim Laden des Status</string>
     <string name="home_installedWorking_ok">Installiert &amp; funktioniert</string>
