@@ -87,10 +87,10 @@
     <string name="action_settings">Opções</string>
     <string name="menu_home">Lar</string>
     <string name="menu_roms">ROMs</string>
-    <string name="menu_sd">SD card</string>
-    <string name="menu_generalcfg">General settings</string>
-    <string name="wizard_updatelk_intro">You are about to update the bootloader.</string>
-    <string name="aboutLibraries">About Libraries</string>
+    <string name="menu_sd">Cartão SD</string>
+    <string name="menu_generalcfg">Configurações gerais</string>
+    <string name="wizard_updatelk_intro">Você está prestes a atualizar o bootloader.</string>
+    <string name="aboutLibraries">Sobre as Bibliotecas</string>
     <string name="home_installedWorking_img">Marca/Cruz para representar o estado instalado</string>
     <string name="home_installedWorking_text">Falha ao carregar estado</string>
     <string name="home_installedWorking_ok">Instalado &amp; funcionando</string>
