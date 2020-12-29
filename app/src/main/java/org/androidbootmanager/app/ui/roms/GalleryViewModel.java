@@ -1,4 +1,4 @@
-package org.androidbootmanager.app.ui.gallery;
+package org.androidbootmanager.app.ui.roms;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

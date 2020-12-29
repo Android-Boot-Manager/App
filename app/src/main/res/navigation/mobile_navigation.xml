@@ -12,20 +12,27 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/nav_gallery"
-        android:name="org.androidbootmanager.app.ui.gallery.GalleryFragment"
-        android:label="@string/menu_gallery"
-        tools:layout="@layout/fragment_gallery" />
+        android:id="@+id/nav_roms"
+        android:name="org.androidbootmanager.app.ui.roms.GalleryFragment"
+        android:label="@string/menu_roms"
+        tools:layout="@layout/fragment_roms" />
 
     <fragment
-        android:id="@+id/nav_slideshow"
-        android:name="org.androidbootmanager.app.ui.slideshow.SlideshowFragment"
-        android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
+        android:id="@+id/nav_sd"
+        android:name="org.androidbootmanager.app.ui.roms.GalleryFragment"
+        android:label="@string/menu_sd"
+        tools:layout="@layout/fragment_roms" />
+
+    <fragment
+        android:id="@+id/nav_generalcfg"
+        android:name="org.androidbootmanager.app.ui.generalcfg.GeneralCfgFragment"
+        android:label="@string/menu_generalcfg"
+        tools:layout="@layout/fragment_generalcfg" />
 
     <fragment
         android:id="@+id/nav_about"
         android:name="org.androidbootmanager.app.ui.about.AboutFragment"
-        android:label="About" />
+        tools:layout="@layout/fragment_about"
+        android:label="@string/about" />
 
 </navigation>

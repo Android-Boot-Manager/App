@@ -18,8 +18,9 @@ public class AboutFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        new LibsBuilder().withFields(R.string.class.getFields()).start(requireActivity());
-        ((NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment)).getNavController().navigate(R.id.nav_home);
-        return super.onCreateView(inflater, container, savedInstanceState);
+        View root = inflater.inflate(R.layout.fragment_about, container, false);
+        root.findViewById(R.id.aboutlib).setOnClickListener((view) -> new LibsBuilder().withFields(R.string.class.getFields()).start(requireActivity()));
+        return root;
     }
+
 }

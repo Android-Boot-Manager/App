@@ -9,13 +9,17 @@
             android:icon="@drawable/ic_menu_home"
             android:title="@string/menu_home" />
         <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="@string/menu_gallery" />
+            android:id="@+id/nav_roms"
+            android:icon="@drawable/ic_roms"
+            android:title="@string/menu_roms" />
         <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="@string/menu_slideshow" />
+            android:id="@+id/nav_sd"
+            android:icon="@drawable/ic_sd"
+            android:title="@string/menu_sd" />
+        <item
+            android:id="@+id/nav_generalcfg"
+            android:icon="@drawable/ic_settings"
+            android:title="@string/menu_generalcfg" />
         <item
             android:id="@+id/nav_about"
             android:icon="@drawable/ic_about"
