@@ -22,7 +22,7 @@ public class BlUpdateWizardPageFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         model = new ViewModelProvider(requireActivity()).get(WizardViewModel.class);
-        model.setPositiveFragment(null);
+        model.setPositiveFragment(DroidBootSelector2WizardPageFragment.class);
         model.setNegativeFragment(null);
         model.setPositiveAction(null);
         model.setNegativeAction(() -> requireActivity().finish());

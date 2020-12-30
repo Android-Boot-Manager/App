@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.topjohnwu.superuser.Shell;
 
+import org.androidbootmanager.app.BuildConfig;
 import org.androidbootmanager.app.R;
 import org.androidbootmanager.app.util.Constants;
 
@@ -21,6 +22,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class SplashActivity extends AppCompatActivity {
+
+    static {
+        Shell.enableVerboseLogging = BuildConfig.DEBUG;
+        Shell.setDefaultBuilder(Shell.Builder.create()
+                .setFlags(Shell.FLAG_REDIRECT_STDERR | Shell.FLAG_MOUNT_MASTER)
+                .setTimeout(10));
+    }
 
     boolean fail = false;
 
