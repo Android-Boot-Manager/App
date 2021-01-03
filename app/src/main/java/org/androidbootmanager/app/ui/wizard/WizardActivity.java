@@ -20,6 +20,7 @@ public class WizardActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         model = new ViewModelProvider(this).get(WizardViewModel.class);
+        model.setCodename(getIntent().getStringExtra("codename"));
         setContentView(R.layout.wizard_activity);
         if (savedInstanceState == null) {
             try {

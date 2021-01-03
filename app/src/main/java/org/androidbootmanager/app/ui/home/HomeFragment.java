@@ -13,23 +13,32 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.navigation.NavigationView;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.io.SuFile;
+import com.topjohnwu.superuser.io.SuFileInputStream;
 
 import org.androidbootmanager.app.R;
 import org.androidbootmanager.app.ui.installer.InstallerWelcomeWizardPageFragment;
 import org.androidbootmanager.app.ui.wizard.WizardActivity;
 import org.androidbootmanager.app.util.Constants;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class HomeFragment extends Fragment {
 
+    InstalledViewModel model;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+        model = new ViewModelProvider(requireActivity()).get(InstalledViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
         TextView statusText0 = root.findViewById(R.id.home_installedWorking_superUser);
         TextView statusText1 = root.findViewById(R.id.home_installedWorking_install1);
@@ -52,6 +61,17 @@ public class HomeFragment extends Fragment {
             statusText3.setText(check3.get() ? R.string.ok : R.string.failure);
             statusImg.setImageDrawable(ContextCompat.getDrawable(requireActivity(),check1.get() && check2.get() && check3.get() ? R.drawable.ic_ok : R.drawable.ic_no));
             installButton.setVisibility((!(check1.get() && check2.get()) && (!check3.get())) ? View.VISIBLE : View.INVISIBLE);
+            try {
+                byte[] buf = new byte[100];
+                int len;
+                ByteArrayOutputStream s = new ByteArrayOutputStream();
+                SuFileInputStream i = new SuFileInputStream("/data/abm/codename.cfg");
+                while ((len = i.read(buf)) > 0)
+                    s.write(buf, 0, len);
+                model.setCodename(s.toString("UTF-8").replace("\n",""));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             installButton.setOnClickListener((v) -> startActivity(new Intent(requireActivity(), WizardActivity.class).putExtra("StartFragment", InstallerWelcomeWizardPageFragment.class)));
             ((NavigationView) requireActivity().findViewById(R.id.nav_view)).getMenu().findItem(R.id.nav_generalcfg).setEnabled(check1.get() && check2.get() && check3.get());
             ((NavigationView) requireActivity().findViewById(R.id.nav_view)).getMenu().findItem(R.id.nav_roms).setEnabled(check1.get() && check2.get() && check3.get());

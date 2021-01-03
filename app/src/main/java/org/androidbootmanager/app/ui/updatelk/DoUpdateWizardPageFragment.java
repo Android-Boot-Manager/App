@@ -41,7 +41,7 @@ public class DoUpdateWizardPageFragment extends Fragment {
         final TextView log = root.findViewById(R.id.wizard_installer_do_log);
         final LinkedList<String> queue = new LinkedList<>();
         AtomicBoolean hdone = new AtomicBoolean(false);
-        Shell.su("/data/data/org.androidbootmanager.app/assets/Scripts/update/`cat /data/abm/codename.cfg`.droid.sh").to(queue).submit((out)-> hdone.set(true));
+        Shell.su("/data/data/org.androidbootmanager.app/assets/Scripts/update/" + model.getCodename().getValue() + ".droid.sh").to(queue).submit((out)-> hdone.set(true));
         handler.post(new Runnable() {
             @Override
             public void run() {

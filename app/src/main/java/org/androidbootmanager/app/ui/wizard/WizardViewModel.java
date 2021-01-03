@@ -13,6 +13,20 @@ public class WizardViewModel extends ViewModel {
     private MutableLiveData<String> negativeText;
     private MutableLiveData<Runnable> positiveAction;
     private MutableLiveData<Runnable> negativeAction;
+    private MutableLiveData<String> codename;
+
+    public LiveData<String> getCodename() {
+        if (codename == null)
+            codename = new MutableLiveData<>();
+        return codename;
+    }
+
+    public void setCodename(String codename) {
+        if (this.codename == null)
+            this.codename = new MutableLiveData<>(codename);
+        else
+            this.codename.setValue(codename);
+    }
 
     public void setNegativeFragment(@Nullable Class<? extends Fragment> fragment) {
         if (negativeFragment == null) negativeFragment = new MutableLiveData<>();
