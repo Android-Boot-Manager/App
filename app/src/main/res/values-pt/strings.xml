@@ -2,6 +2,10 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">Android Boot Manager</string>
     <string name="fatal">ERRO FATAL</string>
+    <string name="about_txt_1">Founded by Luka Panio &amp; nift4</string>
+    <string name="about_txt_2">    App Development: nift4</string>
+    <string name="about_txt_3">    DroidBoot development: Luka Panio</string>
+    <string name="about_txt_4">    Thanks to Volla &amp; F(x)tec for developer devices</string>
     <string name="cp_err_msg">Falha ao pegar alguns dados. você instalou o app em um cartão SD? Pressionando OK levará você ao app, não faça nada sem investigar primeiro!</string>
     <string name="wrong_device_title">Dispositivo errado</string>
     <string name="wrong_device_msg">O Android Boot Manager não está disponível para este dispositivo (%1$s).</string>
@@ -15,6 +19,7 @@
     <string name="installing_title">Instalando…</string>
     <string name="installing_msg">Instalando. Por favor espere…</string>
     <string name="current_rom_name">Nome da ROM atual</string>
+    <string name="bootset_fail">ATTENTION! Failed to mount bootset! Please check logs and do not touch stuff!</string>
     <string name="select_droidboot_title">Selecione o DroidBoot</string>
     <string name="select_droidboot_msg">Agora você será perguntado pelo arquivo do DroidBoot, Tenha certeza que é o correto para o seu dispositivo</string>
     <string name="select_droidboot_ok">DroidBoot está selecionado.</string>
@@ -86,8 +91,11 @@
     <string name="nav_header_desc">Cabeçalho de navegação</string>
     <string name="action_settings">Opções</string>
     <string name="menu_home">Lar</string>
-    <string name="menu_gallery">Galeria</string>
-    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_roms">ROMs</string>
+    <string name="menu_sd">Cartão SD</string>
+    <string name="menu_generalcfg">Configurações gerais</string>
+    <string name="wizard_updatelk_intro">Você está prestes a atualizar o bootloader.</string>
+    <string name="aboutLibraries">Sobre as Bibliotecas</string>
     <string name="home_installedWorking_img">Marca/Cruz para representar o estado instalado</string>
     <string name="home_installedWorking_text">Falha ao carregar estado</string>
     <string name="home_installedWorking_ok">Instalado &amp; funcionando</string>

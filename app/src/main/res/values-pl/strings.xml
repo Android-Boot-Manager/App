@@ -2,6 +2,10 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">Menedżer uruchamiania Androida</string>
     <string name="fatal">BŁĄD KRYTYCZNY</string>
+    <string name="about_txt_1">Founded by Luka Panio &amp; nift4</string>
+    <string name="about_txt_2">    App Development: nift4</string>
+    <string name="about_txt_3">    DroidBoot development: Luka Panio</string>
+    <string name="about_txt_4">    Thanks to Volla &amp; F(x)tec for developer devices</string>
     <string name="cp_err_msg">Failed to extract some data. Did you install the app on a SD card? Pressing OK will take you to the app, do not do anything without investigating first!</string>
     <string name="wrong_device_title">Nieodpowiednie urządzenie</string>
     <string name="wrong_device_msg">Menedżer uruchamiania Androida nie jest dostępny dla tego urządzenia (%1$s).</string>
@@ -15,6 +19,7 @@
     <string name="installing_title">Instaluję…</string>
     <string name="installing_msg">Instaluję. Proszę czekać…</string>
     <string name="current_rom_name">Nazwa obecnego ROMu</string>
+    <string name="bootset_fail">ATTENTION! Failed to mount bootset! Please check logs and do not touch stuff!</string>
     <string name="select_droidboot_title">Wybierz DroidBoot</string>
     <string name="select_droidboot_msg">Zostaniesz teraz poproszony o plik DroidBoot. Upewnij się, że jest on właściwy dla twojego urządzenia!</string>
     <string name="select_droidboot_ok">DroidBoot is selected.</string>
@@ -86,8 +91,11 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
     <string name="menu_home">Home</string>
-    <string name="menu_gallery">Gallery</string>
-    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_roms">ROMs</string>
+    <string name="menu_sd">SD card</string>
+    <string name="menu_generalcfg">General settings</string>
+    <string name="wizard_updatelk_intro">You are about to update the bootloader.</string>
+    <string name="aboutLibraries">About Libraries</string>
     <string name="home_installedWorking_img">Checkmark/Cross to represent installed state</string>
     <string name="home_installedWorking_text">Failed to load state</string>
     <string name="home_installedWorking_ok">Installed &amp; working</string>
