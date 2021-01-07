@@ -2,10 +2,10 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">Android Boot Manager</string>
     <string name="fatal">SCHWERWIEGENDER FEHLER</string>
-    <string name="about_txt_1">Founded by Luka Panio &amp; nift4</string>
-    <string name="about_txt_2">    App Development: nift4</string>
-    <string name="about_txt_3">    DroidBoot development: Luka Panio</string>
-    <string name="about_txt_4">    Thanks to Volla &amp; F(x)tec for developer devices</string>
+    <string name="about_txt_1">Gegründet von Luka Panio &amp; nift4</string>
+    <string name="about_txt_2">    App-Entwicklung: nift4</string>
+    <string name="about_txt_3">    DroidBoot Entwicklung: Luka Panio</string>
+    <string name="about_txt_4">    Vielen Dank an Volla &amp; F(x)tec für Entwicklergeräte</string>
     <string name="cp_err_msg">Fehler beim Extrahieren der Daten. Haben Sie die App auf einer SD-Karte installiert? Das Drücken von OK bringt Sie zur App, tun Sie nichts ohne den Fehler vorher zu untersuchen!</string>
     <string name="wrong_device_title">Inkompatibles Gerät</string>
     <string name="wrong_device_msg">Die Android-Startverwaltung ist für dieses Gerät (%1$s) nicht verfügbar.</string>
