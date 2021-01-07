@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import com.topjohnwu.superuser.io.SuFile;
 import com.topjohnwu.superuser.io.SuFileInputStream;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -61,9 +62,10 @@ public class ConfigFile {
     }
 
     public static ConfigFile importFromFile(File f) throws ActionAbortedCleanlyError {
-        StringBuilder s = new StringBuilder();
+        ByteArrayOutputStream s = new ByteArrayOutputStream();
         SuFileInputStream i;
         byte[] b = new byte[1024];
+        int o;
         try {
             i = new SuFileInputStream(f);
         } catch (FileNotFoundException e) {
@@ -71,13 +73,13 @@ public class ConfigFile {
         }
         while (true) {
             try {
-                if (!(i.read(b) > 1)) break;
-                s.append(Arrays.toString(b));
+                if (!((o = i.read(b)) > 1)) break;
+                s.write(b, 0, o);
             } catch (IOException e) {
                 throw new ActionAbortedCleanlyError(e);
             }
         }
-        return importFromString(s.toString());
+        return importFromString(new String(s.toByteArray()));
     }
 
     public static ConfigFile importFromFile(String s) throws ActionAbortedCleanlyError {

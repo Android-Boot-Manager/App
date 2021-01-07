@@ -1,6 +1,8 @@
 package org.androidbootmanager.app.ui.activities;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -16,21 +18,21 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.io.SuFile;
 
-import org.androidbootmanager.app.BuildConfig;
 import org.androidbootmanager.app.R;
+import org.androidbootmanager.app.devices.DeviceModel;
 import org.androidbootmanager.app.ui.home.InstalledViewModel;
 
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
-    private InstalledViewModel model;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        model = new ViewModelProvider(this).get(InstalledViewModel.class);
+        new ViewModelProvider(this).get(InstalledViewModel.class);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -59,4 +61,56 @@ public class MainActivity extends AppCompatActivity {
                 || super.onSupportNavigateUp();
     }
 
+    @SuppressLint("SdCardPath")
+    public boolean mount(DeviceModel d) {
+        if (SuFile.open("/data/abm/bootset/db").exists())
+            return true;
+        Shell.Result result;
+        if(!(result = Shell.su("/data/data/org.androidbootmanager.app/assets/Scripts/config/mount/yggdrasil.sh").exec()).isSuccess()) {
+            Log.e("ABM_MOUNT",String.join("",result.getOut()));
+            Log.e("ABM_MOUNT",String.join("",result.getErr()));
+            return false;
+        }
+        if (d.usesLegacyDir) {
+            if (!(result = Shell.su("mount --bind /data/abm/bootset/lk2nd /data/abm/bootset/db").exec()).isSuccess()) {
+                Log.e("ABM_MOUNT", String.join("", result.getOut()));
+                Log.e("ABM_MOUNT", String.join("", result.getErr()));
+                return false;
+            }
+        } else {
+            if(!(result = Shell.su("mount --bind /data/abm/bootset/db /data/abm/bootset/lk2nd").exec()).isSuccess()) {
+                Log.e("ABM_MOUNT",String.join("",result.getOut()));
+                Log.e("ABM_MOUNT",String.join("",result.getErr()));
+                return false;
+            }
+        }
+
+         return true;
+    }
+
+    @SuppressLint("SdCardPath")
+    public boolean umount(DeviceModel d) {
+        Shell.Result result;
+
+        if (d.usesLegacyDir) {
+            if (!(result = Shell.su("umount /data/abm/bootset/db").exec()).isSuccess()) {
+                Log.e("ABM_MOUNT", String.join("", result.getOut()));
+                Log.e("ABM_MOUNT", String.join("", result.getErr()));
+                return false;
+            }
+        } else {
+            if (!(result = Shell.su("umount /data/abm/bootset/lk2nd").exec()).isSuccess()) {
+                Log.e("ABM_MOUNT", String.join("", result.getOut()));
+                Log.e("ABM_MOUNT", String.join("", result.getErr()));
+                return false;
+            }
+        }
+        if(!(result = Shell.su("/data/data/org.androidbootmanager.app/assets/Scripts/config/umount/yggdrasil.sh").exec()).isSuccess()) {
+            Log.e("ABM_MOUNT",String.join("",result.getOut()));
+            Log.e("ABM_MOUNT",String.join("",result.getErr()));
+            return false;
+        }
+
+        return true;
+    }
 }

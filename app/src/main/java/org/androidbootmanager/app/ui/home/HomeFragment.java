@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -22,6 +23,8 @@ import com.topjohnwu.superuser.io.SuFile;
 import com.topjohnwu.superuser.io.SuFileInputStream;
 
 import org.androidbootmanager.app.R;
+import org.androidbootmanager.app.devices.DeviceList;
+import org.androidbootmanager.app.ui.activities.MainActivity;
 import org.androidbootmanager.app.ui.installer.InstallerWelcomeWizardPageFragment;
 import org.androidbootmanager.app.ui.wizard.WizardActivity;
 import org.androidbootmanager.app.util.Constants;
@@ -76,6 +79,9 @@ public class HomeFragment extends Fragment {
             ((NavigationView) requireActivity().findViewById(R.id.nav_view)).getMenu().findItem(R.id.nav_generalcfg).setEnabled(check1.get() && check2.get() && check3.get());
             ((NavigationView) requireActivity().findViewById(R.id.nav_view)).getMenu().findItem(R.id.nav_roms).setEnabled(check1.get() && check2.get() && check3.get());
             ((NavigationView) requireActivity().findViewById(R.id.nav_view)).getMenu().findItem(R.id.nav_sd).setEnabled(check1.get() && check2.get() && check3.get());
+            if (check1.get() && check2.get() && check3.get())
+                if (!((MainActivity) requireActivity()).mount(DeviceList.getModel(model.getCodename().getValue())))
+                    Toast.makeText(requireActivity(),R.string.bootset_fail, Toast.LENGTH_LONG).show();
         });
         return root;
     }

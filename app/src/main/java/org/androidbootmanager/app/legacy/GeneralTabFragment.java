@@ -12,8 +12,6 @@ import org.androidbootmanager.app.util.ConfigFile;
 import org.androidbootmanager.app.util.ConfigTextWatcher;
 import org.androidbootmanager.app.R;
 
-import java.util.Objects;
-
 public class GeneralTabFragment extends ConfiguratorActivity.BaseFragment {
 
     ConfigFile generalConfig;
@@ -35,10 +33,10 @@ public class GeneralTabFragment extends ConfiguratorActivity.BaseFragment {
             generalConfig = new ConfigFile();
         }
         generalConfig.exportToPrivFile("lk2nd.conf", fileName);
-        ((EditText) requireView().findViewById(R.id.tabgeneralSettingTimeout)).setText(generalConfig.get("timeout"));
-        ((EditText) requireView().findViewById(R.id.tabgeneralSettingDefaultEntry)).setText(generalConfig.get("default"));
-        ConfigTextWatcher.attachTo(R.id.tabgeneralSettingTimeout, getView(), generalConfig, "timeout");
-        ConfigTextWatcher.attachTo(R.id.tabgeneralSettingDefaultEntry, getView(), generalConfig, "default");
+        ((EditText) requireView().findViewById(R.id.generalcfg_timeout)).setText(generalConfig.get("timeout"));
+        ((EditText) requireView().findViewById(R.id.generalcfg_default_entry)).setText(generalConfig.get("default"));
+        ConfigTextWatcher.attachTo(R.id.generalcfg_timeout, getView(), generalConfig, "timeout");
+        ConfigTextWatcher.attachTo(R.id.generalcfg_default_entry, getView(), generalConfig, "default");
 
         ((Button) requireView().findViewById(R.id.tabgeneralSave)).setOnClickListener((OnClickListener) p1 -> generalConfig.exportToPrivFile("lk2nd.conf", fileName));
     }

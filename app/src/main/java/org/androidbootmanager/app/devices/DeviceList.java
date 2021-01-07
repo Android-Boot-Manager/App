@@ -32,6 +32,7 @@ public class DeviceList {
                 d = new DeviceModel();
                 d.codename = "cedric";
                 d.viewname = "Moto G5";
+                d.usesLegacyDir = true;
                 d.flow = Arrays.asList(DeviceInstallerWizardPageFragment.class, DroidBootSelectorWizardPageFragment.class, ExampleWizardPageFragment.class);
                 break;
             default:

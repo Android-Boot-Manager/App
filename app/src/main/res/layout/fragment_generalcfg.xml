@@ -6,6 +6,89 @@
     android:layout_height="match_parent"
     tools:context=".ui.generalcfg.GeneralCfgFragment">
 
+    <TableLayout
+        android:id="@+id/tableLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="1"
+                android:layout_gravity="center_vertical"
+                android:text="@string/timeout"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <EditText
+                android:id="@+id/generalcfg_timeout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="2"
+                android:layout_gravity="end"
+                android:ems="10"
+                android:importantForAutofill="no"
+                android:inputType="number"
+                tools:ignore="LabelFor" />
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="1"
+                android:layout_gravity="center_vertical"
+                android:text="@string/default_entry"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <EditText
+                android:id="@+id/generalcfg_default_entry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="2"
+                android:ems="10"
+                android:importantForAutofill="no"
+                android:inputType="text"
+                tools:ignore="LabelFor" />
+
+        </TableRow>
+
+    </TableLayout>
+
+    <Button
+        android:id="@+id/generalcfg_save"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/save"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tableLayout"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/generalcfg_umount"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/umount"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/generalcfg_save"
+        app:layout_constraintVertical_bias="0.0" />
+
     <Button
         android:id="@+id/generalcfg_update_bl"
         android:layout_width="0dp"
@@ -14,6 +97,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/generalcfg_umount"
         app:layout_constraintVertical_bias="0.0" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

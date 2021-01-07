@@ -29,7 +29,7 @@
 				android:ems="10"
 				android:layout_gravity="end"
 				android:layout_column="2"
-				android:id="@+id/tabgeneralSettingTimeout"
+				android:id="@+id/generalcfg_timeout"
 				android:importantForAutofill="no"
 				tools:ignore="LabelFor" />
 
@@ -52,7 +52,7 @@
 				android:ems="10"
 				android:layout_height="wrap_content"
 				android:layout_column="2"
-				android:id="@+id/tabgeneralSettingDefaultEntry"
+				android:id="@+id/generalcfg_default_entry"
 				android:importantForAutofill="no"
 				tools:ignore="LabelFor"
 				android:inputType="text" />
