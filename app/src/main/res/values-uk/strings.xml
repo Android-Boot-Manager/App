@@ -2,6 +2,10 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">Менеджер завантаження Android</string>
     <string name="fatal">КРИТИЧНА ПОМИЛКА</string>
+    <string name="about_txt_1">Founded by Luka Panio &amp; nift4</string>
+    <string name="about_txt_2">    App Development: nift4</string>
+    <string name="about_txt_3">    DroidBoot development: Luka Panio</string>
+    <string name="about_txt_4">    Thanks to Volla &amp; F(x)tec for developer devices</string>
     <string name="cp_err_msg">Не вдалося розархівувати деякі дані. Ви встановили додаток на SD-карту? Натискання \"ОК\" перенаправить вас до застосунку, нічого не робити без попереднього виправлення проблеми!</string>
     <string name="wrong_device_title">Неправильний пристрій</string>
     <string name="wrong_device_msg">Android Boot Manager не доступний для цього приладу (%1$s).</string>
@@ -15,6 +19,7 @@
     <string name="installing_title">Інсталяція…</string>
     <string name="installing_msg">Встановлення. Будь ласка, зачекайте…</string>
     <string name="current_rom_name">Ім\'я поточної прошивки</string>
+    <string name="bootset_fail">ATTENTION! Failed to mount bootset! Please check logs and do not touch stuff!</string>
     <string name="select_droidboot_title">Виберіть DroidBoot</string>
     <string name="select_droidboot_msg">Ви повинні вибрати DroidBoot файл. Перевірте чи він для вашого пристрою!</string>
     <string name="select_droidboot_ok">DroidBoot обрано.</string>
