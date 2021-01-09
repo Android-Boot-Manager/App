@@ -1,7 +1,6 @@
 package org.androidbootmanager.app.ui.installer;
 
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,7 +22,6 @@ import org.androidbootmanager.app.devices.DeviceModel;
 import org.androidbootmanager.app.ui.wizard.WizardViewModel;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class FindDeviceWizardPageFragment extends Fragment {
@@ -63,7 +61,7 @@ public class FindDeviceWizardPageFragment extends Fragment {
 
             public ViewHolder(View view) {
                 super(view);
-                selectionState = (RadioButton) view.findViewById(R.id.wizard_installer_finddevice_radio);
+                selectionState = view.findViewById(R.id.wizard_installer_finddevice_radio);
                 selectionState.setOnClickListener(v -> {
                     lastSelectedPosition = getAdapterPosition();
                     notifyDataSetChanged();
@@ -95,7 +93,7 @@ public class FindDeviceWizardPageFragment extends Fragment {
         recyclerView.setLayoutManager(recyclerLayoutManager);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), recyclerLayoutManager.getOrientation());
         recyclerView.addItemDecoration(dividerItemDecoration);
-        DeviceRecyclerViewAdapter recyclerViewAdapter = new DeviceRecyclerViewAdapter(Arrays.asList(DeviceList.getModel("cedric"), DeviceList.getModel("yggdrasil")), requireContext());
+        DeviceRecyclerViewAdapter recyclerViewAdapter = new DeviceRecyclerViewAdapter(DeviceList.getModels(), requireContext());
         recyclerView.setAdapter(recyclerViewAdapter);
         return root;
     }
