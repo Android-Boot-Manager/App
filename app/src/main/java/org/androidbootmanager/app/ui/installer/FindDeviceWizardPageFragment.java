@@ -1,12 +1,10 @@
 package org.androidbootmanager.app.ui.installer;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,13 +27,11 @@ public class FindDeviceWizardPageFragment extends Fragment {
     public class DeviceRecyclerViewAdapter extends RecyclerView.Adapter<DeviceRecyclerViewAdapter.ViewHolder> {
 
         private final List<DeviceModel> devicesList;
-        private final Context context;
 
         private int lastSelectedPosition = -1;
 
-        public DeviceRecyclerViewAdapter(List<DeviceModel> devicesListIn, Context ctx) {
+        public DeviceRecyclerViewAdapter(List<DeviceModel> devicesListIn) {
             devicesList = devicesListIn;
-            context = ctx;
         }
 
         @NotNull
@@ -65,7 +61,6 @@ public class FindDeviceWizardPageFragment extends Fragment {
                 selectionState.setOnClickListener(v -> {
                     lastSelectedPosition = getAdapterPosition();
                     notifyDataSetChanged();
-                    Toast.makeText(DeviceRecyclerViewAdapter.this.context, "selected device is " + devicesList.get(lastSelectedPosition).codename, Toast.LENGTH_LONG).show();
                     FindDeviceWizardPageFragment.this.imodel.setCodename(devicesList.get(lastSelectedPosition).codename);
                     FindDeviceWizardPageFragment.this.model.setPositiveFragment(DeviceInstallerWizardPageFragment.class);
                 });
@@ -93,7 +88,7 @@ public class FindDeviceWizardPageFragment extends Fragment {
         recyclerView.setLayoutManager(recyclerLayoutManager);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), recyclerLayoutManager.getOrientation());
         recyclerView.addItemDecoration(dividerItemDecoration);
-        DeviceRecyclerViewAdapter recyclerViewAdapter = new DeviceRecyclerViewAdapter(DeviceList.getModels(), requireContext());
+        DeviceRecyclerViewAdapter recyclerViewAdapter = new DeviceRecyclerViewAdapter(DeviceList.getModels());
         recyclerView.setAdapter(recyclerViewAdapter);
         return root;
     }
