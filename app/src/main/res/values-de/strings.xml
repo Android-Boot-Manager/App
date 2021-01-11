@@ -19,7 +19,7 @@
     <string name="installing_title">Installiere…</string>
     <string name="installing_msg">Installiere, bitte warten…</string>
     <string name="current_rom_name">Name des installierten ROMs</string>
-    <string name="bootset_fail">ATTENTION! Failed to mount bootset! Please check logs and do not touch stuff!</string>
+    <string name="bootset_fail">ACHTUNG! Bootset konnte nicht eingebunden werden! Bitte überprüfen Sie die Logs und tun Sie nichts!</string>
     <string name="select_droidboot_title">DroidBoot auswählen</string>
     <string name="select_droidboot_msg">Du wirst nun nach der DroidBoot-Datei gefragt. Stelle sicher, dass sie die richtige für dein Gerät ist!</string>
     <string name="select_droidboot_ok">DroidBoot ist ausgewählt.</string>
