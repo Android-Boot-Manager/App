@@ -26,7 +26,7 @@ public class SplashActivity extends AppCompatActivity {
     static {
         Shell.enableVerboseLogging = BuildConfig.DEBUG;
         Shell.setDefaultBuilder(Shell.Builder.create()
-                .setFlags(Shell.FLAG_REDIRECT_STDERR | Shell.FLAG_MOUNT_MASTER)
+                .setFlags(Shell.FLAG_MOUNT_MASTER)
                 .setTimeout(10));
     }
 
