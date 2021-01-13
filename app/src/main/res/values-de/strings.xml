@@ -114,10 +114,10 @@
     <!-- Assistant page navigation -->
     <string name="prev">Zurück</string>
     <string name="help">Hilfe</string>
-    <string name="unknown_part">Unknown partition type</string>
-    <string name="sd_mbr">This SD card uses the legacy MBR partition scheme but GPT is required. However, it can be converted to GPT. But this may cause data loss, therefore please backup your data.</string>
-    <string name="sd_err">Unknown error.</string>
-    <string name="convert">Convert</string>
-    <string name="failed">Failed</string>
-    <string name="successful">Successful</string>
+    <string name="unknown_part">Unbekannter Partitionstyp</string>
+    <string name="sd_mbr">Diese SD-Karte verwendet das alte MBR-Partitionsschema aber GPT ist erforderlich. Es kann in GPT umgewandelt werden, dies kann jedoch zu Datenverlust führen. Bitte sichern Sie Ihre Daten.</string>
+    <string name="sd_err">Unbekannter Fehler.</string>
+    <string name="convert">Konvertieren</string>
+    <string name="failed">Fehlgeschlagen</string>
+    <string name="successful">Erfolgreich</string>
 </resources>
