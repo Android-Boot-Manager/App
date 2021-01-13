@@ -120,4 +120,5 @@
     <string name="convert">Konvertieren</string>
     <string name="failed">Fehlgeschlagen</string>
     <string name="successful">Erfolgreich</string>
+    <string name="free_space">Free space</string>
 </resources>
