@@ -121,4 +121,5 @@ se falsifichi il fingerprint)</string>
     <string name="convert">Convert</string>
     <string name="failed">Failed</string>
     <string name="successful">Successful</string>
+    <string name="free_space">Free space</string>
 </resources>
