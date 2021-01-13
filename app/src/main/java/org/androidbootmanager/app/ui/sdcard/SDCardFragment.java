@@ -1,14 +1,17 @@
 package org.androidbootmanager.app.ui.sdcard;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -20,8 +23,10 @@ import com.topjohnwu.superuser.Shell;
 
 import org.androidbootmanager.app.R;
 import org.androidbootmanager.app.ui.home.InstalledViewModel;
+import org.androidbootmanager.app.ui.wizard.WizardActivity;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.channels.AlreadyBoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -134,8 +139,10 @@ public class SDCardFragment extends Fragment {
                     case UNKNOWN:
                     default:
                         holder.icon.setImageDrawable(ContextCompat.getDrawable(requireActivity(), R.drawable.ic_unknown));
+                        holder.text.setText(getString(R.string.unknown_part));
                         break;
                 }
+                holder.size.setText(p.sizeFancy);
             }
         }
 
@@ -146,11 +153,15 @@ public class SDCardFragment extends Fragment {
 
         public class ViewHolder extends RecyclerView.ViewHolder {
             public ImageView icon;
+            public TextView text, size;
             public View container;
 
             public ViewHolder(View view) {
                 super(view);
-                icon = view.findViewById(R.id.wizard_installer_finddevice_radio);
+                icon = view.findViewById(R.id.sd_icon);
+                container = view.findViewById(R.id.sd_container);
+                text = view.findViewById(R.id.sd_label);
+                size = view.findViewById(R.id.sd_size);
                 container.setOnClickListener(v -> {
                     notifyDataSetChanged();
                     //SDCardFragment.this
@@ -167,9 +178,7 @@ public class SDCardFragment extends Fragment {
             meta = new SDPartitionMeta();
         else
             return null;
-        List<String> out = r.getOut();
-        List<List<String>> nout = new ArrayList<>();
-        for (String o : out) {
+        for (String o : r.getOut()) {
             if (o.startsWith("Disk ") && !o.contains("GUID")) {
                 String[] t = o.split(": ")[1].split(", ");
                 meta.sectors = Integer.parseInt(t[0].replace(" sectors",""));
@@ -192,21 +201,21 @@ public class SDCardFragment extends Fragment {
                 meta.totalFreeFancy = t[1];
             } else if(o.equals("") || o.startsWith("Number  Start (sector)    End (sector)  Size       Code  Name")) {
                 assert true; //avoid empty statement warning but do nothing
-            } else {
+            } else if (o.startsWith("  ")) {
                 String[] ocut = o.trim().replace("     "," ").replace("   "," ").replace("  "," ").split(" ");
-                nout.add(Arrays.asList(ocut[0], ocut[1], ocut[2], ocut[3] + " " + ocut[4], ocut[5], String.join(" ",Arrays.copyOfRange(ocut, 6, ocut.length))));
+                Partition p = new Partition();
+                p.id = Integer.parseInt(ocut[0]);
+                p.startSector = Integer.parseInt(ocut[1]);
+                p.endSector = Integer.parseInt(ocut[2]);
+                p.sizeFancy = ocut[3] + " " + ocut[4];
+                p.size = p.endSector - p.startSector;
+                p.code = ocut[5];
+                p.name = String.join(" ",Arrays.copyOfRange(ocut, 6, ocut.length));
+                p.type = PartitionType.UNKNOWN; //TODO
+                meta.p.add(p);
+            } else {
+                return null;
             }
-        }
-        for (List<String> fields : nout) {
-            Partition p = new Partition();
-            p.id = Integer.parseInt(fields.get(0));
-            p.startSector = Integer.parseInt(fields.get(1));
-            p.endSector = Integer.parseInt(fields.get(2));
-            p.sizeFancy = fields.get(3);
-            p.size = p.endSector - p.startSector;
-            p.code = fields.get(4);
-            p.name = fields.get(5);
-            meta.p.add(p);
         }
         Log.i("ABM",meta.toString());
         return meta;
@@ -216,13 +225,40 @@ public class SDCardFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         model = new ViewModelProvider(requireActivity()).get(InstalledViewModel.class);
         View root = inflater.inflate(R.layout.wizard_installer_finddevice, container, false);
-        final RecyclerView recyclerView = root.findViewById(R.id.wizard_installer_finddevice);
-        LinearLayoutManager recyclerLayoutManager = new LinearLayoutManager(requireContext());
-        recyclerView.setLayoutManager(recyclerLayoutManager);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), recyclerLayoutManager.getOrientation());
-        recyclerView.addItemDecoration(dividerItemDecoration);
-        SDRecyclerViewAdapter recyclerViewAdapter = new SDRecyclerViewAdapter(generateMeta());
-        recyclerView.setAdapter(recyclerViewAdapter);
+        final SDPartitionMeta meta = generateMeta();
+        if (meta == null) {
+            if (String.join("",Shell.su("sgdisk /dev/block/mmcblk1 --print").exec().getOut()).contains("invalid GPT and valid MBR"))
+                new AlertDialog.Builder(requireActivity())
+                    .setNegativeButton("Close", (d, p) -> requireActivity().finish())
+                    .setCancelable(false)
+                    .setMessage(R.string.sd_mbr)
+                    .setTitle(R.string.fatal)
+                    .setPositiveButton(R.string.convert, (d, p) -> {
+                        Shell.Result r = Shell.su("sm unmount `sm list-volumes public` && sgdisk /dev/block/mmcblk1 --mbrtogpt").exec();
+                        new AlertDialog.Builder(requireActivity())
+                                .setTitle(r.isSuccess() ? R.string.successful : R.string.failed)
+                                .setMessage(String.join("\n",r.getOut()) + "\n" + String.join("\n",r.getErr()))
+                                .setCancelable(false)
+                                .setPositiveButton(R.string.ok, (d2, p2) -> requireActivity().finish())
+                                .show();
+                    })
+                    .show();
+            else
+                new AlertDialog.Builder(requireActivity())
+                .setNegativeButton("Close", (d, p) -> requireActivity().finish())
+                .setCancelable(false)
+                .setTitle(R.string.fatal)
+                .setMessage(R.string.sd_err)
+                .show();
+        } else {
+            final RecyclerView recyclerView = root.findViewById(R.id.wizard_installer_finddevice);
+            LinearLayoutManager recyclerLayoutManager = new LinearLayoutManager(requireContext());
+            recyclerView.setLayoutManager(recyclerLayoutManager);
+            DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), recyclerLayoutManager.getOrientation());
+            recyclerView.addItemDecoration(dividerItemDecoration);
+            SDRecyclerViewAdapter recyclerViewAdapter = new SDRecyclerViewAdapter(meta);
+            recyclerView.setAdapter(recyclerViewAdapter);
+        }
         return root;
     }
 }
