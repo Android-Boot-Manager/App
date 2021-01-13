@@ -114,4 +114,10 @@
     <!-- Assistant page navigation -->
     <string name="prev">Geri</string>
     <string name="help">Yardım</string>
+    <string name="unknown_part">Unknown partition type</string>
+    <string name="sd_mbr">This SD card uses the legacy MBR partition scheme but GPT is required. However, it can be converted to GPT. But this may cause data loss, therefore please backup your data.</string>
+    <string name="sd_err">Unknown error.</string>
+    <string name="convert">Convert</string>
+    <string name="failed">Failed</string>
+    <string name="successful">Successful</string>
 </resources>
