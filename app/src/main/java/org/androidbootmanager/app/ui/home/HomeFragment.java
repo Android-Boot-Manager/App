@@ -33,6 +33,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class HomeFragment extends Fragment {
@@ -52,6 +53,7 @@ public class HomeFragment extends Fragment {
         AtomicBoolean check1 = new AtomicBoolean(false);
         AtomicBoolean check2 = new AtomicBoolean(false);
         AtomicBoolean check3 = new AtomicBoolean(false);
+        AtomicBoolean sd = new AtomicBoolean(false);
         ImageView statusImg = root.findViewById(R.id.home_installedWorking_image);
         Shell.su(Constants.scriptDir + "is_installed.sh").submit((result) -> {
             check0.set(Shell.rootAccess());
@@ -63,7 +65,7 @@ public class HomeFragment extends Fragment {
             check3.set(SuFile.open("/data/abm/codename.cfg").exists());
             statusText3.setText(check3.get() ? R.string.ok : R.string.failure);
             statusImg.setImageDrawable(ContextCompat.getDrawable(requireActivity(),check1.get() && check2.get() && check3.get() ? R.drawable.ic_ok : R.drawable.ic_no));
-            installButton.setVisibility((!(check1.get() && check2.get()) && (!check3.get())) ? View.VISIBLE : View.INVISIBLE);
+            installButton.setVisibility((!(check1.get() && check2.get()) && (!check3.get())) && check0.get() ? View.VISIBLE : View.INVISIBLE);
             try {
                 byte[] buf = new byte[100];
                 int len;
@@ -79,9 +81,12 @@ public class HomeFragment extends Fragment {
             ((NavigationView) requireActivity().findViewById(R.id.nav_view)).getMenu().findItem(R.id.nav_generalcfg).setEnabled(check1.get() && check2.get() && check3.get());
             ((NavigationView) requireActivity().findViewById(R.id.nav_view)).getMenu().findItem(R.id.nav_roms).setEnabled(check1.get() && check2.get() && check3.get());
             ((NavigationView) requireActivity().findViewById(R.id.nav_view)).getMenu().findItem(R.id.nav_sd).setEnabled(check1.get() && check2.get() && check3.get());
-            if (check1.get() && check2.get() && check3.get())
-                if (!((MainActivity) requireActivity()).mount(DeviceList.getModel(model.getCodename().getValue())))
-                    Toast.makeText(requireActivity(),R.string.bootset_fail, Toast.LENGTH_LONG).show();
+            if (check1.get() && check2.get() && check3.get()) {
+                if (!((MainActivity) requireActivity()).mount(DeviceList.getModel(Objects.requireNonNull(model.getCodename().getValue()))))
+                    Toast.makeText(requireActivity(), R.string.bootset_fail, Toast.LENGTH_LONG).show();
+                sd.set(SuFile.open(DeviceList.getModel(model.getCodename().getValue()).bdev).exists());
+                ((NavigationView) requireActivity().findViewById(R.id.nav_view)).getMenu().findItem(R.id.nav_sd).setEnabled(check1.get() && check2.get() && check3.get() && sd.get());
+            }
         });
         return root;
     }
