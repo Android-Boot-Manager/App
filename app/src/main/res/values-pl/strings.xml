@@ -122,7 +122,7 @@
     <string name="successful">Sukces</string>
     <string name="free_space">Free space</string>
     <string name="partid">Partition %1$d</string>
-    <string name="create">Erstellen</string>
+    <string name="create">Create</string>
     <string name="free_space_size">Free space of size %1$s</string>
     <string name="start_sector">Start Sector</string>
     <string name="end_sector">End Sector</string>
