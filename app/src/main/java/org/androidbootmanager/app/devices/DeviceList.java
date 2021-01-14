@@ -3,10 +3,10 @@ package org.androidbootmanager.app.devices;
 import org.androidbootmanager.app.ui.installer.DeviceInstallerWizardPageFragment;
 import org.androidbootmanager.app.ui.installer.DoInstallWizardPageFragment;
 import org.androidbootmanager.app.ui.installer.DroidBootSelectorWizardPageFragment;
-import org.androidbootmanager.app.ui.wizard.ExampleWizardPageFragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -16,7 +16,7 @@ public class DeviceList {
     static {
         deviceList.add("cedric");
         deviceList.add("yggdrasil");
-        bspList.put("k63v2_64_bsp", Arrays.asList("yggdrasil"));
+        bspList.put("k63v2_64_bsp", Collections.singletonList("yggdrasil"));
     }
 
     public static DeviceModel getModel(String codename) {
@@ -26,15 +26,19 @@ public class DeviceList {
                 d = new DeviceModel();
                 d.codename = "yggdrasil";
                 d.viewname = "Volla Phone";
+                d.bdev = "/dev/block/mmcblk1";
+                d.pbdev = "/dev/block/mmcblk1p";
                 d.flow = Arrays.asList(DeviceInstallerWizardPageFragment.class, DroidBootSelectorWizardPageFragment.class, DoInstallWizardPageFragment.class);
                 break;
-            case "cedric":
+            /*case "cedric":
                 d = new DeviceModel();
                 d.codename = "cedric";
                 d.viewname = "Moto G5";
+                d.bdev = "/dev/block/mmcblk1";
+                d.pbdev = "/dev/block/mmcblk1p";
                 d.usesLegacyDir = true;
                 d.flow = Arrays.asList(DeviceInstallerWizardPageFragment.class, DroidBootSelectorWizardPageFragment.class, ExampleWizardPageFragment.class);
-                break;
+                break;*/
             default:
                 throw new RuntimeException(new IllegalStateException("DeviceModel not found: unknown device '" + codename + "'"));
         }
