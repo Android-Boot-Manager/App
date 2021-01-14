@@ -121,4 +121,16 @@
     <string name="failed">Fehlgeschlagen</string>
     <string name="successful">Erfolgreich</string>
     <string name="free_space">Freier Speicher</string>
+    <string name="partid">Partition %1$d</string>
+    <string name="create">Erstellen</string>
+    <string name="free_space_size">Free space of size %1$s</string>
+    <string name="start_sector">Start Sector</string>
+    <string name="end_sector">End Sector</string>
+    <string name="adopted_part">Adopted Storage</string>
+    <string name="meta_part">ABM/Adopted Storage Metadata</string>
+    <string name="portable_part">Portable Storage</string>
+    <string name="system_part">OS System data</string>
+    <string name="data_part">OS User data</string>
+    <!-- How an partition is used -->
+    <string name="usage">Usage</string>
 </resources>
