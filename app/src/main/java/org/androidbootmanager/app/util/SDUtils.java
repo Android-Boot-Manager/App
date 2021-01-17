@@ -10,7 +10,10 @@ import org.androidbootmanager.app.devices.DeviceModel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SDUtils {
     public enum PartitionType {
@@ -63,6 +66,7 @@ public class SDUtils {
     public static class SDPartitionMeta {
         public List<Partition> p = new ArrayList<>();
         public List<Partition> u = new ArrayList<>();
+        public List<Partition> s = new ArrayList<>();
         public String friendlySize;
         public String guid;
         public long sectors;
@@ -84,7 +88,7 @@ public class SDUtils {
         public String toString() {
             return "SDPartitionMeta{" +
                     "p=" + p +
-                    ", u=" + u +
+                    ", s=" + s +
                     ", friendlySize='" + friendlySize + '\'' +
                     ", guid='" + guid + '\'' +
                     ", sectors=" + sectors +
@@ -112,6 +116,8 @@ public class SDUtils {
         public Partition dump(int id) {
             return u.get(id);
         }
+
+        public Partition dumpS(int id) { return s.get(id); }
     }
 
     public static String umsd(PartitionType t, int major, int minor) {
@@ -121,7 +127,7 @@ public class SDUtils {
             case PORTABLE:
                 return "sm unmount public:" + major + "," + minor;
             case ADOPTED:
-                return "false"; //TODO: Handle adopted volumes
+                return "sm unmount private:" + major + "," + minor;
             case RESERVED:
             case UNKNOWN:
             default:
@@ -204,17 +210,37 @@ public class SDUtils {
                         p.type = PartitionType.UNKNOWN;
                         break;
                 }
-                if (p.startSector > temp + meta.alignSector)
-                    meta.u.add(new Partition.FreeSpace(temp, p.startSector, meta.logicalSectorSizeBytes));
-                temp = p.endSector;
                 meta.p.add(p);
                 meta.u.add(p);
             } else {
                 return null;
             }
         }
+        List<Partition> l = meta.u.stream().collect(Collectors.toList()); // this actually copies, therefore, we need this.
+        l.sort((o1, o2) -> {
+            // this is like this because startSector is long and I don't want overflows due to casting
+            if(o1.startSector - o2.startSector < -1)
+                return -1;
+            else if (o1.startSector == o2.startSector)
+                return 0;
+            else return 1;
+        });
+        for (Partition p : l) {
+            if (p.startSector > temp + meta.alignSector)
+                meta.u.add(new Partition.FreeSpace(temp, p.startSector, meta.logicalSectorSizeBytes));
+            temp = p.endSector;
+        }
         if (meta.lastUsableSector > temp + meta.alignSector)
             meta.u.add(new Partition.FreeSpace(temp, meta.lastUsableSector, meta.logicalSectorSizeBytes));
+        meta.s = meta.u.subList(0, meta.u.size());
+        meta.s.sort((o1, o2) -> {
+            // this is like this because startSector is long and I don't want overflows due to casting
+            if(o1.startSector - o2.startSector < -1)
+                return -1;
+            else if (o1.startSector == o2.startSector)
+                return 0;
+            else return 1;
+        });
         Log.i("ABM",meta.toString());
         return meta;
     }

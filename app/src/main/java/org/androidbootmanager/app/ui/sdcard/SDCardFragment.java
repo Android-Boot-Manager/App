@@ -55,8 +55,8 @@ public class SDCardFragment extends Fragment {
         @Override
         public void onBindViewHolder(@NotNull SDRecyclerViewAdapter.ViewHolder holder, int position) {
             SDUtils.Partition p;
+            p = meta.dumpS(position);
             holder.id = position;
-            p = meta.dump(position);
             switch (p.type) {
                 case ADOPTED:
                     holder.icon.setImageDrawable(ContextCompat.getDrawable(requireActivity(), R.drawable.ic_adopted));
@@ -111,24 +111,24 @@ public class SDCardFragment extends Fragment {
                 text = view.findViewById(R.id.sd_label);
                 size = view.findViewById(R.id.sd_size);
                 container.setOnClickListener(e -> {
-                    if (meta.dump(id).type == SDUtils.PartitionType.FREE) {
+                    if (meta.dumpS(id).type == SDUtils.PartitionType.FREE) {
                         View v = getLayoutInflater().inflate(R.layout.create_part, null);
                         final EditText start = v.findViewById(R.id.create_part_start);
                         final EditText end = v.findViewById(R.id.create_part_end);
                         final Spinner dd = v.findViewById(R.id.create_part_dd);
                         final String[] ddresolv = new String[]{"0700", "8302", "8301", "8305", "8300"};
                         dd.setAdapter(new ArrayAdapter<>(requireActivity(), android.R.layout.simple_spinner_dropdown_item, new String[]{getString(R.string.portable_part), getString(R.string.data_part), getString(R.string.meta_part), getString(R.string.system_part), getString(R.string.unknown_part)}));
-                        start.setText(String.valueOf(meta.dump(id).startSector));
-                        end.setText(String.valueOf(meta.dump(id).endSector));
+                        start.setText(String.valueOf(meta.dumpS(id).startSector));
+                        end.setText(String.valueOf(meta.dumpS(id).endSector));
                         new AlertDialog.Builder(requireContext())
-                                .setTitle(getString(R.string.free_space_size, meta.dump(id).sizeFancy))
+                                .setTitle(getString(R.string.free_space_size, meta.dumpS(id).sizeFancy))
                                 .setView(v)
                                 .setNegativeButton(R.string.cancel, (d, p) -> d.dismiss())
                                 .setPositiveButton(R.string.create, (d, p) -> {
                                     Shell.Result r = Shell.su(("sgdisk " + bdev + " --new " + meta.nid + ":" + start.getText() + ":" + end.getText() + " --typecode " + meta.nid + ":" + ddresolv[dd.getSelectedItemPosition()] + (ddresolv[dd.getSelectedItemPosition()].equals("0700") ? (" && sm format public:" + meta.major + "," + (meta.minor + meta.nid)) : (ddresolv[dd.getSelectedItemPosition()].equals("8301") ? " && mkfs.ext4 " + pbdev + meta.nid : "")))).exec();
                                     new AlertDialog.Builder(requireContext())
                                             .setTitle(r.isSuccess() ? R.string.successful : R.string.failed)
-                                            .setMessage(String.join("\n", r.getOut()) + "\n" + String.join("\n", r.getErr()))
+                                            .setMessage(String.join("\n", r.getOut()) + "\n" + String.join("\n", r.getErr()) + (r.getOut().contains("Warning: The kernel is still using the old partiton table.") ? "echo 'IMPORTANT: Please reboot!'" : ""))
                                             .setPositiveButton(R.string.ok, (g, l) -> recyclerView.setAdapter(new SDRecyclerViewAdapter(generateMeta(DeviceList.getModel(Objects.requireNonNull(model.getCodename().getValue()))))))
                                             .setCancelable(false)
                                             .show();
@@ -136,13 +136,13 @@ public class SDCardFragment extends Fragment {
                                 .show();
                     } else
                         new AlertDialog.Builder(requireContext())
-                                    .setTitle(getString(R.string.partid, meta.dump(id).id))
+                                    .setTitle(getString(R.string.partid, meta.dumpS(id).id))
                                     .setNegativeButton(R.string.cancel, (d, p) -> d.dismiss())
                                     .setPositiveButton(R.string.delete, (d, p) -> {
-                                        Shell.Result r = Shell.su(SDUtils.umsd(meta.dump(id).type, meta.major, meta.dump(id).minor) + " && sgdisk " + bdev + " --delete " + meta.dump(id).id).exec();
+                                        Shell.Result r = Shell.su(SDUtils.umsd(meta.dumpS(id).type, meta.major, meta.dumpS(id).minor) + " && sgdisk " + bdev + " --delete " + meta.dumpS(id).id).exec();
                                         new AlertDialog.Builder(requireContext())
                                                 .setTitle(r.isSuccess() ? R.string.successful : R.string.failed)
-                                                .setMessage(String.join("\n", r.getOut()) + "\n" + String.join("", r.getErr()))
+                                                .setMessage(String.join("\n", r.getOut()) + "\n" + String.join("", r.getErr()) + (r.getOut().contains("Warning: The kernel is still using the old partiton table.") ? "echo 'IMPORTANT: Please reboot!'" : ""))
                                                 .setPositiveButton(R.string.ok, (g, s) -> recyclerView.setAdapter(new SDRecyclerViewAdapter(generateMeta(DeviceList.getModel(Objects.requireNonNull(model.getCodename().getValue()))))))
                                                 .setCancelable(false)
                                                 .show();
