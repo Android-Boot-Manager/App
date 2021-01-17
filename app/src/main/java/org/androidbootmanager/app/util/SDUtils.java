@@ -227,11 +227,11 @@ public class SDUtils {
         });
         for (Partition p : l) {
             if (p.startSector > temp + meta.alignSector)
-                meta.u.add(new Partition.FreeSpace(temp, p.startSector, meta.logicalSectorSizeBytes-1));
+                meta.u.add(new Partition.FreeSpace(temp, p.startSector-1, meta.logicalSectorSizeBytes));
             temp = p.endSector;
         }
         if (meta.lastUsableSector > temp + meta.alignSector)
-            meta.u.add(new Partition.FreeSpace(temp, meta.lastUsableSector, meta.logicalSectorSizeBytes-1));
+            meta.u.add(new Partition.FreeSpace(temp, meta.lastUsableSector-1, meta.logicalSectorSizeBytes));
         meta.s = meta.u.subList(0, meta.u.size());
         meta.s.sort((o1, o2) -> {
             // this is like this because startSector is long and I don't want overflows due to casting
