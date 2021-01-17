@@ -128,7 +128,7 @@ public class SDCardFragment extends Fragment {
                                     Shell.Result r = Shell.su(("sgdisk " + bdev + " --new " + meta.nid + ":" + start.getText() + ":" + end.getText() + " --typecode " + meta.nid + ":" + ddresolv[dd.getSelectedItemPosition()] + (ddresolv[dd.getSelectedItemPosition()].equals("0700") ? (" && sm format public:" + meta.major + "," + (meta.minor + meta.nid)) : (ddresolv[dd.getSelectedItemPosition()].equals("8301") ? " && mkfs.ext4 " + pbdev + meta.nid : "")))).exec();
                                     new AlertDialog.Builder(requireContext())
                                             .setTitle(r.isSuccess() ? R.string.successful : R.string.failed)
-                                            .setMessage(String.join("\n", r.getOut()) + "\n" + String.join("\n", r.getErr()) + (r.getOut().contains("Warning: The kernel is still using the old partiton table.") ? "echo 'IMPORTANT: Please reboot!'" : ""))
+                                            .setMessage(String.join("\n", r.getOut()) + "\n" + String.join("\n", r.getErr()) + (String.join("",r.getOut()).contains("Warning: The kernel is still using the old partition table.") ? "echo 'IMPORTANT: Please reboot!'" : ""))
                                             .setPositiveButton(R.string.ok, (g, l) -> recyclerView.setAdapter(new SDRecyclerViewAdapter(generateMeta(DeviceList.getModel(Objects.requireNonNull(model.getCodename().getValue()))))))
                                             .setCancelable(false)
                                             .show();
@@ -142,7 +142,7 @@ public class SDCardFragment extends Fragment {
                                         Shell.Result r = Shell.su(SDUtils.umsd(meta.dumpS(id).type, meta.major, meta.dumpS(id).minor) + " && sgdisk " + bdev + " --delete " + meta.dumpS(id).id).exec();
                                         new AlertDialog.Builder(requireContext())
                                                 .setTitle(r.isSuccess() ? R.string.successful : R.string.failed)
-                                                .setMessage(String.join("\n", r.getOut()) + "\n" + String.join("", r.getErr()) + (r.getOut().contains("Warning: The kernel is still using the old partiton table.") ? "echo 'IMPORTANT: Please reboot!'" : ""))
+                                                .setMessage(String.join("\n", r.getOut()) + "\n" + String.join("", r.getErr()) + (String.join("",r.getOut()).contains("Warning: The kernel is still using the old partiton table.") ? "echo 'IMPORTANT: Please reboot!'" : ""))
                                                 .setPositiveButton(R.string.ok, (g, s) -> recyclerView.setAdapter(new SDRecyclerViewAdapter(generateMeta(DeviceList.getModel(Objects.requireNonNull(model.getCodename().getValue()))))))
                                                 .setCancelable(false)
                                                 .show();
