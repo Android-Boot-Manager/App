@@ -1,5 +1,17 @@
 package org.androidbootmanager.app.util;
 
+import android.content.Context;
+import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import org.androidbootmanager.app.R;
+import org.w3c.dom.Text;
+
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.Locale;
@@ -21,5 +33,5 @@ public class SOUtils {
         value *= Long.signum(bytes);
         return String.format(Locale.ENGLISH,"%.1f %ciB", value / 1024.0, ci.current());
     }
-
+    
 }

@@ -1,6 +1,10 @@
 package org.androidbootmanager.app.ui.sdcard;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,15 +23,19 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.slider.RangeSlider;
 import com.topjohnwu.superuser.Shell;
 
 import org.androidbootmanager.app.R;
 import org.androidbootmanager.app.devices.DeviceList;
 import org.androidbootmanager.app.ui.home.InstalledViewModel;
 import org.androidbootmanager.app.util.SDUtils;
+import org.androidbootmanager.app.util.SOUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.androidbootmanager.app.util.SDUtils.generateMeta;
@@ -116,6 +124,61 @@ public class SDCardFragment extends Fragment {
                         final EditText start = v.findViewById(R.id.create_part_start);
                         final EditText end = v.findViewById(R.id.create_part_end);
                         final Spinner dd = v.findViewById(R.id.create_part_dd);
+                        final RangeSlider slider = v.findViewById(R.id.create_part_slide);
+                        final TextView size = v.findViewById(R.id.create_part_size);
+                        size.setText(meta.dumpS(id).sizeFancy);
+                        AtomicBoolean ws = new AtomicBoolean(false);
+                        slider.setValueFrom(0f);
+                        slider.setValueTo((float) (meta.dumpS(id).endSector - meta.dumpS(id).startSector));
+                        slider.setValues(0f, (float) (meta.dumpS(id).endSector - meta.dumpS(id).startSector));
+                        slider.setStepSize(1);
+                        slider.setMinSeparationValue(2048);
+                        slider.addOnChangeListener((a, b, c) -> {
+                            if (ws.get()) ws.set(false);
+                            else {
+                                List<Float> values = slider.getValues();
+                                float from = values.get(0);
+                                float to = values.get(1);
+                                start.setText(String.valueOf(meta.dumpS(id).startSector + (long) from));
+                                end.setText(String.valueOf(meta.dumpS(id).startSector + (long) to));
+                                size.setText(SOUtils.humanReadableByteCountBin((long) (to - from) * meta.logicalSectorSizeBytes));
+                                ws.set(true);
+                            }
+                        });
+                        start.addTextChangedListener(new TextWatcher() {
+                            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+                            @Override
+                            public void afterTextChanged(Editable s) {
+                                if (ws.get()) ws.set(false);
+                                else {
+                                    if ((float) (Long.parseLong(s.toString()) - meta.dumpS(id).startSector) < slider.getValueFrom())
+                                        slider.setValues(0f,1f);
+                                    else if ((float) (Long.parseLong(s.toString()) - meta.dumpS(id).startSector) > slider.getValues().get(1))
+                                        slider.setValues(slider.getValues().get(1)-1,slider.getValues().get(1));
+                                    else
+                                        slider.setValues((float) (Long.parseLong(s.toString()) - meta.dumpS(id).startSector), slider.getValues().get(1));
+                                    ws.set(true);
+                                }
+                            }
+                        });
+                        end.addTextChangedListener(new TextWatcher() {
+                            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+                            @Override
+                            public void afterTextChanged(Editable s) {
+                                if (ws.get()) ws.set(false);
+                                else {
+                                    if ((float) (Long.parseLong(s.toString()) - meta.dumpS(id).startSector) > slider.getValueTo())
+                                        slider.setValues(slider.getValues().get(0),slider.getValueTo());
+                                    else if ((float) (Long.parseLong(s.toString()) - meta.dumpS(id).startSector) < slider.getValues().get(0))
+                                        slider.setValues(slider.getValues().get(0)-1,slider.getValues().get(0));
+                                    else
+                                        slider.setValues(slider.getValues().get(0), (float) (Long.parseLong(s.toString()) - meta.dumpS(id).startSector));
+                                    ws.set(true);
+                                }
+                            }
+                        });
                         final String[] ddresolv = new String[]{"0700", "8302", "8301", "8305", "8300"};
                         dd.setAdapter(new ArrayAdapter<>(requireActivity(), android.R.layout.simple_spinner_dropdown_item, new String[]{getString(R.string.portable_part), getString(R.string.data_part), getString(R.string.meta_part), getString(R.string.system_part), getString(R.string.unknown_part)}));
                         start.setText(String.valueOf(meta.dumpS(id).startSector));
@@ -136,7 +199,7 @@ public class SDCardFragment extends Fragment {
                                 .show();
                     } else
                         new AlertDialog.Builder(requireContext())
-                                    .setTitle(getString(R.string.partid, meta.dumpS(id).id))
+                                    .setTitle(getString(R.string.partid, meta.dumpS(id).id, meta.dumpS(id).name))
                                     .setNegativeButton(R.string.cancel, (d, p) -> d.dismiss())
                                     .setPositiveButton(R.string.delete, (d, p) -> {
                                         Shell.Result r = Shell.su(SDUtils.umsd(meta.dumpS(id).type, meta.major, meta.dumpS(id).minor) + " && sgdisk " + bdev + " --delete " + meta.dumpS(id).id).exec();
