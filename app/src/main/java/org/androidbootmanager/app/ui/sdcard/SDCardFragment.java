@@ -8,6 +8,7 @@ import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -121,44 +122,46 @@ public class SDCardFragment extends Fragment {
                 container.setOnClickListener(e -> {
                     if (meta.dumpS(id).type == SDUtils.PartitionType.FREE) {
                         View v = getLayoutInflater().inflate(R.layout.create_part, null);
+                        final String[] ddresolv = new String[]{"0700", "8302", "8301", "8305", "8300"};
                         final EditText start = v.findViewById(R.id.create_part_start);
                         final EditText end = v.findViewById(R.id.create_part_end);
+                        final EditText label = v.findViewById(R.id.create_part_label);
                         final Spinner dd = v.findViewById(R.id.create_part_dd);
                         final RangeSlider slider = v.findViewById(R.id.create_part_slide);
                         final TextView size = v.findViewById(R.id.create_part_size);
                         size.setText(meta.dumpS(id).sizeFancy);
-                        AtomicBoolean ws = new AtomicBoolean(false);
                         slider.setValueFrom(0f);
                         slider.setValueTo((float) (meta.dumpS(id).endSector - meta.dumpS(id).startSector));
                         slider.setValues(0f, (float) (meta.dumpS(id).endSector - meta.dumpS(id).startSector));
                         slider.setStepSize(1);
                         slider.setMinSeparationValue(2048);
                         slider.addOnChangeListener((a, b, c) -> {
-                            if (ws.get()) ws.set(false);
-                            else {
                                 List<Float> values = slider.getValues();
                                 float from = values.get(0);
                                 float to = values.get(1);
-                                start.setText(String.valueOf(meta.dumpS(id).startSector + (long) from));
-                                end.setText(String.valueOf(meta.dumpS(id).startSector + (long) to));
-                                size.setText(SOUtils.humanReadableByteCountBin((long) (to - from) * meta.logicalSectorSizeBytes));
-                                ws.set(true);
+                                if(!start.getText().toString().equals(String.valueOf(meta.dumpS(id).startSector + (long) from))) start.setText(String.valueOf(meta.dumpS(id).startSector + (long) from));
+                                if(!end.getText().toString().equals(String.valueOf(meta.dumpS(id).startSector + (long) to))) end.setText(String.valueOf(meta.dumpS(id).startSector + (long) to));
+                                if(!size.getText().toString().equals(SOUtils.humanReadableByteCountBin((long) (to - from) * meta.logicalSectorSizeBytes))) size.setText(SOUtils.humanReadableByteCountBin((long) (to - from) * meta.logicalSectorSizeBytes));
+                        });
+                        dd.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                            @Override
+                            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                if (ddresolv[position].equals(ddresolv[3]))
+                                    slider.setValues(0f,7340031f);
                             }
+                            @Override public void onNothingSelected(AdapterView<?> parent) {}
                         });
                         start.addTextChangedListener(new TextWatcher() {
                             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
                             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
                             @Override
                             public void afterTextChanged(Editable s) {
-                                if (ws.get()) ws.set(false);
-                                else {
-                                    if ((float) (Long.parseLong(s.toString()) - meta.dumpS(id).startSector) < slider.getValueFrom())
-                                        slider.setValues(0f,1f);
-                                    else if ((float) (Long.parseLong(s.toString()) - meta.dumpS(id).startSector) > slider.getValues().get(1))
-                                        slider.setValues(slider.getValues().get(1)-1,slider.getValues().get(1));
-                                    else
-                                        slider.setValues((float) (Long.parseLong(s.toString()) - meta.dumpS(id).startSector), slider.getValues().get(1));
-                                    ws.set(true);
+                                if ((float) (Long.parseLong(s.toString()) - meta.dumpS(id).startSector) < slider.getValueFrom()) {
+                                    slider.setValues(0f, 1f);
+                                } else if ((float) (Long.parseLong(s.toString()) - meta.dumpS(id).startSector) > slider.getValues().get(1)) {
+                                    slider.setValues(slider.getValues().get(1) - 1, slider.getValues().get(1));
+                                } else {
+                                    slider.setValues((float) (Long.parseLong(s.toString()) - meta.dumpS(id).startSector), slider.getValues().get(1));
                                 }
                             }
                         });
@@ -167,19 +170,15 @@ public class SDCardFragment extends Fragment {
                             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
                             @Override
                             public void afterTextChanged(Editable s) {
-                                if (ws.get()) ws.set(false);
-                                else {
-                                    if ((float) (Long.parseLong(s.toString()) - meta.dumpS(id).startSector) > slider.getValueTo())
-                                        slider.setValues(slider.getValues().get(0),slider.getValueTo());
-                                    else if ((float) (Long.parseLong(s.toString()) - meta.dumpS(id).startSector) < slider.getValues().get(0))
-                                        slider.setValues(slider.getValues().get(0)-1,slider.getValues().get(0));
-                                    else
+                                    if ((float) (Long.parseLong(s.toString()) - meta.dumpS(id).startSector) > slider.getValueTo()) {
+                                        slider.setValues(slider.getValues().get(0), slider.getValueTo());
+                                    } else if ((float) (Long.parseLong(s.toString()) - meta.dumpS(id).startSector) < slider.getValues().get(0)) {
+                                        slider.setValues(slider.getValues().get(0) - 1, slider.getValues().get(0));
+                                    } else {
                                         slider.setValues(slider.getValues().get(0), (float) (Long.parseLong(s.toString()) - meta.dumpS(id).startSector));
-                                    ws.set(true);
-                                }
+                                    }
                             }
                         });
-                        final String[] ddresolv = new String[]{"0700", "8302", "8301", "8305", "8300"};
                         dd.setAdapter(new ArrayAdapter<>(requireActivity(), android.R.layout.simple_spinner_dropdown_item, new String[]{getString(R.string.portable_part), getString(R.string.data_part), getString(R.string.meta_part), getString(R.string.system_part), getString(R.string.unknown_part)}));
                         start.setText(String.valueOf(meta.dumpS(id).startSector));
                         end.setText(String.valueOf(meta.dumpS(id).endSector));
@@ -188,10 +187,10 @@ public class SDCardFragment extends Fragment {
                                 .setView(v)
                                 .setNegativeButton(R.string.cancel, (d, p) -> d.dismiss())
                                 .setPositiveButton(R.string.create, (d, p) -> {
-                                    Shell.Result r = Shell.su(("sgdisk " + bdev + " --new " + meta.nid + ":" + start.getText() + ":" + end.getText() + " --typecode " + meta.nid + ":" + ddresolv[dd.getSelectedItemPosition()] + (ddresolv[dd.getSelectedItemPosition()].equals("0700") ? (" && sm format public:" + meta.major + "," + (meta.minor + meta.nid)) : (ddresolv[dd.getSelectedItemPosition()].equals("8301") ? " && mkfs.ext4 " + pbdev + meta.nid : "")))).exec();
+                                    Shell.Result r = Shell.su("sgdisk " + bdev + " --new " + meta.nid + ":" + start.getText() + ":" + end.getText() + " --typecode " + meta.nid + ":" + ddresolv[dd.getSelectedItemPosition()] + " --change-name " + meta.nid + ":'" + label.getText().toString().replace("'","") + "' && ls " + pbdev + meta.nid + (ddresolv[dd.getSelectedItemPosition()].equals("0700") ? (" && sm format public:" + meta.major + "," + (meta.minor + meta.nid)) : (ddresolv[dd.getSelectedItemPosition()].equals("8301") ? " && mkfs.ext4 " + pbdev + meta.nid : "true"))).exec();
                                     new AlertDialog.Builder(requireContext())
                                             .setTitle(r.isSuccess() ? R.string.successful : R.string.failed)
-                                            .setMessage(String.join("\n", r.getOut()) + "\n" + String.join("\n", r.getErr()) + (String.join("",r.getOut()).contains("old") ? "echo 'IMPORTANT: Please reboot!'" : ""))
+                                            .setMessage(String.join("\n", r.getOut()) + "\n" + String.join("\n", r.getErr()) + (String.join("",r.getOut()).contains("old") ? "IMPORTANT: Please reboot!" : ""))
                                             .setPositiveButton(R.string.ok, (g, l) -> recyclerView.setAdapter(new SDRecyclerViewAdapter(generateMeta(DeviceList.getModel(Objects.requireNonNull(model.getCodename().getValue()))))))
                                             .setCancelable(false)
                                             .show();
@@ -205,7 +204,7 @@ public class SDCardFragment extends Fragment {
                                         Shell.Result r = Shell.su(SDUtils.umsd(meta.dumpS(id).type, meta.major, meta.dumpS(id).minor) + " && sgdisk " + bdev + " --delete " + meta.dumpS(id).id).exec();
                                         new AlertDialog.Builder(requireContext())
                                                 .setTitle(r.isSuccess() ? R.string.successful : R.string.failed)
-                                                .setMessage(String.join("\n", r.getOut()) + "\n" + String.join("", r.getErr()) + (String.join("",r.getOut()).contains("old") ? "echo 'IMPORTANT: Please reboot!'" : ""))
+                                                .setMessage(String.join("\n", r.getOut()) + "\n" + String.join("", r.getErr()) + (String.join("",r.getOut()).contains("old") ? "IMPORTANT: Please reboot!" : ""))
                                                 .setPositiveButton(R.string.ok, (g, s) -> recyclerView.setAdapter(new SDRecyclerViewAdapter(generateMeta(DeviceList.getModel(Objects.requireNonNull(model.getCodename().getValue()))))))
                                                 .setCancelable(false)
                                                 .show();
