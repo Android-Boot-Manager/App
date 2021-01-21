@@ -13,7 +13,7 @@
 
     <fragment
         android:id="@+id/nav_roms"
-        android:name="org.androidbootmanager.app.ui.roms.GalleryFragment"
+        android:name="org.androidbootmanager.app.ui.roms.ROMFragment"
         android:label="@string/menu_roms"
         tools:layout="@layout/fragment_roms" />
 

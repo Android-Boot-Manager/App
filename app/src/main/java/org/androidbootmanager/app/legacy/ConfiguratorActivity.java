@@ -26,6 +26,7 @@ import com.google.android.material.tabs.TabLayoutMediator;
 import com.topjohnwu.superuser.Shell;
 
 import org.androidbootmanager.app.R;
+import org.androidbootmanager.app.ui.activities.SplashActivity;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -155,7 +156,7 @@ public class ConfiguratorActivity extends FragmentActivity {
                     @SuppressLint("SdCardPath") File targetFile = new File("/data/data/org.androidbootmanager.app/files/lk2nd.img");
                     OutputStream outStream = new FileOutputStream(targetFile);
                     assert initialStream != null;
-                    MainActivity.copyFile(initialStream, outStream);
+                    SplashActivity.copyFile(initialStream, outStream);
                     initialStream.close();
                     outStream.close();
                     new Thread(() -> {
