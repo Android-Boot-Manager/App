@@ -121,9 +121,10 @@
     <string name="failed">Nie powiodło się</string>
     <string name="successful">Sukces</string>
     <string name="free_space">Free space</string>
-    <string name="partid">Partition %1$d labeled %2$s</string>
+    <string name="partid">Partition %1$d labeled \"%2$s\"</string>
     <string name="create">Create</string>
     <string name="sector_range">Sector range</string>
+    <string name="label">Label</string>
     <string name="size">Size</string>
     <string name="free_space_size">Free space of size %1$s</string>
     <string name="start_sector">Start Sector</string>
