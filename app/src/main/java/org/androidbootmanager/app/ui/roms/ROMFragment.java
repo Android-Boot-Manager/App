@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -14,26 +15,46 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.io.SuFile;
+
 import org.androidbootmanager.app.R;
 import org.androidbootmanager.app.devices.DeviceModel;
+import org.androidbootmanager.app.legacy.EntryTabFragment;
 import org.androidbootmanager.app.ui.installer.DeviceInstallerWizardPageFragment;
 import org.androidbootmanager.app.ui.installer.FindDeviceWizardPageFragment;
+import org.androidbootmanager.app.util.ActionAbortedCleanlyError;
+import org.androidbootmanager.app.util.ConfigFile;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ROMFragment extends Fragment {
 
     RecyclerView recyclerView;
+    ArrayList<Entry> entries;
+    ROMRecyclerViewAdapter adapter;
+
+    private static class Entry {
+        public String file;
+        public ConfigFile config;
+        public Entry(String outFile) throws ActionAbortedCleanlyError {
+            file = outFile;
+            config = ConfigFile.importFromFile(file);
+        }
+        public void save() {
+            config.exportToPrivFile("entry.conf",file);
+        }
+    }
 
     public class ROMRecyclerViewAdapter extends RecyclerView.Adapter<ROMRecyclerViewAdapter.ViewHolder> {
 
-        private final List<DeviceModel> devicesList;
+        private final List<Entry> entryList;
 
-        private int lastSelectedPosition = -1;
-
-        public ROMRecyclerViewAdapter(List<DeviceModel> devicesListIn) {
-            devicesList = devicesListIn;
+        public ROMRecyclerViewAdapter(List<Entry> entryListIn) {
+            entryList = entryListIn;
         }
 
         @NotNull
@@ -44,26 +65,27 @@ public class ROMFragment extends Fragment {
         }
 
         @Override
-        public void onBindViewHolder(ROMRecyclerViewAdapter.ViewHolder holder, int position) {
-            holder.selectionState.setText(devicesList.get(position).viewname);
-            holder.selectionState.setChecked(lastSelectedPosition == position);
+        public void onBindViewHolder(@NotNull ROMRecyclerViewAdapter.ViewHolder holder, int position) {
+            //
+        }
+
+        public void updateEntries() {
+            ROMFragment.this.updateEntries();
         }
 
         @Override
         public int getItemCount() {
-            return devicesList.size();
+            return entryList.size();
         }
 
         public class ViewHolder extends RecyclerView.ViewHolder {
-            public RadioButton selectionState;
 
             public ViewHolder(View view) {
                 super(view);
-                selectionState = view.findViewById(R.id.wizard_installer_finddevice_radio);
-                selectionState.setOnClickListener(v -> {
-                    lastSelectedPosition = getAdapterPosition();
-                    notifyDataSetChanged();
-                });
+            }
+
+            public void updateEntries() {
+                ROMRecyclerViewAdapter.this.updateEntries();
             }
         }
     }
@@ -75,6 +97,22 @@ public class ROMFragment extends Fragment {
         LinearLayoutManager recyclerLayoutManager = new LinearLayoutManager(requireContext());
         recyclerView.setLayoutManager(recyclerLayoutManager);
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), recyclerLayoutManager.getOrientation()));
+        updateEntries();
+        adapter = new ROMRecyclerViewAdapter(entries);
+        recyclerView.setAdapter(adapter);
         return root;
+    }
+
+    public void updateEntries() {
+        entries = new ArrayList<>();
+        for (String entryFile : Objects.requireNonNull(SuFile.open("/data/abm/bootset/lk2nd/entries").list())) {
+            try {
+                entries.add(new Entry(entryFile));
+            } catch (ActionAbortedCleanlyError actionAbortedCleanlyError) {
+                actionAbortedCleanlyError.printStackTrace();
+                Toast.makeText(requireContext(), "Loading entry: Error. Action aborted cleanly.", Toast.LENGTH_LONG).show();
+            }
+        }
+        adapter.notifyDataSetChanged();
     }
 }
