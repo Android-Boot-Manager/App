@@ -87,7 +87,7 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="navigation_drawer_open">Відкрити панель навігації</string>
     <string name="navigation_drawer_close">Закрити вікно навігації</string>
-    <string name="nav_header_subtitle">Multiboot для Android - ще один шлях</string>
+    <string name="nav_header_subtitle">One phone to start them all!</string>
     <string name="nav_header_desc">Заголовок панелі навігації</string>
     <string name="action_settings">Налаштування</string>
     <string name="menu_home">Головна</string>
