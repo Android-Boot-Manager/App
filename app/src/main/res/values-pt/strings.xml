@@ -87,7 +87,7 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="navigation_drawer_open">Abrir gaveta de navegação</string>
     <string name="navigation_drawer_close">Fechar gaveta de navegação</string>
-    <string name="nav_header_subtitle">Multiboot for Android - the other way</string>
+    <string name="nav_header_subtitle">One phone to start them all!</string>
     <string name="nav_header_desc">Cabeçalho de navegação</string>
     <string name="action_settings">Opções</string>
     <string name="menu_home">Lar</string>
