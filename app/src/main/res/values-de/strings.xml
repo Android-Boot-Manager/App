@@ -87,7 +87,7 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="navigation_drawer_open">Navigationsleiste öffnen</string>
     <string name="navigation_drawer_close">Navigationsleiste schließen</string>
-    <string name="nav_header_subtitle">Multiboot für Android - mal anders</string>
+    <string name="nav_header_subtitle">One phone to start them all!</string>
     <string name="nav_header_desc">Navigations-Header</string>
     <string name="action_settings">Einstellungen</string>
     <string name="menu_home">Startseite</string>
