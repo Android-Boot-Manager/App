@@ -15,13 +15,13 @@
         android:id="@+id/nav_roms"
         android:name="org.androidbootmanager.app.ui.roms.ROMFragment"
         android:label="@string/menu_roms"
-        tools:layout="@layout/fragment_roms" />
+        tools:layout="@layout/wizard_installer_finddevice" />
 
     <fragment
         android:id="@+id/nav_sd"
         android:name="org.androidbootmanager.app.ui.sdcard.SDCardFragment"
         android:label="@string/menu_sd"
-        tools:layout="@layout/fragment_roms" />
+        tools:layout="@layout/wizard_installer_finddevice" />
 
     <fragment
         android:id="@+id/nav_generalcfg"

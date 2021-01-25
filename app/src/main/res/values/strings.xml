@@ -97,6 +97,7 @@
     <string name="menu_sd">SD card</string>
     <string name="menu_generalcfg">General settings</string>
     <string name="wizard_updatelk_intro">You are about to update the bootloader.</string>
+    <string name="wizard_addrom_intro">You are about to install an ROM to the SD card.</string>
     <string name="aboutLibraries">About Libraries</string>
     <string name="aboutLibraries_description_showIcon" translatable="false">true</string>
     <string name="aboutLibraries_description_showVersion" translatable="false">true</string>
@@ -111,6 +112,9 @@
     <string name="installcheck3">Install check #3:</string>
     <string name="superuser">Root:</string>
     <string name="failure">Failure</string>
+    <string name="unknown_os">Unknown OS</string>
+    <string name="ut">Ubuntu Touch</string>
+    <string name="android">Android</string>
     <string name="about">About</string>
     <string name="welcome">Welcome!</string>
     <string name="wizard_deviceinstaller_text">Ready! Please follow the next steps for installing Android Boot Manager. If you redecided, you can click cancel. Nothing was changed until now.</string>
