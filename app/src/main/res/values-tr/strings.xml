@@ -95,6 +95,7 @@
     <string name="menu_sd">SD kart</string>
     <string name="menu_generalcfg">Genel ayarlar</string>
     <string name="wizard_updatelk_intro">Bootloader\'ınızı güncellemek üzeresiniz.</string>
+    <string name="wizard_addrom_intro">You are about to install an ROM to the SD card.</string>
     <string name="aboutLibraries">Kütüphaneler Hakkında</string>
     <string name="home_installedWorking_img">Yükleme durumu teyit etmek için Tik/Çarpı</string>
     <string name="home_installedWorking_text">Kayıtlı durum yüklenemedi</string>
@@ -106,6 +107,9 @@
     <string name="installcheck3">Yükleme kontrolü #3:</string>
     <string name="superuser">Root:</string>
     <string name="failure">Başarısız</string>
+    <string name="unknown_os">Unknown OS</string>
+    <string name="ut">Ubuntu Touch</string>
+    <string name="android">Android</string>
     <string name="about">Hakkında</string>
     <string name="welcome">Hoşgeldiniz!</string>
     <string name="wizard_deviceinstaller_text">Hazır! Android Boot Manager yüklemek için adımları takip edin. Eğer fikrinizi değiştirirseniz iptale basabilirsiniz. Şimdiye kadar hiç bir şey değiştirilmedi.</string>
