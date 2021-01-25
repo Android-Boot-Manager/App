@@ -95,7 +95,7 @@
     <string name="menu_sd">SD-Karte</string>
     <string name="menu_generalcfg">Allgemeine Einstellungen</string>
     <string name="wizard_updatelk_intro">Sie sind dabei, den Bootloader zu aktualisieren.</string>
-    <string name="wizard_addrom_intro">You are about to install an ROM to the SD card.</string>
+    <string name="wizard_addrom_intro">Sie sind dabei eine ROM auf der SD-Karte zu installieren.</string>
     <string name="aboutLibraries">Über die Bibliotheken</string>
     <string name="home_installedWorking_img">Checkmark um den installierten Zustand darzustellen</string>
     <string name="home_installedWorking_text">Fehler beim Laden des Status</string>
@@ -107,7 +107,7 @@
     <string name="installcheck3">Installationstest #3:</string>
     <string name="superuser">Root:</string>
     <string name="failure">Fehler</string>
-    <string name="unknown_os">Unknown OS</string>
+    <string name="unknown_os">Unbekanntes Betriebssystem</string>
     <string name="ut">Ubuntu Touch</string>
     <string name="android">Android</string>
     <string name="about">Über</string>
