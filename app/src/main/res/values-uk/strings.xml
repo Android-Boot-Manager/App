@@ -87,7 +87,7 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="navigation_drawer_open">Відкрити панель навігації</string>
     <string name="navigation_drawer_close">Закрити вікно навігації</string>
-    <string name="nav_header_subtitle">Multiboot для Android - ще один шлях</string>
+    <string name="nav_header_subtitle">One phone to start them all!</string>
     <string name="nav_header_desc">Заголовок панелі навігації</string>
     <string name="action_settings">Налаштування</string>
     <string name="menu_home">Головна</string>
@@ -95,6 +95,7 @@
     <string name="menu_sd">SD card</string>
     <string name="menu_generalcfg">General settings</string>
     <string name="wizard_updatelk_intro">You are about to update the bootloader.</string>
+    <string name="wizard_addrom_intro">You are about to install an ROM to the SD card.</string>
     <string name="aboutLibraries">About Libraries</string>
     <string name="home_installedWorking_img">Позначка представляють інстальований стан</string>
     <string name="home_installedWorking_text">Не вдалося завантажити стан</string>
@@ -106,6 +107,9 @@
     <string name="installcheck3">Встановлення перевірка #3:</string>
     <string name="superuser">Root:</string>
     <string name="failure">Помилка</string>
+    <string name="unknown_os">Unknown OS</string>
+    <string name="ut">Ubuntu Touch</string>
+    <string name="android">Android</string>
     <string name="about">Про програму</string>
     <string name="welcome">Ласкаво просимо!</string>
     <string name="wizard_deviceinstaller_text">Готово! Будь ласка, виконайте наступні кроки до встановлення Android Boot Manager. Якщо ви передумали, натисніть кнопку \"Скасувати\". До цього часу нічого не змінилося.</string>
@@ -114,4 +118,26 @@
     <!-- Assistant page navigation -->
     <string name="prev">Попередній</string>
     <string name="help">Help</string>
+    <string name="unknown_part">Unknown partition type</string>
+    <string name="sd_mbr">This SD card uses the legacy MBR partition scheme but GPT is required. However, it can be converted to GPT. But this may cause data loss, therefore please backup your data.</string>
+    <string name="sd_err">Unknown error.</string>
+    <string name="convert">Convert</string>
+    <string name="failed">Failed</string>
+    <string name="successful">Successful</string>
+    <string name="free_space">Free space</string>
+    <string name="partid">Partition %1$d labeled \"%2$s\"</string>
+    <string name="create">Create</string>
+    <string name="sector_range">Sector range</string>
+    <string name="label">Label</string>
+    <string name="size">Size</string>
+    <string name="free_space_size">Free space of size %1$s</string>
+    <string name="start_sector">Start Sector</string>
+    <string name="end_sector">End Sector</string>
+    <string name="adopted_part">Adopted Storage</string>
+    <string name="meta_part">ABM/Adopted Storage Metadata</string>
+    <string name="portable_part">Portable Storage</string>
+    <string name="system_part">OS System data</string>
+    <string name="data_part">OS User data</string>
+    <!-- How an partition is used -->
+    <string name="usage">Usage</string>
 </resources>

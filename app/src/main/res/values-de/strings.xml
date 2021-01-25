@@ -2,10 +2,10 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">Android Boot Manager</string>
     <string name="fatal">SCHWERWIEGENDER FEHLER</string>
-    <string name="about_txt_1">Founded by Luka Panio &amp; nift4</string>
-    <string name="about_txt_2">    App Development: nift4</string>
-    <string name="about_txt_3">    DroidBoot development: Luka Panio</string>
-    <string name="about_txt_4">    Thanks to Volla &amp; F(x)tec for developer devices</string>
+    <string name="about_txt_1">Gegründet von Luka Panio &amp; nift4</string>
+    <string name="about_txt_2">    App-Entwicklung: nift4</string>
+    <string name="about_txt_3">    DroidBoot Entwicklung: Luka Panio</string>
+    <string name="about_txt_4">    Vielen Dank an Volla &amp; F(x)tec für Entwicklergeräte</string>
     <string name="cp_err_msg">Fehler beim Extrahieren der Daten. Haben Sie die App auf einer SD-Karte installiert? Das Drücken von OK bringt Sie zur App, tun Sie nichts ohne den Fehler vorher zu untersuchen!</string>
     <string name="wrong_device_title">Inkompatibles Gerät</string>
     <string name="wrong_device_msg">Die Android-Startverwaltung ist für dieses Gerät (%1$s) nicht verfügbar.</string>
@@ -19,7 +19,7 @@
     <string name="installing_title">Installiere…</string>
     <string name="installing_msg">Installiere, bitte warten…</string>
     <string name="current_rom_name">Name des installierten ROMs</string>
-    <string name="bootset_fail">ATTENTION! Failed to mount bootset! Please check logs and do not touch stuff!</string>
+    <string name="bootset_fail">ACHTUNG! Bootset konnte nicht eingebunden werden! Bitte überprüfen Sie die Logs und tun Sie nichts!</string>
     <string name="select_droidboot_title">DroidBoot auswählen</string>
     <string name="select_droidboot_msg">Du wirst nun nach der DroidBoot-Datei gefragt. Stelle sicher, dass sie die richtige für dein Gerät ist!</string>
     <string name="select_droidboot_ok">DroidBoot ist ausgewählt.</string>
@@ -87,7 +87,7 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="navigation_drawer_open">Navigationsleiste öffnen</string>
     <string name="navigation_drawer_close">Navigationsleiste schließen</string>
-    <string name="nav_header_subtitle">Multiboot für Android - mal anders</string>
+    <string name="nav_header_subtitle">One phone to start them all!</string>
     <string name="nav_header_desc">Navigations-Header</string>
     <string name="action_settings">Einstellungen</string>
     <string name="menu_home">Startseite</string>
@@ -95,6 +95,7 @@
     <string name="menu_sd">SD-Karte</string>
     <string name="menu_generalcfg">Allgemeine Einstellungen</string>
     <string name="wizard_updatelk_intro">Sie sind dabei, den Bootloader zu aktualisieren.</string>
+    <string name="wizard_addrom_intro">Sie sind dabei eine ROM auf der SD-Karte zu installieren.</string>
     <string name="aboutLibraries">Über die Bibliotheken</string>
     <string name="home_installedWorking_img">Checkmark um den installierten Zustand darzustellen</string>
     <string name="home_installedWorking_text">Fehler beim Laden des Status</string>
@@ -106,6 +107,9 @@
     <string name="installcheck3">Installationstest #3:</string>
     <string name="superuser">Root:</string>
     <string name="failure">Fehler</string>
+    <string name="unknown_os">Unbekanntes Betriebssystem</string>
+    <string name="ut">Ubuntu Touch</string>
+    <string name="android">Android</string>
     <string name="about">Über</string>
     <string name="welcome">Willkommen!</string>
     <string name="wizard_deviceinstaller_text">Fertig! Bitte befolge die nächsten Schritte um den Android Boot Manager zu installieren. Wenn du es dir anders überlegst kannst du auf Abbrechen klicken. Bis jetzt wurde nichts geändert.</string>
@@ -114,4 +118,26 @@
     <!-- Assistant page navigation -->
     <string name="prev">Zurück</string>
     <string name="help">Hilfe</string>
+    <string name="unknown_part">Unbekannter Partitionstyp</string>
+    <string name="sd_mbr">Diese SD-Karte verwendet das alte MBR-Partitionsschema aber GPT ist erforderlich. Es kann in GPT umgewandelt werden, dies kann jedoch zu Datenverlust führen. Bitte sichern Sie Ihre Daten.</string>
+    <string name="sd_err">Unbekannter Fehler.</string>
+    <string name="convert">Konvertieren</string>
+    <string name="failed">Fehlgeschlagen</string>
+    <string name="successful">Erfolgreich</string>
+    <string name="free_space">Freier Speicher</string>
+    <string name="partid">Partition %1$d bezeichnet mit %2$s\"</string>
+    <string name="create">Erstellen</string>
+    <string name="sector_range">Sektorbereich</string>
+    <string name="label">Bezeichnung</string>
+    <string name="size">Size</string>
+    <string name="free_space_size">Freier Speicherplatz der Größe %1$s</string>
+    <string name="start_sector">Startsektor</string>
+    <string name="end_sector">Endsektor</string>
+    <string name="adopted_part">Adaptierter Speicher</string>
+    <string name="meta_part">ABM/Metadaten des adaptierten Speichers</string>
+    <string name="portable_part">Externer Speicher</string>
+    <string name="system_part">OS Systemdaten</string>
+    <string name="data_part">OS Benutzerdaten</string>
+    <!-- How an partition is used -->
+    <string name="usage">Belegung</string>
 </resources>

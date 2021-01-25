@@ -2,10 +2,10 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">Android Boot Manager</string>
     <string name="fatal">ERRO FATAL</string>
-    <string name="about_txt_1">Founded by Luka Panio &amp; nift4</string>
-    <string name="about_txt_2">    App Development: nift4</string>
-    <string name="about_txt_3">    DroidBoot development: Luka Panio</string>
-    <string name="about_txt_4">    Thanks to Volla &amp; F(x)tec for developer devices</string>
+    <string name="about_txt_1">Fundado por Luka Panio &amp; nift4</string>
+    <string name="about_txt_2">    Desenvolvimento do app: nift4</string>
+    <string name="about_txt_3">    Desenvolvimento do DroidBoot: Luka Panio</string>
+    <string name="about_txt_4">    Obrigado a Volla &amp; F(x)tec pros aparelhos de desenvolvimento</string>
     <string name="cp_err_msg">Falha ao pegar alguns dados. você instalou o app em um cartão SD? Pressionando OK levará você ao app, não faça nada sem investigar primeiro!</string>
     <string name="wrong_device_title">Dispositivo errado</string>
     <string name="wrong_device_msg">O Android Boot Manager não está disponível para este dispositivo (%1$s).</string>
@@ -19,7 +19,7 @@
     <string name="installing_title">Instalando…</string>
     <string name="installing_msg">Instalando. Por favor espere…</string>
     <string name="current_rom_name">Nome da ROM atual</string>
-    <string name="bootset_fail">ATTENTION! Failed to mount bootset! Please check logs and do not touch stuff!</string>
+    <string name="bootset_fail">ATENÇÃO! Falha ao montar o bootset! Por favor cheque os logs e não toque nas coisas!</string>
     <string name="select_droidboot_title">Selecione o DroidBoot</string>
     <string name="select_droidboot_msg">Agora você será perguntado pelo arquivo do DroidBoot, Tenha certeza que é o correto para o seu dispositivo</string>
     <string name="select_droidboot_ok">DroidBoot está selecionado.</string>
@@ -87,7 +87,7 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="navigation_drawer_open">Abrir gaveta de navegação</string>
     <string name="navigation_drawer_close">Fechar gaveta de navegação</string>
-    <string name="nav_header_subtitle">Multiboot for Android - the other way</string>
+    <string name="nav_header_subtitle">Um celular para iniciar todos eles!</string>
     <string name="nav_header_desc">Cabeçalho de navegação</string>
     <string name="action_settings">Opções</string>
     <string name="menu_home">Lar</string>
@@ -95,6 +95,7 @@
     <string name="menu_sd">Cartão SD</string>
     <string name="menu_generalcfg">Configurações gerais</string>
     <string name="wizard_updatelk_intro">Você está prestes a atualizar o bootloader.</string>
+    <string name="wizard_addrom_intro">You are about to install an ROM to the SD card.</string>
     <string name="aboutLibraries">Sobre as Bibliotecas</string>
     <string name="home_installedWorking_img">Marca/Cruz para representar o estado instalado</string>
     <string name="home_installedWorking_text">Falha ao carregar estado</string>
@@ -106,6 +107,9 @@
     <string name="installcheck3">Checagem de instalação #3:</string>
     <string name="superuser">Root:</string>
     <string name="failure">Falha</string>
+    <string name="unknown_os">Unknown OS</string>
+    <string name="ut">Ubuntu Touch</string>
+    <string name="android">Android</string>
     <string name="about">Sobre</string>
     <string name="welcome">Bem-vindo!</string>
     <string name="wizard_deviceinstaller_text">Pronto! Por favor siga os próximos pra instalar o Android Boot Manager. Se você mudar de ideia, você pode apertar em cancelar. Nada foi alterado ate agora.</string>
@@ -114,4 +118,26 @@
     <!-- Assistant page navigation -->
     <string name="prev">Voltar</string>
     <string name="help">Ajuda</string>
+    <string name="unknown_part">Tipo de partição desconhecida</string>
+    <string name="sd_mbr">Esse SD Card usa o esquema de partição MBR mais o esquema GPT é necessário, contudo, ele pode ser convertido para GPT, mas isso pode causar perda de arquivos, portanto faça backup dos seus arquivos.</string>
+    <string name="sd_err">Erro desconhecido.</string>
+    <string name="convert">Converter</string>
+    <string name="failed">Falhou</string>
+    <string name="successful">Sucesso</string>
+    <string name="free_space">Espaço disponível</string>
+    <string name="partid">Partição %1$d nomeada \"%2$s\"</string>
+    <string name="create">Criar</string>
+    <string name="sector_range">Alcance do setor</string>
+    <string name="label">Rótulo</string>
+    <string name="size">Tamanho</string>
+    <string name="free_space_size">Espaço disponível do tamanho %1$s</string>
+    <string name="start_sector">Iniciar Setor</string>
+    <string name="end_sector">Acabar Setor</string>
+    <string name="adopted_part">Armazenamento Adotado</string>
+    <string name="meta_part">ABM/Metadata do Armazenamento Adotado</string>
+    <string name="portable_part">Armazenamento Portátil</string>
+    <string name="system_part">Arquivos do Sistema do OS</string>
+    <string name="data_part">Arquivos do Usuário no OS</string>
+    <!-- How an partition is used -->
+    <string name="usage">Utilização</string>
 </resources>

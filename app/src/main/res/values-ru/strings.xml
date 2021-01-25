@@ -87,7 +87,7 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_subtitle">Multiboot for Android - the other way</string>
+    <string name="nav_header_subtitle">One phone to start them all!</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
     <string name="menu_home">Home</string>
@@ -95,6 +95,7 @@
     <string name="menu_sd">SD card</string>
     <string name="menu_generalcfg">General settings</string>
     <string name="wizard_updatelk_intro">You are about to update the bootloader.</string>
+    <string name="wizard_addrom_intro">You are about to install an ROM to the SD card.</string>
     <string name="aboutLibraries">About Libraries</string>
     <string name="home_installedWorking_img">Checkmark/Cross to represent installed state</string>
     <string name="home_installedWorking_text">Failed to load state</string>
@@ -106,6 +107,9 @@
     <string name="installcheck3">Install check #3:</string>
     <string name="superuser">Root:</string>
     <string name="failure">Failure</string>
+    <string name="unknown_os">Unknown OS</string>
+    <string name="ut">Ubuntu Touch</string>
+    <string name="android">Android</string>
     <string name="about">About</string>
     <string name="welcome">Welcome!</string>
     <string name="wizard_deviceinstaller_text">Ready! Please follow the next steps for installing Android Boot Manager. If you redecided, you can click cancel. Nothing was changed until now.</string>
@@ -114,4 +118,26 @@
     <!-- Assistant page navigation -->
     <string name="prev">Prev</string>
     <string name="help">Help</string>
+    <string name="unknown_part">Unknown partition type</string>
+    <string name="sd_mbr">This SD card uses the legacy MBR partition scheme but GPT is required. However, it can be converted to GPT. But this may cause data loss, therefore please backup your data.</string>
+    <string name="sd_err">Unknown error.</string>
+    <string name="convert">Convert</string>
+    <string name="failed">Failed</string>
+    <string name="successful">Successful</string>
+    <string name="free_space">Free space</string>
+    <string name="partid">Partition %1$d labeled \"%2$s\"</string>
+    <string name="create">Create</string>
+    <string name="sector_range">Sector range</string>
+    <string name="label">Label</string>
+    <string name="size">Size</string>
+    <string name="free_space_size">Free space of size %1$s</string>
+    <string name="start_sector">Start Sector</string>
+    <string name="end_sector">End Sector</string>
+    <string name="adopted_part">Adopted Storage</string>
+    <string name="meta_part">ABM/Adopted Storage Metadata</string>
+    <string name="portable_part">Portable Storage</string>
+    <string name="system_part">OS System data</string>
+    <string name="data_part">OS User data</string>
+    <!-- How an partition is used -->
+    <string name="usage">Usage</string>
 </resources>
