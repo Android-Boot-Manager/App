@@ -96,6 +96,7 @@ se falsifichi il fingerprint)</string>
     <string name="menu_sd">SD card</string>
     <string name="menu_generalcfg">General settings</string>
     <string name="wizard_updatelk_intro">You are about to update the bootloader.</string>
+    <string name="wizard_addrom_intro">You are about to install an ROM to the SD card.</string>
     <string name="aboutLibraries">About Libraries</string>
     <string name="home_installedWorking_img">Checkmark/Croce per rappresentare stato di installazione</string>
     <string name="home_installedWorking_text">Impossibile caricare lo stato</string>
@@ -107,6 +108,9 @@ se falsifichi il fingerprint)</string>
     <string name="installcheck3">Install check #3:</string>
     <string name="superuser">Root:</string>
     <string name="failure">Errore</string>
+    <string name="unknown_os">Unknown OS</string>
+    <string name="ut">Ubuntu Touch</string>
+    <string name="android">Android</string>
     <string name="about">Informazioni</string>
     <string name="welcome">Welcome!</string>
     <string name="wizard_deviceinstaller_text">Ready! Please follow the next steps for installing Android Boot Manager. If you redecided, you can click cancel. Nothing was changed until now.</string>
