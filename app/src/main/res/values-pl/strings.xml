@@ -139,5 +139,5 @@
     <string name="system_part">OS System data</string>
     <string name="data_part">OS User data</string>
     <!-- How an partition is used -->
-    <string name="usage">Usage</string>
+    <string name="usage">Użycie</string>
 </resources>
