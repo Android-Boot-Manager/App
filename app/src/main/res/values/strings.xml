@@ -79,6 +79,7 @@
     <string name="install_ut_halium_boot_systemimage">You are going to install ubuntu touch, using system image and halium boot. Are you sure?</string>
     <string name="select_halium_boot">Please select halium boot file</string>
     <string name="select_system_image">Please select systemimage</string>
+    <string name="selected">File selected.</string>
     <string name="enter_rom_name">Enter ROM name</string>
     <string name="install_ut_halium_boot_systemimage_rootfs">You are going to install ubuntu touch, using system image, rootfs and halium boot. Are you sure?</string>
     <string name="select_rootfs">Please select rootfs</string>
@@ -118,6 +119,7 @@
     <string name="about">About</string>
     <string name="welcome">Welcome!</string>
     <string name="wizard_deviceinstaller_text">Ready! Please follow the next steps for installing Android Boot Manager. If you redecided, you can click cancel. Nothing was changed until now.</string>
+    <string name="wizard_devicerominstaller_text">Ready! Please follow the next steps for installing your ROM. If you redecided, you can click cancel. Nothing was changed until now.</string>
     <string name="installerWelcome">Welcome to the Android Boot Manager installer. This will install Android Boot Manager on your device. Not easily undoable modifications are being done, please do not install without knowledge about it. Disclaimer follows:</string>
     <string name="next">Next</string>
     <!-- Assistant page navigation -->

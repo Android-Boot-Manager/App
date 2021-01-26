@@ -110,6 +110,9 @@ public class ROMFragment extends Fragment {
                 label = view.findViewById(R.id.entry_text);
                 pic = view.findViewById(R.id.entry_pic);
                 name = view.findViewById(R.id.entry_name);
+                container.setOnClickListener((v) -> {
+                    // TODO
+                });
             }
 
             public void updateEntries() {
