@@ -128,7 +128,7 @@
     <string name="successful">Sucesso</string>
     <string name="free_space">Espaço disponível</string>
     <string name="partid">Partição %1$d nomeada \"%2$s\"</string>
-    <string name="partidt">%1$s with id %2$d labeled \"%3$s\"</string>
+    <string name="partidt">%1$s com a id %2$d nomeada \"%3$s\"</string>
     <string name="create">Criar</string>
     <string name="sector_range">Alcance do setor</string>
     <string name="label">Rótulo</string>
@@ -141,7 +141,7 @@
     <string name="portable_part">Armazenamento Portátil</string>
     <string name="system_part">Arquivos do Sistema do OS</string>
     <string name="data_part">Arquivos do Usuário no OS</string>
-    <string name="select_part">Please select an unused partition on your SD card configured with the following type: %1$s. Please make sure it really is the correct one, you can cancel and label it if unsure. If you didn\'t create one yet, do that first.</string>
+    <string name="select_part">Por favor selecione uma partição não usada no seu cartão SD configurada com o tipo: %1$s. Por favor tenho certeza que é realmente a correta, você pode cancelar e nomear para ter certeza, se você ainda não criou uma faça isso primeiro.</string>
     <!-- How an partition is used -->
     <string name="usage">Utilização</string>
 </resources>
