@@ -128,6 +128,7 @@
     <string name="successful">Sukces</string>
     <string name="free_space">Free space</string>
     <string name="partid">Partition %1$d labeled \"%2$s\"</string>
+    <string name="partidt">%1$s with id %2$d labeled \"%3$s\"</string>
     <string name="create">Create</string>
     <string name="sector_range">Sector range</string>
     <string name="label">Label</string>
@@ -140,6 +141,7 @@
     <string name="portable_part">Portable Storage</string>
     <string name="system_part">OS System data</string>
     <string name="data_part">OS User data</string>
+    <string name="select_part">Please select an unused partition on your SD card configured with the following type: %1$s. Please make sure it really is the correct one, you can cancel and label it if unsure. If you didn\'t create one yet, do that first.</string>
     <!-- How an partition is used -->
     <string name="usage">Użycie</string>
 </resources>
