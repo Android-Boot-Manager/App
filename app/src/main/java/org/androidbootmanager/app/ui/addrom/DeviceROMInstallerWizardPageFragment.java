@@ -5,10 +5,15 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,16 +21,23 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.RecyclerView;
 
 import org.androidbootmanager.app.R;
+import org.androidbootmanager.app.devices.DeviceList;
+import org.androidbootmanager.app.roms.ROM;
 import org.androidbootmanager.app.ui.activities.SplashActivity;
 import org.androidbootmanager.app.ui.wizard.WizardViewModel;
+import org.androidbootmanager.app.util.SDUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DeviceROMInstallerWizardPageFragment extends Fragment {
 
@@ -48,6 +60,7 @@ public class DeviceROMInstallerWizardPageFragment extends Fragment {
         model.setNegativeAction(() -> requireActivity().finish());
         model.setPositiveText("");
         model.setNegativeText(getString(R.string.cancel));
+        SDUtils.setupCodes(requireContext());
         if (imodel.getROM().getValue().requiredFiles.size() > 0) {
             root = inflater.inflate(R.layout.wizard_installer_droidboot, container, false);
             txt = root.findViewById(R.id.wizard_installer_droidboot_text);
@@ -63,12 +76,31 @@ public class DeviceROMInstallerWizardPageFragment extends Fragment {
             txt.setText(val);
             imodel.getROM().getValue().requiredFiles.remove(key);
         } else if (imodel.getROM().getValue().parts.size() > 0) {
-            // TODO
-            return null;
+            root = inflater.inflate(R.layout.wizard_addrom_getpart, container, false);
+            ok = root.findViewById(R.id.wizard_addrom_getpart_btn);
+            txt = root.findViewById(R.id.wizard_addrom_getpart_txt);
+            Spinner dd = root.findViewById(R.id.wizard_addrom_getpart_dd);
+            final SDUtils.SDPartitionMeta meta = SDUtils.generateMeta(DeviceList.getModel(model.getCodename().getValue()));
+            ArrayList<String> a = new ArrayList<>();
+            for (SDUtils.Partition partition : meta.p) {
+                a.add(getString(R.string.partidt, SDUtils.codes.get(partition.code), partition.id, partition.name));
+            }
+            txt.setText(imodel.getROM().getValue().parts.get(0));
+            dd.setAdapter(new ArrayAdapter<>(requireActivity(), android.R.layout.simple_spinner_dropdown_item, a));
+            ok.setOnClickListener((v) -> {
+                dd.setEnabled(false);
+                ok.setVisibility(View.INVISIBLE);
+                imodel.getROM().getValue().parts.remove(0);
+                imodel.addPart(meta.dumpPartition(dd.getSelectedItemPosition()).id);
+                model.setPositiveText(getString(R.string.next));
+                model.setPositiveFragment(DeviceROMInstallerWizardPageFragment.class);
+            });
         } else {
             root = inflater.inflate(R.layout.wizard_installer_deviceinstaller, container, false);
             ((TextView) root.findViewById(R.id.wizard_deviceinstaller)).setText(getString(R.string.wizard_devicerominstaller_text));
-            model.setPositiveFragment(null); // TODO
+            imodel.setCmdline(imodel.getROM().getValue().fullPath + " ut UT " + imodel.getParts().getValue().get(0) + " " + imodel.getParts().getValue().get(1) + " /data/data/org.androidbootmanager.app/files/system.img /data/data/org.androidbootmanager.app/files/halium-boot.img");
+            model.setPositiveFragment(DoAddROMWizardPageFragment.class);
+            model.setPositiveText(getString(R.string.next));
         }
         return root;
     }

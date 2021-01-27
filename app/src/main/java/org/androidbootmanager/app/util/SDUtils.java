@@ -1,21 +1,35 @@
 package org.androidbootmanager.app.util;
 
+import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
 
 import com.topjohnwu.superuser.Shell;
 
+import org.androidbootmanager.app.R;
 import org.androidbootmanager.app.devices.DeviceModel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class SDUtils {
+
+    public static HashMap<String, String> codes = new HashMap<>();
+
+    public static void setupCodes(Context c) {
+        codes.put("0700", c.getString(R.string.portable_part));
+        codes.put("8302", c.getString(R.string.data_part));
+        codes.put("8301", c.getString(R.string.meta_part));
+        codes.put("8305", c.getString(R.string.system_part));
+        codes.put("8300", c.getString(R.string.unknown_part));
+    }
+
     public enum PartitionType {
         RESERVED, ADOPTED, PORTABLE, UNKNOWN, FREE, SYSTEM, DATA
     }

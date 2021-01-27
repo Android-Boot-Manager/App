@@ -34,7 +34,9 @@ public class ROMsList {
                     r.requiredFiles = new HashMap<>();
                     r.requiredFiles.put("halium-boot.img", c.getString(R.string.select_halium_boot));
                     r.requiredFiles.put("system.img", c.getString(R.string.select_system_image));
-                    //r.parts; //TODO
+                    r.parts = new ArrayList<>();
+                    r.parts.add(c.getString(R.string.select_part, c.getString(R.string.system_part)));
+                    r.parts.add(c.getString(R.string.select_part, c.getString(R.string.data_part)));
                     break;
                 default:
                     r = null;
