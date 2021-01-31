@@ -46,6 +46,6 @@ public class DeviceList {
     }
 
     public static List<DeviceModel> getModels() {
-        return Arrays.asList(DeviceList.getModel("cedric"),DeviceList.getModel("yggdrasil"));
+        return Arrays.asList(/*DeviceList.getModel("cedric"),*/DeviceList.getModel("yggdrasil"));
     }
 }
