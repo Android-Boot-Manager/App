@@ -14,7 +14,7 @@ public class DeviceList {
     public static ArrayList<String> deviceList = new ArrayList<>();
     public static HashMap<String, List<String>> bspList = new HashMap<>();
     static {
-        deviceList.add("cedric");
+        //deviceList.add("cedric");
         deviceList.add("yggdrasil");
         bspList.put("k63v2_64_bsp", Collections.singletonList("yggdrasil"));
     }
