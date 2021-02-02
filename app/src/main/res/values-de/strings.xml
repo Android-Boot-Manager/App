@@ -78,7 +78,7 @@
     <string name="install_ut_halium_boot_systemimage">Ubuntu Touch wird jetzt durch Auswahl des System-Images und der halium-boot Datei installiert. Bist Du sicher?</string>
     <string name="select_halium_boot">Bitte die halium-boot Datei auswählen (boot.img)</string>
     <string name="select_system_image">Bitte das System-Image auswählen (system.img)</string>
-    <string name="selected">File selected.</string>
+    <string name="selected">Datei ausgewählt.</string>
     <string name="enter_rom_name">ROM Name eingeben</string>
     <string name="install_ut_halium_boot_systemimage_rootfs">Ubuntu Touch wird jetzt durch Auswahl des System-Images, rootfs und der halium-boot Datei installiert. Bist Du sicher?</string>
     <string name="select_rootfs">Bitte rootfs auswählen</string>
@@ -88,7 +88,7 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="navigation_drawer_open">Navigationsleiste öffnen</string>
     <string name="navigation_drawer_close">Navigationsleiste schließen</string>
-    <string name="nav_header_subtitle">One phone to start them all!</string>
+    <string name="nav_header_subtitle">Ein Handy, um alle zu starten!</string>
     <string name="nav_header_desc">Navigations-Header</string>
     <string name="action_settings">Einstellungen</string>
     <string name="menu_home">Startseite</string>
@@ -127,7 +127,7 @@
     <string name="failed">Fehlgeschlagen</string>
     <string name="successful">Erfolgreich</string>
     <string name="free_space">Freier Speicher</string>
-    <string name="partid">Partition %1$d bezeichnet mit %2$s\"</string>
+    <string name="partid">Partition %1$d bezeichnet mit \"%2$s\"</string>
     <string name="partidt">%1$s with id %2$d labeled \"%3$s\"</string>
     <string name="create">Erstellen</string>
     <string name="sector_range">Sektorbereich</string>
@@ -137,11 +137,11 @@
     <string name="start_sector">Startsektor</string>
     <string name="end_sector">Endsektor</string>
     <string name="adopted_part">Adaptierter Speicher</string>
-    <string name="meta_part">ABM/Metadaten des adaptierten Speichers</string>
+    <string name="meta_part">Metadaten des adaptierten Speichers/ABM</string>
     <string name="portable_part">Externer Speicher</string>
-    <string name="system_part">OS Systemdaten</string>
+    <string name="system_part">Betriebssystem-Daten</string>
     <string name="data_part">OS Benutzerdaten</string>
     <string name="select_part">Please select an unused partition on your SD card configured with the following type: %1$s. Please make sure it really is the correct one, you can cancel and label it if unsure. If you didn\'t create one yet, do that first.</string>
     <!-- How an partition is used -->
-    <string name="usage">Belegung</string>
+    <string name="usage">Verwendung</string>
 </resources>
