@@ -7,18 +7,12 @@
     <string name="about_txt_3">    DroidBoot Entwicklung: Luka Panio</string>
     <string name="about_txt_4">    Vielen Dank an Volla &amp; F(x)tec für Entwicklergeräte</string>
     <string name="cp_err_msg">Fehler beim Extrahieren der Daten. Haben Sie die App auf einer SD-Karte installiert? Das Drücken von OK bringt Sie zur App, tun Sie nichts ohne den Fehler vorher zu untersuchen!</string>
-    <string name="wrong_device_title">Inkompatibles Gerät</string>
     <string name="wrong_device_msg">Die Android-Startverwaltung ist für dieses Gerät (%1$s) nicht verfügbar.</string>
     <string name="device_msg">Android Boot Manager ist für dieses Gerät verfügbar (%1$s).</string>
     <string name="device_btn">Nicht dein Gerät?</string>
     <string name="bsp_msg">Dein Gerät verwendet einen BSP-Codenamen (%1$s). Das bedeutet, dass wir dein Gerät nicht identifizieren können und du es auswählen musst.</string>
-    <string name="allow_install_unchecked_title">Installation ist nicht erlaubt</string>
-    <string name="allow_install_unchecked_msg">Es sieht so aus als hättest du nicht auf diese Seite geschaut. Das ist nicht gut!</string>
     <string name="ok">OK</string>
     <string name="cancel">Abbrechen</string>
-    <string name="installing_title">Installiere…</string>
-    <string name="installing_msg">Installiere, bitte warten…</string>
-    <string name="current_rom_name">Name des installierten ROMs</string>
     <string name="bootset_fail">ACHTUNG! Bootset konnte nicht eingebunden werden! Bitte überprüfen Sie die Logs und tun Sie nichts!</string>
     <string name="select_droidboot_title">DroidBoot auswählen</string>
     <string name="select_droidboot_msg">Du wirst nun nach der DroidBoot-Datei gefragt. Stelle sicher, dass sie die richtige für dein Gerät ist!</string>
@@ -26,9 +20,7 @@
     <string name="select_droidboot_unzip">Dies sieht aus wie eine Zip-Datei. Du musst lk.img extrahieren!</string>
     <string name="select_droidboot_invalid">Das sieht nicht wie ein DroidBoot aus!</string>
     <string name="sure_title">Bist du sicher?</string>
-    <string name="sure_msg">Wenn Sie jetzt OK drücken, wird ABM installiert. Dies ist die letzte Bestätigung!</string>
-    <string name="choose_device">Wählen Sie Ihr Gerät aus</string>
-    <string name="install_finish_title">Installation abgeschlossen</string>
+    <string name="install_finish_msg">Rückgabe ist %1$sWenn die Rückgabe ERROR (Fehler) ist ist etwas schiefgelaufen. Bitte flashe den Deinstallierer und sag und in unserer Telegram-Gruppe @andbootmgr bescheid. Bitte bring das Log (/sdcard/abm/install.log) mit! Falls die Rückgabe OK ist war die Installation erfolgreich. Du solltest dein Gerät neustarten.</string>
     <string name="root">Rootzugriff erlangt. Super! :)</string>
     <string name="no_root">Rootzugriff verweigert. Etwas ist schiefgelaufen!</string>
     <string name="test_root">Root testen</string>
@@ -126,8 +118,8 @@
     <string name="failed">Fehlgeschlagen</string>
     <string name="successful">Erfolgreich</string>
     <string name="free_space">Freier Speicher</string>
-    <string name="partid">Partition %1$d bezeichnet mit \"%2$s\"</string>
-    <string name="partidt">%1$s mit id %2$d gekennzeichnet \"%3$s\"</string>
+    <string name="partid" tools:ignore="PluralsCandidate">Partition %1$d bezeichnet mit \"%2$s\"</string>
+    <string name="partidt" tools:ignore="PluralsCandidate">%1$s mit id %2$d gekennzeichnet \"%3$s\"</string>
     <string name="create">Erstellen</string>
     <string name="sector_range">Sektorbereich</string>
     <string name="label">Bezeichnung</string>
