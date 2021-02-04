@@ -44,7 +44,7 @@ public class DoAddROMWizardPageFragment  extends Fragment {
         final TextView log = root.findViewById(R.id.wizard_installer_do_log);
         final LinkedList<String> queue = new LinkedList<>();
         AtomicBoolean hdone = new AtomicBoolean(false);
-        Shell.su(imodel.getCmdline().getValue()).to(queue).submit((out)-> hdone.set(true));
+        Shell.su(imodel.getCmdline().getValue()).to(queue, queue).submit((out)-> hdone.set(true));
         handler.post(new Runnable() {
             @Override
             public void run() {

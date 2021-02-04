@@ -92,7 +92,7 @@ public class DeviceROMInstallerWizardPageFragment extends Fragment {
         } else {
             root = inflater.inflate(R.layout.wizard_installer_deviceinstaller, container, false);
             ((TextView) root.findViewById(R.id.wizard_deviceinstaller)).setText(getString(R.string.wizard_devicerominstaller_text));
-            imodel.setCmdline(Objects.requireNonNull(imodel.getROM().getValue()).fullPath + " ut UT " + Objects.requireNonNull(imodel.getParts().getValue()).get(0) + " " + imodel.getParts().getValue().get(1) + " /data/data/org.androidbootmanager.app/files/system.img /data/data/org.androidbootmanager.app/files/halium-boot.img");
+            imodel.setCmdline(Objects.requireNonNull(imodel.getROM().getValue()).fullPath + " ut UT " + Objects.requireNonNull(imodel.getParts().getValue()).get(0) + " " + imodel.getParts().getValue().get(1) + " /data/data/org.androidbootmanager.app/cache/system.img /data/data/org.androidbootmanager.app/cache/halium-boot.img");
             model.setPositiveFragment(DoAddROMWizardPageFragment.class);
             model.setPositiveText(getString(R.string.next));
         }
@@ -119,16 +119,26 @@ public class DeviceROMInstallerWizardPageFragment extends Fragment {
                         new IllegalStateException("null selected").printStackTrace();
                         return;
                     }
-                    @SuppressLint("SdCardPath") File targetFile = new File("/data/data/org.androidbootmanager.app/files/" + key);
-                    OutputStream outStream = new FileOutputStream(targetFile);
-                    assert initialStream != null;
-                    SplashActivity.copyFile(initialStream, outStream);
-                    initialStream.close();
-                    outStream.close();
-                    model.setPositiveText(getString(R.string.next));
-                    model.setPositiveFragment(DeviceROMInstallerWizardPageFragment.class);
-                    txt.setText(getString(R.string.selected));
+                    txt.setText(R.string.copy_file);
                     ok.setVisibility(View.INVISIBLE);
+                    new Thread(() -> {
+                        try {
+                            @SuppressLint("SdCardPath") File targetFile = new File("/data/data/org.androidbootmanager.app/cache/" + key);
+                            assert initialStream != null;
+                            OutputStream outStream = new FileOutputStream(targetFile);
+                            SplashActivity.copyFile(initialStream, outStream);
+                            initialStream.close();
+                            outStream.close();
+                            requireActivity().runOnUiThread(() -> {
+                                model.setPositiveText(getString(R.string.next));
+                                model.setPositiveFragment(DeviceROMInstallerWizardPageFragment.class);
+                                txt.setText(getString(R.string.selected));
+                            });
+                        } catch (IOException e) {
+                            requireActivity().runOnUiThread(() -> Toast.makeText(requireContext(), R.string.failure, Toast.LENGTH_LONG).show());
+                            e.printStackTrace();
+                        }
+                    }).start();
                 } catch (IOException e) {
                     Toast.makeText(requireContext(), R.string.failure, Toast.LENGTH_LONG).show();
                     e.printStackTrace();
