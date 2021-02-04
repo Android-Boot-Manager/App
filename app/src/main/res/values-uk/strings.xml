@@ -121,6 +121,7 @@
     <string name="partid" tools:ignore="PluralsCandidate">Partition %1$d labeled \"%2$s\"</string>
     <string name="partidt" tools:ignore="PluralsCandidate">%1$s with id %2$d labeled \"%3$s\"</string>
     <string name="create">Create</string>
+    <string name="copy_file">Copying file…</string>
     <string name="sector_range">Sector range</string>
     <string name="label">Label</string>
     <string name="size">Size</string>
