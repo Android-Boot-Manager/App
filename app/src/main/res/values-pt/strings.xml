@@ -121,6 +121,7 @@
     <string name="partid" tools:ignore="PluralsCandidate">Partição %1$d nomeada \"%2$s\"</string>
     <string name="partidt" tools:ignore="PluralsCandidate">%1$s com a id %2$d nomeada \"%3$s\"</string>
     <string name="create">Criar</string>
+    <string name="copy_file">Copying file…</string>
     <string name="sector_range">Alcance do setor</string>
     <string name="label">Rótulo</string>
     <string name="size">Tamanho</string>
