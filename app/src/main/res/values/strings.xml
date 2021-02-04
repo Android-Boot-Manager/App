@@ -132,8 +132,8 @@
     <string name="failed">Failed</string>
     <string name="successful">Successful</string>
     <string name="free_space">Free space</string>
-    <string name="partid">Partition %1$d labeled \"%2$s\"</string>
-    <string name="partidt">%1$s with id %2$d labeled \"%3$s\"</string>
+    <string name="partid" tools:ignore="PluralsCandidate">Partition %1$d labeled \"%2$s\"</string>
+    <string name="partidt" tools:ignore="PluralsCandidate">%1$s with id %2$d labeled \"%3$s\"</string>
     <string name="create">Create</string>
     <string name="sector_range">Sector range</string>
     <string name="label">Label</string>

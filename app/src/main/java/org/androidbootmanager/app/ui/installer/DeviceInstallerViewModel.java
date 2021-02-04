@@ -8,10 +8,11 @@ import androidx.lifecycle.ViewModel;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 public class DeviceInstallerViewModel extends ViewModel {
     MutableLiveData<String> codename;
-    public ArrayList<Class<? extends Fragment>> flow = new ArrayList<>(Arrays.asList(DeviceInstallerWizardPageFragment.class));
+    public ArrayList<Class<? extends Fragment>> flow = new ArrayList<>(Collections.singletonList(DeviceInstallerWizardPageFragment.class));
     public int flowPos = 1;
     public File droidboot;
 

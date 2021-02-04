@@ -112,6 +112,7 @@ public class ROMFragment extends Fragment {
                 name = view.findViewById(R.id.entry_name);
                 container.setOnClickListener((v) -> {
                     // TODO
+                    updateEntries();
                 });
             }
 

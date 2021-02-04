@@ -16,7 +16,6 @@ import androidx.lifecycle.ViewModelProvider;
 import com.topjohnwu.superuser.Shell;
 
 import org.androidbootmanager.app.R;
-import org.androidbootmanager.app.ui.installer.DeviceInstallerViewModel;
 import org.androidbootmanager.app.ui.wizard.WizardViewModel;
 
 import java.util.LinkedList;

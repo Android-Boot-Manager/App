@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel;
 import org.androidbootmanager.app.roms.ROM;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class AddROMViewModel extends ViewModel {
     MutableLiveData<ROM> rom;
@@ -33,7 +34,7 @@ public class AddROMViewModel extends ViewModel {
     }
 
     public void addPart(Integer i){
-        getParts().getValue().add(i);
+        Objects.requireNonNull(getParts().getValue()).add(i);
     }
 
     public MutableLiveData<String> getCmdline() {

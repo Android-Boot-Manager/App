@@ -10,6 +10,7 @@ import org.androidbootmanager.app.R;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class ROMsList {
     public String codename;
@@ -23,7 +24,7 @@ public class ROMsList {
     @SuppressLint("SdCardPath")
     public List<ROM> getROMs() {
         ArrayList<ROM> l = new ArrayList<>();
-        for (String sn : SuFile.open("/data/data/org.androidbootmanager.app/assets/Scripts/add_os/" + codename + "/").list()) {
+        for (String sn : Objects.requireNonNull(SuFile.open("/data/data/org.androidbootmanager.app/assets/Scripts/add_os/" + codename + "/").list())) {
             ROM r = new ROM();
             r.scriptname = sn;
             r.fullPath = "/data/data/org.androidbootmanager.app/assets/Scripts/add_os/" + codename + "/" + r.scriptname;

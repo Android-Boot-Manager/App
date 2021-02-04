@@ -2,6 +2,7 @@ package org.androidbootmanager.app.ui.wizard;
 
 import androidx.lifecycle.ViewModelProvider;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -19,6 +20,7 @@ public class ExampleWizardPageFragment extends Fragment {
 
     protected WizardViewModel model;
 
+    @SuppressLint("SetTextI18n")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -31,7 +33,7 @@ public class ExampleWizardPageFragment extends Fragment {
         model.setPositiveText(getString(R.string.next));
         model.setNegativeText(getString(R.string.prev));
         final View root = inflater.inflate(R.layout.wizardpage_fragment, container, false);
-        final TextView message = (TextView) root.findViewById(R.id.wizardpage_message);
+        final TextView message = root.findViewById(R.id.wizardpage_message);
         message.setText("hi.");
         return root;
     }

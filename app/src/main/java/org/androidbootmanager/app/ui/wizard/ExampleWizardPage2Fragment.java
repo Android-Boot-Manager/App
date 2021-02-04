@@ -1,5 +1,6 @@
 package org.androidbootmanager.app.ui.wizard;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import org.androidbootmanager.app.R;
 
 public class ExampleWizardPage2Fragment extends ExampleWizardPageFragment {
 
+    @SuppressLint("SetTextI18n")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -22,7 +24,7 @@ public class ExampleWizardPage2Fragment extends ExampleWizardPageFragment {
         model.setPositiveFragment(ExampleWizardPageFragment.class);
         model.setNegativeFragment(ExampleWizardPageFragment.class);
         final View root = inflater.inflate(R.layout.wizardpage_fragment, container, false);
-        final TextView message = (TextView) root.findViewById(R.id.wizardpage_message);
+        final TextView message = root.findViewById(R.id.wizardpage_message);
         message.setText("ho.");
         return root;
     }
