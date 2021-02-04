@@ -21,7 +21,6 @@ import com.topjohnwu.superuser.Shell;
 
 import org.androidbootmanager.app.R;
 import org.androidbootmanager.app.ui.activities.SplashActivity;
-import org.androidbootmanager.app.ui.installer.DeviceInstallerViewModel;
 import org.androidbootmanager.app.ui.wizard.WizardViewModel;
 
 import java.io.File;
@@ -62,6 +61,7 @@ public class DroidBootSelector2WizardPageFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == 5207) {
             if (resultCode == Activity.RESULT_OK) {
+                assert data != null;
                 Uri selectedUri = data.getData();
                 try {
                     InputStream initialStream;

@@ -5,15 +5,13 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 
 public class DeviceInstallerViewModel extends ViewModel {
     MutableLiveData<String> codename;
-    public ArrayList<Class<? extends Fragment>> flow = new ArrayList<>(Arrays.asList(DeviceInstallerWizardPageFragment.class));
+    public final ArrayList<Class<? extends Fragment>> flow = new ArrayList<>(Collections.singletonList(DeviceInstallerWizardPageFragment.class));
     public int flowPos = 1;
-    public File droidboot;
 
     public LiveData<String> getCodename() {
         if (codename == null) codename = new MutableLiveData<>();

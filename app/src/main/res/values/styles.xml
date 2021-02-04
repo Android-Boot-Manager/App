@@ -9,15 +9,9 @@
         <item name="android:statusBarColor">@color/colorAccent</item>
     </style>
 
-    <style name="MyToolbarTheme" parent="@style/ThemeOverlay.MaterialComponents.Light">
-        <item name="colorControlNormal">@color/white</item>
-        <item name="titleTextColor">@color/white</item>
-    </style>
-
     <color name="colorPrimary">#FE9200</color>
     <color name="colorSecondary">#FE9200</color>
     <color name="colorAccent" tools:ignore="UnusedResources">#FE9F11</color>
-    <color name="white">#FFFFFF</color>
 
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>

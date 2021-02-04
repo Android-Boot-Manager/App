@@ -6,8 +6,8 @@ import android.view.View;
 import android.widget.EditText;
 
 public class ConfigTextWatcher implements TextWatcher {
-    ConfigFile config;
-    String key;
+    final ConfigFile config;
+    final String key;
 
     public ConfigTextWatcher(ConfigFile config, String key) {
         this.config = config;

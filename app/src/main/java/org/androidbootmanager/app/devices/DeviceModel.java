@@ -10,5 +10,6 @@ public class DeviceModel {
     public String bdev = "";
     public String pbdev = "";
     public List<Class<? extends Fragment>> flow;
+    @SuppressWarnings("CanBeFinal")
     public boolean usesLegacyDir = false;
 }

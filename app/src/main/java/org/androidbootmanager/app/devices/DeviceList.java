@@ -11,8 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 
 public class DeviceList {
-    public static ArrayList<String> deviceList = new ArrayList<>();
-    public static HashMap<String, List<String>> bspList = new HashMap<>();
+    public static final ArrayList<String> deviceList = new ArrayList<>();
+    public static final HashMap<String, List<String>> bspList = new HashMap<>();
     static {
         //deviceList.add("cedric");
         deviceList.add("yggdrasil");
@@ -21,6 +21,7 @@ public class DeviceList {
 
     public static DeviceModel getModel(String codename) {
         DeviceModel d;
+        //noinspection SwitchStatementWithTooFewBranches
         switch(codename) {
             case "yggdrasil":
                 d = new DeviceModel();
@@ -46,6 +47,6 @@ public class DeviceList {
     }
 
     public static List<DeviceModel> getModels() {
-        return Arrays.asList(/*DeviceList.getModel("cedric"),*/DeviceList.getModel("yggdrasil"));
+        return Collections.singletonList(/*DeviceList.getModel("cedric"),*/DeviceList.getModel("yggdrasil"));
     }
 }

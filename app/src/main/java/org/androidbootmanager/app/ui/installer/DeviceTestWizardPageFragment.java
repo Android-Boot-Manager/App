@@ -1,6 +1,5 @@
 package org.androidbootmanager.app.ui.installer;
 
-import android.bluetooth.BluetoothClass;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;

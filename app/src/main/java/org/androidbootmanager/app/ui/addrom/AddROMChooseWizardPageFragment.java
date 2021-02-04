@@ -53,7 +53,7 @@ public class AddROMChooseWizardPageFragment extends Fragment {
         }
 
         public class ViewHolder extends RecyclerView.ViewHolder {
-            public RadioButton selectionState;
+            public final RadioButton selectionState;
 
             public ViewHolder(View view) {
                 super(view);

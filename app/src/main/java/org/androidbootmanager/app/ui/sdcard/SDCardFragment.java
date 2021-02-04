@@ -3,8 +3,6 @@ package org.androidbootmanager.app.ui.sdcard;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
-import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,7 +34,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.androidbootmanager.app.util.SDUtils.generateMeta;
@@ -106,9 +103,10 @@ public class SDCardFragment extends Fragment {
         }
 
         public class ViewHolder extends RecyclerView.ViewHolder {
-            public ImageView icon;
-            public TextView text, size;
-            public View container;
+            public final ImageView icon;
+            public final TextView text;
+            public final TextView size;
+            public final View container;
             public int id;
 
             public ViewHolder(View view) {

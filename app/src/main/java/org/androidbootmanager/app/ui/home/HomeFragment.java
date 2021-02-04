@@ -2,8 +2,6 @@ package org.androidbootmanager.app.ui.home;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,9 +28,7 @@ import org.androidbootmanager.app.ui.wizard.WizardActivity;
 import org.androidbootmanager.app.util.Constants;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 

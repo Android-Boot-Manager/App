@@ -33,5 +33,5 @@
 <div align="center">
   <sub>Built with ❤︎ by
   <a href="https://git.io/nift4">nift4</a>, <a href="https://github.com/luka177">Luka Panio</a> and
-  <a href="https://github.com/Android-Boot-Manager/App/graphs/contributors">contributors </a>
+  <a href="https://github.com/Android-Boot-Manager/App/graphs/contributors">contributors </a></sub>
 </div>

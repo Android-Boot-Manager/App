@@ -16,7 +16,6 @@ import androidx.lifecycle.ViewModelProvider;
 import com.topjohnwu.superuser.Shell;
 
 import org.androidbootmanager.app.R;
-import org.androidbootmanager.app.ui.installer.DeviceInstallerViewModel;
 import org.androidbootmanager.app.ui.wizard.WizardViewModel;
 
 import java.util.LinkedList;
@@ -26,7 +25,7 @@ public class DoAddROMWizardPageFragment  extends Fragment {
 
     protected WizardViewModel model;
     protected AddROMViewModel imodel;
-    Handler handler = new Handler();
+    final Handler handler = new Handler();
 
     @SuppressLint("SdCardPath")
     @Nullable

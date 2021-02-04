@@ -41,7 +41,7 @@ public class ROMFragment extends Fragment {
     FloatingActionButton fab;
 
     private static class Entry {
-        public String file;
+        public final String file;
         public ConfigFile config;
         public Entry(String outFile) throws ActionAbortedCleanlyError {
             file = outFile;
@@ -98,10 +98,10 @@ public class ROMFragment extends Fragment {
 
         public class ViewHolder extends RecyclerView.ViewHolder {
 
-            ConstraintLayout container;
-            TextView label;
-            TextView name;
-            ImageView pic;
+            final ConstraintLayout container;
+            final TextView label;
+            final TextView name;
+            final ImageView pic;
             Entry e;
 
             public ViewHolder(View view) {
@@ -112,6 +112,7 @@ public class ROMFragment extends Fragment {
                 name = view.findViewById(R.id.entry_name);
                 container.setOnClickListener((v) -> {
                     // TODO
+                    updateEntries();
                 });
             }
 

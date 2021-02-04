@@ -12,15 +12,13 @@ import org.androidbootmanager.app.devices.DeviceModel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class SDUtils {
 
-    public static HashMap<String, String> codes = new HashMap<>();
+    public static final HashMap<String, String> codes = new HashMap<>();
 
     public static void setupCodes(Context c) {
         codes.put("0700", c.getString(R.string.portable_part));
@@ -78,7 +76,9 @@ public class SDUtils {
     }
 
     public static class SDPartitionMeta {
+        @SuppressWarnings("CanBeFinal")
         public List<Partition> p = new ArrayList<>();
+        @SuppressWarnings("CanBeFinal")
         public List<Partition> u = new ArrayList<>();
         public List<Partition> s = new ArrayList<>();
         public String friendlySize;
@@ -230,7 +230,7 @@ public class SDUtils {
                 return null;
             }
         }
-        List<Partition> l = meta.u.stream().collect(Collectors.toList()); // this actually copies, therefore, we need this.
+        @SuppressWarnings({"FuseStreamOperations", "SimplifyStreamApiCallChains"}) List<Partition> l = meta.u.stream().collect(Collectors.toList()); // this actually copies, therefore, we need this.
         l.sort((o1, o2) -> {
             // this is like this because startSector is long and I don't want overflows due to casting
             if(o1.startSector - o2.startSector < -1)

@@ -6,17 +6,16 @@ import com.topjohnwu.superuser.io.SuFile;
 import com.topjohnwu.superuser.io.SuFileInputStream;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class ConfigFile {
-    Map<String, String> data = new HashMap<>();
+    final Map<String, String> data = new HashMap<>();
 
     public String get(String name) {
         return data.get(name);

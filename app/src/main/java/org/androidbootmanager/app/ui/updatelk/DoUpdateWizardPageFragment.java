@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DoUpdateWizardPageFragment extends Fragment {
     protected WizardViewModel model;
-    Handler handler = new Handler();
+    final Handler handler = new Handler();
 
     @SuppressLint("SdCardPath")
     @Nullable

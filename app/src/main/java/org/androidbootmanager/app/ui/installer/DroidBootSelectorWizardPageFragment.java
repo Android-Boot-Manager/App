@@ -2,11 +2,9 @@ package org.androidbootmanager.app.ui.installer;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,6 +64,7 @@ public class DroidBootSelectorWizardPageFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == 5207) {
             if (resultCode == Activity.RESULT_OK) {
+                assert data != null;
                 Uri selectedUri = data.getData();
                 try {
                     InputStream initialStream;

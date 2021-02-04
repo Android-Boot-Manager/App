@@ -10,10 +10,11 @@ import org.androidbootmanager.app.R;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class ROMsList {
-    public String codename;
-    public Context c;
+    public final String codename;
+    public final Context c;
 
     public ROMsList(String codename, Context context) {
         this.codename = codename;
@@ -23,12 +24,13 @@ public class ROMsList {
     @SuppressLint("SdCardPath")
     public List<ROM> getROMs() {
         ArrayList<ROM> l = new ArrayList<>();
-        for (String sn : SuFile.open("/data/data/org.androidbootmanager.app/assets/Scripts/add_os/" + codename + "/").list()) {
+        for (String sn : Objects.requireNonNull(SuFile.open("/data/data/org.androidbootmanager.app/assets/Scripts/add_os/" + codename + "/").list())) {
             ROM r = new ROM();
             r.scriptname = sn;
             r.fullPath = "/data/data/org.androidbootmanager.app/assets/Scripts/add_os/" + codename + "/" + r.scriptname;
             switch (r.scriptname) {
                 case "add_ubuntutouch_systemimage_haliumboot.sh":
+                    //noinspection SpellCheckingInspection
                 case "add_ubuntutouch_sytemimage_haliumboot.sh": // this is considered deprecated
                     r.viewname = c.getString(R.string.rom_type_add_ut_sysimg_halium);
                     r.requiredFiles = new HashMap<>();

@@ -29,7 +29,7 @@ public class AddROMWelcomeWizardPageFragment extends Fragment {
         model.setPositiveText(getString(R.string.next));
         model.setNegativeText(getString(R.string.cancel));
         final View root = inflater.inflate(R.layout.wizard_installer_welcome, container, false);
-        final TextView message = (TextView) root.findViewById(R.id.wizard_installer_welcome_txt);
+        final TextView message = root.findViewById(R.id.wizard_installer_welcome_txt);
         message.setText(R.string.wizard_addrom_intro);
         return root;
     }

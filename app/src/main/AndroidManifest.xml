@@ -28,10 +28,6 @@
             android:name=".ui.activities.MainActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".legacy.ConfiguratorActivity"
-            android:label="@string/configurator"
-            android:exported="true"/>
     </application>
 
 </manifest>

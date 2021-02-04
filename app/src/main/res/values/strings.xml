@@ -8,18 +8,12 @@
     <string name="about_txt_3">    DroidBoot development: Luka Panio</string>
     <string name="about_txt_4">    Thanks to Volla &amp; F(x)tec for developer devices</string>
     <string name="cp_err_msg">Failed to extract some data. Did you install the app on a SD card? Pressing OK will take you to the app, do not do anything without investigating first!</string>
-    <string name="wrong_device_title">Wrong device</string>
     <string name="wrong_device_msg">Android Boot Manager is not available for this device (%1$s).</string>
     <string name="device_msg">Android Boot Manager is available for this device (%1$s).</string>
     <string name="device_btn">Not your device?</string>
     <string name="bsp_msg">Your device uses an BSP codename (%1$s). That means we are not able to identify your device and you need to select yours.</string>
-    <string name="allow_install_unchecked_title">Allow install not checked</string>
-    <string name="allow_install_unchecked_msg">It seems that you didn\'t look at this page. That\'s not good!</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
-    <string name="installing_title">Installing…</string>
-    <string name="installing_msg">Installing. Please wait…</string>
-    <string name="current_rom_name">Current ROM name</string>
     <string name="bootset_fail">ATTENTION! Failed to mount bootset! Please check logs and do not touch stuff!</string>
     <string name="select_droidboot_title">Select DroidBoot</string>
     <string name="select_droidboot_msg">You will now be asked for the DroidBoot file. Make sure it is the right for your device!</string>
@@ -27,9 +21,6 @@
     <string name="select_droidboot_unzip">This looks like a zip file. You need to extract lk.img!</string>
     <string name="select_droidboot_invalid">That does not look like an DroidBoot!</string>
     <string name="sure_title">Are you sure?</string>
-    <string name="sure_msg">If you now press OK, ABM will install. This the last confirmation!</string>
-    <string name="choose_device">Choose your device</string>
-    <string name="install_finish_title">Installation completed</string>
     <string name="install_finish_msg">Return code is %1$sWhen the Return Code is ERROR, something went wrong. Please flash the uninstaller and ask in our Telegram group @andbootmgr. Don\'t forget the log file at /sdcard/abm/install.log! If the Return Code is OK, the installation was successful. You should reboot now.</string>
     <string name="root">I am root. Fine! :)</string>
     <string name="no_root">I am NOT root. Something went wrong!</string>
@@ -132,8 +123,8 @@
     <string name="failed">Failed</string>
     <string name="successful">Successful</string>
     <string name="free_space">Free space</string>
-    <string name="partid">Partition %1$d labeled \"%2$s\"</string>
-    <string name="partidt">%1$s with id %2$d labeled \"%3$s\"</string>
+    <string name="partid" tools:ignore="PluralsCandidate">Partition %1$d labeled \"%2$s\"</string>
+    <string name="partidt" tools:ignore="PluralsCandidate">%1$s with id %2$d labeled \"%3$s\"</string>
     <string name="create">Create</string>
     <string name="sector_range">Sector range</string>
     <string name="label">Label</string>
