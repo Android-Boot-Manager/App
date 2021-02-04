@@ -7,18 +7,12 @@
     <string name="about_txt_3">    DroidBoot development: Luka Panio</string>
     <string name="about_txt_4">    Thanks to Volla &amp; F(x)tec for developer devices</string>
     <string name="cp_err_msg">Не вдалося розархівувати деякі дані. Ви встановили додаток на SD-карту? Натискання \"ОК\" перенаправить вас до застосунку, нічого не робити без попереднього виправлення проблеми!</string>
-    <string name="wrong_device_title">Неправильний пристрій</string>
     <string name="wrong_device_msg">Android Boot Manager не доступний для цього приладу (%1$s).</string>
     <string name="device_msg">Android Boot Manager не доступний для цього приладу (%1$s).</string>
     <string name="device_btn">Не той пристрій?</string>
     <string name="bsp_msg">Your device uses an BSP codename (%1$s). That means we are not able to identify your device and you need to select yours.</string>
-    <string name="allow_install_unchecked_title">Інсталяція не дозволена</string>
-    <string name="allow_install_unchecked_msg">Здається, що ви не прочитали інструкцію на сторінці. Це не добре!</string>
     <string name="ok">OK</string>
     <string name="cancel">Скасувати</string>
-    <string name="installing_title">Інсталяція…</string>
-    <string name="installing_msg">Встановлення. Будь ласка, зачекайте…</string>
-    <string name="current_rom_name">Ім\'я поточної прошивки</string>
     <string name="bootset_fail">ATTENTION! Failed to mount bootset! Please check logs and do not touch stuff!</string>
     <string name="select_droidboot_title">Виберіть DroidBoot</string>
     <string name="select_droidboot_msg">Ви повинні вибрати DroidBoot файл. Перевірте чи він для вашого пристрою!</string>
@@ -26,9 +20,6 @@
     <string name="select_droidboot_unzip">Це схоже на zip-файл. Ви повинні розпакувати lk.img!</string>
     <string name="select_droidboot_invalid">Це не схоже на DroidBoot!</string>
     <string name="sure_title">Ви впевнені?</string>
-    <string name="sure_msg">Якщо ви натиснете ОК, ABM буде встановлено. Остання перевірка!</string>
-    <string name="choose_device">Виберіть ваш пристрій</string>
-    <string name="install_finish_title">Установку завершено</string>
     <string name="install_finish_msg">Результат %1$sКоли результат ERROR, щось пішло не так. Будь ласуа прошийте uninstaller деінсталятор і запитайте в нашій Телеграм групі @andbootmgr. Не забудьте лог файл /sdcard/abm/install.log! Якщо результат ОК, інсталяція успішна. Ви мусите перезагрузити пристрій зараз.</string>
     <string name="root">Я рут, добре :)</string>
     <string name="no_root">Я НЕ рут. Щось пішло не так!</string>
@@ -127,8 +118,8 @@
     <string name="failed">Failed</string>
     <string name="successful">Successful</string>
     <string name="free_space">Free space</string>
-    <string name="partid">Partition %1$d labeled \"%2$s\"</string>
-    <string name="partidt">%1$s with id %2$d labeled \"%3$s\"</string>
+    <string name="partid" tools:ignore="PluralsCandidate">Partition %1$d labeled \"%2$s\"</string>
+    <string name="partidt" tools:ignore="PluralsCandidate">%1$s with id %2$d labeled \"%3$s\"</string>
     <string name="create">Create</string>
     <string name="sector_range">Sector range</string>
     <string name="label">Label</string>
