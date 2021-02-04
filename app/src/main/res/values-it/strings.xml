@@ -7,18 +7,12 @@
     <string name="about_txt_3">    DroidBoot development: Luka Panio</string>
     <string name="about_txt_4">    Thanks to Volla &amp; F(x)tec for developer devices</string>
     <string name="cp_err_msg">Impossibile estrarre alcuni dati. Hai installato l\'app su una scheda SD? Premere OK ti porterà all\'app, non fare nulla senza prima indagare!</string>
-    <string name="wrong_device_title">Dispositivo errato</string>
     <string name="wrong_device_msg">Android Boot Manager non è disponibile per questo dispositivo (%1$s).</string>
     <string name="device_msg">Android Boot Manager is available for this device (%1$s).</string>
     <string name="device_btn">Not your device?</string>
     <string name="bsp_msg">Your device uses an BSP codename (%1$s). That means we are not able to identify your device and you need to select yours.</string>
-    <string name="allow_install_unchecked_title">La casella Consenti Installazione non è stata selezionata</string>
-    <string name="allow_install_unchecked_msg">Sembra che tu non abbia guardato a questa pagina. Non va bene!</string>
     <string name="ok">OK</string>
     <string name="cancel">Annulla</string>
-    <string name="installing_title">Installazione…</string>
-    <string name="installing_msg">Installazione. Per favore attendi…</string>
-    <string name="current_rom_name">Nome della ROM attuale</string>
     <string name="bootset_fail">ATTENTION! Failed to mount bootset! Please check logs and do not touch stuff!</string>
     <string name="select_droidboot_title">Seleziona DroidBoot</string>
     <string name="select_droidboot_msg">Ti verrà chiesto di selezionare il file DroidBoot. Assicurati che sia corretto per il tuo dispositivo!</string>
@@ -26,9 +20,6 @@
     <string name="select_droidboot_unzip">This looks like a zip file. You need to extract lk.img!</string>
     <string name="select_droidboot_invalid">That does not look like an DroidBoot!</string>
     <string name="sure_title">Sei sicuro?</string>
-    <string name="sure_msg">Se premi OK, ABM verrà installato. Questa è l\'ultima conferma!</string>
-    <string name="choose_device">Scegli il tuo dispositivo</string>
-    <string name="install_finish_title">Installazione completata</string>
     <string name="install_finish_msg">Il codice di ritorno è %1$sQuando il codice di ritorno è ERROR, qualcosa è andato storto. Per favore esegui il flash del programma di disinstallazione e chiedi nel nostro gruppo Telegram @andbootmgr. Non dimenticarti il file di log situato in /sdcard/abm/install.log! Se il codice di ritorno è OK, l\'installazione è stata completata con successo. Riavvia il sistema ora.</string>
     <string name="root">Ho i permessi root. Ottimo! :)</string>
     <string name="no_root">Non ho i permessi root. Qualcosa è andato storto!</string>
@@ -128,8 +119,8 @@ se falsifichi il fingerprint)</string>
     <string name="failed">Failed</string>
     <string name="successful">Successful</string>
     <string name="free_space">Free space</string>
-    <string name="partid">Partition %1$d labeled \"%2$s\"</string>
-    <string name="partidt">%1$s with id %2$d labeled \"%3$s\"</string>
+    <string name="partid" tools:ignore="PluralsCandidate">Partition %1$d labeled \"%2$s\"</string>
+    <string name="partidt" tools:ignore="PluralsCandidate">%1$s with id %2$d labeled \"%3$s\"</string>
     <string name="create">Create</string>
     <string name="sector_range">Sector range</string>
     <string name="label">Label</string>
