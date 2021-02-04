@@ -79,6 +79,7 @@ se falsifichi il fingerprint)</string>
     <string name="install_ut_halium_boot_systemimage">Stai per installare il ubuntu touch, usando l\'immagine system (systemimage) e halium boot. Sei sicuro?</string>
     <string name="select_halium_boot">Selezionare il file halium boot</string>
     <string name="select_system_image">Selezionare l\'immagine di sistema (systemimage)</string>
+    <string name="selected">File selected.</string>
     <string name="enter_rom_name">Inserisci il nome della ROM</string>
     <string name="install_ut_halium_boot_systemimage_rootfs">Stai per installare ubuntu touch, utilizzando l\'immagine system, rootfs e halium boot. Sei sicuro?</string>
     <string name="select_rootfs">Per favore seleziona la rootfs</string>
@@ -114,6 +115,7 @@ se falsifichi il fingerprint)</string>
     <string name="about">Informazioni</string>
     <string name="welcome">Welcome!</string>
     <string name="wizard_deviceinstaller_text">Ready! Please follow the next steps for installing Android Boot Manager. If you redecided, you can click cancel. Nothing was changed until now.</string>
+    <string name="wizard_devicerominstaller_text">Ready! Please follow the next steps for installing your ROM. If you redecided, you can click cancel. Nothing was changed until now.</string>
     <string name="installerWelcome">Welcome to the Android Boot Manager installer. This will install Android Boot Manager on your device. Not easily undoable modifications are being done, please do not install without knowledge about it. Disclaimer follows:</string>
     <string name="next">Next</string>
     <!-- Assistant page navigation -->
@@ -127,6 +129,7 @@ se falsifichi il fingerprint)</string>
     <string name="successful">Successful</string>
     <string name="free_space">Free space</string>
     <string name="partid">Partition %1$d labeled \"%2$s\"</string>
+    <string name="partidt">%1$s with id %2$d labeled \"%3$s\"</string>
     <string name="create">Create</string>
     <string name="sector_range">Sector range</string>
     <string name="label">Label</string>
@@ -139,6 +142,7 @@ se falsifichi il fingerprint)</string>
     <string name="portable_part">Portable Storage</string>
     <string name="system_part">OS System data</string>
     <string name="data_part">OS User data</string>
+    <string name="select_part">Please select an unused partition on your SD card configured with the following type: %1$s. Please make sure it really is the correct one, you can cancel and label it if unsure. If you didn\'t create one yet, do that first.</string>
     <!-- How an partition is used -->
     <string name="usage">Usage</string>
 </resources>

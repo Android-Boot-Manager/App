@@ -78,6 +78,7 @@
     <string name="install_ut_halium_boot_systemimage">You are going to install ubuntu touch, using system image and halium boot. Are you sure?</string>
     <string name="select_halium_boot">Porfavor selecione o arquivo do Halium Boot</string>
     <string name="select_system_image">Porfavor selecione a System Image</string>
+    <string name="selected">File selected.</string>
     <string name="enter_rom_name">Insira o nome da ROM</string>
     <string name="install_ut_halium_boot_systemimage_rootfs">You are going to install ubuntu touch, using system image, rootfs and halium boot. Are you sure?</string>
     <string name="select_rootfs">Por favor selecione o rootfs</string>
@@ -95,7 +96,7 @@
     <string name="menu_sd">Cartão SD</string>
     <string name="menu_generalcfg">Configurações gerais</string>
     <string name="wizard_updatelk_intro">Você está prestes a atualizar o bootloader.</string>
-    <string name="wizard_addrom_intro">You are about to install an ROM to the SD card.</string>
+    <string name="wizard_addrom_intro">Você está prestes a instalar uma ROM no cartão SD.</string>
     <string name="aboutLibraries">Sobre as Bibliotecas</string>
     <string name="home_installedWorking_img">Marca/Cruz para representar o estado instalado</string>
     <string name="home_installedWorking_text">Falha ao carregar estado</string>
@@ -107,12 +108,13 @@
     <string name="installcheck3">Checagem de instalação #3:</string>
     <string name="superuser">Root:</string>
     <string name="failure">Falha</string>
-    <string name="unknown_os">Unknown OS</string>
+    <string name="unknown_os">OS desconhecido</string>
     <string name="ut">Ubuntu Touch</string>
     <string name="android">Android</string>
     <string name="about">Sobre</string>
     <string name="welcome">Bem-vindo!</string>
     <string name="wizard_deviceinstaller_text">Pronto! Por favor siga os próximos pra instalar o Android Boot Manager. Se você mudar de ideia, você pode apertar em cancelar. Nada foi alterado ate agora.</string>
+    <string name="wizard_devicerominstaller_text">Ready! Please follow the next steps for installing your ROM. If you redecided, you can click cancel. Nothing was changed until now.</string>
     <string name="installerWelcome">Bem-vindo ao instalador do Android Boot Manager. Isso irá instalar o Android Boot Manager no seu aparelho. Modificações que não são fáceis de desfazer estão sendo feitas, por favor não instale sem conhecimento sobre. Aviso seguinte:</string>
     <string name="next">Próximo</string>
     <!-- Assistant page navigation -->
@@ -126,6 +128,7 @@
     <string name="successful">Sucesso</string>
     <string name="free_space">Espaço disponível</string>
     <string name="partid">Partição %1$d nomeada \"%2$s\"</string>
+    <string name="partidt">%1$s com a id %2$d nomeada \"%3$s\"</string>
     <string name="create">Criar</string>
     <string name="sector_range">Alcance do setor</string>
     <string name="label">Rótulo</string>
@@ -138,6 +141,7 @@
     <string name="portable_part">Armazenamento Portátil</string>
     <string name="system_part">Arquivos do Sistema do OS</string>
     <string name="data_part">Arquivos do Usuário no OS</string>
+    <string name="select_part">Por favor selecione uma partição não usada no seu cartão SD configurada com o tipo: %1$s. Por favor tenho certeza que é realmente a correta, você pode cancelar e nomear para ter certeza, se você ainda não criou uma faça isso primeiro.</string>
     <!-- How an partition is used -->
     <string name="usage">Utilização</string>
 </resources>

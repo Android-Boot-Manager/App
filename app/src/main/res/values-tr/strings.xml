@@ -78,6 +78,7 @@
     <string name="install_ut_halium_boot_systemimage">Sistem imajı ve halium boot kullanarak, ubuntu touch yüklemek üzeresiniz. Devam etmekten emin misiniz?</string>
     <string name="select_halium_boot">Lütfen halium boot dosyasını seçin</string>
     <string name="select_system_image">Lütfen sistem imajını seçin</string>
+    <string name="selected">File selected.</string>
     <string name="enter_rom_name">ROM adını girin</string>
     <string name="install_ut_halium_boot_systemimage_rootfs">Sistem imajı, rootfs ve halium boot kullanarak ubuntu touch yüklemek üzeresiniz. Devam etmekten emin misiniz?</string>
     <string name="select_rootfs">Lütfen rootfs seçiniz</string>
@@ -113,6 +114,7 @@
     <string name="about">Hakkında</string>
     <string name="welcome">Hoşgeldiniz!</string>
     <string name="wizard_deviceinstaller_text">Hazır! Android Boot Manager yüklemek için adımları takip edin. Eğer fikrinizi değiştirirseniz iptale basabilirsiniz. Şimdiye kadar hiç bir şey değiştirilmedi.</string>
+    <string name="wizard_devicerominstaller_text">Ready! Please follow the next steps for installing your ROM. If you redecided, you can click cancel. Nothing was changed until now.</string>
     <string name="installerWelcome">Android Boot Manager yükleyicisine hoş geldiniz. Bu araç Android Boot Manager\'ı cihazınıza yükleyecektir. Yaptığınız bazı düzenlemeler kolayca geri alınamayabilir, lütfen bilmiyorsanız kullanmayınız. Sorumluluk reddi beyanı şu şekildedir:</string>
     <string name="next">İleri</string>
     <!-- Assistant page navigation -->
@@ -126,6 +128,7 @@
     <string name="successful">Successful</string>
     <string name="free_space">Free space</string>
     <string name="partid">Partition %1$d labeled \"%2$s\"</string>
+    <string name="partidt">%1$s with id %2$d labeled \"%3$s\"</string>
     <string name="create">Create</string>
     <string name="sector_range">Sector range</string>
     <string name="label">Label</string>
@@ -138,6 +141,7 @@
     <string name="portable_part">Portable Storage</string>
     <string name="system_part">OS System data</string>
     <string name="data_part">OS User data</string>
+    <string name="select_part">Please select an unused partition on your SD card configured with the following type: %1$s. Please make sure it really is the correct one, you can cancel and label it if unsure. If you didn\'t create one yet, do that first.</string>
     <!-- How an partition is used -->
     <string name="usage">Usage</string>
 </resources>
