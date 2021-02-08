@@ -70,7 +70,8 @@
     <string name="select_halium_boot">Por favor selecione o arquivo do Halium Boot</string>
     <string name="select_system_image">Por favor selecione a System Image</string>
     <string name="selected">Arquivo selecionado.</string>
-    <string name="enter_rom_name">Insira o nome da ROM</string>
+    <string name="enter_rom_name">Please enter the ROM name for displaying in menu. You may choose freely.</string>
+    <string name="enter_rom_folder">Please enter the ROM directory name. It may not already exist. If in doubt, keep the default.</string>
     <string name="install_ut_halium_boot_systemimage_rootfs">You are going to install ubuntu touch, using system image, rootfs and halium boot. Are you sure?</string>
     <string name="select_rootfs">Por favor selecione o rootfs</string>
     <string name="install_sailfish">Você está prestes a instalar o SailfishOS, usando um zip. Você tem certeza?</string>
