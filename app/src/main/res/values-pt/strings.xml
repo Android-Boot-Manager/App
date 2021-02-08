@@ -5,7 +5,7 @@
     <string name="about_txt_1">Fundado por Luka Panio &amp; nift4</string>
     <string name="about_txt_2">    Desenvolvedor do app: nift4</string>
     <string name="about_txt_3">    Desenvolvedor do DroidBoot: Luka Panio</string>
-    <string name="about_txt_4">    Obrigado a Volla &amp; F(x)tec pelos aparelhos de desenvolvimento</string>
+    <string name="about_txt_4">    Obrigado a Volla &amp; F(x)tec pelos aparelhos para desenvolvimento</string>
     <string name="cp_err_msg">Falha ao pegar alguns dados. você instalou o app em um cartão SD? Pressionando OK levará você ao app, não faça nada sem investigar primeiro!</string>
     <string name="wrong_device_msg">O Android Boot Manager não está disponível para este dispositivo (%1$s).</string>
     <string name="device_msg">Android Boot Manager está disponível pra este aparelho (%1$s)</string>
@@ -25,7 +25,7 @@
     <string name="no_root">root NÃO detectado. Alguma coisa deu errado!</string>
     <string name="test_root">Testar Root</string>
     <string name="readme_title">README, Código e Licença</string>
-    <string name="readme_text">O código está disponível aqui: %1$s\nO README está disponível aqui: %2$s</string>
+    <string name="readme_text">O código fonte está disponível aqui: %1$s\nO README está disponível aqui: %2$s</string>
     <string name="install">Instalar</string>
     <string name="readme">README</string>
     <string name="nodevcheck">Desativar verificação do dispositivo (se você spoofar a digital)</string>
@@ -70,8 +70,8 @@
     <string name="select_halium_boot">Por favor selecione o arquivo do Halium Boot</string>
     <string name="select_system_image">Por favor selecione a System Image</string>
     <string name="selected">Arquivo selecionado.</string>
-    <string name="enter_rom_name">Please enter the ROM name for displaying in menu. You may choose freely.</string>
-    <string name="enter_rom_folder">Please enter the ROM directory name. It may not already exist. If in doubt, keep the default.</string>
+    <string name="enter_rom_name">Por favor adicione o nome da ROM para mostrar no menu. Você pode escolher livremente.</string>
+    <string name="enter_rom_folder">Por favor adicione o nome do diretório da ROM. ele pode já existir. Se tiver em dúvida, deixe o padrão.</string>
     <string name="install_ut_halium_boot_systemimage_rootfs">You are going to install ubuntu touch, using system image, rootfs and halium boot. Are you sure?</string>
     <string name="select_rootfs">Por favor selecione o rootfs</string>
     <string name="install_sailfish">Você está prestes a instalar o SailfishOS, usando um zip. Você tem certeza?</string>
