@@ -70,7 +70,8 @@
     <string name="select_halium_boot">Будь ласка, виберіть файл halium-boot</string>
     <string name="select_system_image">Будь ласка, виберіть system.img</string>
     <string name="selected">Файл вибраний.</string>
-    <string name="enter_rom_name">Введіть ім\'я прошивки</string>
+    <string name="enter_rom_name">Please enter the ROM name for displaying in menu. You may choose freely.</string>
+    <string name="enter_rom_folder">Please enter the ROM directory name. It may not already exist. If in doubt, keep the default.</string>
     <string name="install_ut_halium_boot_systemimage_rootfs">Ви збираєтеся встановити Ubuntu Touch, використовуючи образ sytem, rootfs і halium-boot, ви впевнені?</string>
     <string name="select_rootfs">Будь ласка виберіть rootfs</string>
     <string name="install_sailfish">Ви збираєтеся встановити SailfishOS, використовуючи zip. Ви впевнені?</string>
