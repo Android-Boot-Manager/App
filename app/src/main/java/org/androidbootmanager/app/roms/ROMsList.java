@@ -42,7 +42,7 @@ public class ROMsList {
                     r.parts.add(c.getString(R.string.select_part, c.getString(R.string.data_part)));
                     r.strings = new HashMap<>();
                     r.strings.put(c.getString(R.string.enter_rom_name), "");
-                    List<String> a = Arrays.asList(Objects.requireNonNull(SuFile.open("/data/abm/bootset/db/entries/").list()));
+                    ArrayList<String> a = new ArrayList<String>(Arrays.asList(Objects.requireNonNull(SuFile.open("/data/abm/bootset/db/entries/").list())));
                     a.removeIf((b) -> !b.contains("rom"));
                     a.sort((b, c) -> Integer.compare(Integer.parseInt(b.replace("rom","").replace(".conf","")), Integer.parseInt(c.replace("rom","").replace(".conf",""))));
                     int b = a.size() > 0 ? Integer.parseInt(a.get(a.size()-1).replace("rom",""))+1 : 0;
