@@ -13,6 +13,7 @@ public class AddROMViewModel extends ViewModel {
     MutableLiveData<ROM> rom;
     MutableLiveData<ArrayList<Integer>> parts;
     MutableLiveData<String> cmdline;
+    MutableLiveData<ArrayList<String>> strings;
 
     public LiveData<ROM> getROM() {
         if (rom == null)
@@ -45,5 +46,10 @@ public class AddROMViewModel extends ViewModel {
 
     public void setCmdline(String s) {
         getCmdline().setValue(s);
+    }
+
+    public ArrayList<String> getName() {
+        if (strings == null) strings = new MutableLiveData<>(new ArrayList<>());
+        return strings.getValue();
     }
 }

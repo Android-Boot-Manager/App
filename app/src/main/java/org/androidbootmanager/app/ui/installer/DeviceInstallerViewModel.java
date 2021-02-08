@@ -10,6 +10,7 @@ import java.util.Collections;
 
 public class DeviceInstallerViewModel extends ViewModel {
     MutableLiveData<String> codename;
+    MutableLiveData<String> romName;
     public final ArrayList<Class<? extends Fragment>> flow = new ArrayList<>(Collections.singletonList(DeviceInstallerWizardPageFragment.class));
     public int flowPos = 1;
 
@@ -21,5 +22,15 @@ public class DeviceInstallerViewModel extends ViewModel {
     public void setCodename(String codename) {
         getCodename(); // ensure codename not null
         this.codename.setValue(codename);
+    }
+
+    public LiveData<String> getName() {
+        if (romName == null) romName = new MutableLiveData<>();
+        return romName;
+    }
+
+    public void setName(String name) {
+        getName(); // ensure romName not null
+        this.romName.setValue(name);
     }
 }

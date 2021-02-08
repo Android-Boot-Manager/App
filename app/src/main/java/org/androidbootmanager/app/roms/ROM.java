@@ -1,6 +1,7 @@
 package org.androidbootmanager.app.roms;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ROM {
@@ -9,4 +10,6 @@ public class ROM {
     public String fullPath;
     public Map<String, String> requiredFiles;
     public ArrayList<String> parts;
+    public HashMap<String, String> strings;
+    public CmdlineGenerator gen;
 }

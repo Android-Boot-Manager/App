@@ -30,7 +30,7 @@ public class DeviceTestWizardPageFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         model = new ViewModelProvider(requireActivity()).get(WizardViewModel.class);
         imodel = new ViewModelProvider(requireActivity()).get(DeviceInstallerViewModel.class);
-        model.setPositiveFragment(DeviceInstallerWizardPageFragment.class);
+        model.setPositiveFragment(ROMNameChooserWizardPageFragment.class);
         model.setNegativeFragment(InstallerWelcomeWizardPageFragment.class);
         model.setPositiveAction(null);
         model.setNegativeAction(null);

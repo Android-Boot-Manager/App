@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +23,7 @@ import androidx.lifecycle.ViewModelProvider;
 import org.androidbootmanager.app.R;
 import org.androidbootmanager.app.devices.DeviceList;
 import org.androidbootmanager.app.ui.activities.SplashActivity;
+import org.androidbootmanager.app.ui.installer.DeviceInstallerWizardPageFragment;
 import org.androidbootmanager.app.ui.wizard.WizardViewModel;
 import org.androidbootmanager.app.util.SDUtils;
 
@@ -89,10 +91,25 @@ public class DeviceROMInstallerWizardPageFragment extends Fragment {
                 model.setPositiveText(getString(R.string.next));
                 model.setPositiveFragment(DeviceROMInstallerWizardPageFragment.class);
             });
+        } else if (imodel.getROM().getValue().strings.size() > 0) {
+            root = inflater.inflate(R.layout.wizard_installer_getname, container, false);
+            final EditText val = root.findViewById(R.id.wizard_installer_getname_val);
+            ok = root.findViewById(R.id.wizard_installer_getname_btn);
+            txt = root.findViewById(R.id.wizard_installer_getname_txt);
+            txt.setText((String) imodel.getROM().getValue().strings.keySet().toArray()[0]);
+            val.setText(imodel.getROM().getValue().strings.get((String) imodel.getROM().getValue().strings.keySet().toArray()[0]));
+            ok.setOnClickListener(v -> {
+                imodel.getName().add(val.getText().toString());
+                val.setEnabled(false);
+                ok.setVisibility(View.INVISIBLE);
+                imodel.getROM().getValue().strings.remove((String) imodel.getROM().getValue().strings.keySet().toArray()[0]);
+                model.setPositiveFragment(DeviceROMInstallerWizardPageFragment.class);
+                model.setPositiveText(getString(R.string.next));
+            });
         } else {
             root = inflater.inflate(R.layout.wizard_installer_deviceinstaller, container, false);
             ((TextView) root.findViewById(R.id.wizard_deviceinstaller)).setText(getString(R.string.wizard_devicerominstaller_text));
-            imodel.setCmdline(Objects.requireNonNull(imodel.getROM().getValue()).fullPath + " ut UT " + Objects.requireNonNull(imodel.getParts().getValue()).get(0) + " " + imodel.getParts().getValue().get(1) + " /data/data/org.androidbootmanager.app/cache/system.img /data/data/org.androidbootmanager.app/cache/halium-boot.img");
+            Objects.requireNonNull(imodel.getROM().getValue()).gen.gen(imodel, imodel.getName().get(0), imodel.getName().get(1));
             model.setPositiveFragment(DoAddROMWizardPageFragment.class);
             model.setPositiveText(getString(R.string.next));
         }
