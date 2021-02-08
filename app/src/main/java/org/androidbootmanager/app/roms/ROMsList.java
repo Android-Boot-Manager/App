@@ -43,8 +43,8 @@ public class ROMsList {
                     r.strings = new HashMap<>();
                     r.strings.put(c.getString(R.string.enter_rom_name), "");
                     List<String> a = Arrays.asList(Objects.requireNonNull(SuFile.open("/data/abm/bootset/db/entries/").list()));
-                    a.removeIf((b) -> b.contains("rom"));
-                    a.sort((b, c) -> Integer.compare(Integer.parseInt(b.replace("rom","")), Integer.parseInt(c.replace("rom",""))));
+                    a.removeIf((b) -> !b.contains("rom"));
+                    a.sort((b, c) -> Integer.compare(Integer.parseInt(b.replace("rom","").replace(".conf","")), Integer.parseInt(c.replace("rom","").replace(".conf",""))));
                     int b = a.size() > 0 ? Integer.parseInt(a.get(a.size()-1).replace("rom",""))+1 : 0;
                     r.strings.put(c.getString(R.string.enter_rom_folder), "rom" + b);
                     r.gen = (imodel, menuName, folderName) -> imodel.setCmdline(Objects.requireNonNull(imodel.getROM().getValue()).fullPath + " '" + folderName + "' '" + menuName + "' " + Objects.requireNonNull(imodel.getParts().getValue()).get(0) + " " + imodel.getParts().getValue().get(1) + " /data/data/org.androidbootmanager.app/cache/system.img /data/data/org.androidbootmanager.app/cache/halium-boot.img");
