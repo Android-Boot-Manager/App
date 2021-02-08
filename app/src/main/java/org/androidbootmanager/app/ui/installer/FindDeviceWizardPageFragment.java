@@ -62,7 +62,7 @@ public class FindDeviceWizardPageFragment extends Fragment {
                     lastSelectedPosition = getAdapterPosition();
                     notifyDataSetChanged();
                     FindDeviceWizardPageFragment.this.imodel.setCodename(devicesList.get(lastSelectedPosition).codename);
-                    FindDeviceWizardPageFragment.this.model.setPositiveFragment(DeviceInstallerWizardPageFragment.class);
+                    FindDeviceWizardPageFragment.this.model.setPositiveFragment(ROMNameChooserWizardPageFragment.class);
                 });
             }
         }
