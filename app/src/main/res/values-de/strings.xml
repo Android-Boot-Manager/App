@@ -70,8 +70,8 @@
     <string name="select_halium_boot">Bitte die halium-boot Datei auswählen (boot.img)</string>
     <string name="select_system_image">Bitte das System-Image auswählen (system.img)</string>
     <string name="selected">Datei ausgewählt.</string>
-    <string name="enter_rom_name">Please enter the ROM name for displaying in menu. You may choose freely.</string>
-    <string name="enter_rom_folder">Please enter the ROM directory name. It may not already exist. If in doubt, keep the default.</string>
+    <string name="enter_rom_name">Bitte gebe den ROM-Namen für den Titel im Menü ein. Sie können frei wählen.</string>
+    <string name="enter_rom_folder">Bitte geben Sie den ROM-Verzeichnisnamen ein. Dies existiert möglicherweise nicht bereits. Im Zweifelfall behalten Sie die Standardeinstellungen.</string>
     <string name="install_ut_halium_boot_systemimage_rootfs">Ubuntu Touch wird jetzt durch Auswahl des System-Images, rootfs und der halium-boot Datei installiert. Bist Du sicher?</string>
     <string name="select_rootfs">Bitte rootfs auswählen</string>
     <string name="install_sailfish">Du wirst nun SailfishOS mit einer zip-Datei installieren. Bist Du sicher?</string>
