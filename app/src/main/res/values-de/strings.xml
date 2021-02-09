@@ -134,7 +134,7 @@
     <string name="portable_part">Externer Speicher</string>
     <string name="system_part">Betriebssystem-Daten</string>
     <string name="data_part">OS Benutzerdaten</string>
-    <string name="select_part">Please select an unused partition on your SD card configured with the following type: %1$s. Please make sure it really is the correct one, you can cancel and label it if unsure. If you didn\'t create one yet, do that first.</string>
+    <string name="select_part">Bitte wähle eine unbenutzte Partition auf Ihrer SD-Karte aus, die mit dem folgendem Typ konfiguriert ist: %1$s. Bitte stelle sicher das es wirklich die Richtige Partition ist, sie können aber immer noch abbrechen wenn Sie sich nicht sicher sind. Wenn sie noch keine Partition erstellt haben, tun Sie dies zuerst.</string>
     <!-- How an partition is used -->
     <string name="usage">Verwendung</string>
 </resources>
