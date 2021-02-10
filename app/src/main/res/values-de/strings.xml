@@ -32,7 +32,7 @@
     <string name="allow_install">Ich akzeptiere das Risiko, Installation erlauben!</string>
     <string name="not_installed">Der Android Boot Manager ist auf Deinem Gerät nicht installiert!</string>
     <string name="devices">ABM ist nur für das Moto G5 (cedric) und für das Volla Phone (yggdrasil) verfügbar!</string>
-    <string name="be_careful">DU KANNST DEINE DATEN VERLIEREN! DU KANNST DEIN GERÄT ZERSTÖREN! DU KANNST DEINE IMEI VERLIEREN! DU KANNST SOGAR GELD VERLIEREN! NIEMAND IST DAFÜR VERANTWORTLICH AUSSER DU! BENUTZEN AUF EIGENE GEFAHR! SEI VORSICHTIG!</string>
+    <string name="be_careful">YOU CAN LOOSE YOUR DATA! YOU CAN BRICK YOUR DEVICE! YOU CAN LOOSE YOUR IMEI! YOU CAN LOOSE YOUR MONEY! NOBODY IS RESPONSIBLE EXCEPT YOU! DO AT YOUR OWN RISK AND BE CAREFUL!</string>
     <string name="configurator">Konfigurator</string>
     <string name="mount">Bootset einbinden</string>
     <string name="umount">Bootset ausbinden</string>
@@ -56,10 +56,18 @@
     <string name="storage_in_use">Der Speicher wird gerade verwendet. Oft hängt Android ihn automatisch ein oder die SD-Karte ist als interner Speicher formatiert. Bitte stelle sicher das er nicht verwendet wird</string>
     <string name="no_storage_found">Es wurde kein Speichergerät mit ABM-Metadaten gefunden, aber Sie benötigen hierfür eines. Wenn Sie eines haben, drücken Sie \"Formatieren\". Wenn kein \"Formatieren\"-Knopf vorhanden ist, wurde kein kompatibler Speicher gefunden.</string>
     <string name="delete">Löschen</string>
+    <string name="delete_msg">This will delete partition %1$d of type %2$s labeled \'%3$s\'</string>
+    <string name="delete_msg_2">This will delete the configuration file of the ROM %1$s. You need to delete the partitions on the SD card manually to prevent data loss.</string>
     <string name="filename">Konfigurationsdateiname (keine Leerzeichen, keine Dateiendung)</string>
     <string name="add_rom">ROM hinzufügen</string>
+    <string name="wait">Please wait…</string>
+    <string name="delete_prog">Deleting…</string>
+    <string name="convert_prog">Converting…</string>
+    <string name="creating_prog">Creating…</string>
+    <string name="renaming_prog">Renaming…</string>
     <string name="rom_location">ROM Speicherort</string>
     <string name="delete_real_rom">Sie können das primäre ROM nicht löschen!</string>
+    <string name="rename">Rename</string>
     <string name="app_unfinished">Die Android-Startverwaltung ist erfolgreich installiert aber die App ist noch nicht fertig. Nutzlose Knöpfe und leere Seiten sind zu erwarten :(</string>
     <string name="rom_type_add_rom_zip">Android (ROM Zip)</string>
     <string name="updatelk">Aktualisierung von DroidBoot</string>
@@ -107,7 +115,7 @@
     <string name="welcome">Willkommen!</string>
     <string name="wizard_deviceinstaller_text">Fertig! Bitte befolge die nächsten Schritte um den Android Boot Manager zu installieren. Wenn du es dir anders überlegst kannst du auf Abbrechen klicken. Bis jetzt wurde nichts geändert.</string>
     <string name="wizard_devicerominstaller_text">Fertig! Bitte befolge die nächsten Schritte um dein Betriebssystem zu installieren. Wenn du es dir anders überlegst kannst du auf Abbrechen klicken. Bis jetzt wurde nichts geändert.</string>
-    <string name="installerWelcome">Willkommen beim Android Boot Manager Installer. Damit wird Android Boot Manager auf Ihrem Gerät installiert. Es werden nicht leicht rückgängig zu machende Änderungen vorgenommen, bitte installieren Sie dies nicht ohne zu wissen was Sie tun. Haftungsausschluss:</string>
+    <string name="installerWelcome">Welcome to the Android Boot Manager installer. This will install Android Boot Manager on your device. Not easily undoable modifications are being done, please do not install without knowledge about it. Keep the prerequisites in mind - you may need to format stuff manually! Disclaimer follows:</string>
     <string name="next">Weiter</string>
     <!-- Assistant page navigation -->
     <string name="prev">Zurück</string>
@@ -134,6 +142,8 @@
     <string name="portable_part">Externer Speicher</string>
     <string name="system_part">Betriebssystem-Daten</string>
     <string name="data_part">OS Benutzerdaten</string>
+    <string name="data">Data</string>
+    <string name="system">System</string>
     <string name="select_part">Bitte wähle eine unbenutzte Partition auf Ihrer SD-Karte aus, die mit dem folgendem Typ konfiguriert ist: %1$s. Bitte stelle sicher das es wirklich die Richtige Partition ist, sie können aber immer noch abbrechen wenn Sie sich nicht sicher sind. Wenn sie noch keine Partition erstellt haben, tun Sie dies zuerst.</string>
     <!-- How an partition is used -->
     <string name="usage">Verwendung</string>
