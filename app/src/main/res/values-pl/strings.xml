@@ -32,7 +32,7 @@
     <string name="allow_install">Akceptuję ryzyko, pozwól na instalację!</string>
     <string name="not_installed">Menedżer uruchamiania Androida nie jest zainstalowany na twoim urządzeniu!</string>
     <string name="devices">Jest on dostępny tylko dla Moto G5 (cedric) i Volla Phone (yggdrasil)!</string>
-    <string name="be_careful">Możesz stracić dane, IMEI lub zbrickować urządzenie. Nikt nie jest odpowiedzialny oprócz ciebie. Wszystko wykonujesz na własne ryzyko. Bądź ostrożny.</string>
+    <string name="be_careful">YOU CAN LOOSE YOUR DATA! YOU CAN BRICK YOUR DEVICE! YOU CAN LOOSE YOUR IMEI! YOU CAN LOOSE YOUR MONEY! NOBODY IS RESPONSIBLE EXCEPT YOU! DO AT YOUR OWN RISK AND BE CAREFUL!</string>
     <string name="configurator">Konfigurator</string>
     <string name="mount">Zamontuj Bootset</string>
     <string name="umount">Odmontuj Bootset</string>
@@ -56,10 +56,18 @@
     <string name="storage_in_use">Pamięć jest obecnie w użyciu. Często Android montuje ją automatycznie lub karta SD jest sformatowana jako pamięć wewnętrzna. Upewnij się, że nie jest używana (montowana lub nawet zmodyfikowana)</string>
     <string name="no_storage_found">Nie znaleziono urządzenia magazynującego z metadanymi ABM, ale potrzebujesz ich. Jeśli posiadasz je, naciśnij \"Format\". Jeśli nie ma przycisku \"Format\" nie znaleziono kompatybilnej pamięci.</string>
     <string name="delete">Usuń</string>
+    <string name="delete_msg">This will delete partition %1$d of type %2$s labeled \'%3$s\'</string>
+    <string name="delete_msg_2">This will delete the configuration file of the ROM %1$s. You need to delete the partitions on the SD card manually to prevent data loss.</string>
     <string name="filename">Nazwa pliku konfiguracyjnego (bez spacji, bez rozszerzenia pliku)</string>
     <string name="add_rom">Dodaj ROM</string>
+    <string name="wait">Please wait…</string>
+    <string name="delete_prog">Deleting…</string>
+    <string name="convert_prog">Converting…</string>
+    <string name="creating_prog">Creating…</string>
+    <string name="renaming_prog">Renaming…</string>
     <string name="rom_location">Lokalizacja ROMu</string>
     <string name="delete_real_rom">Nie możesz usunąć swojego głównego ROMu!</string>
+    <string name="rename">Rename</string>
     <string name="app_unfinished">Menedżer uruchamiania Androida jest zainstalowany pomyślnie ale aplikacja jeszcze nie jest skończona; puste strony i przyciski które nic nie robią są normalne. :(</string>
     <string name="rom_type_add_rom_zip">Android (ROM zip)</string>
     <string name="updatelk">Aktualizuj DroidBoot</string>
@@ -107,7 +115,7 @@
     <string name="welcome">Welcome!</string>
     <string name="wizard_deviceinstaller_text">Ready! Please follow the next steps for installing Android Boot Manager. If you redecided, you can click cancel. Nothing was changed until now.</string>
     <string name="wizard_devicerominstaller_text">Ready! Please follow the next steps for installing your ROM. If you redecided, you can click cancel. Nothing was changed until now.</string>
-    <string name="installerWelcome">Welcome to the Android Boot Manager installer. This will install Android Boot Manager on your device. Not easily undoable modifications are being done, please do not install without knowledge about it. Disclaimer follows:</string>
+    <string name="installerWelcome">Welcome to the Android Boot Manager installer. This will install Android Boot Manager on your device. Not easily undoable modifications are being done, please do not install without knowledge about it. Keep the prerequisites in mind - you may need to format stuff manually! Disclaimer follows:</string>
     <string name="next">Next</string>
     <!-- Assistant page navigation -->
     <string name="prev">Prev</string>
@@ -134,6 +142,8 @@
     <string name="portable_part">Portable Storage</string>
     <string name="system_part">OS System data</string>
     <string name="data_part">OS User data</string>
+    <string name="data">Data</string>
+    <string name="system">System</string>
     <string name="select_part">Please select an unused partition on your SD card configured with the following type: %1$s. Please make sure it really is the correct one, you can cancel and label it if unsure. If you didn\'t create one yet, do that first.</string>
     <!-- How an partition is used -->
     <string name="usage">Użycie</string>
