@@ -32,7 +32,7 @@
     <string name="allow_install">Eu aceito o risco, permitir instalação!</string>
     <string name="not_installed">Android Boot Manager não está instalado no seu dispositivo!</string>
     <string name="devices">Está apenas disponível para o Moto G5 (cedric) e para o Volla Phone (yggdrasil)!</string>
-    <string name="be_careful">YOU CAN LOOSE YOUR DATA! YOU CAN BRICK YOUR DEVICE! YOU CAN LOOSE YOUR IMEI! YOU CAN LOOSE YOUR MONEY! NOBODY IS RESPONSIBLE EXCEPT YOU! DO AT YOUR OWN RISK AND BE CAREFUL!</string>
+    <string name="be_careful">VOCÊ PODE PERDER SEUS ARQUIVOS! VOCÊ PODE BRICKAR SEU APARELHO! NINGUÉM É RESPONSÁVEL EXCETO VOCÊ! FASSA NO SEU PRÓPRIO RISCO E TENHA CUIDADO!</string>
     <string name="configurator">Configurador</string>
     <string name="mount">Montar Bootset</string>
     <string name="umount">Desmontar Bootset</string>
@@ -56,18 +56,18 @@
     <string name="storage_in_use">Este armazenamento está atualmente em uso. Muitas vezes o Android automaticamente monta ou seu cartão SD está formatado como Memória Interna. Por favor tenha certeza que não está sendo usado (montado ou sequer modificado)</string>
     <string name="no_storage_found">Nenhum dispositivo de armazenamento com a metadata do ABM foi encontrado mas você precisa de um pra isso. Se você tem um, pressione \"Formatar\". Se não tem nenhum botão de \"Formatar\" nenhum armazenamento compatível foi encontrado.</string>
     <string name="delete">Deletar</string>
-    <string name="delete_msg">This will delete partition %1$d of type %2$s labeled \'%3$s\'</string>
-    <string name="delete_msg_2">This will delete the configuration file of the ROM %1$s. You need to delete the partitions on the SD card manually to prevent data loss.</string>
+    <string name="delete_msg">Isso vai deletar a partição %1$d do tipo %2$s nomeada \'%3$s\'</string>
+    <string name="delete_msg_2">Isso vai deletar o arquivo de configuração da ROM %1$s. Você precisa deletar partições no cartão SD manualmente para prevenir a perda de dados.</string>
     <string name="filename">Configurar nome do arquivo (sem espaços, ou extensões)</string>
     <string name="add_rom">Adicionar ROM</string>
-    <string name="wait">Please wait…</string>
-    <string name="delete_prog">Deleting…</string>
-    <string name="convert_prog">Converting…</string>
-    <string name="creating_prog">Creating…</string>
-    <string name="renaming_prog">Renaming…</string>
+    <string name="wait">Por favor aguarde…</string>
+    <string name="delete_prog">Deletando…</string>
+    <string name="convert_prog">Convertendo…</string>
+    <string name="creating_prog">Criando…</string>
+    <string name="renaming_prog">Renomeando…</string>
     <string name="rom_location">Local da ROM</string>
     <string name="delete_real_rom">Você não pode deletar sua ROM principal!</string>
-    <string name="rename">Rename</string>
+    <string name="rename">Renomear</string>
     <string name="app_unfinished">O Android Boot Manager está instalado corretamente mais o app não está terminado; páginas em branco e botões sem função são esperados :(</string>
     <string name="rom_type_add_rom_zip">Android (ROM zip)</string>
     <string name="updatelk">Atualizar DroidBoot</string>
@@ -115,7 +115,7 @@
     <string name="welcome">Bem-vindo!</string>
     <string name="wizard_deviceinstaller_text">Pronto! por favor siga as próximos etapas para instalar o Android Boot Manager. Se você mudar de ideia, você pode apertar em cancelar. Nada foi alterado até agora.</string>
     <string name="wizard_devicerominstaller_text">Pronto! por favor siga as próximas etapas pafa a sua ROM. se você mudou de ideia, você pode apertar em cancelar. Nada foi alterado até agora.</string>
-    <string name="installerWelcome">Welcome to the Android Boot Manager installer. This will install Android Boot Manager on your device. Not easily undoable modifications are being done, please do not install without knowledge about it. Keep the prerequisites in mind - you may need to format stuff manually! Disclaimer follows:</string>
+    <string name="installerWelcome">Bem-vindo ao instalador do Android Boot Manager. Isso irá instalar o Android Boot Manager no seu aparelho. Modificações que não são fáceis de converter estão sendo feitas, por favor não instale sem conhecimento disso. Mantenha os requisitos mínimos em mente - você pode precisar formatar coisas manualmente! O aviso legal segue:</string>
     <string name="next">Próximo</string>
     <!-- Assistant page navigation -->
     <string name="prev">Voltar</string>
@@ -142,8 +142,8 @@
     <string name="portable_part">Armazenamento Portátil</string>
     <string name="system_part">Arquivos do Sistema no OS</string>
     <string name="data_part">Arquivos do Usuário no OS</string>
-    <string name="data">Data</string>
-    <string name="system">System</string>
+    <string name="data">Arquivos</string>
+    <string name="system">Sistema</string>
     <string name="select_part">Por favor selecione uma partição não usada no seu cartão SD configurada com o tipo: %1$s. Por favor tenho certeza que é realmente a correta, você pode cancelar e nomear para ter certeza, se você ainda não criou uma faça isso primeiro.</string>
     <!-- How an partition is used -->
     <string name="usage">Utilização</string>
