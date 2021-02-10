@@ -149,6 +149,14 @@ public class SDUtils {
         }
     }
 
+    public static String umsd(SDPartitionMeta meta) {
+        StringBuilder s = new StringBuilder();
+        for (Partition p : meta.p)
+            s.append(umsd(p.type, meta.major, p.minor)).append(" && ");
+        String e = s.toString();
+        return e.substring(0, e.length()-4);
+    }
+
     @Nullable
     public static SDPartitionMeta generateMeta(String bdev, String pbdev) {
         SDPartitionMeta meta;

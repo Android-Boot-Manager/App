@@ -8,10 +8,11 @@ android {
     defaultConfig {
         applicationId "org.androidbootmanager.app"
         minSdkVersion 26
+        // we're not going to google play
         //noinspection OldTargetApi
         targetSdkVersion 27
-        versionCode 2001
-        versionName "0.2.0-pre1"
+        versionCode 2010
+        versionName "0.2.0-rc1"
     }
     signingConfigs {
         release {

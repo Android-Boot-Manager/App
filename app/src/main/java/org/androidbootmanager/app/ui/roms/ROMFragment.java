@@ -5,11 +5,13 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -19,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.io.SuFile;
 
 import org.androidbootmanager.app.R;
@@ -27,6 +30,8 @@ import org.androidbootmanager.app.ui.home.InstalledViewModel;
 import org.androidbootmanager.app.ui.wizard.WizardActivity;
 import org.androidbootmanager.app.util.ActionAbortedCleanlyError;
 import org.androidbootmanager.app.util.ConfigFile;
+import org.androidbootmanager.app.util.ConfigTextWatcher;
+import org.androidbootmanager.app.util.MiscUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -111,8 +116,58 @@ public class ROMFragment extends Fragment {
                 pic = view.findViewById(R.id.entry_pic);
                 name = view.findViewById(R.id.entry_name);
                 container.setOnClickListener((v) -> {
-                    // TODO
-                    updateEntries();
+                    assert e != null;
+                    ConfigFile proposed_;
+                    try {
+                        proposed_ = ConfigFile.importFromFile(e.file);
+                    } catch (ActionAbortedCleanlyError actionAbortedCleanlyError) {
+                        actionAbortedCleanlyError.printStackTrace();
+                        Toast.makeText(requireContext(),"Loading configuration file: Error. Action aborted cleanly. Creating new.",Toast.LENGTH_LONG).show();
+                        proposed_ = new ConfigFile();
+                    }
+                    final ConfigFile proposed = proposed_;
+                    View dialog = LayoutInflater.from(requireContext()).inflate(R.layout.edit_entry,null);
+                    ((EditText) dialog.findViewById(R.id.editentryTitle)).setText(e.config.get("title"));
+                    ((EditText) dialog.findViewById(R.id.editentryTitle)).addTextChangedListener(new ConfigTextWatcher(proposed, "title"));
+                    ((EditText) dialog.findViewById(R.id.editentryKernel)).setText(e.config.get("linux"));
+                    ((EditText) dialog.findViewById(R.id.editentryKernel)).addTextChangedListener(new ConfigTextWatcher(proposed, "linux"));
+                    ((EditText) dialog.findViewById(R.id.editentryDtb)).setText(e.config.get("dtb"));
+                    ((EditText) dialog.findViewById(R.id.editentryDtb)).addTextChangedListener(new ConfigTextWatcher(proposed, "dtb"));
+                    ((EditText) dialog.findViewById(R.id.editentryInitrd)).setText(e.config.get("initrd"));
+                    ((EditText) dialog.findViewById(R.id.editentryInitrd)).addTextChangedListener(new ConfigTextWatcher(proposed, "initrd"));
+                    ((EditText) dialog.findViewById(R.id.editentryCmdline)).setText(e.config.get("options"));
+                    ((EditText) dialog.findViewById(R.id.editentryCmdline)).addTextChangedListener(new ConfigTextWatcher(proposed, "options"));
+                    ((EditText) dialog.findViewById(R.id.editentryDataPart)).setText(e.config.get("xdata"));
+                    dialog.findViewById(R.id.editentryDataPart).setEnabled(false);
+                    ((EditText) dialog.findViewById(R.id.editentrySysPart)).setText(e.config.get("xsystem"));
+                    dialog.findViewById(R.id.editentrySysPart).setEnabled(false);
+                    new AlertDialog.Builder(requireContext())
+                            .setCancelable(true)
+                            .setNeutralButton(R.string.cancel, (p1, p2) -> p1.dismiss())
+                            .setNegativeButton(R.string.delete, (p1, p2) -> MiscUtils.sure(requireContext(), p1, getString(R.string.delete_msg_2, e.config.get("title")), (p112, p212) -> {
+                                if (e.config.get("xsystem") != null && e.config.get("xdata") != null) {
+                                    if (e.config.get("xsystem").equals("real") || e.config.get("xdata").equals("real"))
+                                        new AlertDialog.Builder(requireContext())
+                                                .setTitle(R.string.failed)
+                                                .setMessage(R.string.delete_real_rom)
+                                                .setCancelable(true)
+                                                .setNegativeButton(R.string.ok, (d, p) -> d.dismiss())
+                                                .show();
+                                } else {
+                                    if (!SuFile.open(e.file).delete())
+                                        Toast.makeText(requireContext(),"Deleting configuration file: Error.",Toast.LENGTH_LONG).show();
+                                    Shell.su("rm -rf /data/abm/bootset/" + e.file.replace("/data/abm/bootset/lk2nd/entries/","").replace(".conf","")).submit();
+                                    updateEntries();
+                                }
+                            }))
+                            .setPositiveButton(R.string.save, (p1, p2) -> {
+                                e.config = proposed;
+                                e.save();
+                                updateEntries();
+                            })
+                            .setTitle(R.string.edit_entry)
+                            .setView(dialog)
+                            .show();
                 });
             }
 
@@ -148,6 +203,7 @@ public class ROMFragment extends Fragment {
                 Toast.makeText(requireContext(), "Loading entry: Error. Action aborted cleanly.", Toast.LENGTH_LONG).show();
             }
         }
-        if (adapter != null) adapter.notifyDataSetChanged();
+        adapter = new ROMRecyclerViewAdapter(entries);
+        recyclerView.setAdapter(adapter);
     }
 }
