@@ -1,16 +1,18 @@
 package org.androidbootmanager.app.util;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.TextView;
 
 import com.topjohnwu.superuser.Shell;
 
 import org.androidbootmanager.app.R;
 
 public class MiscUtils {
-    public static ProgressDialog prog;
+    public static AlertDialog prog;
     public static void sure(Context c, DialogInterface d, String msg, DialogInterface.OnClickListener v) {
         d.dismiss();
         new AlertDialog.Builder(c)
@@ -27,14 +29,13 @@ public class MiscUtils {
     }
 
     public static void w(Context c, String msg, Runnable r) {
-        //TODO: no more deprecated ProgressDialog
-        prog = new ProgressDialog(c);
-        prog.setIndeterminate(true);
-        prog.setCanceledOnTouchOutside(false);
-        prog.setCancelable(false);
-        prog.setTitle(R.string.wait);
-        prog.setMessage(msg);
-        prog.show();
+        View v = LayoutInflater.from(c).inflate(R.layout.progressdialog, null);
+        ((TextView) v.findViewById(R.id.prog_message)).setText(msg);
+        prog = new AlertDialog.Builder(c)
+        .setCancelable(false)
+        .setTitle(R.string.wait)
+        .setView(v)
+        .show();
         r.run();
     }
 
