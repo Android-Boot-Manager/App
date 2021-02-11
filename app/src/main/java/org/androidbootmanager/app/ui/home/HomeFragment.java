@@ -29,6 +29,7 @@ import org.androidbootmanager.app.util.Constants;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -66,7 +67,7 @@ public class HomeFragment extends Fragment {
                 byte[] buf = new byte[100];
                 int len;
                 ByteArrayOutputStream s = new ByteArrayOutputStream();
-                SuFileInputStream i = new SuFileInputStream("/data/abm/codename.cfg");
+                InputStream i = SuFileInputStream.open("/data/abm/codename.cfg");
                 while ((len = i.read(buf)) > 0)
                     s.write(buf, 0, len);
                 model.setCodename(s.toString("UTF-8").replace("\n",""));

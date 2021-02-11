@@ -9,6 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
@@ -62,11 +63,11 @@ public class ConfigFile {
 
     public static ConfigFile importFromFile(File f) throws ActionAbortedCleanlyError {
         ByteArrayOutputStream s = new ByteArrayOutputStream();
-        SuFileInputStream i;
+        InputStream i;
         byte[] b = new byte[1024];
         int o;
         try {
-            i = new SuFileInputStream(f);
+            i = SuFileInputStream.open(f);
         } catch (FileNotFoundException e) {
             throw new ActionAbortedCleanlyError(e);
         }

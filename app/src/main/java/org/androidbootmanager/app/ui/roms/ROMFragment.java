@@ -2,6 +2,7 @@ package org.androidbootmanager.app.ui.roms;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -145,20 +146,22 @@ public class ROMFragment extends Fragment {
                             .setCancelable(true)
                             .setNeutralButton(R.string.cancel, (p1, p2) -> p1.dismiss())
                             .setNegativeButton(R.string.delete, (p1, p2) -> MiscUtils.sure(requireContext(), p1, getString(R.string.delete_msg_2, e.config.get("title")), (p112, p212) -> {
-                                if (e.config.get("xsystem") != null && e.config.get("xdata") != null) {
-                                    if (e.config.get("xsystem").equals("real") || e.config.get("xdata").equals("real"))
+                                Log.i("ABM","tryna1");
+                                if (e.config.get("xsystem") != null && e.config.get("xdata") != null)
+                                    if (e.config.get("xsystem").equals("real") || e.config.get("xdata").equals("real")) {
                                         new AlertDialog.Builder(requireContext())
                                                 .setTitle(R.string.failed)
                                                 .setMessage(R.string.delete_real_rom)
                                                 .setCancelable(true)
                                                 .setNegativeButton(R.string.ok, (d, p) -> d.dismiss())
                                                 .show();
-                                } else {
-                                    if (!SuFile.open(e.file).delete())
-                                        Toast.makeText(requireContext(),"Deleting configuration file: Error.",Toast.LENGTH_LONG).show();
-                                    Shell.su("rm -rf /data/abm/bootset/" + e.file.replace("/data/abm/bootset/lk2nd/entries/","").replace(".conf","")).submit();
-                                    updateEntries();
-                                }
+                                        return;
+                                    }
+
+                                if (!SuFile.open(e.file).delete())
+                                    Toast.makeText(requireContext(),"Deleting configuration file: Error.",Toast.LENGTH_LONG).show();
+                                Shell.su("rm -rf /data/abm/bootset/" + e.file.replace("/data/abm/bootset/lk2nd/entries/","").replace(".conf","")).submit();
+                                updateEntries();
                             }))
                             .setPositiveButton(R.string.save, (p1, p2) -> {
                                 e.config = proposed;

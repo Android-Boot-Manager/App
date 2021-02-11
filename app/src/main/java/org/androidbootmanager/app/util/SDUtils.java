@@ -154,7 +154,7 @@ public class SDUtils {
         for (Partition p : meta.p)
             s.append(umsd(p.type, meta.major, p.minor)).append(" && ");
         String e = s.toString();
-        if (e.isEmpty()) return e;
+        if (e.isEmpty()) return "true";
         return e.substring(0, e.length()-4);
     }
 
