@@ -23,7 +23,6 @@ import androidx.lifecycle.ViewModelProvider;
 import org.androidbootmanager.app.R;
 import org.androidbootmanager.app.devices.DeviceList;
 import org.androidbootmanager.app.ui.activities.SplashActivity;
-import org.androidbootmanager.app.ui.installer.DeviceInstallerWizardPageFragment;
 import org.androidbootmanager.app.ui.wizard.WizardViewModel;
 import org.androidbootmanager.app.util.SDUtils;
 

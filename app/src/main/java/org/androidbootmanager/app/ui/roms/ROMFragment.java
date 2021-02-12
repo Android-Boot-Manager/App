@@ -146,7 +146,6 @@ public class ROMFragment extends Fragment {
                             .setCancelable(true)
                             .setNeutralButton(R.string.cancel, (p1, p2) -> p1.dismiss())
                             .setNegativeButton(R.string.delete, (p1, p2) -> MiscUtils.sure(requireContext(), p1, getString(R.string.delete_msg_2, e.config.get("title")), (p112, p212) -> {
-                                Log.i("ABM","tryna1");
                                 if (e.config.get("xsystem") != null && e.config.get("xdata") != null)
                                     if (e.config.get("xsystem").equals("real") || e.config.get("xdata").equals("real")) {
                                         new AlertDialog.Builder(requireContext())

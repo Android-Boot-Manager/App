@@ -13,10 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import org.androidbootmanager.app.R;
-import org.androidbootmanager.app.devices.DeviceList;
 import org.androidbootmanager.app.ui.wizard.WizardViewModel;
-
-import java.util.Objects;
 
 public class ROMNameChooserWizardPageFragment extends Fragment {
     protected WizardViewModel model;
