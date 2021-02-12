@@ -60,4 +60,9 @@ public class WizardActivity extends AppCompatActivity {
         });
         model.getNegativeText().observe(this,((Button) findViewById(R.id.wizard_negativeButton))::setText);
     }
+
+    @Override
+    public void onBackPressed() {
+        // Do nothing
+    }
 }

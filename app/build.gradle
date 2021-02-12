@@ -11,8 +11,8 @@ android {
         // we're not going to google play
         //noinspection OldTargetApi
         targetSdkVersion 27
-        versionCode 2030
-        versionName "0.2.0-rc3"
+        versionCode 2040
+        versionName "0.2.0-rc4"
     }
     signingConfigs {
         release {
