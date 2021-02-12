@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.topjohnwu.superuser.Shell;
 
 import org.androidbootmanager.app.R;
+import org.androidbootmanager.app.ui.activities.MainActivity;
 import org.androidbootmanager.app.ui.wizard.WizardViewModel;
 
 import java.util.LinkedList;
@@ -51,7 +52,10 @@ public class DoAddROMWizardPageFragment  extends Fragment {
                 if (!queue.isEmpty()) log.append("\n" + queue.poll());
                 if (!queue.isEmpty()) handler.post(this); else if (!hdone.get()) handler.postDelayed(this, 50); else if (hdone.get())  {
                     model.setPositiveText(getString(R.string.ok));
-                    model.setPositiveAction(() -> requireActivity().finish());
+                    model.setPositiveAction(() -> {
+                        MainActivity.exit = true;
+                        requireActivity().finish();
+                    });
                 }
             }
         });

@@ -29,6 +29,8 @@ public class ROMsList {
             ROM r = new ROM();
             r.scriptname = sn;
             r.fullPath = "/data/data/org.androidbootmanager.app/assets/Scripts/add_os/" + codename + "/" + r.scriptname;
+            ArrayList<String> a;
+            int b;
             switch (r.scriptname) {
                 case "add_ubuntutouch_systemimage_haliumboot.sh":
                     //noinspection SpellCheckingInspection
@@ -42,12 +44,39 @@ public class ROMsList {
                     r.parts.add(c.getString(R.string.select_part, c.getString(R.string.data_part)));
                     r.strings = new HashMap<>();
                     r.strings.put(c.getString(R.string.enter_rom_name), "");
-                    ArrayList<String> a = new ArrayList<String>(Arrays.asList(Objects.requireNonNull(SuFile.open("/data/abm/bootset/db/entries/").list())));
-                    a.removeIf((b) -> !b.contains("rom"));
-                    a.sort((b, c) -> Integer.compare(Integer.parseInt(b.replace("rom","").replace(".conf","")), Integer.parseInt(c.replace("rom","").replace(".conf",""))));
-                    int b = a.size() > 0 ? Integer.parseInt(a.get(a.size()-1).replace("rom","").replace(".conf",""))+1 : 0;
+                    a = new ArrayList<>(Arrays.asList(Objects.requireNonNull(SuFile.open("/data/abm/bootset/db/entries/").list())));
+                    a.removeIf((c) -> !c.contains("rom"));
+                    a.sort((c, d) -> Integer.compare(Integer.parseInt(c.replace("rom","").replace(".conf","")), Integer.parseInt(d.replace("rom","").replace(".conf",""))));
+                    b = a.size() > 0 ? Integer.parseInt(a.get(a.size()-1).replace("rom","").replace(".conf",""))+1 : 0;
                     r.strings.put(c.getString(R.string.enter_rom_folder), "rom" + b);
                     r.gen = (imodel, menuName, folderName) -> imodel.setCmdline(Objects.requireNonNull(imodel.getROM().getValue()).fullPath + " '" + folderName + "' '" + menuName + "' " + Objects.requireNonNull(imodel.getParts().getValue()).get(0) + " " + imodel.getParts().getValue().get(1) + " /data/data/org.androidbootmanager.app/cache/system.img /data/data/org.androidbootmanager.app/cache/halium-boot.img");
+                    break;
+                case "other_os.sh":
+                    r.viewname = c.getString(R.string.other_os);
+                    r.requiredFiles = new HashMap<>();
+                    r.requiredFiles.put("boot.img", c.getString(R.string.select_boot));
+                    r.parts = new ArrayList<>();
+                    r.strings = new HashMap<>();
+                    r.strings.put(c.getString(R.string.enter_rom_name), "");
+                    a = new ArrayList<>(Arrays.asList(Objects.requireNonNull(SuFile.open("/data/abm/bootset/db/entries/").list())));
+                    a.removeIf((c) -> !c.contains("rom"));
+                    a.sort((c, d) -> Integer.compare(Integer.parseInt(c.replace("rom","").replace(".conf","")), Integer.parseInt(d.replace("rom","").replace(".conf",""))));
+                    b = a.size() > 0 ? Integer.parseInt(a.get(a.size()-1).replace("rom","").replace(".conf",""))+1 : 0;
+                    r.strings.put(c.getString(R.string.enter_rom_folder), "rom" + b);
+                    r.gen = (imodel, menuName, folderName) -> imodel.setCmdline(Objects.requireNonNull(imodel.getROM().getValue()).fullPath + " '" + folderName + "' '" + menuName + "' /data/data/org.androidbootmanager.app/cache/boot.img");
+                    break;
+                case "entry_only.sh":
+                    r.viewname = c.getString(R.string.empty_entry);
+                    r.requiredFiles = new HashMap<>();
+                    r.parts = new ArrayList<>();
+                    r.strings = new HashMap<>();
+                    r.strings.put(c.getString(R.string.enter_rom_name), "");
+                    a = new ArrayList<>(Arrays.asList(Objects.requireNonNull(SuFile.open("/data/abm/bootset/db/entries/").list())));
+                    a.removeIf((c) -> !c.contains("rom"));
+                    a.sort((c, d) -> Integer.compare(Integer.parseInt(c.replace("rom","").replace(".conf","")), Integer.parseInt(d.replace("rom","").replace(".conf",""))));
+                    b = a.size() > 0 ? Integer.parseInt(a.get(a.size()-1).replace("rom","").replace(".conf",""))+1 : 0;
+                    r.strings.put(c.getString(R.string.enter_rom_folder), "rom" + b);
+                    r.gen = (imodel, menuName, folderName) -> imodel.setCmdline(Objects.requireNonNull(imodel.getROM().getValue()).fullPath + " '" + folderName + "' '" + menuName + "'");
                     break;
                 default:
                     r = null;
