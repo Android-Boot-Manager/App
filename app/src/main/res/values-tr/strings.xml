@@ -60,6 +60,8 @@
     <string name="delete_msg_2">This will delete the configuration file of the ROM %1$s. You need to delete the partitions on the SD card manually to prevent data loss.</string>
     <string name="filename">Yapılandırma dosyasının adı (Boşluk, uzantı içermeyecek)</string>
     <string name="add_rom">ROM ekle</string>
+    <string name="other_os">Other OS (boot.img) (Advanced users only!)</string>
+    <string name="empty_entry">Empty Entry file (Advanced users only!)</string>
     <string name="wait">Please wait…</string>
     <string name="delete_prog">Deleting…</string>
     <string name="convert_prog">Converting…</string>
@@ -75,8 +77,9 @@
     <string name="rom_type_add_ut_sysimg_halium_rootfs">Ubuntu Touch (System imajı, Halium Boot imajı, Rootfs)</string>
     <string name="rom_type_add_ut_sysimg_halium">Ubuntu Touch (System imajı, Halium Boot imajı)</string>
     <string name="install_ut_halium_boot_systemimage">Sistem imajı ve halium boot kullanarak, ubuntu touch yüklemek üzeresiniz. Devam etmekten emin misiniz?</string>
-    <string name="select_halium_boot">Lütfen halium boot dosyasını seçin</string>
-    <string name="select_system_image">Lütfen sistem imajını seçin</string>
+    <string name="select_halium_boot">Please select the halium boot image</string>
+    <string name="select_boot">Please select the boot image</string>
+    <string name="select_system_image">Please select the system image</string>
     <string name="selected">File selected.</string>
     <string name="enter_rom_name">Please enter the ROM name for displaying in menu. You may choose freely.</string>
     <string name="enter_rom_folder">Please enter the ROM directory name. It may not already exist. If in doubt, keep the default.</string>
