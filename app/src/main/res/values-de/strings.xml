@@ -60,6 +60,8 @@
     <string name="delete_msg_2">This will delete the configuration file of the ROM %1$s. You need to delete the partitions on the SD card manually to prevent data loss.</string>
     <string name="filename">Konfigurationsdateiname (keine Leerzeichen, keine Dateiendung)</string>
     <string name="add_rom">ROM hinzufügen</string>
+    <string name="other_os">Other OS (boot.img) (Advanced users only!)</string>
+    <string name="empty_entry">Empty Entry file (Advanced users only!)</string>
     <string name="wait">Please wait…</string>
     <string name="delete_prog">Deleting…</string>
     <string name="convert_prog">Converting…</string>
@@ -75,8 +77,9 @@
     <string name="rom_type_add_ut_sysimg_halium_rootfs">Ubuntu Touch (System Image, Halium-Boot Image, Rootfs)</string>
     <string name="rom_type_add_ut_sysimg_halium">Ubuntu Touch (System Image, Halium-Boot Image)</string>
     <string name="install_ut_halium_boot_systemimage">Ubuntu Touch wird jetzt durch Auswahl des System-Images und der halium-boot Datei installiert. Bist Du sicher?</string>
-    <string name="select_halium_boot">Bitte die halium-boot Datei auswählen (boot.img)</string>
-    <string name="select_system_image">Bitte das System-Image auswählen (system.img)</string>
+    <string name="select_halium_boot">Please select the halium boot image</string>
+    <string name="select_boot">Please select the boot image</string>
+    <string name="select_system_image">Please select the system image</string>
     <string name="selected">Datei ausgewählt.</string>
     <string name="enter_rom_name">Bitte gebe den ROM-Namen für den Titel im Menü ein. Sie können frei wählen.</string>
     <string name="enter_rom_folder">Bitte geben Sie den ROM-Verzeichnisnamen ein. Dies existiert möglicherweise nicht bereits. Im Zweifelfall behalten Sie die Standardeinstellungen.</string>
