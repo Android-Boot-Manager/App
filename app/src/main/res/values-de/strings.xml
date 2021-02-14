@@ -20,7 +20,7 @@
     <string name="select_droidboot_invalid">Das sieht nicht wie ein DroidBoot aus!</string>
     <string name="sure_title">Bist du sicher?</string>
     <string name="install">Installieren</string>
-    <string name="be_careful">DU KANNST DEINE DATEN VERLIEREN! DU KANNST DEIN GERÄT ZERSTÖREN! DU KANNST DEINE IMEI VERLIEREN! DU KANNST SOGAR GELD VERLIEREN! NIEMAND IST DAFÜR VERANTWORTLICH AUSSER DU! BENUTZEN AUF EIGENE GEFAHR! SEI VORSICHTIG!</string>
+    <string name="be_careful">YOU CAN LOOSE YOUR DATA! YOU CAN BRICK YOUR DEVICE! YOU CAN LOOSE YOUR IMEI! YOU CAN LOOSE YOUR MONEY! NOBODY IS RESPONSIBLE EXCEPT YOU! DO AT YOUR OWN RISK AND BE CAREFUL!</string>
     <string name="umount">Bootset ausbinden</string>
     <string name="timeout">Wartezeit</string>
     <string name="default_entry">Standardeintrag</string>
@@ -32,14 +32,27 @@
     <string name="initrd">Initrd</string>
     <string name="cmdline">Optionen</string>
     <string name="delete">Löschen</string>
+    <string name="delete_msg">This will delete partition %1$d of type %2$s labeled \'%3$s\'</string>
+    <string name="delete_msg_2">This will delete the configuration file of the ROM %1$s. You need to delete the partitions on the SD card manually to prevent data loss.</string>
     <string name="add_rom">ROM hinzufügen</string>
+    <string name="other_os">Other OS (boot.img) (Advanced users only!)</string>
+    <string name="empty_entry">Empty Entry file (Advanced users only!)</string>
+    <string name="wait">Please wait…</string>
+    <string name="delete_prog">Deleting…</string>
+    <string name="convert_prog">Converting…</string>
+    <string name="creating_prog">Creating…</string>
+    <string name="renaming_prog">Renaming…</string>
     <string name="delete_real_rom">Sie können das primäre ROM nicht löschen!</string>
+    <string name="rename">Rename</string>
     <string name="updatelk">Aktualisierung von DroidBoot</string>
     <string name="rom_type_add_ut_sysimg_halium">Ubuntu Touch (System Image, Halium-Boot Image)</string>
-    <string name="select_halium_boot">Bitte die halium-boot Datei auswählen (boot.img)</string>
-    <string name="select_system_image">Bitte das System-Image auswählen (system.img)</string>
+    <string name="select_halium_boot">Please select the halium boot image</string>
+    <string name="select_hybris_boot">Please select the hybris boot image</string>
+    <string name="select_boot">Please select the boot image</string>
+    <string name="select_system_image">Please select the system image</string>
     <string name="selected">Datei ausgewählt.</string>
-    <string name="enter_rom_name">ROM Name eingeben</string>
+    <string name="enter_rom_name">Bitte gebe den ROM-Namen für den Titel im Menü ein. Sie können frei wählen.</string>
+    <string name="enter_rom_folder">Bitte geben Sie den ROM-Verzeichnisnamen ein. Dies existiert möglicherweise nicht bereits. Im Zweifelfall behalten Sie die Standardeinstellungen.</string>
     <string name="rom_type_add_sailfish">Sailfish OS</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="nav_header_subtitle">Ein Handy, um alle zu starten!</string>
@@ -64,7 +77,7 @@
     <string name="welcome">Willkommen!</string>
     <string name="wizard_deviceinstaller_text">Fertig! Bitte befolge die nächsten Schritte um den Android Boot Manager zu installieren. Wenn du es dir anders überlegst kannst du auf Abbrechen klicken. Bis jetzt wurde nichts geändert.</string>
     <string name="wizard_devicerominstaller_text">Fertig! Bitte befolge die nächsten Schritte um dein Betriebssystem zu installieren. Wenn du es dir anders überlegst kannst du auf Abbrechen klicken. Bis jetzt wurde nichts geändert.</string>
-    <string name="installerWelcome">Willkommen beim Android Boot Manager Installer. Damit wird Android Boot Manager auf Ihrem Gerät installiert. Es werden nicht leicht rückgängig zu machende Änderungen vorgenommen, bitte installieren Sie dies nicht ohne zu wissen was Sie tun. Haftungsausschluss:</string>
+    <string name="installerWelcome">Welcome to the Android Boot Manager installer. This will install Android Boot Manager on your device. Not easily undoable modifications are being done, please do not install without knowledge about it. Keep the prerequisites in mind - you may need to format stuff manually! Disclaimer follows:</string>
     <string name="next">Weiter</string>
     <!-- Assistant page navigation -->
     <string name="prev">Zurück</string>
@@ -76,9 +89,10 @@
     <string name="failed">Fehlgeschlagen</string>
     <string name="successful">Erfolgreich</string>
     <string name="free_space">Freier Speicher</string>
-    <string name="partid">Partition %1$d bezeichnet mit \"%2$s\"</string>
-    <string name="partidt">%1$s mit id %2$d gekennzeichnet \"%3$s\"</string>
+    <string name="partid" tools:ignore="PluralsCandidate">Partition %1$d bezeichnet mit \"%2$s\"</string>
+    <string name="partidt" tools:ignore="PluralsCandidate">%1$s mit id %2$d gekennzeichnet \"%3$s\"</string>
     <string name="create">Erstellen</string>
+    <string name="copy_file">Kopiere Datei...</string>
     <string name="sector_range">Sektorbereich</string>
     <string name="label">Bezeichnung</string>
     <string name="size">Größe</string>
@@ -90,7 +104,9 @@
     <string name="portable_part">Externer Speicher</string>
     <string name="system_part">Betriebssystem-Daten</string>
     <string name="data_part">OS Benutzerdaten</string>
-    <string name="select_part">Please select an unused partition on your SD card configured with the following type: %1$s. Please make sure it really is the correct one, you can cancel and label it if unsure. If you didn\'t create one yet, do that first.</string>
+    <string name="data">Data</string>
+    <string name="system">System</string>
+    <string name="select_part">Bitte wähle eine unbenutzte Partition auf Ihrer SD-Karte aus, die mit dem folgendem Typ konfiguriert ist: %1$s. Bitte stelle sicher das es wirklich die Richtige Partition ist, sie können aber immer noch abbrechen wenn Sie sich nicht sicher sind. Wenn sie noch keine Partition erstellt haben, tun Sie dies zuerst.</string>
     <!-- How an partition is used -->
     <string name="usage">Verwendung</string>
 </resources>

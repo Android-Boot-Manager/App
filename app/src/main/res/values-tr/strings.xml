@@ -20,7 +20,7 @@
     <string name="select_droidboot_invalid">Bu DroidBoot\'a benzemiyor!</string>
     <string name="sure_title">Emin misiniz?</string>
     <string name="install">Yükle</string>
-    <string name="be_careful">VERİLERİNİZİ KAYBEDEBİLİRSİNİZ! CİHAZINIZI BRICK EDEBILIRSINIZ! IMEI NUMARANIZI KAYBEDEBİLİRSİNİZ (her şeyde olduğu gibi cedric)! PARANIZI KAYBEDEBİLİRSİNZ! SİZ HARİÇ KİMSE SORUMLU DEĞİLDİR! DİKKATLİ OLUN!</string>
+    <string name="be_careful">YOU CAN LOOSE YOUR DATA! YOU CAN BRICK YOUR DEVICE! YOU CAN LOOSE YOUR IMEI! YOU CAN LOOSE YOUR MONEY! NOBODY IS RESPONSIBLE EXCEPT YOU! DO AT YOUR OWN RISK AND BE CAREFUL!</string>
     <string name="umount">Bootset çıkar</string>
     <string name="timeout">Zaman aşımı</string>
     <string name="default_entry">Varsayılan Girdi</string>
@@ -32,14 +32,27 @@
     <string name="initrd">Initrd</string>
     <string name="cmdline">Cmdline</string>
     <string name="delete">Sil</string>
+    <string name="delete_msg">This will delete partition %1$d of type %2$s labeled \'%3$s\'</string>
+    <string name="delete_msg_2">This will delete the configuration file of the ROM %1$s. You need to delete the partitions on the SD card manually to prevent data loss.</string>
     <string name="add_rom">ROM ekle</string>
+    <string name="other_os">Other OS (boot.img) (Advanced users only!)</string>
+    <string name="empty_entry">Empty Entry file (Advanced users only!)</string>
+    <string name="wait">Please wait…</string>
+    <string name="delete_prog">Deleting…</string>
+    <string name="convert_prog">Converting…</string>
+    <string name="creating_prog">Creating…</string>
+    <string name="renaming_prog">Renaming…</string>
     <string name="delete_real_rom">Ana ROM silinemez!</string>
+    <string name="rename">Rename</string>
     <string name="updatelk">DroidBoot\'u Güncelle</string>
     <string name="rom_type_add_ut_sysimg_halium">Ubuntu Touch (System imajı, Halium Boot imajı)</string>
-    <string name="select_halium_boot">Lütfen halium boot dosyasını seçin</string>
-    <string name="select_system_image">Lütfen sistem imajını seçin</string>
+    <string name="select_halium_boot">Please select the halium boot image</string>
+    <string name="select_hybris_boot">Please select the hybris boot image</string>
+    <string name="select_boot">Please select the boot image</string>
+    <string name="select_system_image">Please select the system image</string>
     <string name="selected">File selected.</string>
-    <string name="enter_rom_name">ROM adını girin</string>
+    <string name="enter_rom_name">Please enter the ROM name for displaying in menu. You may choose freely.</string>
+    <string name="enter_rom_folder">Please enter the ROM directory name. It may not already exist. If in doubt, keep the default.</string>
     <string name="rom_type_add_sailfish">Sailfish OS</string>
     <string name="title_activity_main">AnaAktivite</string>
     <string name="nav_header_subtitle">One phone to start them all!</string>
@@ -64,7 +77,7 @@
     <string name="welcome">Hoşgeldiniz!</string>
     <string name="wizard_deviceinstaller_text">Hazır! Android Boot Manager yüklemek için adımları takip edin. Eğer fikrinizi değiştirirseniz iptale basabilirsiniz. Şimdiye kadar hiç bir şey değiştirilmedi.</string>
     <string name="wizard_devicerominstaller_text">Ready! Please follow the next steps for installing your ROM. If you redecided, you can click cancel. Nothing was changed until now.</string>
-    <string name="installerWelcome">Android Boot Manager yükleyicisine hoş geldiniz. Bu araç Android Boot Manager\'ı cihazınıza yükleyecektir. Yaptığınız bazı düzenlemeler kolayca geri alınamayabilir, lütfen bilmiyorsanız kullanmayınız. Sorumluluk reddi beyanı şu şekildedir:</string>
+    <string name="installerWelcome">Welcome to the Android Boot Manager installer. This will install Android Boot Manager on your device. Not easily undoable modifications are being done, please do not install without knowledge about it. Keep the prerequisites in mind - you may need to format stuff manually! Disclaimer follows:</string>
     <string name="next">İleri</string>
     <!-- Assistant page navigation -->
     <string name="prev">Geri</string>
@@ -76,9 +89,10 @@
     <string name="failed">Failed</string>
     <string name="successful">Successful</string>
     <string name="free_space">Free space</string>
-    <string name="partid">Partition %1$d labeled \"%2$s\"</string>
-    <string name="partidt">%1$s with id %2$d labeled \"%3$s\"</string>
+    <string name="partid" tools:ignore="PluralsCandidate">Partition %1$d labeled \"%2$s\"</string>
+    <string name="partidt" tools:ignore="PluralsCandidate">%1$s with id %2$d labeled \"%3$s\"</string>
     <string name="create">Create</string>
+    <string name="copy_file">Copying file…</string>
     <string name="sector_range">Sector range</string>
     <string name="label">Label</string>
     <string name="size">Size</string>
@@ -90,6 +104,8 @@
     <string name="portable_part">Portable Storage</string>
     <string name="system_part">OS System data</string>
     <string name="data_part">OS User data</string>
+    <string name="data">Data</string>
+    <string name="system">System</string>
     <string name="select_part">Please select an unused partition on your SD card configured with the following type: %1$s. Please make sure it really is the correct one, you can cancel and label it if unsure. If you didn\'t create one yet, do that first.</string>
     <!-- How an partition is used -->
     <string name="usage">Usage</string>
