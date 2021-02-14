@@ -35,8 +35,8 @@
     <string name="delete_msg">Isso vai deletar a partição %1$d do tipo %2$s nomeada \'%3$s\'</string>
     <string name="delete_msg_2">Isso vai deletar o arquivo de configuração da ROM %1$s. Você precisa deletar partições no cartão SD manualmente para prevenir a perda de dados.</string>
     <string name="add_rom">Adicionar ROM</string>
-    <string name="other_os">Other OS (boot.img) (Advanced users only!)</string>
-    <string name="empty_entry">Empty Entry file (Advanced users only!)</string>
+    <string name="other_os">Outro OS (boot.img) (Usuários avançados apenas!)</string>
+    <string name="empty_entry">Arquivo de entrada vazio (Usuários avançados apenas!)</string>
     <string name="wait">Por favor aguarde…</string>
     <string name="delete_prog">Deletando…</string>
     <string name="convert_prog">Convertendo…</string>
@@ -46,10 +46,10 @@
     <string name="rename">Renomear</string>
     <string name="updatelk">Atualizar DroidBoot</string>
     <string name="rom_type_add_ut_sysimg_halium">Ubuntu Touch (System image, Halium Boot image)</string>
-    <string name="select_halium_boot">Please select the halium boot image</string>
-    <string name="select_hybris_boot">Please select the hybris boot image</string>
-    <string name="select_boot">Please select the boot image</string>
-    <string name="select_system_image">Please select the system image</string>
+    <string name="select_halium_boot">Por favor selecione a imagem do halium boot</string>
+    <string name="select_hybris_boot">Por favor selecione a hybris boot image</string>
+    <string name="select_boot">Por favor selecione a boot image</string>
+    <string name="select_system_image">Por favor selecione a system image</string>
     <string name="selected">Arquivo selecionado.</string>
     <string name="enter_rom_name">Por favor adicione o nome da ROM para mostrar no menu. Você pode escolher livremente.</string>
     <string name="enter_rom_folder">Por favor adicione o nome do diretório da ROM. ele pode já existir. Se tiver em dúvida, deixe o padrão.</string>
