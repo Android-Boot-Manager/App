@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -17,6 +18,7 @@ import com.topjohnwu.superuser.io.SuFile;
 import org.androidbootmanager.app.R;
 import org.androidbootmanager.app.devices.DeviceList;
 import org.androidbootmanager.app.ui.activities.MainActivity;
+import org.androidbootmanager.app.ui.debug.DebugActivity;
 import org.androidbootmanager.app.ui.home.InstalledViewModel;
 import org.androidbootmanager.app.ui.updatelk.BlUpdateWizardPageFragment;
 import org.androidbootmanager.app.ui.wizard.WizardActivity;
@@ -41,6 +43,9 @@ public class GeneralCfgFragment extends Fragment {
                 a.finish();
         });
         root.findViewById(R.id.generalcfg_update_bl).setOnClickListener((view) -> startActivity(new Intent(requireActivity(), WizardActivity.class).putExtra("codename",model.getCodename().getValue()).putExtra("StartFragment", BlUpdateWizardPageFragment.class)));
+        Button debug = root.findViewById(R.id.debug);
+        if (debug != null)
+            debug.setOnClickListener((view) -> startActivity(new Intent(requireActivity(), DebugActivity.class)));
 
         final String fileName = SuFile.open("/data/abm/bootset/lk2nd/lk2nd.conf").exists() ? "/data/abm/bootset/lk2nd/lk2nd.conf" : "/data/abm/bootset/lk2nd/db.conf";
         try {
