@@ -1,5 +1,6 @@
 package org.androidbootmanager.app.util;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -47,6 +48,20 @@ public class MiscUtils {
         return (a) -> {
             r.onResult(a);
             prog.dismiss();
+        };
+    }
+
+    public static Runnable w2(Runnable r) {
+        return () -> {
+            r.run();
+            prog.dismiss();
+        };
+    }
+
+    public static Runnable w2t(Activity a, Runnable r) {
+        return () -> {
+            r.run();
+            a.runOnUiThread(() -> prog.dismiss());
         };
     }
 }

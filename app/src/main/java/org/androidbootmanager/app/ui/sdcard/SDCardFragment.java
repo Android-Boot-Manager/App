@@ -1,5 +1,9 @@
 package org.androidbootmanager.app.ui.sdcard;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -12,9 +16,12 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -24,15 +31,24 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.slider.RangeSlider;
 import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.io.SuFileInputStream;
+import com.topjohnwu.superuser.io.SuFileOutputStream;
 
 import org.androidbootmanager.app.R;
 import org.androidbootmanager.app.devices.DeviceList;
+import org.androidbootmanager.app.ui.activities.SplashActivity;
+import org.androidbootmanager.app.ui.addrom.DeviceROMInstallerWizardPageFragment;
 import org.androidbootmanager.app.ui.home.InstalledViewModel;
 import org.androidbootmanager.app.util.MiscUtils;
 import org.androidbootmanager.app.util.SDUtils;
 import org.androidbootmanager.app.util.SOUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -44,6 +60,7 @@ public class SDCardFragment extends Fragment {
 
     private InstalledViewModel model;
     private RecyclerView recyclerView;
+    public String outpath;
 
     public class SDRecyclerViewAdapter extends RecyclerView.Adapter<SDRecyclerViewAdapter.ViewHolder> {
 
@@ -222,6 +239,10 @@ public class SDCardFragment extends Fragment {
                         final Spinner dd = v.findViewById(R.id.create_part_dd);
                         final RangeSlider slider = v.findViewById(R.id.create_part_slide);
                         final TextView size = v.findViewById(R.id.create_part_size);
+                        final Toolbar t = new Toolbar(requireContext());
+                        t.setBackgroundColor(getResources().getColor(R.color.colorAccent, requireActivity().getTheme()));
+                        t.setTitle(getString(R.string.partidn, meta.dumpS(id).id));
+                        t.setNavigationIcon(android.R.drawable.ic_menu_close_clear_cancel);
                         size.setText(meta.dumpS(id).sizeFancy);
                         slider.setValueFrom(0f);
                         slider.setValueTo((float) (meta.dumpS(id).endSector - meta.dumpS(id).startSector));
@@ -239,9 +260,8 @@ public class SDCardFragment extends Fragment {
                         label.setText(meta.dumpS(id).name);
                         ArrayList<String> out = new ArrayList<>();
                         ArrayList<String> err = new ArrayList<>();
-                        new AlertDialog.Builder(requireContext())
-                                .setTitle(getString(R.string.partid, meta.dumpS(id).id, meta.dumpS(id).name))
-                                .setNeutralButton(R.string.cancel, (d, p) -> d.dismiss())
+                        AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                                .setCustomTitle(t)
                                 .setNegativeButton(R.string.delete, (w, p1) -> MiscUtils.sure(requireContext(), w, getString(R.string.delete_msg, meta.dumpS(id).id, SDUtils.codes.get(meta.dumpS(id).code), meta.dumpS(id).name), (d, p) -> {
                                     MiscUtils.w(requireContext(), R.string.delete_prog, () -> Shell.su(SDUtils.umsd(meta) + " && sgdisk " + bdev + " --delete " + meta.dumpS(id).id).to(out, err).submit(MiscUtils.w2((r) -> new AlertDialog.Builder(requireContext())
                                             .setTitle(r.isSuccess() ? R.string.successful : R.string.failed)
@@ -250,14 +270,36 @@ public class SDCardFragment extends Fragment {
                                             .setCancelable(false)
                                             .show())));
                                 }))
-                                .setPositiveButton(R.string.rename, (d, p) -> MiscUtils.w(requireContext(), R.string.renaming_prog, () -> Shell.su(SDUtils.umsd(meta) + " && sgdisk " + bdev + " --change-name " + meta.dumpS(id).id + ":'" + label.getText().toString().replace("'","") + "'").to(out, err).submit(MiscUtils.w2((r) -> new AlertDialog.Builder(requireContext())
+                                .setNeutralButton(R.string.rename, (d, p) -> MiscUtils.w(requireContext(), R.string.renaming_prog, () -> Shell.su(SDUtils.umsd(meta) + " && sgdisk " + bdev + " --change-name " + meta.dumpS(id).id + ":'" + label.getText().toString().replace("'","") + "'").to(out, err).submit(MiscUtils.w2((r) -> new AlertDialog.Builder(requireContext())
                                         .setTitle(r.isSuccess() ? R.string.successful : R.string.failed)
                                         .setMessage(String.join("\n", out) + "\n" + String.join("", err) + (String.join("", out).contains("old") ? "IMPORTANT: Please reboot!" : ""))
                                         .setPositiveButton(R.string.ok, (g, s) -> recyclerView.setAdapter(new SDRecyclerViewAdapter(generateMeta(DeviceList.getModel(model)))))
                                         .setCancelable(false)
                                         .show()))))
+                                .setPositiveButton(R.string.backup, (d, p) -> new AlertDialog.Builder(requireContext())
+                                        .setTitle(getString(R.string.partidn, meta.dumpS(id).id))
+                                        .setMessage(R.string.backup_msg)
+                                        .setPositiveButton(R.string.backup, (d2, p2) -> {
+                                            outpath = meta.ppath + meta.dumpS(id).id;
+                                            Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+                                            intent.setType("application/octet-stream");
+                                            intent.addCategory(Intent.CATEGORY_OPENABLE);
+                                            intent.putExtra(Intent.EXTRA_TITLE, "abm_backup_" + meta.dumpS(id).id + ".img");
+                                            startActivityForResult(intent, 5211);
+                                        })
+                                        .setNegativeButton(R.string.restore, (d2, p2) -> {
+                                            outpath = meta.ppath + meta.dumpS(id).id;
+                                            Intent intent = new Intent();
+                                            intent.setType("*/*");
+                                            intent.setAction(Intent.ACTION_GET_CONTENT);
+                                            startActivityForResult(intent, 5212);
+                                        })
+                                        .setNeutralButton(R.string.cancel, (d2, p2) -> d2.dismiss())
+                                        .show())
                                 .setView(v)
-                                .show();
+                                .create();
+                        t.setNavigationOnClickListener((a) -> dialog.dismiss());
+                        dialog.show();
                     }
                 });
             }
@@ -308,5 +350,79 @@ public class SDCardFragment extends Fragment {
         } else
             recyclerView.setAdapter(new SDRecyclerViewAdapter(meta.get()));
         return root;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == 5212) {
+            if (resultCode == Activity.RESULT_OK) {
+                assert data != null;
+                Uri selectedUri = data.getData();
+                try {
+                    InputStream initialStream;
+                    if (selectedUri != null) {
+                        initialStream = requireActivity().getContentResolver().openInputStream(selectedUri);
+                    } else {
+                        Toast.makeText(requireContext(), R.string.failure, Toast.LENGTH_LONG).show();
+                        new IllegalStateException("null selected").printStackTrace();
+                        return;
+                    }
+                    MiscUtils.w(requireContext(), R.string.restore, () -> new Thread(MiscUtils.w2t(requireActivity(), () -> {
+                        try {
+                            File targetFile = new File(outpath);
+                            assert initialStream != null;
+                            OutputStream outStream = SuFileOutputStream.open(targetFile);
+                            SplashActivity.copyFile(initialStream, outStream);
+                            initialStream.close();
+                            outStream.close();
+                        } catch (IOException e) {
+                            requireActivity().runOnUiThread(() -> Toast.makeText(requireContext(), R.string.failure, Toast.LENGTH_LONG).show());
+                            e.printStackTrace();
+                        }
+                    })).start());
+                } catch (IOException e) {
+                    Toast.makeText(requireContext(), R.string.failure, Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                }
+            } else {
+                Toast.makeText(requireContext(), R.string.failure, Toast.LENGTH_LONG).show();
+                new IllegalStateException("Result not OK but " + resultCode).printStackTrace();
+            }
+        } else if (requestCode == 5211) {
+            if (resultCode == Activity.RESULT_OK) {
+                assert data != null;
+                Uri selectedUri = data.getData();
+                try {
+                    OutputStream initialStream;
+                    if (selectedUri != null) {
+                        initialStream = requireActivity().getContentResolver().openOutputStream(selectedUri);
+                    } else {
+                        Toast.makeText(requireContext(), R.string.failure, Toast.LENGTH_LONG).show();
+                        new IllegalStateException("null selected").printStackTrace();
+                        return;
+                    }
+                    MiscUtils.w(requireContext(), R.string.backup, () -> new Thread(MiscUtils.w2t(requireActivity(), () -> {
+                        try {
+                            File targetFile = new File(outpath);
+                            InputStream inStream = SuFileInputStream.open(targetFile);
+                            assert initialStream != null;
+                            SplashActivity.copyFile(inStream, initialStream);
+                            inStream.close();
+                            initialStream.close();
+                        } catch (IOException e) {
+                            requireActivity().runOnUiThread(() -> Toast.makeText(requireContext(), R.string.failure, Toast.LENGTH_LONG).show());
+                            e.printStackTrace();
+                        }
+                    })).start());
+                } catch (IOException e) {
+                    Toast.makeText(requireContext(), R.string.failure, Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                }
+            } else {
+                Toast.makeText(requireContext(), R.string.failure, Toast.LENGTH_LONG).show();
+                new IllegalStateException("Result not OK but " + resultCode).printStackTrace();
+            }
+        }
+        else super.onActivityResult(requestCode, resultCode, data);
     }
 }
