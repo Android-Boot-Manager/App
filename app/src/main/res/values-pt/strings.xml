@@ -90,8 +90,12 @@
     <string name="successful">Sucesso</string>
     <string name="free_space">Espaço disponível</string>
     <string name="partid" tools:ignore="PluralsCandidate">Partição %1$d nomeada \"%2$s\"</string>
+    <string name="partidn" tools:ignore="PluralsCandidate">Partition %1$d</string>
     <string name="partidt" tools:ignore="PluralsCandidate">%1$s com a id %2$d nomeada \"%3$s\"</string>
     <string name="create">Criar</string>
+    <string name="backup">Backup</string>
+    <string name="restore">Restore</string>
+    <string name="backup_msg">Welcome to the simple Backup &amp; Restore tool. What do you want to do with this partition?</string>
     <string name="copy_file">Copiando arquivo…</string>
     <string name="sector_range">Alcance do setor</string>
     <string name="label">Rótulo</string>
