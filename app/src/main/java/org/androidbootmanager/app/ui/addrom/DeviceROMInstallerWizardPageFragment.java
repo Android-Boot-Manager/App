@@ -20,6 +20,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.topjohnwu.superuser.io.SuFileOutputStream;
+
 import org.androidbootmanager.app.R;
 import org.androidbootmanager.app.devices.DeviceList;
 import org.androidbootmanager.app.ui.activities.SplashActivity;
@@ -27,7 +29,6 @@ import org.androidbootmanager.app.ui.wizard.WizardViewModel;
 import org.androidbootmanager.app.util.SDUtils;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -40,8 +41,9 @@ public class DeviceROMInstallerWizardPageFragment extends Fragment {
     protected AddROMViewModel imodel;
     protected TextView txt;
     protected Button ok;
-    protected String key;
+    protected String key, pdump;
 
+    @SuppressLint("SdCardPath")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -66,10 +68,37 @@ public class DeviceROMInstallerWizardPageFragment extends Fragment {
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(intent, 5210);
             });
+            pdump = "/data/data/org.androidbootmanager.app/cache/" + key;
             key = (String) Objects.requireNonNull(imodel.getROM().getValue()).requiredFiles.keySet().toArray()[0];
             String val = imodel.getROM().getValue().requiredFiles.get(key);
             txt.setText(val);
             imodel.getROM().getValue().requiredFiles.remove(key);
+        } else if (imodel.getROM().getValue().flashes.size() > 0) {
+            root = inflater.inflate(R.layout.wizard_addrom_getpart, container, false);
+            ok = root.findViewById(R.id.wizard_addrom_getpart_btn);
+            txt = root.findViewById(R.id.wizard_addrom_getpart_txt);
+            Spinner dd = root.findViewById(R.id.wizard_addrom_getpart_dd);
+            key = (String) imodel.getROM().getValue().flashes.keySet().toArray()[0];
+            final SDUtils.SDPartitionMeta meta = SDUtils.generateMeta(DeviceList.getModel(Objects.requireNonNull(model.getCodename().getValue())));
+            ArrayList<String> a = new ArrayList<>();
+            for (SDUtils.Partition partition : meta.p) {
+                a.add(getString(R.string.partidt, SDUtils.codes.get(partition.code), partition.id, partition.name));
+            }
+            txt.setText(imodel.getROM().getValue().flashes.get(key));
+            dd.setAdapter(new ArrayAdapter<>(requireActivity(), android.R.layout.simple_spinner_dropdown_item, a));
+            ok.setOnClickListener((v) -> {
+                dd.setEnabled(false);
+                pdump = meta.ppath + meta.dumpPartition(dd.getSelectedItemPosition()).id;
+                txt.setText(key);
+                ok.setOnClickListener((b) -> {
+                    Intent intent = new Intent();
+                    intent.setType("*/*");
+                    intent.setAction(Intent.ACTION_GET_CONTENT);
+                    startActivityForResult(intent, 5210);
+                });
+                imodel.getROM().getValue().flashes.remove(key);
+                imodel.addPart(meta.dumpPartition(dd.getSelectedItemPosition()).id);
+            });
         } else if (imodel.getROM().getValue().parts.size() > 0) {
             root = inflater.inflate(R.layout.wizard_addrom_getpart, container, false);
             ok = root.findViewById(R.id.wizard_addrom_getpart_btn);
@@ -93,15 +122,16 @@ public class DeviceROMInstallerWizardPageFragment extends Fragment {
         } else if (imodel.getROM().getValue().strings.size() > 0) {
             root = inflater.inflate(R.layout.wizard_installer_getname, container, false);
             final EditText val = root.findViewById(R.id.wizard_installer_getname_val);
+            key = (String) imodel.getROM().getValue().strings.keySet().toArray()[0];
             ok = root.findViewById(R.id.wizard_installer_getname_btn);
             txt = root.findViewById(R.id.wizard_installer_getname_txt);
-            txt.setText((String) imodel.getROM().getValue().strings.keySet().toArray()[0]);
-            val.setText(imodel.getROM().getValue().strings.get((String) imodel.getROM().getValue().strings.keySet().toArray()[0]));
+            txt.setText(key);
+            val.setText(imodel.getROM().getValue().strings.get(key));
             ok.setOnClickListener(v -> {
                 imodel.getName().add(val.getText().toString());
                 val.setEnabled(false);
                 ok.setVisibility(View.INVISIBLE);
-                imodel.getROM().getValue().strings.remove((String) imodel.getROM().getValue().strings.keySet().toArray()[0]);
+                imodel.getROM().getValue().strings.remove(key);
                 model.setPositiveFragment(DeviceROMInstallerWizardPageFragment.class);
                 model.setPositiveText(getString(R.string.next));
             });
@@ -139,9 +169,9 @@ public class DeviceROMInstallerWizardPageFragment extends Fragment {
                     ok.setVisibility(View.INVISIBLE);
                     new Thread(() -> {
                         try {
-                            @SuppressLint("SdCardPath") File targetFile = new File("/data/data/org.androidbootmanager.app/cache/" + key);
+                            @SuppressLint("SdCardPath") File targetFile = new File(pdump);
                             assert initialStream != null;
-                            OutputStream outStream = new FileOutputStream(targetFile);
+                            OutputStream outStream = SuFileOutputStream.open(targetFile);
                             SplashActivity.copyFile(initialStream, outStream);
                             initialStream.close();
                             outStream.close();
