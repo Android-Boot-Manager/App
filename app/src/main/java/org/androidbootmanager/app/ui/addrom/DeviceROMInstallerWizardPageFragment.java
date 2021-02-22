@@ -79,7 +79,7 @@ public class DeviceROMInstallerWizardPageFragment extends Fragment {
             txt = root.findViewById(R.id.wizard_addrom_getpart_txt);
             Spinner dd = root.findViewById(R.id.wizard_addrom_getpart_dd);
             key = (String) imodel.getROM().getValue().flashes.keySet().toArray()[0];
-            final SDUtils.SDPartitionMeta meta = SDUtils.generateMeta(DeviceList.getModel(Objects.requireNonNull(model.getCodename().getValue())));
+            final SDUtils.SDPartitionMeta meta = SDUtils.generateMeta(DeviceList.getModel(model));
             ArrayList<String> a = new ArrayList<>();
             for (SDUtils.Partition partition : meta.p) {
                 a.add(getString(R.string.partidt, SDUtils.codes.get(partition.code), partition.id, partition.name));
@@ -104,7 +104,7 @@ public class DeviceROMInstallerWizardPageFragment extends Fragment {
             ok = root.findViewById(R.id.wizard_addrom_getpart_btn);
             txt = root.findViewById(R.id.wizard_addrom_getpart_txt);
             Spinner dd = root.findViewById(R.id.wizard_addrom_getpart_dd);
-            final SDUtils.SDPartitionMeta meta = SDUtils.generateMeta(DeviceList.getModel(Objects.requireNonNull(model.getCodename().getValue())));
+            final SDUtils.SDPartitionMeta meta = SDUtils.generateMeta(DeviceList.getModel(model));
             ArrayList<String> a = new ArrayList<>();
             for (SDUtils.Partition partition : meta.p) {
                 a.add(getString(R.string.partidt, SDUtils.codes.get(partition.code), partition.id, partition.name));

@@ -26,8 +26,6 @@ import org.androidbootmanager.app.util.ActionAbortedCleanlyError;
 import org.androidbootmanager.app.util.ConfigFile;
 import org.androidbootmanager.app.util.ConfigTextWatcher;
 
-import java.util.Objects;
-
 public class GeneralCfgFragment extends Fragment {
 
     private InstalledViewModel model;
@@ -39,7 +37,7 @@ public class GeneralCfgFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_generalcfg, container, false);
         root.findViewById(R.id.generalcfg_umount).setOnClickListener((view) -> {
             MainActivity a = (MainActivity) requireActivity();
-            if(a.umount(DeviceList.getModel(Objects.requireNonNull(model.getCodename().getValue()))))
+            if(a.umount(DeviceList.getModel(model)))
                 a.finish();
         });
         root.findViewById(R.id.generalcfg_update_bl).setOnClickListener((view) -> startActivity(new Intent(requireActivity(), WizardActivity.class).putExtra("codename",model.getCodename().getValue()).putExtra("StartFragment", BlUpdateWizardPageFragment.class)));

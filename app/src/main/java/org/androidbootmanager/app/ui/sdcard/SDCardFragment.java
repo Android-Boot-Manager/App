@@ -36,7 +36,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.androidbootmanager.app.util.SDUtils.generateMeta;
@@ -114,8 +113,8 @@ public class SDCardFragment extends Fragment {
 
             public ViewHolder(View view) {
                 super(view);
-                final String bdev = DeviceList.getModel(Objects.requireNonNull(model.getCodename().getValue())).bdev;
-                final String pbdev = DeviceList.getModel(Objects.requireNonNull(model.getCodename().getValue())).pbdev;
+                final String bdev = DeviceList.getModel(model).bdev;
+                final String pbdev = DeviceList.getModel(model).pbdev;
                 icon = view.findViewById(R.id.sd_icon);
                 container = view.findViewById(R.id.sd_container);
                 text = view.findViewById(R.id.sd_label);
@@ -151,7 +150,7 @@ public class SDCardFragment extends Fragment {
                             @Override
                             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                                 if (ddresolv[position].equals(ddresolv[3]))
-                                    slider.setValues(0f, 7340031f); // TODO: un-hardcode
+                                    slider.setValues(0f, DeviceList.getModel(model).spartsize);
                             }
 
                             @Override
@@ -210,7 +209,7 @@ public class SDCardFragment extends Fragment {
                                 .setPositiveButton(R.string.create, (d, p) -> MiscUtils.w(requireContext(), R.string.creating_prog, () -> Shell.su(SDUtils.umsd(meta) + " && sgdisk " + bdev + " --new " + meta.nid + ":" + start.getText() + ":" + end.getText() + " --typecode " + meta.nid + ":" + ddresolv[dd.getSelectedItemPosition()] + " --change-name " + meta.nid + ":'" + label.getText().toString().replace("'", "") + "' && sleep 1 && ls " + pbdev + meta.nid + (ddresolv[dd.getSelectedItemPosition()].equals("0700") ? (" && sm format public:" + meta.major + "," + (meta.minor + meta.nid)) : (ddresolv[dd.getSelectedItemPosition()].equals("8301") ? " && mkfs.ext4 " + pbdev + meta.nid : " && echo Warning: Unsure on how to format this partition."))).to(out, err).submit(MiscUtils.w2((r) -> new AlertDialog.Builder(requireContext())
                                         .setTitle(r.isSuccess() ? R.string.successful : R.string.failed)
                                         .setMessage(String.join("\n", out) + "\n" + String.join("\n", err) + (String.join("", out).contains("old") ? "IMPORTANT: Please reboot!" : ""))
-                                        .setPositiveButton(R.string.ok, (g, l) -> recyclerView.setAdapter(new SDRecyclerViewAdapter(generateMeta(DeviceList.getModel(Objects.requireNonNull(model.getCodename().getValue()))))))
+                                        .setPositiveButton(R.string.ok, (g, l) -> recyclerView.setAdapter(new SDRecyclerViewAdapter(generateMeta(DeviceList.getModel(model)))))
                                         .setCancelable(false)
                                         .show()))))
                                 .show();
@@ -247,14 +246,14 @@ public class SDCardFragment extends Fragment {
                                     MiscUtils.w(requireContext(), R.string.delete_prog, () -> Shell.su(SDUtils.umsd(meta) + " && sgdisk " + bdev + " --delete " + meta.dumpS(id).id).to(out, err).submit(MiscUtils.w2((r) -> new AlertDialog.Builder(requireContext())
                                             .setTitle(r.isSuccess() ? R.string.successful : R.string.failed)
                                             .setMessage(String.join("\n", out) + "\n" + String.join("", err) + (String.join("", out).contains("old") ? "IMPORTANT: Please reboot!" : ""))
-                                            .setPositiveButton(R.string.ok, (g, s) -> recyclerView.setAdapter(new SDRecyclerViewAdapter(generateMeta(DeviceList.getModel(Objects.requireNonNull(model.getCodename().getValue()))))))
+                                            .setPositiveButton(R.string.ok, (g, s) -> recyclerView.setAdapter(new SDRecyclerViewAdapter(generateMeta(DeviceList.getModel(model)))))
                                             .setCancelable(false)
                                             .show())));
                                 }))
                                 .setPositiveButton(R.string.rename, (d, p) -> MiscUtils.w(requireContext(), R.string.renaming_prog, () -> Shell.su(SDUtils.umsd(meta) + " && sgdisk " + bdev + " --change-name " + meta.dumpS(id).id + ":'" + label.getText().toString().replace("'","") + "'").to(out, err).submit(MiscUtils.w2((r) -> new AlertDialog.Builder(requireContext())
                                         .setTitle(r.isSuccess() ? R.string.successful : R.string.failed)
                                         .setMessage(String.join("\n", out) + "\n" + String.join("", err) + (String.join("", out).contains("old") ? "IMPORTANT: Please reboot!" : ""))
-                                        .setPositiveButton(R.string.ok, (g, s) -> recyclerView.setAdapter(new SDRecyclerViewAdapter(generateMeta(DeviceList.getModel(Objects.requireNonNull(model.getCodename().getValue()))))))
+                                        .setPositiveButton(R.string.ok, (g, s) -> recyclerView.setAdapter(new SDRecyclerViewAdapter(generateMeta(DeviceList.getModel(model)))))
                                         .setCancelable(false)
                                         .show()))))
                                 .setView(v)
@@ -273,9 +272,9 @@ public class SDCardFragment extends Fragment {
         LinearLayoutManager recyclerLayoutManager = new LinearLayoutManager(requireContext());
         recyclerView.setLayoutManager(recyclerLayoutManager);
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), recyclerLayoutManager.getOrientation()));
-        final String bdev = DeviceList.getModel(Objects.requireNonNull(model.getCodename().getValue())).bdev;
+        final String bdev = DeviceList.getModel(model).bdev;
         SDUtils.setupCodes(requireContext());
-        AtomicReference<SDUtils.SDPartitionMeta> meta = new AtomicReference<>(generateMeta(DeviceList.getModel(Objects.requireNonNull(model.getCodename().getValue()))));
+        AtomicReference<SDUtils.SDPartitionMeta> meta = new AtomicReference<>(generateMeta(DeviceList.getModel(model)));
         if (meta.get() == null) {
             if (String.join("",Shell.su("sgdisk " + bdev + " --print").exec().getOut()).contains("invalid GPT and valid MBR")) {
                 ArrayList<String> out = new ArrayList<>();
@@ -291,7 +290,7 @@ public class SDCardFragment extends Fragment {
                                 .setCancelable(false)
                                 .setPositiveButton(R.string.ok, (d2, p2) -> {
                                     if (r.isSuccess()) {
-                                        meta.set(generateMeta(DeviceList.getModel(Objects.requireNonNull(model.getCodename().getValue()))));
+                                        meta.set(generateMeta(DeviceList.getModel(model)));
                                         recyclerView.setAdapter(new SDRecyclerViewAdapter(meta.get()));
                                     } else {
                                         requireActivity().finish();
