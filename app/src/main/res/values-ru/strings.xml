@@ -90,8 +90,12 @@
     <string name="successful">Successful</string>
     <string name="free_space">Free space</string>
     <string name="partid" tools:ignore="PluralsCandidate">Partition %1$d labeled \"%2$s\"</string>
+    <string name="partidn" tools:ignore="PluralsCandidate">Partition %1$d</string>
     <string name="partidt" tools:ignore="PluralsCandidate">%1$s with id %2$d labeled \"%3$s\"</string>
     <string name="create">Create</string>
+    <string name="backup">Backup</string>
+    <string name="restore">Restore</string>
+    <string name="backup_msg">Welcome to the simple Backup &amp; Restore tool. What do you want to do with this partition?</string>
     <string name="copy_file">Copying file…</string>
     <string name="sector_range">Sector range</string>
     <string name="label">Label</string>
