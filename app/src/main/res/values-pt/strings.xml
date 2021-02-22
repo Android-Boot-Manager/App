@@ -76,7 +76,7 @@
     <string name="about">Sobre</string>
     <string name="welcome">Bem-vindo!</string>
     <string name="wizard_deviceinstaller_text">Pronto! por favor siga as próximos etapas para instalar o Android Boot Manager. Se você mudar de ideia, você pode apertar em cancelar. Nada foi alterado até agora.</string>
-    <string name="wizard_devicerominstaller_text">Pronto! por favor siga as próximas etapas pafa a sua ROM. se você mudou de ideia, você pode apertar em cancelar. Nada foi alterado até agora.</string>
+    <string name="wizard_devicerominstaller_text">Ready! Please follow the next steps for installing your ROM. If you redecided, you can click cancel. Nothing was changed until now except that your SD card got flashed.</string>
     <string name="installerWelcome">Bem-vindo ao instalador do Android Boot Manager. Isso irá instalar o Android Boot Manager no seu aparelho. Modificações que não são fáceis de converter estão sendo feitas, por favor não instale sem conhecimento disso. Mantenha os requisitos mínimos em mente - você pode precisar formatar coisas manualmente! O aviso legal segue:</string>
     <string name="next">Próximo</string>
     <!-- Assistant page navigation -->
