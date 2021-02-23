@@ -68,8 +68,8 @@ public class DeviceROMInstallerWizardPageFragment extends Fragment {
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(intent, 5210);
             });
-            pdump = "/data/data/org.androidbootmanager.app/cache/" + key;
             key = (String) Objects.requireNonNull(imodel.getROM().getValue()).requiredFiles.keySet().toArray()[0];
+            pdump = "/data/data/org.androidbootmanager.app/cache/" + key;
             String val = imodel.getROM().getValue().requiredFiles.get(key);
             txt.setText(val);
             imodel.getROM().getValue().requiredFiles.remove(key);
