@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -52,6 +53,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.androidbootmanager.app.util.SDUtils.generateMeta;
@@ -152,14 +154,36 @@ public class SDCardFragment extends Fragment {
                         slider.setValues(0f, (float) (meta.dumpS(id).endSector - meta.dumpS(id).startSector));
                         slider.setStepSize(1);
                         slider.setMinSeparationValue(2048);
+                        Runnable rs = () -> {
+                            Editable s = start.getText();
+                            if ((float) (Long.parseLong(s.toString()) - meta.dumpS(id).startSector) < slider.getValueFrom()) {
+                                slider.setValues(0f, 1f);
+                            } else if ((float) (Long.parseLong(s.toString()) - meta.dumpS(id).startSector) > slider.getValues().get(1)) {
+                                slider.setValues(slider.getValues().get(1) - 1, slider.getValues().get(1));
+                            } else {
+                                slider.setValues((float) (Long.parseLong(s.toString()) - meta.dumpS(id).startSector), slider.getValues().get(1));
+                            }
+                        };
+                        Runnable re = () -> {
+                            Editable s = end.getText();
+                            if ((float) (Long.parseLong(s.toString()) - meta.dumpS(id).startSector) > slider.getValueTo()) {
+                                slider.setValues(slider.getValues().get(0), slider.getValueTo());
+                            } else if ((float) (Long.parseLong(s.toString()) - meta.dumpS(id).startSector) < slider.getValues().get(0)) {
+                                slider.setValues(slider.getValues().get(0) - 1, slider.getValues().get(0));
+                            } else {
+                                slider.setValues(slider.getValues().get(0), (float) (Long.parseLong(s.toString()) - meta.dumpS(id).startSector));
+                            }
+                        };
                         slider.addOnChangeListener((a, b, c) -> {
                             List<Float> values = slider.getValues();
                             float from = values.get(0);
                             float to = values.get(1);
-                            if (!start.getText().toString().equals(String.valueOf(meta.dumpS(id).startSector + (long) from)))
-                                start.setText(String.valueOf(meta.dumpS(id).startSector + (long) from));
-                            if (!end.getText().toString().equals(String.valueOf(meta.dumpS(id).startSector + (long) to)))
-                                end.setText(String.valueOf(meta.dumpS(id).startSector + (long) to));
+                            if (!start.getText().toString().equals(String.valueOf(meta.dumpS(id).startSector + (long) from))) {
+                                start.setText(String.valueOf(meta.dumpS(id).startSector + (long) from)); rs.run();
+                            }
+                            if (!end.getText().toString().equals(String.valueOf(meta.dumpS(id).startSector + (long) to))) {
+                                end.setText(String.valueOf(meta.dumpS(id).startSector + (long) to)); re.run();
+                            }
                             if (!size.getText().toString().equals(SOUtils.humanReadableByteCountBin((long) (to - from) * meta.logicalSectorSizeBytes)))
                                 size.setText(SOUtils.humanReadableByteCountBin((long) (to - from) * meta.logicalSectorSizeBytes));
                         });
@@ -174,45 +198,26 @@ public class SDCardFragment extends Fragment {
                             public void onNothingSelected(AdapterView<?> parent) {
                             }
                         });
+                        AtomicInteger xid = new AtomicInteger();
+                        start.setOnFocusChangeListener((view1, hasFocus) -> rs.run());
+                        end.setOnFocusChangeListener((view1, hasFocus) -> re.run());
                         start.addTextChangedListener(new TextWatcher() {
+                            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+                            @Override public void onTextChanged(CharSequence s, int start, int before, int count) { }
                             @Override
-                            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                            }
-
-                            @Override
-                            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                            }
-
-                            @Override
-                            public void afterTextChanged(Editable s) {
-                                if ((float) (Long.parseLong(s.toString()) - meta.dumpS(id).startSector) < slider.getValueFrom()) {
-                                    slider.setValues(0f, 1f);
-                                } else if ((float) (Long.parseLong(s.toString()) - meta.dumpS(id).startSector) > slider.getValues().get(1)) {
-                                    slider.setValues(slider.getValues().get(1) - 1, slider.getValues().get(1));
-                                } else {
-                                    slider.setValues((float) (Long.parseLong(s.toString()) - meta.dumpS(id).startSector), slider.getValues().get(1));
-                                }
-                            }
+                            public void afterTextChanged(Editable s) { int mid = xid.incrementAndGet(); new Handler().postDelayed(() -> {
+                                if (mid == xid.get())
+                                    rs.run();
+                            }, 1000); }
                         });
                         end.addTextChangedListener(new TextWatcher() {
+                            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+                            @Override public void onTextChanged(CharSequence s, int start, int before, int count) { }
                             @Override
-                            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                            }
-
-                            @Override
-                            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                            }
-
-                            @Override
-                            public void afterTextChanged(Editable s) {
-                                if ((float) (Long.parseLong(s.toString()) - meta.dumpS(id).startSector) > slider.getValueTo()) {
-                                    slider.setValues(slider.getValues().get(0), slider.getValueTo());
-                                } else if ((float) (Long.parseLong(s.toString()) - meta.dumpS(id).startSector) < slider.getValues().get(0)) {
-                                    slider.setValues(slider.getValues().get(0) - 1, slider.getValues().get(0));
-                                } else {
-                                    slider.setValues(slider.getValues().get(0), (float) (Long.parseLong(s.toString()) - meta.dumpS(id).startSector));
-                                }
-                            }
+                            public void afterTextChanged(Editable s) { int mid = xid.incrementAndGet(); new Handler().postDelayed(() -> {
+                                if (mid == xid.get())
+                                    rs.run();
+                            }, 1000); }
                         });
                         dd.setAdapter(new ArrayAdapter<>(requireActivity(), android.R.layout.simple_spinner_dropdown_item, new String[]{getString(R.string.portable_part), getString(R.string.data_part), getString(R.string.meta_part), getString(R.string.system_part), getString(R.string.unknown_part)}));
                         start.setText(String.valueOf(meta.dumpS(id).startSector));
