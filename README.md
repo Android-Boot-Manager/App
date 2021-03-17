@@ -24,9 +24,9 @@
 <div align="center">
   <h4>
     <a href="https://android-boot-manager.github.io">Website</a> |
-    <a href="https://github.com/Android-Boot-Manager/App/wiki/Install">Install</a> |
-    <a href="https://github.com/Android-Boot-Manager/App/wiki#Features">Features</a> |
-    <a href="https://github.com/Android-Boot-Manager/App/wiki/Configuration">Options</a>
+    <a href="https://www.wiki.abmanager.tech/index.php/Installation_Tutorial">Install</a> |
+    <a href="https://www.wiki.abmanager.tech/index.php/Main_Page#Features">Features</a> |
+    <a href="https://www.wiki.abmanager.tech/index.php/Configuration">Options</a>
   </h4>
 </div>
 

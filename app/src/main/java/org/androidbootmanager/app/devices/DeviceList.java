@@ -1,8 +1,11 @@
 package org.androidbootmanager.app.devices;
 
+import org.androidbootmanager.app.ui.home.InstalledViewModel;
+import org.androidbootmanager.app.ui.installer.DeviceInstallerViewModel;
 import org.androidbootmanager.app.ui.installer.DeviceInstallerWizardPageFragment;
 import org.androidbootmanager.app.ui.installer.DoInstallWizardPageFragment;
 import org.androidbootmanager.app.ui.installer.DroidBootSelectorWizardPageFragment;
+import org.androidbootmanager.app.ui.wizard.WizardViewModel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,6 +32,7 @@ public class DeviceList {
                 d.viewname = "Volla Phone";
                 d.bdev = "/dev/block/mmcblk1";
                 d.pbdev = "/dev/block/mmcblk1p";
+                d.spartsize = 7340031f;
                 d.flow = Arrays.asList(DeviceInstallerWizardPageFragment.class, DroidBootSelectorWizardPageFragment.class, DoInstallWizardPageFragment.class);
                 break;
             /*case "cedric":
@@ -44,6 +48,18 @@ public class DeviceList {
                 throw new RuntimeException(new IllegalStateException("DeviceModel not found: unknown device '" + codename + "'"));
         }
         return d;
+    }
+
+    public static DeviceModel getModel(InstalledViewModel m) {
+        return getModel(m.getCodename().getValue());
+    }
+
+    public static DeviceModel getModel(WizardViewModel m) {
+        return getModel(m.getCodename().getValue());
+    }
+
+    public static DeviceModel getModel(DeviceInstallerViewModel m) {
+        return getModel(m.getCodename().getValue());
     }
 
     public static List<DeviceModel> getModels() {

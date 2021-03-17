@@ -9,6 +9,7 @@ public class DeviceModel {
     public String viewname = "";
     public String bdev = "";
     public String pbdev = "";
+    public float spartsize = 0f;
     public List<Class<? extends Fragment>> flow;
     @SuppressWarnings("CanBeFinal")
     public boolean usesLegacyDir = false;

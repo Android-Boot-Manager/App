@@ -11,5 +11,6 @@ public class ROM {
     public Map<String, String> requiredFiles;
     public ArrayList<String> parts;
     public HashMap<String, String> strings;
+    public HashMap<String, String> flashes;
     public CmdlineGenerator gen;
 }

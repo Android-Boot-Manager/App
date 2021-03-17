@@ -30,7 +30,6 @@ import org.androidbootmanager.app.util.Constants;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class HomeFragment extends Fragment {
@@ -79,9 +78,9 @@ public class HomeFragment extends Fragment {
             ((NavigationView) requireActivity().findViewById(R.id.nav_view)).getMenu().findItem(R.id.nav_roms).setEnabled(check1.get() && check2.get() && check3.get());
             ((NavigationView) requireActivity().findViewById(R.id.nav_view)).getMenu().findItem(R.id.nav_sd).setEnabled(check1.get() && check2.get() && check3.get());
             if (check1.get() && check2.get() && check3.get()) {
-                if (!((MainActivity) requireActivity()).mount(DeviceList.getModel(Objects.requireNonNull(model.getCodename().getValue()))))
+                if (!((MainActivity) requireActivity()).mount(DeviceList.getModel(model)))
                     Toast.makeText(requireActivity(), R.string.bootset_fail, Toast.LENGTH_LONG).show();
-                sd.set(SuFile.open(DeviceList.getModel(model.getCodename().getValue()).bdev).exists());
+                sd.set(SuFile.open(DeviceList.getModel(model).bdev).exists());
                 ((NavigationView) requireActivity().findViewById(R.id.nav_view)).getMenu().findItem(R.id.nav_sd).setEnabled(check1.get() && check2.get() && check3.get() && sd.get());
             }
         });
