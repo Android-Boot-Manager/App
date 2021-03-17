@@ -35,8 +35,8 @@
     <string name="delete_msg">Isso vai deletar a partição %1$d do tipo %2$s nomeada \'%3$s\'</string>
     <string name="delete_msg_2">Isso vai deletar o arquivo de configuração da ROM %1$s. Você precisa deletar partições no cartão SD manualmente para prevenir a perda de dados.</string>
     <string name="add_rom">Adicionar ROM</string>
-    <string name="other_os">Other OS (boot.img) (Advanced users only!)</string>
-    <string name="empty_entry">Empty Entry file (Advanced users only!)</string>
+    <string name="other_os">Outro OS (boot.img) (Usuários avançados apenas!)</string>
+    <string name="empty_entry">Arquivo de entrada vazio (Usuários avançados apenas!)</string>
     <string name="wait">Por favor aguarde…</string>
     <string name="delete_prog">Deletando…</string>
     <string name="convert_prog">Convertendo…</string>
@@ -46,10 +46,10 @@
     <string name="rename">Renomear</string>
     <string name="updatelk">Atualizar DroidBoot</string>
     <string name="rom_type_add_ut_sysimg_halium">Ubuntu Touch (System image, Halium Boot image)</string>
-    <string name="select_halium_boot">Please select the halium boot image</string>
-    <string name="select_hybris_boot">Please select the hybris boot image</string>
-    <string name="select_boot">Please select the boot image</string>
-    <string name="select_system_image">Please select the system image</string>
+    <string name="select_halium_boot">Por favor selecione a imagem do halium boot</string>
+    <string name="select_hybris_boot">Por favor selecione a hybris boot image</string>
+    <string name="select_boot">Por favor selecione a boot image</string>
+    <string name="select_system_image">Por favor selecione a system image</string>
     <string name="selected">Arquivo selecionado.</string>
     <string name="enter_rom_name">Por favor adicione o nome da ROM para mostrar no menu. Você pode escolher livremente.</string>
     <string name="enter_rom_folder">Por favor adicione o nome do diretório da ROM. ele pode já existir. Se tiver em dúvida, deixe o padrão.</string>
@@ -76,7 +76,7 @@
     <string name="about">Sobre</string>
     <string name="welcome">Bem-vindo!</string>
     <string name="wizard_deviceinstaller_text">Pronto! por favor siga as próximos etapas para instalar o Android Boot Manager. Se você mudar de ideia, você pode apertar em cancelar. Nada foi alterado até agora.</string>
-    <string name="wizard_devicerominstaller_text">Pronto! por favor siga as próximas etapas pafa a sua ROM. se você mudou de ideia, você pode apertar em cancelar. Nada foi alterado até agora.</string>
+    <string name="wizard_devicerominstaller_text">Pronto! por favor siga as próximas etapas para a instalação da sua ROM. Se vc você mudar de ideia, Você pode apertar em cancelar. Nada foi feito até agora exceto que o seu cartão SD foi flasheado.</string>
     <string name="installerWelcome">Bem-vindo ao instalador do Android Boot Manager. Isso irá instalar o Android Boot Manager no seu aparelho. Modificações que não são fáceis de converter estão sendo feitas, por favor não instale sem conhecimento disso. Mantenha os requisitos mínimos em mente - você pode precisar formatar coisas manualmente! O aviso legal segue:</string>
     <string name="next">Próximo</string>
     <!-- Assistant page navigation -->
@@ -90,8 +90,12 @@
     <string name="successful">Sucesso</string>
     <string name="free_space">Espaço disponível</string>
     <string name="partid" tools:ignore="PluralsCandidate">Partição %1$d nomeada \"%2$s\"</string>
+    <string name="partidn" tools:ignore="PluralsCandidate">Partição %1$d</string>
     <string name="partidt" tools:ignore="PluralsCandidate">%1$s com a id %2$d nomeada \"%3$s\"</string>
     <string name="create">Criar</string>
+    <string name="backup">Backup</string>
+    <string name="restore">Restore</string>
+    <string name="backup_msg">Bem-vindo ao backup simples &amp; ferramenta de restauração. Oque você quer fazer nessa partição?</string>
     <string name="copy_file">Copiando arquivo…</string>
     <string name="sector_range">Alcance do setor</string>
     <string name="label">Rótulo</string>

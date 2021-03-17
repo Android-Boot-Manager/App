@@ -76,7 +76,7 @@
     <string name="about">Про програму</string>
     <string name="welcome">Ласкаво просимо!</string>
     <string name="wizard_deviceinstaller_text">Готово! Будь ласка, виконайте наступні кроки до встановлення Android Boot Manager. Якщо ви передумали, натисніть кнопку \"Скасувати\". До цього часу нічого не змінилося.</string>
-    <string name="wizard_devicerominstaller_text">Готово! Будь ласка, виконайте наступні кроки до встановлення Android Boot Manager. Якщо ви передумали, натисніть кнопку \"Скасувати\". До цього часу нічого не змінилося.</string>
+    <string name="wizard_devicerominstaller_text">Ready! Please follow the next steps for installing your ROM. If you redecided, you can click cancel. Nothing was changed until now except that your SD card got flashed.</string>
     <string name="installerWelcome">Welcome to the Android Boot Manager installer. This will install Android Boot Manager on your device. Not easily undoable modifications are being done, please do not install without knowledge about it. Keep the prerequisites in mind - you may need to format stuff manually! Disclaimer follows:</string>
     <string name="next">Наступний</string>
     <!-- Assistant page navigation -->
@@ -90,8 +90,12 @@
     <string name="successful">Successful</string>
     <string name="free_space">Free space</string>
     <string name="partid" tools:ignore="PluralsCandidate">Partition %1$d labeled \"%2$s\"</string>
+    <string name="partidn" tools:ignore="PluralsCandidate">Partition %1$d</string>
     <string name="partidt" tools:ignore="PluralsCandidate">%1$s with id %2$d labeled \"%3$s\"</string>
     <string name="create">Create</string>
+    <string name="backup">Backup</string>
+    <string name="restore">Restore</string>
+    <string name="backup_msg">Welcome to the simple Backup &amp; Restore tool. What do you want to do with this partition?</string>
     <string name="copy_file">Copying file…</string>
     <string name="sector_range">Sector range</string>
     <string name="label">Label</string>
