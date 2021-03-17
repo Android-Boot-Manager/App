@@ -76,7 +76,7 @@
     <string name="about">Über</string>
     <string name="welcome">Willkommen!</string>
     <string name="wizard_deviceinstaller_text">Fertig! Bitte befolge die nächsten Schritte um den Android Boot Manager zu installieren. Wenn du es dir anders überlegst kannst du auf Abbrechen klicken. Bis jetzt wurde nichts geändert.</string>
-    <string name="wizard_devicerominstaller_text">Ready! Please follow the next steps for installing your ROM. If you redecided, you can click cancel. Nothing was changed until now except that your SD card got flashed.</string>
+    <string name="wizard_devicerominstaller_text">Fertig! Bitte befolge die nächsten Schritte um dein Betriebssystem zu installieren. Wenn du es dir anders überlegst kannst du auf Abbrechen klicken. Bis jetzt wurde nichts geändert, außer deine SD-Karte.</string>
     <string name="installerWelcome">Willkommen beim Android Boot Manager Installer. Damit wird Android Boot Manager auf Ihrem Gerät installiert. Es werden nicht leicht rückgängig zu machende Änderungen vorgenommen, bitte installieren Sie nicht ohne Wissen darüber. Bitte beachten Sie die Voraussetzungen - Sie müssen eventuell etwas manuell formatieren! Haftungsausschluss:</string>
     <string name="next">Weiter</string>
     <!-- Assistant page navigation -->
@@ -94,8 +94,8 @@
     <string name="partidt" tools:ignore="PluralsCandidate">%1$s mit id %2$d gekennzeichnet \"%3$s\"</string>
     <string name="create">Erstellen</string>
     <string name="backup">Backup</string>
-    <string name="restore">Restore</string>
-    <string name="backup_msg">Welcome to the simple Backup &amp; Restore tool. What do you want to do with this partition?</string>
+    <string name="restore">Wiederherstellen</string>
+    <string name="backup_msg">Willkommen beim einfachen Backup- &amp; Wiederherstellungswerkzeug. Was möchten Sie mit dieser Partition tun?</string>
     <string name="copy_file">Kopiere Datei…</string>
     <string name="sector_range">Sektorbereich</string>
     <string name="label">Bezeichnung</string>
