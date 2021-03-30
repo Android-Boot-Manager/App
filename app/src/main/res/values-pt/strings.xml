@@ -95,6 +95,7 @@
     <string name="create">Criar</string>
     <string name="backup">Backup</string>
     <string name="restore">Restore</string>
+    <string name="restoresparse">Restore Sparse</string>
     <string name="backup_msg">Bem-vindo ao backup simples &amp; ferramenta de restauração. Oque você quer fazer nessa partição?</string>
     <string name="copy_file">Copiando arquivo…</string>
     <string name="sector_range">Alcance do setor</string>
