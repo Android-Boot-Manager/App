@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.slider.RangeSlider;
 import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.io.SuFile;
 import com.topjohnwu.superuser.io.SuFileInputStream;
 import com.topjohnwu.superuser.io.SuFileOutputStream;
 
@@ -245,9 +247,14 @@ public class SDCardFragment extends Fragment {
                         final RangeSlider slider = v.findViewById(R.id.create_part_slide);
                         final TextView size = v.findViewById(R.id.create_part_size);
                         final Toolbar t = new Toolbar(requireContext());
+                        final Toolbar bt = new Toolbar(requireContext());
+                        final AlertDialog[] bdialog = new AlertDialog[1];
                         t.setBackgroundColor(getResources().getColor(R.color.colorAccent, requireActivity().getTheme()));
+                        bt.setBackgroundColor(getResources().getColor(R.color.colorAccent, requireActivity().getTheme()));
                         t.setTitle(getString(R.string.partidn, meta.dumpS(id).id));
+                        bt.setTitle(getString(R.string.partidn, meta.dumpS(id).id));
                         t.setNavigationIcon(android.R.drawable.ic_menu_close_clear_cancel);
+                        bt.setNavigationIcon(android.R.drawable.ic_menu_close_clear_cancel);
                         size.setText(meta.dumpS(id).sizeFancy);
                         slider.setValueFrom(0f);
                         slider.setValueTo((float) (meta.dumpS(id).endSector - meta.dumpS(id).startSector));
@@ -265,7 +272,7 @@ public class SDCardFragment extends Fragment {
                         label.setText(meta.dumpS(id).name);
                         ArrayList<String> out = new ArrayList<>();
                         ArrayList<String> err = new ArrayList<>();
-                        AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                        final AlertDialog[] dialog = {new AlertDialog.Builder(requireContext())
                                 .setCustomTitle(t)
                                 .setNegativeButton(R.string.delete, (w, p1) -> MiscUtils.sure(requireContext(), w, getString(R.string.delete_msg, meta.dumpS(id).id, SDUtils.codes.get(meta.dumpS(id).code), meta.dumpS(id).name), (d, p) -> {
                                     MiscUtils.w(requireContext(), R.string.delete_prog, () -> Shell.su(SDUtils.umsd(meta) + " && sgdisk " + bdev + " --delete " + meta.dumpS(id).id).to(out, err).submit(MiscUtils.w2((r) -> new AlertDialog.Builder(requireContext())
@@ -275,14 +282,14 @@ public class SDCardFragment extends Fragment {
                                             .setCancelable(false)
                                             .show())));
                                 }))
-                                .setNeutralButton(R.string.rename, (d, p) -> MiscUtils.w(requireContext(), R.string.renaming_prog, () -> Shell.su(SDUtils.umsd(meta) + " && sgdisk " + bdev + " --change-name " + meta.dumpS(id).id + ":'" + label.getText().toString().replace("'","") + "'").to(out, err).submit(MiscUtils.w2((r) -> new AlertDialog.Builder(requireContext())
+                                .setNeutralButton(R.string.rename, (d, p) -> MiscUtils.w(requireContext(), R.string.renaming_prog, () -> Shell.su(SDUtils.umsd(meta) + " && sgdisk " + bdev + " --change-name " + meta.dumpS(id).id + ":'" + label.getText().toString().replace("'", "") + "'").to(out, err).submit(MiscUtils.w2((r) -> new AlertDialog.Builder(requireContext())
                                         .setTitle(r.isSuccess() ? R.string.successful : R.string.failed)
                                         .setMessage(String.join("\n", out) + "\n" + String.join("", err) + (String.join("", out).contains("old") ? "IMPORTANT: Please reboot!" : ""))
                                         .setPositiveButton(R.string.ok, (g, s) -> recyclerView.setAdapter(new SDRecyclerViewAdapter(generateMeta(DeviceList.getModel(model)))))
                                         .setCancelable(false)
                                         .show()))))
-                                .setPositiveButton(R.string.backup, (d, p) -> new AlertDialog.Builder(requireContext())
-                                        .setTitle(getString(R.string.partidn, meta.dumpS(id).id))
+                                .setPositiveButton(R.string.backup, (d, p) -> bdialog[0] = new AlertDialog.Builder(requireContext())
+                                        .setCustomTitle(bt)
                                         .setMessage(R.string.backup_msg)
                                         .setPositiveButton(R.string.backup, (d2, p2) -> {
                                             outpath = meta.ppath + meta.dumpS(id).id;
@@ -299,12 +306,19 @@ public class SDCardFragment extends Fragment {
                                             intent.setAction(Intent.ACTION_GET_CONTENT);
                                             startActivityForResult(intent, 5212);
                                         })
-                                        .setNeutralButton(R.string.cancel, (d2, p2) -> d2.dismiss())
+                                        .setNeutralButton(R.string.restoresparse, (d2, p2) -> {
+                                            outpath = meta.ppath + meta.dumpS(id).id;
+                                            Intent intent = new Intent();
+                                            intent.setType("*/*");
+                                            intent.setAction(Intent.ACTION_GET_CONTENT);
+                                            startActivityForResult(intent, 5299);
+                                        })
                                         .show())
                                 .setView(v)
-                                .create();
-                        t.setNavigationOnClickListener((a) -> dialog.dismiss());
-                        dialog.show();
+                                .create()};
+                        t.setNavigationOnClickListener((a) -> dialog[0].dismiss());
+                        bt.setNavigationOnClickListener(a -> bdialog[0].dismiss());
+                        dialog[0].show();
                     }
                 });
             }
@@ -357,6 +371,7 @@ public class SDCardFragment extends Fragment {
         return root;
     }
 
+    @SuppressLint("SdCardPath")
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == 5212) {
@@ -414,6 +429,43 @@ public class SDCardFragment extends Fragment {
                             SplashActivity.copyFile(inStream, initialStream);
                             inStream.close();
                             initialStream.close();
+                        } catch (IOException e) {
+                            requireActivity().runOnUiThread(() -> Toast.makeText(requireContext(), R.string.failure, Toast.LENGTH_LONG).show());
+                            e.printStackTrace();
+                        }
+                    })).start());
+                } catch (IOException e) {
+                    Toast.makeText(requireContext(), R.string.failure, Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                }
+            } else {
+                Toast.makeText(requireContext(), R.string.failure, Toast.LENGTH_LONG).show();
+                new IllegalStateException("Result not OK but " + resultCode).printStackTrace();
+            }
+        } else if (requestCode == 5299) {
+            if (resultCode == Activity.RESULT_OK) {
+                assert data != null;
+                Uri selectedUri = data.getData();
+                try {
+                    InputStream initialStream;
+                    if (selectedUri != null) {
+                        initialStream = requireActivity().getContentResolver().openInputStream(selectedUri);
+                    } else {
+                        Toast.makeText(requireContext(), R.string.failure, Toast.LENGTH_LONG).show();
+                        new IllegalStateException("null selected").printStackTrace();
+                        return;
+                    }
+                    MiscUtils.w(requireContext(), R.string.backup, () -> new Thread(MiscUtils.w2t(requireActivity(), () -> {
+                        try {
+                            File targetFile = new File("/data/data/org.androidbootmanager.app/cache/unsparse.img");
+                            assert initialStream != null;
+                            OutputStream outStream = SuFileOutputStream.open(targetFile);
+                            SplashActivity.copyFile(initialStream, outStream);
+                            initialStream.close();
+                            outStream.close();
+                            Log.i("ABM","copy done");
+                            Shell.su("/data/data/org.androidbootmanager.app/assets/Toolkit/simg2img /data/data/org.androidbootmanager.app/cache/unsparse.img " + outpath).exec();
+                            Log.i("ABM","Result of delete: " + SuFile.open(targetFile.getAbsolutePath()).delete());
                         } catch (IOException e) {
                             requireActivity().runOnUiThread(() -> Toast.makeText(requireContext(), R.string.failure, Toast.LENGTH_LONG).show());
                             e.printStackTrace();

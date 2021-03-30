@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.io.SuFile;
 import com.topjohnwu.superuser.io.SuFileOutputStream;
 
 import org.androidbootmanager.app.R;
@@ -94,7 +97,7 @@ public class DeviceROMInstallerWizardPageFragment extends Fragment {
                     Intent intent = new Intent();
                     intent.setType("*/*");
                     intent.setAction(Intent.ACTION_GET_CONTENT);
-                    startActivityForResult(intent, 5210);
+                    startActivityForResult(intent, 5299);
                 });
                 imodel.getROM().getValue().flashes.remove(key);
                 imodel.addPart(meta.dumpPartition(dd.getSelectedItemPosition()).id);
@@ -150,6 +153,7 @@ public class DeviceROMInstallerWizardPageFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
     }
 
+    @SuppressLint("SdCardPath")
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == 5210) {
@@ -169,7 +173,7 @@ public class DeviceROMInstallerWizardPageFragment extends Fragment {
                     ok.setVisibility(View.INVISIBLE);
                     new Thread(() -> {
                         try {
-                            @SuppressLint("SdCardPath") File targetFile = new File(pdump);
+                            File targetFile = new File(pdump);
                             assert initialStream != null;
                             OutputStream outStream = SuFileOutputStream.open(targetFile);
                             SplashActivity.copyFile(initialStream, outStream);
@@ -180,6 +184,50 @@ public class DeviceROMInstallerWizardPageFragment extends Fragment {
                                 model.setPositiveFragment(DeviceROMInstallerWizardPageFragment.class);
                                 txt.setText(getString(R.string.selected));
                             });
+                        } catch (IOException e) {
+                            requireActivity().runOnUiThread(() -> Toast.makeText(requireContext(), R.string.failure, Toast.LENGTH_LONG).show());
+                            e.printStackTrace();
+                        }
+                    }).start();
+                } catch (IOException e) {
+                    Toast.makeText(requireContext(), R.string.failure, Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                }
+            } else {
+                Toast.makeText(requireContext(), R.string.failure, Toast.LENGTH_LONG).show();
+                new IllegalStateException("Result not OK but " + resultCode).printStackTrace();
+            }
+        } else if (requestCode == 5299) {
+            if (resultCode == Activity.RESULT_OK) {
+                assert data != null;
+                Uri selectedUri = data.getData();
+                try {
+                    InputStream initialStream;
+                    if (selectedUri != null) {
+                        initialStream = requireActivity().getContentResolver().openInputStream(selectedUri);
+                    } else {
+                        Toast.makeText(requireContext(), R.string.failure, Toast.LENGTH_LONG).show();
+                        new IllegalStateException("null selected").printStackTrace();
+                        return;
+                    }
+                    txt.setText(R.string.copy_file);
+                    ok.setVisibility(View.INVISIBLE);
+                    new Thread(() -> {
+                        try {
+                            File targetFile = new File("/data/data/org.androidbootmanager.app/cache/unsparse.img");
+                            assert initialStream != null;
+                            OutputStream outStream = SuFileOutputStream.open(targetFile);
+                            SplashActivity.copyFile(initialStream, outStream);
+                            initialStream.close();
+                            outStream.close();
+                            Log.i("ABM","copy done");
+                            Shell.su("/data/data/org.androidbootmanager.app/assets/Toolkit/simg2img /data/data/org.androidbootmanager.app/cache/unsparse.img " + pdump).exec();
+                            requireActivity().runOnUiThread(() -> {
+                                model.setPositiveText(getString(R.string.next));
+                                model.setPositiveFragment(DeviceROMInstallerWizardPageFragment.class);
+                                txt.setText(getString(R.string.selected));
+                            });
+                            Log.i("ABM","Result of delete: " + SuFile.open(targetFile.getAbsolutePath()).delete());
                         } catch (IOException e) {
                             requireActivity().runOnUiThread(() -> Toast.makeText(requireContext(), R.string.failure, Toast.LENGTH_LONG).show());
                             e.printStackTrace();
