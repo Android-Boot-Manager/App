@@ -95,6 +95,7 @@
     <string name="create">Erstellen</string>
     <string name="backup">Backup</string>
     <string name="restore">Wiederherstellen</string>
+    <string name="restoresparse">Restore Sparse</string>
     <string name="backup_msg">Willkommen beim einfachen Backup- &amp; Wiederherstellungswerkzeug. Was möchten Sie mit dieser Partition tun?</string>
     <string name="copy_file">Kopiere Datei…</string>
     <string name="sector_range">Sektorbereich</string>
