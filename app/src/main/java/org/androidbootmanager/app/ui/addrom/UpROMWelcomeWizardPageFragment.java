@@ -48,10 +48,11 @@ public class UpROMWelcomeWizardPageFragment extends Fragment {
         else
             imodel.setROM(l.getROMs().stream().filter(r -> r.scriptname.equals("other_os.sh")).findFirst().get());
         imodel.getName().add(e.config.get("title"));
-        imodel.getName().add(e.file.replace("/data/abm/bootset/lk2nd/entries/","").replace(".cfg",""));
+        imodel.getName().add(e.file.replace("/data/abm/bootset/lk2nd/entries/","").replace(".conf",""));
         Objects.requireNonNull(imodel.getROM().getValue()).parts.clear();
         Objects.requireNonNull(imodel.getROM().getValue()).flashes.clear();
         Objects.requireNonNull(imodel.getROM().getValue()).strings.clear();
+        Objects.requireNonNull(imodel.getROM().getValue()).fullPath = "FORMATDATA=false " + imodel.getROM().getValue().fullPath;
         final View root = inflater.inflate(R.layout.wizard_installer_welcome, container, false);
         final TextView message = root.findViewById(R.id.wizard_installer_welcome_txt);
         message.setText(R.string.kernel_update_msg);
