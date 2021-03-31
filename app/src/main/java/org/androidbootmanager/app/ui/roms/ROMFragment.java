@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -25,9 +26,13 @@ import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.io.SuFile;
 
 import org.androidbootmanager.app.R;
+import org.androidbootmanager.app.roms.ROM;
 import org.androidbootmanager.app.ui.addrom.AddROMWelcomeWizardPageFragment;
+import org.androidbootmanager.app.ui.addrom.UpROMWelcomeWizardPageFragment;
 import org.androidbootmanager.app.ui.home.InstalledViewModel;
+import org.androidbootmanager.app.ui.installer.InstallerWelcomeWizardPageFragment;
 import org.androidbootmanager.app.ui.wizard.WizardActivity;
+import org.androidbootmanager.app.ui.wizard.WizardViewModel;
 import org.androidbootmanager.app.util.ActionAbortedCleanlyError;
 import org.androidbootmanager.app.util.ConfigFile;
 import org.androidbootmanager.app.util.ConfigTextWatcher;
@@ -44,8 +49,9 @@ public class ROMFragment extends Fragment {
     ROMRecyclerViewAdapter adapter;
     InstalledViewModel model;
     FloatingActionButton fab;
+    public static Entry current;
 
-    private static class Entry {
+    public static class Entry {
         public final String file;
         public ConfigFile config;
         public Entry(String outFile) throws ActionAbortedCleanlyError {
@@ -130,6 +136,10 @@ public class ROMFragment extends Fragment {
                         proposed_ = new ConfigFile();
                     }
                     final ConfigFile proposed = proposed_;
+                    final Toolbar t = new Toolbar(requireContext());
+                    t.setTitle(R.string.edit_entry);
+                    t.setBackgroundColor(getResources().getColor(R.color.colorAccent, requireActivity().getTheme()));
+                    t.setNavigationIcon(android.R.drawable.ic_menu_close_clear_cancel);
                     View dialog = LayoutInflater.from(requireContext()).inflate(R.layout.edit_entry,null);
                     ((EditText) dialog.findViewById(R.id.editentryTitle)).setText(e.config.get("title"));
                     ((EditText) dialog.findViewById(R.id.editentryTitle)).addTextChangedListener(new ConfigTextWatcher(proposed, "title"));
@@ -145,9 +155,21 @@ public class ROMFragment extends Fragment {
                     dialog.findViewById(R.id.editentryDataPart).setEnabled(false);
                     ((EditText) dialog.findViewById(R.id.editentrySysPart)).setText(e.config.get("xsystem"));
                     dialog.findViewById(R.id.editentrySysPart).setEnabled(false);
-                    new AlertDialog.Builder(requireContext())
+                    AlertDialog d = new AlertDialog.Builder(requireContext())
                             .setCancelable(true)
-                            .setNeutralButton(R.string.cancel, (p1, p2) -> p1.dismiss())
+                            .setNeutralButton(R.string.kernel_update, (p1, p2) -> {
+                                if (e.config.get("xsystem").equals("real") || e.config.get("xdata").equals("real")) {
+                                    new AlertDialog.Builder(requireContext())
+                                            .setTitle(R.string.failed)
+                                            .setMessage(R.string.update_real_rom)
+                                            .setCancelable(true)
+                                            .setNegativeButton(R.string.ok, (d2, p) -> d2.dismiss())
+                                            .show();
+                                    return;
+                                }
+                                current = e;
+                                startActivity(new Intent(requireActivity(), WizardActivity.class).putExtra("StartFragment", UpROMWelcomeWizardPageFragment.class));
+                            })
                             .setNegativeButton(R.string.delete, (p1, p2) -> MiscUtils.sure(requireContext(), p1, getString(R.string.delete_msg_2, e.config.get("title")), (p112, p212) -> {
                                 if (e.config.get("xsystem") != null && e.config.get("xdata") != null)
                                     if (e.config.get("xsystem").equals("real") || e.config.get("xdata").equals("real")) {
@@ -155,7 +177,7 @@ public class ROMFragment extends Fragment {
                                                 .setTitle(R.string.failed)
                                                 .setMessage(R.string.delete_real_rom)
                                                 .setCancelable(true)
-                                                .setNegativeButton(R.string.ok, (d, p) -> d.dismiss())
+                                                .setNegativeButton(R.string.ok, (d2, p) -> d2.dismiss())
                                                 .show();
                                         return;
                                     }
@@ -170,9 +192,10 @@ public class ROMFragment extends Fragment {
                                 e.save();
                                 updateEntries();
                             })
-                            .setTitle(R.string.edit_entry)
+                            .setCustomTitle(t)
                             .setView(dialog)
                             .show();
+                    t.setNavigationOnClickListener(a -> d.dismiss());
                 });
             }
 
