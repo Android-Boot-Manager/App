@@ -158,7 +158,7 @@ public class ROMFragment extends Fragment {
                     AlertDialog d = new AlertDialog.Builder(requireContext())
                             .setCancelable(true)
                             .setNeutralButton(R.string.kernel_update, (p1, p2) -> {
-                                if (e.config.get("xsystem").equals("real") || e.config.get("xdata").equals("real")) {
+                                if ((e.config.get("xsystem") == null ? "" : e.config.get("xsystem")).equals("real") || e.config.get("xdata").equals("real")) {
                                     new AlertDialog.Builder(requireContext())
                                             .setTitle(R.string.failed)
                                             .setMessage(R.string.update_real_rom)
