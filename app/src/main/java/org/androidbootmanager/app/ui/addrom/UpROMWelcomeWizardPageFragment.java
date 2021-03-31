@@ -39,16 +39,19 @@ public class UpROMWelcomeWizardPageFragment extends Fragment {
         ROMFragment.Entry e = ROMFragment.current;
         if (e.config.get("xsystem") != null)
             Objects.requireNonNull(imodel.getParts().getValue()).add(Integer.parseInt(e.config.get("xsystem")));
-        if (e.config.get("xrom").equals("UT"))
+        if (e.config.get("xdata") != null)
+            Objects.requireNonNull(imodel.getParts().getValue()).add(Integer.parseInt(e.config.get("xdata")));
+        if (e.config.get("xtype").equals("UT"))
             imodel.setROM(l.getROMs().stream().filter(r -> r.scriptname.equals("add_ubuntutouch_systemimage_haliumboot.sh")).findFirst().get());
-        else if (e.config.get("xrom").equals("SFOS"))
+        else if (e.config.get("xtype").equals("SFOS"))
             imodel.setROM(l.getROMs().stream().filter(r -> r.scriptname.equals("add_sailfish.sh")).findFirst().get());
+        else
+            imodel.setROM(l.getROMs().stream().filter(r -> r.scriptname.equals("other_os.sh")).findFirst().get());
         imodel.getName().add(e.config.get("title"));
         imodel.getName().add(e.file.replace("/data/abm/bootset/lk2nd/entries/","").replace(".cfg",""));
         Objects.requireNonNull(imodel.getROM().getValue()).parts.clear();
         Objects.requireNonNull(imodel.getROM().getValue()).flashes.clear();
         Objects.requireNonNull(imodel.getROM().getValue()).strings.clear();
-        Objects.requireNonNull(imodel.getParts().getValue()).add(Integer.parseInt(e.config.get("xdata")));
         final View root = inflater.inflate(R.layout.wizard_installer_welcome, container, false);
         final TextView message = root.findViewById(R.id.wizard_installer_welcome_txt);
         message.setText(R.string.kernel_update_msg);
