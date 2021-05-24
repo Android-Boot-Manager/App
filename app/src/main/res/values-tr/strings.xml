@@ -107,14 +107,14 @@
     <string name="adopted_part">Adopted Storage</string>
     <string name="meta_part">ABM/Adopted Storage Metadata</string>
     <string name="portable_part">Portable Storage</string>
-    <string name="system_part">OS System data</string>
-    <string name="data_part">OS User data</string>
-    <string name="data">Data</string>
-    <string name="system">System</string>
-    <string name="update_real_rom">You cannot update your real ROM via ABM!</string>
-    <string name="kernel_update">Kernel Update</string>
-    <string name="kernel_update_msg">You are about to update the kernel/boot image of the selected ROM and regenerate it\'s config.</string>
+    <string name="system_part">Sistem Verileri</string>
+    <string name="data_part">Kullanıcı verileri</string>
+    <string name="data">Veriler</string>
+    <string name="system">Sistem</string>
+    <string name="update_real_rom">ABM ile kurulu ROM\'u güncelleyemezsiniz!</string>
+    <string name="kernel_update">Çekirdek Güncelleme</string>
+    <string name="kernel_update_msg">Seçtiğiniz ROM\'un çekirdek/boot imajını güncellemek ve ayarlarını yeniden oluşturmak üzeresiniz.</string>
     <string name="select_part">Please select an unused partition on your SD card configured with the following type: %1$s. Please make sure it really is the correct one, you can cancel and label it if unsure. If you didn\'t create one yet, do that first.</string>
     <!-- How an partition is used -->
-    <string name="usage">Usage</string>
+    <string name="usage">Kullanım</string>
 </resources>
