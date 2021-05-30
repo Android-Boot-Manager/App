@@ -95,6 +95,7 @@
     <string name="create">Create</string>
     <string name="backup">Backup</string>
     <string name="restore">Restore</string>
+    <string name="restoresparse">Restore Sparse</string>
     <string name="backup_msg">Welcome to the simple Backup &amp; Restore tool. What do you want to do with this partition?</string>
     <string name="copy_file">Copying file…</string>
     <string name="sector_range">Sector range</string>
@@ -106,11 +107,14 @@
     <string name="adopted_part">Adopted Storage</string>
     <string name="meta_part">ABM/Adopted Storage Metadata</string>
     <string name="portable_part">Portable Storage</string>
-    <string name="system_part">OS System data</string>
-    <string name="data_part">OS User data</string>
-    <string name="data">Data</string>
-    <string name="system">System</string>
+    <string name="system_part">Sistem Verileri</string>
+    <string name="data_part">Kullanıcı verileri</string>
+    <string name="data">Veriler</string>
+    <string name="system">Sistem</string>
+    <string name="update_real_rom">ABM ile kurulu ROM\'u güncelleyemezsiniz!</string>
+    <string name="kernel_update">Çekirdek Güncelleme</string>
+    <string name="kernel_update_msg">Seçtiğiniz ROM\'un çekirdek/boot imajını güncellemek ve ayarlarını yeniden oluşturmak üzeresiniz.</string>
     <string name="select_part">Please select an unused partition on your SD card configured with the following type: %1$s. Please make sure it really is the correct one, you can cancel and label it if unsure. If you didn\'t create one yet, do that first.</string>
     <!-- How an partition is used -->
-    <string name="usage">Usage</string>
+    <string name="usage">Kullanım</string>
 </resources>

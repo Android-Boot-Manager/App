@@ -95,6 +95,7 @@
     <string name="create">Erstellen</string>
     <string name="backup">Backup</string>
     <string name="restore">Wiederherstellen</string>
+    <string name="restoresparse">Restore Sparse</string>
     <string name="backup_msg">Willkommen beim einfachen Backup- &amp; Wiederherstellungswerkzeug. Was möchten Sie mit dieser Partition tun?</string>
     <string name="copy_file">Kopiere Datei…</string>
     <string name="sector_range">Sektorbereich</string>
@@ -110,6 +111,9 @@
     <string name="data_part">OS Benutzerdaten</string>
     <string name="data">Daten</string>
     <string name="system">System</string>
+    <string name="update_real_rom">You cannot update your real ROM via ABM!</string>
+    <string name="kernel_update">Kernel Update</string>
+    <string name="kernel_update_msg">You are about to update the kernel/boot image of the selected ROM and regenerate it\'s config.</string>
     <string name="select_part">Bitte wähle eine unbenutzte Partition auf Ihrer SD-Karte aus, die mit dem folgendem Typ konfiguriert ist: %1$s. Bitte stelle sicher das es wirklich die richtige Partition ist, sie können aber immer noch abbrechen wenn Sie sich nicht sicher sind. Wenn sie noch keine Partition erstellt haben, tun Sie dies zuerst.</string>
     <!-- How an partition is used -->
     <string name="usage">Verwendung</string>
