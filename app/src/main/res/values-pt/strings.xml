@@ -111,9 +111,9 @@
     <string name="data_part">Arquivos do Usuário no OS</string>
     <string name="data">Arquivos</string>
     <string name="system">Sistema</string>
-    <string name="update_real_rom">You cannot update your real ROM via ABM!</string>
-    <string name="kernel_update">Kernel Update</string>
-    <string name="kernel_update_msg">You are about to update the kernel/boot image of the selected ROM and regenerate it\'s config.</string>
+    <string name="update_real_rom">Você não pode atualizar sua verdadeira ROM pelo ABM!</string>
+    <string name="kernel_update">Atualização do kernel</string>
+    <string name="kernel_update_msg">Você está prestes a atualizar a imagem do kernel/boot da ROM selecionada e regenerar sua configuração.</string>
     <string name="select_part">Por favor selecione uma partição não usada no seu cartão SD configurada com o tipo: %1$s. Por favor tenho certeza que é realmente a correta, você pode cancelar e nomear para ter certeza, se você ainda não criou uma faça isso primeiro.</string>
     <!-- How an partition is used -->
     <string name="usage">Utilização</string>
