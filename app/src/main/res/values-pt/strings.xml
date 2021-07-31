@@ -117,4 +117,8 @@
     <string name="select_part">Por favor selecione uma partição não usada no seu cartão SD configurada com o tipo: %1$s. Por favor tenho certeza que é realmente a correta, você pode cancelar e nomear para ter certeza, se você ainda não criou uma faça isso primeiro.</string>
     <!-- How an partition is used -->
     <string name="usage">Utilização</string>
+    <string name="select_droidian_gsi">Selecione a GSI do Droidian</string>
+    <string name="select_droidian_adapt">Selecione a adaptação do Droidian</string>
+    <string name="select_droidian_devtools">Selecione as DevTools do Droidian</string>
+    <string name="rom_type_add_droidian">GSI do Droidian com adaptação e DevTools</string>
 </resources>

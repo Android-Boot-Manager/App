@@ -117,4 +117,8 @@
     <string name="select_part">Bitte wähle eine unbenutzte Partition auf Ihrer SD-Karte aus, die mit dem folgendem Typ konfiguriert ist: %1$s. Bitte stelle sicher das es wirklich die richtige Partition ist, sie können aber immer noch abbrechen wenn Sie sich nicht sicher sind. Wenn sie noch keine Partition erstellt haben, tun Sie dies zuerst.</string>
     <!-- How an partition is used -->
     <string name="usage">Verwendung</string>
+    <string name="select_droidian_gsi">Select Droidian GSI</string>
+    <string name="select_droidian_adapt">Select Droidian Adaption</string>
+    <string name="select_droidian_devtools">Select Droidian DevTools</string>
+    <string name="rom_type_add_droidian">Droidian GSI with Adaption and DevTools</string>
 </resources>
