@@ -8,8 +8,8 @@
     <string name="about_txt_4">    Thanks to Volla &amp; F(x)tec for developer devices</string>
     <string name="cp_err_msg">Failed to extract some data. Did you install the app on a SD card? Pressing OK will take you to the app, do not do anything without investigating first!</string>
     <string name="wrong_device_msg">Android Boot Manager не доступен для этого устройства (%1$s).</string>
-    <string name="device_msg">Android Boot Manager is available for this device (%1$s).</string>
-    <string name="device_btn">Not your device?</string>
+    <string name="device_msg">Android Boot Manager доступен для этого устройства (%1$s).</string>
+    <string name="device_btn">Не ваше устройство?</string>
     <string name="bsp_msg">Your device uses an BSP codename (%1$s). That means we are not able to identify your device and you need to select yours.</string>
     <string name="ok">OK</string>
     <string name="cancel">Отмена</string>
