@@ -33,7 +33,7 @@
     <string name="cmdline">Cmdline</string>
     <string name="delete">Удалить</string>
     <string name="delete_msg">This will delete partition %1$d of type %2$s labeled \'%3$s\'</string>
-    <string name="delete_msg_2">This will delete the configuration file of the ROM %1$s. You need to delete the partitions on the SD card manually to prevent data loss.</string>
+    <string name="delete_msg_2">Конфигурационный файл прошивки %1$s будет удален. Вам нужно вручную удалить разделы на SD-карте, чтобы предотвратить потерю данных.</string>
     <string name="add_rom">Добавить прошивку</string>
     <string name="other_os">Другая ОС (boot.img) (только для опытных пользователей!)</string>
     <string name="empty_entry">Empty Entry file (Advanced users only!)</string>
@@ -42,7 +42,7 @@
     <string name="convert_prog">Преобразование…</string>
     <string name="creating_prog">Creating…</string>
     <string name="renaming_prog">Renaming…</string>
-    <string name="delete_real_rom">You cannot delete your primary ROM!</string>
+    <string name="delete_real_rom">Вы не можете удалить основную прошивку!</string>
     <string name="rename">Rename</string>
     <string name="updatelk">Update DroidBoot</string>
     <string name="rom_type_add_ut_sysimg_halium">Ubuntu Touch (System image, Halium Boot image)</string>
