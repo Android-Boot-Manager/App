@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.generalcfg.GeneralCfgFragment">
+    tools:context=".legacy.ui.generalcfg.GeneralCfgFragment">
 
     <TableLayout
         android:id="@+id/tableLayout"

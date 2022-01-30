@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="../../../../../layout/compose-model-1643529241482.xml" value="2.0" />
+        <entry key="../../../../../layout/compose-model-1643532938246.xml" value="0.5" />
+        <entry key="../../../../../layout/compose-model-1643535013971.xml" value="0.17060810810810811" />
+        <entry key="../../../../../layout/compose-model-1643547946881.xml" value="0.15751689189189189" />
+      </map>
+    </option>
+  </component>
   <component name="EntryPointsManager">
     <entry_points version="2.0">
       <entry_point TYPE="field" FQNAME="org.androidbootmanager.app.util.SDUtils.SDPartitionMeta path" />
@@ -11,7 +21,8 @@
     <pattern value="org.androidbootmanager.app.util.SDUtils.SDPartitionMeta" method="dump" />
     <pattern value="org.androidbootmanager.app.util.MiscUtils" method="sure" />
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
 </project>

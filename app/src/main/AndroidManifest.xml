@@ -3,10 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="org.androidbootmanager.app">
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
     <application
         android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
         android:icon="@mipmap/ic_launcher"
         android:installLocation="internalOnly"
         android:label="@string/app_name"
@@ -14,13 +13,26 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="false"
         android:theme="@style/AppTheme"
-        tools:replace="android:allowBackup">
+        tools:ignore="DataExtractionRules"
+        tools:targetApi="s">
         <activity
-            android:name=".ui.debug.DebugActivity" />
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/title_activity_main"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".legacy.ui.debug.DebugActivity" />
         <activity
-            android:name=".ui.wizard.WizardActivity"
+            android:name=".legacy.ui.wizard.WizardActivity"
             android:theme="@style/AppTheme" />
-        <activity android:name=".ui.activities.SplashActivity">
+        <activity
+            android:name=".legacy.ui.activities.SplashActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -28,7 +40,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.activities.MainActivity"
+            android:name=".legacy.ui.activities.MainActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>
