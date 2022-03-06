@@ -2,8 +2,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">Android Boot Manager</string>
     <string name="fatal">Критическая ошибка!</string>
-    <string name="about_txt_1">Founded by Luka Panio &amp; nift4</string>
-    <string name="about_txt_2">    App Development: nift4</string>
+    <string name="about_txt_1">Основано Лукой Панио &amp; nift4</string>
+    <string name="about_txt_2">    Разработка приложения: nift4</string>
     <string name="about_txt_3">    DroidBoot development: Luka Panio</string>
     <string name="about_txt_4">    Thanks to Volla &amp; F(x)tec for developer devices</string>
     <string name="cp_err_msg">Failed to extract some data. Did you install the app on a SD card? Pressing OK will take you to the app, do not do anything without investigating first!</string>
@@ -106,20 +106,20 @@
     <string name="end_sector">End Sector</string>
     <string name="adopted_part">Adopted Storage</string>
     <string name="meta_part">ABM/Adopted Storage Metadata</string>
-    <string name="portable_part">Portable Storage</string>
+    <string name="portable_part">Съемный накопитель</string>
     <string name="system_part">OS System data</string>
     <string name="data_part">OS User data</string>
-    <string name="data">Data</string>
-    <string name="system">System</string>
+    <string name="data">Данные</string>
+    <string name="system">Система</string>
     <string name="update_real_rom">You cannot update your real ROM via ABM!</string>
     <string name="kernel_update">Kernel Update</string>
     <string name="kernel_update_msg">You are about to update the kernel/boot image of the selected ROM and regenerate it\'s config.</string>
     <string name="select_part">Please select an unused partition on your SD card configured with the following type: %1$s. Please make sure it really is the correct one, you can cancel and label it if unsure. If you didn\'t create one yet, do that first.</string>
     <!-- How an partition is used -->
-    <string name="usage">Usage</string>
+    <string name="usage">Использование</string>
     <string name="select_droidian_gsi">Select Droidian GSI</string>
     <string name="select_droidian_adapt">Select Droidian Adaption</string>
     <string name="select_droidian_devtools">Select Droidian DevTools</string>
     <string name="rom_type_add_droidian">Droidian GSI with Adaption and DevTools</string>
-    <string name="menu">Menu</string>
+    <string name="menu">Меню</string>
 </resources>
