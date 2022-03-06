@@ -177,6 +177,8 @@ public class SDUtils {
                 meta.friendlySize = t[1];
             } else if(o.startsWith("Logical sector size: ") && o.endsWith(" bytes")) {
                 meta.logicalSectorSizeBytes = Integer.parseInt(o.replace("Logical sector size: ","").replace(" bytes",""));
+            } else if(o.startsWith("Sector size (logical/physical): ") && o.endsWith(" bytes")) {
+                meta.logicalSectorSizeBytes = Integer.parseInt(o.replace("Sector size (logical/physical): ","").replace(" bytes","").split("/")[0]);
             } else if(o.startsWith("Disk identifier (GUID): ")) {
                 meta.guid = o.replace("Disk identifier (GUID): ", "");
             } else if (o.startsWith("Partition table holds up to ")) {
@@ -196,7 +198,7 @@ public class SDUtils {
                 String[] t = o.trim().split(":");
                 meta.major = Integer.parseInt(t[1]);
                 meta.minor = Integer.parseInt(t[2]);
-            } else if(o.equals("") || o.startsWith("Number  Start (sector)    End (sector)  Size       Code  Name")) {
+            } else if(o.equals("") || o.startsWith("Number  Start (sector)    End (sector)  Size       Code  Name") || o.startsWith("Main partition table begins at")) {
                 assert true; //avoid empty statement warning but do nothing
             } else if (o.startsWith("  ") && o.contains("iB")) {
                 while (o.contains("  "))
@@ -236,6 +238,7 @@ public class SDUtils {
                 meta.p.add(p);
                 meta.u.add(p);
             } else {
+                Log.e("ABM SDUtils","can't handle " + o);
                 return null;
             }
         }
