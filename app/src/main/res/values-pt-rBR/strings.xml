@@ -121,4 +121,5 @@
     <string name="select_droidian_adapt">Selecione a adaptação do Droidian</string>
     <string name="select_droidian_devtools">Selecione as DevTools do Droidian</string>
     <string name="rom_type_add_droidian">GSI do Droidian com adaptação e DevTools</string>
+    <string name="menu">Menu</string>
 </resources>
