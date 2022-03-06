@@ -7,6 +7,7 @@
         <entry key="../../../../../layout/compose-model-1643532938246.xml" value="0.5" />
         <entry key="../../../../../layout/compose-model-1643535013971.xml" value="0.17060810810810811" />
         <entry key="../../../../../layout/compose-model-1643547946881.xml" value="0.15751689189189189" />
+        <entry key="../../../../../layout/compose-model-1646574158722.xml" value="0.25" />
       </map>
     </option>
   </component>
@@ -22,7 +23,10 @@
     <pattern value="org.androidbootmanager.app.util.MiscUtils" method="sure" />
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="SuppressKotlinCodeStyleNotification">
+    <option name="disableForAll" value="true" />
   </component>
 </project>
