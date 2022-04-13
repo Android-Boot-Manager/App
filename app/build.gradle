@@ -18,6 +18,16 @@ android {
         }
     }
     signingConfigs {
+        debug {
+            if (project.hasProperty('ABM_DEBUG_KEY_ALIAS')) {
+                storeFile file(ABM_DEBUG_STORE_FILE)
+                storePassword ABM_DEBUG_STORE_PASSWORD
+                keyAlias ABM_DEBUG_KEY_ALIAS
+                keyPassword ABM_DEBUG_KEY_PASSWORD
+                v1SigningEnabled true
+                v2SigningEnabled true
+            }
+        }
         release {
             if (project.hasProperty('ABM_RELEASE_KEY_ALIAS')) {
                 storeFile file(ABM_RELEASE_STORE_FILE)
@@ -38,7 +48,9 @@ android {
 	        }
         }
         debug {
-            if (project.hasProperty('ABM_RELEASE_KEY_ALIAS')) {
+            if (project.hasProperty('ABM_DEBUG_KEY_ALIAS')) {
+                signingConfig signingConfigs.debug
+            } else if (project.hasProperty('ABM_RELEASE_KEY_ALIAS')) {
                 signingConfig signingConfigs.release
             }
         }
