@@ -121,4 +121,5 @@
     <string name="select_droidian_adapt">Select Droidian Adaption</string>
     <string name="select_droidian_devtools">Select Droidian DevTools</string>
     <string name="rom_type_add_droidian">Droidian GSI with Adaption and DevTools</string>
+    <string name="menu">Menu</string>
 </resources>
