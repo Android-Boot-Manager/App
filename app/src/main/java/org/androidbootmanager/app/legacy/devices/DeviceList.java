@@ -63,6 +63,9 @@ public class DeviceList {
     }
 
     public static List<DeviceModel> getModels() {
-        return Collections.singletonList(/*DeviceList.getModel("cedric"),*/DeviceList.getModel("yggdrasil"));
+        List<DeviceModel> list = new ArrayList();
+        deviceList.forEach(device ->  list.add(DeviceList.getModel(device)));
+
+        return list;
     }
 }
