@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
         if (SuFile.open("/data/abm/bootset/db").exists())
             return true;
         Shell.Result result;
-        if(!(result = Shell.su("/data/data/org.androidbootmanager.app/assets/Scripts/config/mount/yggdrasil.sh").exec()).isSuccess()) {
+        if(!(result = Shell.su("/data/data/org.androidbootmanager.app/assets/Scripts/config/mount/" + d.codename + ".sh").exec()).isSuccess()) {
             Log.e("ABM_MOUNT",String.join("",result.getOut()));
             Log.e("ABM_MOUNT",String.join("",result.getErr()));
             return false;
@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         }
-        if(!(result = Shell.su("/data/data/org.androidbootmanager.app/assets/Scripts/config/umount/yggdrasil.sh").exec()).isSuccess()) {
+        if(!(result = Shell.su("/data/data/org.androidbootmanager.app/assets/Scripts/config/umount/" + d.codename + ".sh").exec()).isSuccess()) {
             Log.e("ABM_MOUNT",String.join("",result.getOut()));
             Log.e("ABM_MOUNT",String.join("",result.getErr()));
             return false;
