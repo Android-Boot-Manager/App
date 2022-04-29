@@ -82,8 +82,8 @@ public class SDCardFragment extends Fragment {
         @Override
         public void onBindViewHolder(@NotNull SDRecyclerViewAdapter.ViewHolder holder, int position) {
             SDUtils.Partition p;
-            p = meta.dumpS(position);
-            holder.id = position;
+            holder.id = position; //todo: maybe use holder.getAbsoluteAdapterPosition
+            p = meta.dumpS(holder.id);
             switch (p.type) {
                 case ADOPTED:
                     holder.icon.setImageDrawable(ContextCompat.getDrawable(requireActivity(), R.drawable.ic_adopted));
@@ -228,7 +228,20 @@ public class SDCardFragment extends Fragment {
                                 .setTitle(getString(R.string.free_space_size, meta.dumpS(id).sizeFancy))
                                 .setView(v)
                                 .setNegativeButton(R.string.cancel, (d, p) -> d.dismiss())
-                                .setPositiveButton(R.string.create, (d, p) -> MiscUtils.w(requireContext(), R.string.creating_prog, () -> Shell.su(SDUtils.umsd(meta) + " && sgdisk " + bdev + " --new " + meta.nid + ":" + start.getText() + ":" + end.getText() + " --typecode " + meta.nid + ":" + ddresolv[dd.getSelectedItemPosition()] + " --change-name " + meta.nid + ":'" + label.getText().toString().replace("'", "") + "' && sleep 1 && ls " + pbdev + meta.nid + (ddresolv[dd.getSelectedItemPosition()].equals("0700") ? (" && sm format public:" + meta.major + "," + (meta.minor + meta.nid)) : (ddresolv[dd.getSelectedItemPosition()].equals("8301") ? " && mkfs.ext4 " + pbdev + meta.nid : " && echo Warning: Unsure on how to format this partition."))).to(out, err).submit(MiscUtils.w2((r) -> new AlertDialog.Builder(requireContext())
+                                .setPositiveButton(R.string.create, (d, p) -> MiscUtils.w(requireContext(), R.string.creating_prog, () -> Shell.su(
+                                        SDUtils.umsd(meta) + " && sgdisk " + bdev +
+                                                " --new " + meta.nid + ":" + start.getText() + ":" + end.getText() +
+                                                " --typecode " + meta.nid + ":" + ddresolv[dd.getSelectedItemPosition()] +
+                                                " --change-name " + meta.nid + ":'" + label.getText().toString().replace("'", "") +
+                                                "' && sleep 1 && ls " + pbdev + meta.nid +
+                                                (ddresolv[dd.getSelectedItemPosition()].equals("0700") ?
+                                                        (" && sm format public:" + meta.major + "," + (meta.minor + meta.nid)) :
+                                                        (ddresolv[dd.getSelectedItemPosition()].equals("8301") ?
+                                                                " && mkfs.ext4 " + pbdev + meta.nid :
+                                                                " && echo Warning: Unsure on how to format this partition."
+                                                        )
+                                                )
+                                ).to(out, err).submit(MiscUtils.w2((r) -> new AlertDialog.Builder(requireContext())
                                         .setTitle(r.isSuccess() ? R.string.successful : R.string.failed)
                                         .setMessage(String.join("\n", out) + "\n" + String.join("\n", err) + (String.join("", out).contains("old") ? "IMPORTANT: Please reboot!" : ""))
                                         .setPositiveButton(R.string.ok, (g, l) -> recyclerView.setAdapter(new SDRecyclerViewAdapter(generateMeta(DeviceList.getModel(model)))))
