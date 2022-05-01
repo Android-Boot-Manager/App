@@ -13,4 +13,5 @@ public class ROM {
     public HashMap<String, String> strings;
     public HashMap<String, String> flashes;
     public CmdlineGenerator gen;
+    public ROMType type;
 }
