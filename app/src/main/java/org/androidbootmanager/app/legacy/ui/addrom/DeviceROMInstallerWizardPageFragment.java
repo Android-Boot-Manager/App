@@ -36,6 +36,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class DeviceROMInstallerWizardPageFragment extends Fragment {
@@ -83,15 +85,17 @@ public class DeviceROMInstallerWizardPageFragment extends Fragment {
             Spinner dd = root.findViewById(R.id.wizard_addrom_getpart_dd);
             key = (String) imodel.getROM().getValue().flashes.keySet().toArray()[0];
             final SDUtils.SDPartitionMeta meta = SDUtils.generateMeta(DeviceList.getModel(model));
-            ArrayList<String> a = new ArrayList<>();
+            Map<Integer, String> a = new HashMap<>();
             for (SDUtils.Partition partition : meta.p) {
-                a.add(getString(R.string.partidt, SDUtils.codes.get(partition.code), partition.id, partition.name));
+                if (partition.code.equals("8305"))
+                    a.put(partition.id, getString(R.string.partidt, SDUtils.codes.get(partition.code), partition.id, partition.name));
             }
             txt.setText(imodel.getROM().getValue().flashes.get(key));
-            dd.setAdapter(new ArrayAdapter<>(requireActivity(), android.R.layout.simple_spinner_dropdown_item, a));
+            dd.setAdapter(new ArrayAdapter<>(requireActivity(), android.R.layout.simple_spinner_dropdown_item, a.values().toArray()));
             ok.setOnClickListener((v) -> {
                 dd.setEnabled(false);
-                pdump = meta.ppath + meta.dumpPartition(dd.getSelectedItemPosition()).id;
+                Integer selectedPart = (Integer) a.keySet().toArray()[dd.getSelectedItemPosition()];
+                pdump = meta.ppath + selectedPart;
                 txt.setText(key);
                 ok.setOnClickListener((b) -> {
                     Intent intent = new Intent();
@@ -100,7 +104,7 @@ public class DeviceROMInstallerWizardPageFragment extends Fragment {
                     startActivityForResult(intent, 5299);
                 });
                 imodel.getROM().getValue().flashes.remove(key);
-                imodel.addPart(meta.dumpPartition(dd.getSelectedItemPosition()).id);
+                imodel.addPart(selectedPart);
             });
         } else if (imodel.getROM().getValue().parts.size() > 0) {
             root = inflater.inflate(R.layout.wizard_addrom_getpart, container, false);
@@ -108,17 +112,18 @@ public class DeviceROMInstallerWizardPageFragment extends Fragment {
             txt = root.findViewById(R.id.wizard_addrom_getpart_txt);
             Spinner dd = root.findViewById(R.id.wizard_addrom_getpart_dd);
             final SDUtils.SDPartitionMeta meta = SDUtils.generateMeta(DeviceList.getModel(model));
-            ArrayList<String> a = new ArrayList<>();
+            Map<Integer, String> a = new HashMap<>();
             for (SDUtils.Partition partition : meta.p) {
-                a.add(getString(R.string.partidt, SDUtils.codes.get(partition.code), partition.id, partition.name));
+                if (partition.code.equals("8302"))
+                    a.put(partition.id, getString(R.string.partidt, SDUtils.codes.get(partition.code), partition.id, partition.name));
             }
             txt.setText(imodel.getROM().getValue().parts.get(0));
-            dd.setAdapter(new ArrayAdapter<>(requireActivity(), android.R.layout.simple_spinner_dropdown_item, a));
+            dd.setAdapter(new ArrayAdapter<>(requireActivity(), android.R.layout.simple_spinner_dropdown_item, a.values().toArray()));
             ok.setOnClickListener((v) -> {
                 dd.setEnabled(false);
                 ok.setVisibility(View.INVISIBLE);
                 imodel.getROM().getValue().parts.remove(0);
-                imodel.addPart(meta.dumpPartition(dd.getSelectedItemPosition()).id);
+                imodel.addPart((Integer) a.keySet().toArray()[dd.getSelectedItemPosition()]);
                 model.setPositiveText(getString(R.string.next));
                 model.setPositiveFragment(DeviceROMInstallerWizardPageFragment.class);
             });
