@@ -49,8 +49,13 @@ public class DoAddROMWizardPageFragment  extends Fragment {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                if (!queue.isEmpty()) log.append("\n" + queue.poll());
-                if (!queue.isEmpty()) handler.post(this); else if (!hdone.get()) handler.postDelayed(this, 50); else if (hdone.get())  {
+                if (!queue.isEmpty())
+                    log.append("\n" + queue.poll());
+                if (!queue.isEmpty())
+                    handler.post(this);
+                else if (!hdone.get())
+                    handler.postDelayed(this, 50);
+                else if (hdone.get())  {
                     model.setPositiveText(getString(R.string.ok));
                     model.setPositiveAction(() -> {
                         MainActivity.exit = true;
