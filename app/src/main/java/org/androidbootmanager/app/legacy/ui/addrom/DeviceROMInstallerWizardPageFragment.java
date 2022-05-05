@@ -32,9 +32,13 @@ import org.androidbootmanager.app.legacy.ui.wizard.WizardViewModel;
 import org.androidbootmanager.app.legacy.util.SDUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -96,13 +100,21 @@ public class DeviceROMInstallerWizardPageFragment extends Fragment {
                 dd.setEnabled(false);
                 Integer selectedPart = (Integer) a.keySet().toArray()[dd.getSelectedItemPosition()];
                 pdump = meta.ppath + selectedPart;
-                txt.setText(imodel.getROM().getValue().flashes.get(key)[0]);
-                ok.setOnClickListener((b) -> {
-                    Intent intent = new Intent();
-                    intent.setType("*/*");
-                    intent.setAction(Intent.ACTION_GET_CONTENT);
-                    startActivityForResult(intent, 5299);
-                });
+
+                File imageFile = new File("/data/data/org.androidbootmanager.app/cache/" + key);
+                if (imageFile.exists()) {
+                    txt.setText(R.string.copy_file);
+                    ok.setVisibility(View.INVISIBLE);
+                    flashPartition(key);
+                } else {
+                    txt.setText(imodel.getROM().getValue().flashes.get(key)[0]);
+                    ok.setOnClickListener((b) -> {
+                        Intent intent = new Intent();
+                        intent.setType("*/*");
+                        intent.setAction(Intent.ACTION_GET_CONTENT);
+                        startActivityForResult(intent, 5299);
+                    });
+                }
                 imodel.getROM().getValue().flashes.remove(key);
                 imodel.addPart(selectedPart);
             });
@@ -151,6 +163,31 @@ public class DeviceROMInstallerWizardPageFragment extends Fragment {
             model.setPositiveText(getString(R.string.next));
         }
         return root;
+    }
+
+    private void flashPartition(String image) {
+        new Thread(() -> {
+            try {
+                File targetFile = new File("/data/data/org.androidbootmanager.app/cache/" + image);
+                InputStream targetIS = new FileInputStream(targetFile);
+                byte[] buffer = new byte[4];
+                targetIS.read(buffer, 0, 4);
+                if (ByteBuffer.wrap(buffer).order(ByteOrder.LITTLE_ENDIAN).getInt() == 0xed26ff3a) {
+                    Shell.su("/data/data/org.androidbootmanager.app/assets/Toolkit/simg2img /data/data/org.androidbootmanager.app/cache/" + image + " " + pdump).exec();
+                } else {
+                    Shell.su("dd bs=4096 if=/data/data/org.androidbootmanager.app/cache/" + image + " of=" + pdump).exec();
+                }
+
+                requireActivity().runOnUiThread(() -> {
+                    model.setPositiveText(getString(R.string.next));
+                    model.setPositiveFragment(DeviceROMInstallerWizardPageFragment.class);
+                    txt.setText(getString(R.string.selected));
+                });
+                Log.i("ABM", "Result of delete: " + SuFile.open(targetFile.getAbsolutePath()).delete());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     @Override
@@ -226,13 +263,7 @@ public class DeviceROMInstallerWizardPageFragment extends Fragment {
                             initialStream.close();
                             outStream.close();
                             Log.i("ABM","copy done");
-                            Shell.su("/data/data/org.androidbootmanager.app/assets/Toolkit/simg2img /data/data/org.androidbootmanager.app/cache/unsparse.img " + pdump).exec();
-                            requireActivity().runOnUiThread(() -> {
-                                model.setPositiveText(getString(R.string.next));
-                                model.setPositiveFragment(DeviceROMInstallerWizardPageFragment.class);
-                                txt.setText(getString(R.string.selected));
-                            });
-                            Log.i("ABM","Result of delete: " + SuFile.open(targetFile.getAbsolutePath()).delete());
+                            flashPartition("unsparse.img");
                         } catch (IOException e) {
                             requireActivity().runOnUiThread(() -> Toast.makeText(requireContext(), R.string.failure, Toast.LENGTH_LONG).show());
                             e.printStackTrace();
