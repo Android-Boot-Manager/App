@@ -90,13 +90,13 @@ public class DeviceROMInstallerWizardPageFragment extends Fragment {
                 if (partition.code.equals("8305"))
                     a.put(partition.id, getString(R.string.partidt, SDUtils.codes.get(partition.code), partition.id, partition.name));
             }
-            txt.setText(imodel.getROM().getValue().flashes.get(key));
+            txt.setText(imodel.getROM().getValue().flashes.get(key)[1]);
             dd.setAdapter(new ArrayAdapter<>(requireActivity(), android.R.layout.simple_spinner_dropdown_item, a.values().toArray()));
             ok.setOnClickListener((v) -> {
                 dd.setEnabled(false);
                 Integer selectedPart = (Integer) a.keySet().toArray()[dd.getSelectedItemPosition()];
                 pdump = meta.ppath + selectedPart;
-                txt.setText(key);
+                txt.setText(imodel.getROM().getValue().flashes.get(key)[0]);
                 ok.setOnClickListener((b) -> {
                     Intent intent = new Intent();
                     intent.setType("*/*");

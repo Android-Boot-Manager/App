@@ -42,7 +42,7 @@ public class ROMsList {
                     r.type = ROMType.UBUNTU;
                     r.viewname = c.getString(R.string.rom_type_add_ut_sysimg_halium);
                     r.requiredFiles.put("halium-boot.img", c.getString(R.string.select_halium_boot));
-                    r.flashes.put(c.getString(R.string.select_system_image), c.getString(R.string.select_part, c.getString(R.string.system_part)));
+                    r.flashes.put("ubuntu.img", new String[] {c.getString(R.string.select_system_image), c.getString(R.string.select_part, c.getString(R.string.system_part))});
                     r.parts.add(c.getString(R.string.select_part, c.getString(R.string.data_part)));
                     r.strings.put(c.getString(R.string.enter_rom_name), "Ubuntu Touch");
                     r.strings.put(c.getString(R.string.enter_rom_folder), "rom" + b);
@@ -63,7 +63,7 @@ public class ROMsList {
                     r.type = ROMType.SAILFISH;
                     r.viewname = c.getString(R.string.rom_type_add_sailfish);
                     r.requiredFiles.put("hybris-boot.img", c.getString(R.string.select_hybris_boot));
-                    r.flashes.put(c.getString(R.string.select_system_image), c.getString(R.string.select_part, c.getString(R.string.data_part)));
+                    r.flashes.put("system.img", new String[] {c.getString(R.string.select_system_image), c.getString(R.string.select_part, c.getString(R.string.data_part))});
                     r.strings.put(c.getString(R.string.enter_rom_name), "SailfishOS");
                     r.strings.put(c.getString(R.string.enter_rom_folder), "rom" + b);
                     r.gen = (imodel, menuName, folderName) -> imodel.setCmdline(Objects.requireNonNull(imodel.getROM().getValue()).fullPath + " '" + folderName + "' '" + menuName + "' " + Objects.requireNonNull(imodel.getParts().getValue()).get(0) + " /data/data/org.androidbootmanager.app/cache/hybris-boot.img");
