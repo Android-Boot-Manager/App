@@ -41,11 +41,11 @@ public class UpROMWelcomeWizardPageFragment extends Fragment {
         if (e.config.get("xdata") != null)
             Objects.requireNonNull(imodel.getParts().getValue()).add(Integer.parseInt(e.config.get("xdata")));
         if (e.config.get("xtype").equals("UT"))
-            imodel.setROM(l.getROMs().stream().filter(r -> r.scriptname.equals("add_ubuntutouch_systemimage_haliumboot.sh")).findFirst().get());
+            imodel.setROM(l.getROMs().stream().filter(r -> r.scriptname.equals("add_ubuntutouch_systemimage_haliumboot.sh")).findFirst().orElse(null));
         else if (e.config.get("xtype").equals("SFOS"))
-            imodel.setROM(l.getROMs().stream().filter(r -> r.scriptname.equals("add_sailfish.sh")).findFirst().get());
+            imodel.setROM(l.getROMs().stream().filter(r -> r.scriptname.equals("add_sailfish.sh")).findFirst().orElse(null));
         else
-            imodel.setROM(l.getROMs().stream().filter(r -> r.scriptname.equals("other_os.sh")).findFirst().get());
+            imodel.setROM(l.getROMs().stream().filter(r -> r.scriptname.equals("other_os.sh")).findFirst().orElse(null));
         imodel.getName().add(e.config.get("title"));
         imodel.getName().add(e.file.replace("/data/abm/bootset/lk2nd/entries/","").replace(".conf",""));
         Objects.requireNonNull(imodel.getROM().getValue()).parts.clear();

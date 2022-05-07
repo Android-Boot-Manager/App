@@ -32,9 +32,4 @@ public class InstallerWelcomeWizardPageFragment extends Fragment {
         return inflater.inflate(R.layout.wizard_installer_welcome, container, false);
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-    }
-
 }

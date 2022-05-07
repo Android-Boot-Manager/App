@@ -3,6 +3,7 @@ package org.androidbootmanager.app.legacy.util;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.topjohnwu.superuser.Shell;
@@ -43,6 +44,7 @@ public class SDUtils {
         public String name;
         public int minor;
 
+        @NonNull
         @Override
         public String toString() {
             return "Partition{" +
@@ -64,6 +66,7 @@ public class SDUtils {
                 startSector = ((start / 2048) + 1) * 2048 ; endSector = end; size = end - start; type = PartitionType.FREE; sizeFancy = SOUtils.humanReadableByteCountBin(size * bytes);
             }
 
+            @NonNull
             @Override
             public String toString() {
                 return "FreeSpace{" +
@@ -98,6 +101,7 @@ public class SDUtils {
         public String path;
         public String ppath;
 
+        @NonNull
         @Override
         public String toString() {
             return "SDPartitionMeta{" +

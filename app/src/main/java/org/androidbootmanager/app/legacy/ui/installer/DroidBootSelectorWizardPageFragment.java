@@ -38,6 +38,7 @@ public class DroidBootSelectorWizardPageFragment extends Fragment {
 
     @Nullable
     @Override
+    @SuppressWarnings("deprecation")
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         model = new ViewModelProvider(requireActivity()).get(WizardViewModel.class);
@@ -61,6 +62,7 @@ public class DroidBootSelectorWizardPageFragment extends Fragment {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == 5207) {
             if (resultCode == Activity.RESULT_OK) {
@@ -103,10 +105,5 @@ public class DroidBootSelectorWizardPageFragment extends Fragment {
             }
         }
         else super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
     }
 }

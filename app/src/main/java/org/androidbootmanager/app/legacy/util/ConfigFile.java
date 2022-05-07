@@ -79,7 +79,7 @@ public class ConfigFile {
                 throw new ActionAbortedCleanlyError(e);
             }
         }
-        return importFromString(new String(s.toByteArray()));
+        return importFromString(s.toString());
     }
 
     public static ConfigFile importFromFile(String s) throws ActionAbortedCleanlyError {

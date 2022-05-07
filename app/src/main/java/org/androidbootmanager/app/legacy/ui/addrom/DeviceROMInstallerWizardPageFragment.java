@@ -33,13 +33,11 @@ import org.androidbootmanager.app.legacy.util.SDUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -53,6 +51,7 @@ public class DeviceROMInstallerWizardPageFragment extends Fragment {
     protected String key, pdump;
 
     @SuppressLint("SdCardPath")
+    @SuppressWarnings("deprecation")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -94,7 +93,7 @@ public class DeviceROMInstallerWizardPageFragment extends Fragment {
                 if (partition.code.equals("8305"))
                     a.put(partition.id, getString(R.string.partidt, SDUtils.codes.get(partition.code), partition.id, partition.name));
             }
-            txt.setText(imodel.getROM().getValue().flashes.get(key)[1]);
+            txt.setText(Objects.requireNonNull(imodel.getROM().getValue().flashes.get(key))[1]);
             dd.setAdapter(new ArrayAdapter<>(requireActivity(), android.R.layout.simple_spinner_dropdown_item, a.values().toArray()));
             ok.setOnClickListener((v) -> {
                 dd.setEnabled(false);
@@ -107,7 +106,7 @@ public class DeviceROMInstallerWizardPageFragment extends Fragment {
                     ok.setVisibility(View.INVISIBLE);
                     flashPartition(key);
                 } else {
-                    txt.setText(imodel.getROM().getValue().flashes.get(key)[0]);
+                    txt.setText(Objects.requireNonNull(imodel.getROM().getValue().flashes.get(key))[0]);
                     ok.setOnClickListener((b) -> {
                         Intent intent = new Intent();
                         intent.setType("*/*");
@@ -171,6 +170,7 @@ public class DeviceROMInstallerWizardPageFragment extends Fragment {
                 File targetFile = new File("/data/data/org.androidbootmanager.app/cache/" + image);
                 InputStream targetIS = new FileInputStream(targetFile);
                 byte[] buffer = new byte[4];
+                //noinspection ResultOfMethodCallIgnored
                 targetIS.read(buffer, 0, 4);
                 if (ByteBuffer.wrap(buffer).order(ByteOrder.LITTLE_ENDIAN).getInt() == 0xed26ff3a) {
                     Shell.su("/data/data/org.androidbootmanager.app/assets/Toolkit/simg2img /data/data/org.androidbootmanager.app/cache/" + image + " " + pdump).exec();
@@ -190,12 +190,8 @@ public class DeviceROMInstallerWizardPageFragment extends Fragment {
         }).start();
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-    }
-
     @SuppressLint("SdCardPath")
+    @SuppressWarnings("deprecation")
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == 5210) {

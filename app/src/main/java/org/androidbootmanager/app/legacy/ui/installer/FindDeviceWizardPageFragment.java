@@ -59,7 +59,7 @@ public class FindDeviceWizardPageFragment extends Fragment {
                 super(view);
                 selectionState = view.findViewById(R.id.wizard_installer_finddevice_radio);
                 selectionState.setOnClickListener(v -> {
-                    lastSelectedPosition = getAdapterPosition();
+                    lastSelectedPosition = getBindingAdapterPosition();
                     notifyDataSetChanged();
                     FindDeviceWizardPageFragment.this.imodel.setCodename(devicesList.get(lastSelectedPosition).codename);
                     FindDeviceWizardPageFragment.this.model.setPositiveFragment(ROMNameChooserWizardPageFragment.class);
@@ -92,12 +92,6 @@ public class FindDeviceWizardPageFragment extends Fragment {
         recyclerView.setAdapter(recyclerViewAdapter);
         return root;
     }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-    }
-
 }
 
 

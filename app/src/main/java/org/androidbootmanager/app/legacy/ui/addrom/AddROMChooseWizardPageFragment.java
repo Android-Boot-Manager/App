@@ -59,7 +59,7 @@ public class AddROMChooseWizardPageFragment extends Fragment {
                 super(view);
                 selectionState = view.findViewById(R.id.wizard_installer_finddevice_radio);
                 selectionState.setOnClickListener(v -> {
-                    lastSelectedPosition = getAdapterPosition();
+                    lastSelectedPosition = getBindingAdapterPosition();
                     notifyDataSetChanged();
                     AddROMChooseWizardPageFragment.this.imodel.setROM(romsList.get(lastSelectedPosition));
                     AddROMChooseWizardPageFragment.this.model.setPositiveFragment(DeviceROMInstallerWizardPageFragment.class);

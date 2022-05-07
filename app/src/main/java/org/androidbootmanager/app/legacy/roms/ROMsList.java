@@ -9,6 +9,7 @@ import org.androidbootmanager.app.R;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -35,7 +36,7 @@ public class ROMsList {
             r.flashes = new HashMap<>();
             ArrayList<String> a = new ArrayList<>(Arrays.asList(Objects.requireNonNull(SuFile.open("/data/abm/bootset/db/entries/").list())));
             a.removeIf((c) -> !c.contains("rom"));
-            a.sort((c, d) -> Integer.compare(Integer.parseInt(c.replace("rom","").replace(".conf","")), Integer.parseInt(d.replace("rom","").replace(".conf",""))));
+            a.sort(Comparator.comparingInt(c -> Integer.parseInt(c.replace("rom", "").replace(".conf", ""))));
             int b = a.size() > 0 ? Integer.parseInt(a.get(a.size()-1).replace("rom","").replace(".conf",""))+1 : 0;
             switch (r.scriptname) {
                 case "add_ubuntutouch_systemimage_haliumboot.sh":

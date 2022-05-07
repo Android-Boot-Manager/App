@@ -82,7 +82,7 @@ public class SDCardFragment extends Fragment {
         @Override
         public void onBindViewHolder(@NotNull SDRecyclerViewAdapter.ViewHolder holder, int position) {
             SDUtils.Partition p;
-            holder.id = position; //todo: maybe use holder.getAbsoluteAdapterPosition
+            holder.id = holder.getBindingAdapterPosition();
             p = meta.dumpS(holder.id);
             switch (p.type) {
                 case ADOPTED:
@@ -283,16 +283,14 @@ public class SDCardFragment extends Fragment {
                         label.setText(meta.dumpS(id).name);
                         ArrayList<String> out = new ArrayList<>();
                         ArrayList<String> err = new ArrayList<>();
-                        final AlertDialog[] dialog = {new AlertDialog.Builder(requireContext())
+                        @SuppressWarnings("deprecation") final AlertDialog[] dialog = {new AlertDialog.Builder(requireContext())
                                 .setCustomTitle(t)
-                                .setNegativeButton(R.string.delete, (w, p1) -> MiscUtils.sure(requireContext(), w, getString(R.string.delete_msg, meta.dumpS(id).id, SDUtils.codes.get(meta.dumpS(id).code), meta.dumpS(id).name), (d, p) -> {
-                                    MiscUtils.w(requireContext(), R.string.delete_prog, () -> Shell.su(SDUtils.umsd(meta) + " && sgdisk " + bdev + " --delete " + meta.dumpS(id).id).to(out, err).submit(MiscUtils.w2((r) -> new AlertDialog.Builder(requireContext())
-                                            .setTitle(r.isSuccess() ? R.string.successful : R.string.failed)
-                                            .setMessage(String.join("\n", out) + "\n" + String.join("", err) + (String.join("", out).contains("old") ? "IMPORTANT: Please reboot!" : ""))
-                                            .setPositiveButton(R.string.ok, (g, s) -> recyclerView.setAdapter(new SDRecyclerViewAdapter(generateMeta(DeviceList.getModel(model)))))
-                                            .setCancelable(false)
-                                            .show())));
-                                }))
+                                .setNegativeButton(R.string.delete, (w, p1) -> MiscUtils.sure(requireContext(), w, getString(R.string.delete_msg, meta.dumpS(id).id, SDUtils.codes.get(meta.dumpS(id).code), meta.dumpS(id).name), (d, p) -> MiscUtils.w(requireContext(), R.string.delete_prog, () -> Shell.su(SDUtils.umsd(meta) + " && sgdisk " + bdev + " --delete " + meta.dumpS(id).id).to(out, err).submit(MiscUtils.w2((r) -> new AlertDialog.Builder(requireContext())
+                                        .setTitle(r.isSuccess() ? R.string.successful : R.string.failed)
+                                        .setMessage(String.join("\n", out) + "\n" + String.join("", err) + (String.join("", out).contains("old") ? "IMPORTANT: Please reboot!" : ""))
+                                        .setPositiveButton(R.string.ok, (g, s) -> recyclerView.setAdapter(new SDRecyclerViewAdapter(generateMeta(DeviceList.getModel(model)))))
+                                        .setCancelable(false)
+                                        .show())))))
                                 .setNeutralButton(R.string.rename, (d, p) -> MiscUtils.w(requireContext(), R.string.renaming_prog, () -> Shell.su(SDUtils.umsd(meta) + " && sgdisk " + bdev + " --change-name " + meta.dumpS(id).id + ":'" + label.getText().toString().replace("'", "") + "'").to(out, err).submit(MiscUtils.w2((r) -> new AlertDialog.Builder(requireContext())
                                         .setTitle(r.isSuccess() ? R.string.successful : R.string.failed)
                                         .setMessage(String.join("\n", out) + "\n" + String.join("", err) + (String.join("", out).contains("old") ? "IMPORTANT: Please reboot!" : ""))
@@ -383,6 +381,7 @@ public class SDCardFragment extends Fragment {
     }
 
     @SuppressLint("SdCardPath")
+    @SuppressWarnings("deprecation")
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == 5212) {

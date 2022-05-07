@@ -34,10 +34,4 @@ public class DeviceInstallerWizardPageFragment extends Fragment {
             imodel.flow.addAll(DeviceList.getModel(imodel).flow);
             return inflater.inflate(R.layout.wizard_installer_deviceinstaller, container, false);
         }
-
-        @Override
-        public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-            super.onActivityCreated(savedInstanceState);
-        }
-
     }

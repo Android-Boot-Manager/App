@@ -12,7 +12,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
+@SuppressWarnings("CommentedOutCode")
 public class DeviceList {
     public static final ArrayList<String> deviceList = new ArrayList<>();
     public static final HashMap<String, List<String>> bspList = new HashMap<>();
@@ -51,19 +53,19 @@ public class DeviceList {
     }
 
     public static DeviceModel getModel(InstalledViewModel m) {
-        return getModel(m.getCodename().getValue());
+        return getModel(Objects.requireNonNull(m.getCodename().getValue()));
     }
 
     public static DeviceModel getModel(WizardViewModel m) {
-        return getModel(m.getCodename().getValue());
+        return getModel(Objects.requireNonNull(m.getCodename().getValue()));
     }
 
     public static DeviceModel getModel(DeviceInstallerViewModel m) {
-        return getModel(m.getCodename().getValue());
+        return getModel(Objects.requireNonNull(m.getCodename().getValue()));
     }
 
     public static List<DeviceModel> getModels() {
-        List<DeviceModel> list = new ArrayList();
+        List<DeviceModel> list = new ArrayList<>();
         deviceList.forEach(device ->  list.add(DeviceList.getModel(device)));
 
         return list;

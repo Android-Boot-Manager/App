@@ -36,6 +36,7 @@ public class DroidBootSelector2WizardPageFragment extends Fragment {
 
     @Nullable
     @Override
+    @SuppressWarnings("deprecation")
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         model = new ViewModelProvider(requireActivity()).get(WizardViewModel.class);
@@ -58,6 +59,7 @@ public class DroidBootSelector2WizardPageFragment extends Fragment {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == 5207) {
             if (resultCode == Activity.RESULT_OK) {

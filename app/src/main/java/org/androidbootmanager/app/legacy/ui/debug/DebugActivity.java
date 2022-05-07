@@ -20,6 +20,7 @@ public class DebugActivity extends AppCompatActivity {
         setContentView(R.layout.activity_debug);
     }
 
+    @SuppressWarnings("unused") //param is needed for android
     public void errorTest(View v) {
         shelldialog("echo out && echo err 1>&2");
     }

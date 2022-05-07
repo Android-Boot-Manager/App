@@ -61,9 +61,4 @@ public class DoInstallWizardPageFragment extends Fragment {
         });
         return root;
     }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-    }
 }
