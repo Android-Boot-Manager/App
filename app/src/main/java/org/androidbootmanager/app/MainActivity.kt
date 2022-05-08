@@ -1,31 +1,35 @@
 package org.androidbootmanager.app
 
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.topjohnwu.superuser.Shell
+import com.topjohnwu.superuser.io.SuFile
+import com.topjohnwu.superuser.io.SuFileInputStream
 import kotlinx.coroutines.launch
 import org.androidbootmanager.app.ui.theme.AbmTheme
-import java.io.File
+import java.io.IOException
 
 class MainActivity : ComponentActivity() {
 
@@ -33,6 +37,7 @@ class MainActivity : ComponentActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		val vm = MainActivityState()
+		vm.logic = MainActivityLogic(this)
 
 		val content: View = findViewById(android.R.id.content)
 		content.viewTreeObserver.addOnPreDrawListener(
@@ -70,6 +75,27 @@ class MainActivity : ComponentActivity() {
 				if (!fail) {
 					Shell.getShell { shell ->
 						vm.root = shell.isRoot
+						val codename: String
+						var b: ByteArray? = null
+						if (vm.root) {
+							try {
+								val f = SuFile.open(vm.logic.abmDir, "codename.cfg")
+								val s = SuFileInputStream.open(f)
+								b = s.readBytes()
+								s.close()
+							} catch (e: IOException) {
+								Log.e("ABM_GetCodeName", Log.getStackTraceString(e))
+							}
+						}
+						codename = if (b != null) {
+							String(b).trim()
+						} else {
+							Build.DEVICE
+						}
+						vm.deviceInfo = HardcodedDeviceInfoFactory.get(codename)
+						if (vm.deviceInfo != null && vm.deviceInfo!!.isInstalled(vm.logic)) {
+							vm.logic.mount(vm.deviceInfo!!)
+						}
 						runOnUiThread {
 							setContent {
 								val navController = rememberNavController()
@@ -178,11 +204,42 @@ fun NavGraph(vm: MainActivityState, it: PaddingValues) {
 	}
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Start(vm: MainActivityState) {
-	ClickableText(AnnotatedString((if (vm.root) "root" else "no root") + vm.name)) {
-		Shell.cmd("echo a; ls").submit {
-			vm.name = " S: " + it.isSuccess() + " C: " + it.getCode() + " O: " + it.out.join("\n") + " E: " + it.err.join("\n")
+	val installed: Boolean
+	val mounted: Boolean
+	if (vm.deviceInfo != null) {
+		installed = remember { vm.deviceInfo!!.isInstalled(vm.logic) }
+		mounted = vm.logic.mounted
+	} else {
+		installed = false
+		mounted = false
+	}
+	val notOkColor = CardDefaults.cardColors(
+		containerColor = Color(0xFFFF0F0F)
+	)
+	val okColor = CardDefaults.cardColors(
+		containerColor = Color(0xFF0FFF0F)
+	)
+	val notOkIcon = R.drawable.ic_baseline_error_24
+	val okIcon = R.drawable.ic_baseline_check_circle_24
+	val okText = "Installed"
+	val notOkText = "Not installed"
+	val ok = remember { installed and mounted }
+	Card(colors = if (ok) okColor else notOkColor, modifier = Modifier
+		.fillMaxWidth()
+		.padding(5.dp)) {
+		Box(Modifier.padding(10.dp)) {
+			Column {
+				Row(Modifier.padding(5.dp).fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+					Icon(painterResource(if (ok) okIcon else notOkIcon), "", Modifier.size(48.dp))
+					Text(if (ok) okText else notOkText, fontSize = 32.sp)
+				}
+				Text("Installed: $installed")
+				Text("Mounted bootset: $mounted")
+				Text("Device: ${if (vm.deviceInfo == null) "(unsupported)" else vm.deviceInfo!!.codename}")
+			}
 		}
 	}
 }
@@ -205,7 +262,7 @@ fun DefaultPreview() {
 	vm.scope = scope
 	AppContent(vm) {
 		Box(modifier = Modifier.padding(it)) {
-			Settings(vm)
+			Start(vm)
 		}
 	}
 }

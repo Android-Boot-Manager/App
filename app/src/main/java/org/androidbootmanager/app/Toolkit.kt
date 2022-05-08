@@ -29,7 +29,7 @@ class Toolkit(private val ctx: Context) {
 			callback.accept(fail)
 			return
 		}
-		val s = String(b)
+		val s = String(b).trim()
 		try {
 			input = FileInputStream(File(targetPath, "_ts"))
 			b = input.readBytes()
@@ -37,7 +37,7 @@ class Toolkit(private val ctx: Context) {
 		} catch (e: IOException) {
 			b = ByteArray(0)
 		}
-		val s2 = String(b)
+		val s2 = String(b).trim()
 		if (s != s2) {
 			uinf.run()
 			copyAssets("Toolkit", "Toolkit")
