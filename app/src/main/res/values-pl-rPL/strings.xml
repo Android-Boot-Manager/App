@@ -111,16 +111,16 @@
 	<string name="data_part">Dane użytkownika</string>
 	<string name="data">Dane</string>
 	<string name="system">System</string>
-	<string name="update_real_rom">You cannot update your real ROM via ABM!</string>
-	<string name="kernel_update">Kernel Update</string>
-	<string name="kernel_update_msg">You are about to update the kernel/boot image of the selected ROM and regenerate it\'s config.</string>
-	<string name="select_part">Please select an unused partition on your SD card configured with the following type: %1$s. Please make sure it really is the correct one, you can cancel and label it if unsure. If you didn\'t create one yet, do that first.</string>
+	<string name="update_real_rom">Nie możesz zaktualizować swojego prawdziwego ROMu przez ABM!</string>
+	<string name="kernel_update">Aktualizacja kernela</string>
+	<string name="kernel_update_msg">Zamierzasz zaktualizować obraz kernel/boot wybranego ROMu i zregenerować jego konfigurację.</string>
+	<string name="select_part">Wybierz nieużywaną partycję na karcie SD skonfigurowaną z następującym typem: %1$s. Upewnij się, że jest on prawidłowy, możesz go anulować i oznaczyć w razie wątpliwości. Jeśli jeszcze tego nie utworzyłeś, zrób to najpierw.</string>
 	<!-- How an partition is used -->
 	<string name="usage">Użycie</string>
-	<string name="select_droidian_gsi">Select Droidian GSI</string>
-	<string name="select_droidian_adapt">Select Droidian Adaption</string>
-	<string name="select_droidian_devtools">Select Droidian DevTools</string>
-	<string name="rom_type_add_droidian">Droidian GSI with Adaption and DevTools</string>
+	<string name="select_droidian_gsi">Wybierz Droidian GSI</string>
+	<string name="select_droidian_adapt">Wybierz adaptację Droidiana</string>
+	<string name="select_droidian_devtools">Wybierz Droidian DevTools</string>
+	<string name="rom_type_add_droidian">Droidian GSI z Adaption i DevTools</string>
 	<string name="menu">Menu</string>
 	<string name="title_activity_wizard">WizardActivity</string>
 </resources>
