@@ -37,6 +37,7 @@ class MainActivity : ComponentActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		val vm = MainActivityState()
+		vm.activity = this
 		vm.logic = MainActivityLogic(this)
 
 		val content: View = findViewById(android.R.id.content)
@@ -59,11 +60,14 @@ class MainActivity : ComponentActivity() {
 		val toast =
 			Toast.makeText(this, "Toolkit extracting, please be patient...", Toast.LENGTH_LONG)
 		Thread {
-			Shell.enableVerboseLogging = BuildConfig.DEBUG
-			Shell.setDefaultBuilder(Shell.Builder.create()
-				.setFlags(0)
-				.setTimeout(30)
-			)
+			if (Shell.getCachedShell() == null) {
+				Shell.enableVerboseLogging = BuildConfig.DEBUG
+				Shell.setDefaultBuilder(
+					Shell.Builder.create()
+						.setFlags(0)
+						.setTimeout(30)
+				)
+			}
 			Toolkit(this).copyAssets({
 				runOnUiThread {
 					toast.show()
@@ -227,18 +231,37 @@ fun Start(vm: MainActivityState) {
 	val okText = "Installed"
 	val notOkText = "Not installed"
 	val ok = remember { installed and mounted }
-	Card(colors = if (ok) okColor else notOkColor, modifier = Modifier
-		.fillMaxWidth()
-		.padding(5.dp)) {
-		Box(Modifier.padding(10.dp)) {
-			Column {
-				Row(Modifier.padding(5.dp).fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-					Icon(painterResource(if (ok) okIcon else notOkIcon), "", Modifier.size(48.dp))
-					Text(if (ok) okText else notOkText, fontSize = 32.sp)
+	Column {
+		Card(
+			colors = if (ok) okColor else notOkColor, modifier = Modifier
+				.fillMaxWidth()
+				.padding(5.dp)
+		) {
+			Box(Modifier.padding(10.dp)) {
+				Column {
+					Row(
+						Modifier
+							.padding(5.dp)
+							.fillMaxWidth(),
+						horizontalArrangement = Arrangement.Center,
+						verticalAlignment = Alignment.CenterVertically
+					) {
+						Icon(
+							painterResource(if (ok) okIcon else notOkIcon),
+							"",
+							Modifier.size(48.dp)
+						)
+						Text(if (ok) okText else notOkText, fontSize = 32.sp)
+					}
+					Text("Installed: $installed")
+					Text("Mounted bootset: $mounted")
+					Text("Device: ${if (vm.deviceInfo == null) "(unsupported)" else vm.deviceInfo!!.codename}")
 				}
-				Text("Installed: $installed")
-				Text("Mounted bootset: $mounted")
-				Text("Device: ${if (vm.deviceInfo == null) "(unsupported)" else vm.deviceInfo!!.codename}")
+			}
+		}
+		if (!installed) {
+			Button(onClick = { vm.startInstall() }) {
+				Text("Install")
 			}
 		}
 	}

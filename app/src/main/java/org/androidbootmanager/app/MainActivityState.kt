@@ -1,6 +1,6 @@
 package org.androidbootmanager.app
 
-import android.content.Context
+import android.content.Intent
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.getValue
@@ -10,6 +10,15 @@ import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 
 class MainActivityState {
+	fun startInstall() {
+		val i = Intent(activity, WizardActivity::class.java)
+		i.putExtra("codename", deviceInfo!!.codename)
+		i.putExtra("flow", "droidboot")
+		activity.startActivity(i)
+		activity.finish()
+	}
+
+	lateinit var activity: MainActivity
 	var deviceInfo: DeviceInfo? = null
 	var currentNav: String = "start"
 	var isReady = false
