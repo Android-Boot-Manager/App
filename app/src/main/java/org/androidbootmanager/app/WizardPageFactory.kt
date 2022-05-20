@@ -1,33 +1,26 @@
 package org.androidbootmanager.app
 
+import android.net.Uri
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import java.util.function.Consumer
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 
 class WizardPageFactory(private val vm: WizardActivityState) {
-	fun get(flow: String): List<WizardPage> {
-		return listOf(object : WizardPage {
-			override var name: String = "start"
-			override var prev: String? = null
-			override var next: String? = "select"
-			override var prevText: String = "Cancel"
-			override var nextText: String = "Next"
-			override var onPrev: Consumer<WizardActivity> = Consumer { it.finish() }
-			override var onNext: Consumer<WizardActivity> = Consumer { it.finish() }
-			override var run: @Composable () -> Unit = @Composable {
-				Start(vm)
-			}
-		}, object : WizardPage {
-			override var name: String = "select"
-			override var prev: String? = "start"
-			override var next: String? = null
-			override var prevText: String = "Prev"
-			override var nextText: String = "Finish"
-			override var onPrev: Consumer<WizardActivity> = Consumer { it.finish() }
-			override var onNext: Consumer<WizardActivity> = Consumer { it.finish() }
-			override var run: @Composable () -> Unit = @Composable {
-				Select(vm)
-			}
+	fun get(flow: String): List<IWizardPage> {
+		return listOf(WizardPage("start",
+			NavButton("Cancel") { it.finish() },
+			NavButton("Next") { it.navigate("select") })
+		{
+			Start(vm)
+		}, WizardPage("select",
+			NavButton("Prev") { it.navigate("start") },
+			NavButton("") {}
+		) {
+			Select(vm)
 		})
 	}
 }
@@ -35,9 +28,23 @@ class WizardPageFactory(private val vm: WizardActivityState) {
 @Composable
 fun Start(vm: WizardActivityState) {
 	Text(text = "Hello name!")
+
 }
 
 @Composable
 fun Select(vm: WizardActivityState) {
-	Text(text = "Hello 2!")
+	val nextButtonAvailable = remember { mutableStateOf(false) }
+	val flashType = "DroidBootFlashType"
+
+	if (nextButtonAvailable.value) {
+		vm.nextText.value = "Next"
+		vm.onNext.value = { it.navigate("done") }
+	} else {
+		Button(onClick = { vm.activity.chooseFile("*/*") {
+			vm.flashes[flashType] = it
+			nextButtonAvailable.value = true
+		} }) {
+			Text("Choose file")
+		}
+	}
 }
