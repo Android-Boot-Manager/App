@@ -38,6 +38,7 @@ class WizardActivity : ComponentActivity() {
 			}
 			if (onFileChosen != null) {
 				onFileChosen!!(uri)
+				onFileChosen = null
 			} else {
 				Toast.makeText(
 					this@WizardActivity,
