@@ -16,10 +16,10 @@ class MainActivityLogic(ctx: Context) {
 	var mounted = false
 	fun mount(d: DeviceInfo): Boolean {
 		if (mounted)
-			return mounted
+			return true
 		if (SuFile.open(abmBootset.toURI()).exists()) {
 			mounted = true
-			return mounted
+			return true
 		}
 		val result: Shell.Result = Shell
 			.cmd(assetDir.absolutePath + "/Scripts/config/mount/" + d.codename + ".sh")
@@ -38,11 +38,11 @@ class MainActivityLogic(ctx: Context) {
 			return mounted
 		}
 		mounted = true
-		return mounted
+		return true
 	}
 	fun unmount(d: DeviceInfo): Boolean {
 		if (!mounted)
-			return !mounted
+			return true
 		val result: Shell.Result = Shell
 			.cmd(assetDir.absolutePath + "/Scripts/config/umount/" + d.codename + ".sh")
 			.exec()
@@ -60,6 +60,6 @@ class MainActivityLogic(ctx: Context) {
 			return !mounted
 		}
 		mounted = false
-		return !mounted
+		return true
 	}
 }
