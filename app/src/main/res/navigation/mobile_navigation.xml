@@ -6,31 +6,31 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="org.androidbootmanager.app.legacy.ui.home.HomeFragment"
+        android:name="org.andbootmgr.app.legacy.ui.home.HomeFragment"
         android:label="@string/menu_home"
         tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/nav_roms"
-        android:name="org.androidbootmanager.app.legacy.ui.roms.ROMFragment"
+        android:name="org.andbootmgr.app.legacy.ui.roms.ROMFragment"
         android:label="@string/menu_roms"
         tools:layout="@layout/wizard_installer_finddevice" />
 
     <fragment
         android:id="@+id/nav_sd"
-        android:name="org.androidbootmanager.app.legacy.ui.sdcard.SDCardFragment"
+        android:name="org.andbootmgr.app.legacy.ui.sdcard.SDCardFragment"
         android:label="@string/menu_sd"
         tools:layout="@layout/wizard_installer_finddevice" />
 
     <fragment
         android:id="@+id/nav_generalcfg"
-        android:name="org.androidbootmanager.app.legacy.ui.generalcfg.GeneralCfgFragment"
+        android:name="org.andbootmgr.app.legacy.ui.generalcfg.GeneralCfgFragment"
         android:label="@string/menu_generalcfg"
         tools:layout="@layout/fragment_generalcfg" />
 
     <fragment
         android:id="@+id/nav_about"
-        android:name="org.androidbootmanager.app.legacy.ui.about.AboutFragment"
+        android:name="org.andbootmgr.app.legacy.ui.about.AboutFragment"
         tools:layout="@layout/fragment_about"
         android:label="@string/about" />
 

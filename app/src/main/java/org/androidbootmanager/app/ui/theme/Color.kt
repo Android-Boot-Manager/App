@@ -1,1 +1,0 @@
-package org.androidbootmanager.app.ui.theme

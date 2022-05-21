@@ -1,0 +1,234 @@
+package org.andbootmgr.app.legacy.ui.roms;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.Toolbar;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.io.SuFile;
+
+import org.andbootmgr.app.R;
+import org.andbootmgr.app.legacy.ui.addrom.AddROMWelcomeWizardPageFragment;
+import org.andbootmgr.app.legacy.ui.addrom.UpROMWelcomeWizardPageFragment;
+import org.andbootmgr.app.legacy.ui.home.InstalledViewModel;
+import org.andbootmgr.app.legacy.ui.wizard.WizardActivity;
+import org.andbootmgr.app.legacy.util.ActionAbortedCleanlyError;
+import org.andbootmgr.app.legacy.util.ConfigFile;
+import org.andbootmgr.app.legacy.util.ConfigTextWatcher;
+import org.andbootmgr.app.legacy.util.MiscUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+public class ROMFragment extends Fragment {
+
+    RecyclerView recyclerView;
+    ArrayList<Entry> entries;
+    ROMRecyclerViewAdapter adapter;
+    InstalledViewModel model;
+    FloatingActionButton fab;
+    public static Entry current;
+
+    public static class Entry {
+        public final String file;
+        public ConfigFile config;
+        public Entry(String outFile) throws ActionAbortedCleanlyError {
+            file = outFile;
+            config = ConfigFile.importFromFile(file);
+        }
+        public void save() {
+            config.exportToPrivFile("entry.conf",file);
+        }
+    }
+
+    public class ROMRecyclerViewAdapter extends RecyclerView.Adapter<ROMRecyclerViewAdapter.ViewHolder> {
+
+        private final List<Entry> entryList;
+
+        public ROMRecyclerViewAdapter(List<Entry> entryListIn) {
+            entryList = entryListIn;
+        }
+
+        @NonNull
+        @Override
+        public ROMRecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.entry, parent, false);
+            return new ROMRecyclerViewAdapter.ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ROMRecyclerViewAdapter.ViewHolder holder, int position) {
+            holder.e = entries.get(position);
+            switch (holder.e.config.get("xtype") != null ? holder.e.config.get("xtype") : "") {
+                case "UT":
+                    holder.label.setText(getString(R.string.ut));
+                    holder.pic.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ut_logo));
+                    break;
+                case "SFOS":
+                    holder.label.setText(getString(R.string.rom_type_add_sailfish));
+                    holder.pic.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_sailfish_os_logo));
+                    break;
+                case "droid":
+                    holder.label.setText(getString(R.string.android));
+                    holder.pic.setImageDrawable(ContextCompat.getDrawable(requireContext(),R.drawable.ic_roms));
+                    break;
+                default:
+                    holder.label.setText(getString(R.string.unknown_os));
+                    break;
+            }
+            if (holder.e.config.get("title") != null)
+                holder.name.setText(holder.e.config.get("title"));
+        }
+
+        public void updateEntries() {
+            ROMFragment.this.updateEntries();
+        }
+
+        @Override
+        public int getItemCount() {
+            return entryList.size();
+        }
+
+        public class ViewHolder extends RecyclerView.ViewHolder {
+
+            final ConstraintLayout container;
+            final TextView label;
+            final TextView name;
+            final ImageView pic;
+            Entry e;
+
+            public ViewHolder(View view) {
+                super(view);
+                container = view.findViewById(R.id.entry_container);
+                label = view.findViewById(R.id.entry_text);
+                pic = view.findViewById(R.id.entry_pic);
+                name = view.findViewById(R.id.entry_name);
+                container.setOnClickListener((v) -> {
+                    assert e != null;
+                    ConfigFile proposed_;
+                    try {
+                        proposed_ = ConfigFile.importFromFile(e.file);
+                    } catch (ActionAbortedCleanlyError actionAbortedCleanlyError) {
+                        actionAbortedCleanlyError.printStackTrace();
+                        Toast.makeText(requireContext(),"Loading configuration file: Error. Action aborted cleanly. Creating new.",Toast.LENGTH_LONG).show();
+                        proposed_ = new ConfigFile();
+                    }
+                    final ConfigFile proposed = proposed_;
+                    final Toolbar t = new Toolbar(requireContext());
+                    t.setTitle(R.string.edit_entry);
+                    t.setBackgroundColor(getResources().getColor(R.color.colorAccent, requireActivity().getTheme()));
+                    t.setNavigationIcon(android.R.drawable.ic_menu_close_clear_cancel);
+                    View dialog = LayoutInflater.from(requireContext()).inflate(R.layout.edit_entry,null);
+                    ((EditText) dialog.findViewById(R.id.editentryTitle)).setText(e.config.get("title"));
+                    ((EditText) dialog.findViewById(R.id.editentryTitle)).addTextChangedListener(new ConfigTextWatcher(proposed, "title"));
+                    ((EditText) dialog.findViewById(R.id.editentryKernel)).setText(e.config.get("linux"));
+                    ((EditText) dialog.findViewById(R.id.editentryKernel)).addTextChangedListener(new ConfigTextWatcher(proposed, "linux"));
+                    ((EditText) dialog.findViewById(R.id.editentryDtb)).setText(e.config.get("dtb"));
+                    ((EditText) dialog.findViewById(R.id.editentryDtb)).addTextChangedListener(new ConfigTextWatcher(proposed, "dtb"));
+                    ((EditText) dialog.findViewById(R.id.editentryInitrd)).setText(e.config.get("initrd"));
+                    ((EditText) dialog.findViewById(R.id.editentryInitrd)).addTextChangedListener(new ConfigTextWatcher(proposed, "initrd"));
+                    ((EditText) dialog.findViewById(R.id.editentryCmdline)).setText(e.config.get("options"));
+                    ((EditText) dialog.findViewById(R.id.editentryCmdline)).addTextChangedListener(new ConfigTextWatcher(proposed, "options"));
+                    ((EditText) dialog.findViewById(R.id.editentryDataPart)).setText(e.config.get("xdata"));
+                    dialog.findViewById(R.id.editentryDataPart).setEnabled(false);
+                    ((EditText) dialog.findViewById(R.id.editentrySysPart)).setText(e.config.get("xsystem"));
+                    dialog.findViewById(R.id.editentrySysPart).setEnabled(false);
+                    AlertDialog d = new AlertDialog.Builder(requireContext())
+                            .setCancelable(true)
+                            .setNeutralButton(R.string.kernel_update, (p1, p2) -> {
+                                if ((e.config.get("xsystem") == null ? "" : e.config.get("xsystem")).equals("real") || (e.config.get("xdata") == null ? "" : e.config.get("xdata")).equals("real")) {
+                                    new AlertDialog.Builder(requireContext())
+                                            .setTitle(R.string.failed)
+                                            .setMessage(R.string.update_real_rom)
+                                            .setCancelable(true)
+                                            .setNegativeButton(R.string.ok, (d2, p) -> d2.dismiss())
+                                            .show();
+                                    return;
+                                }
+                                current = e;
+                                startActivity(new Intent(requireActivity(), WizardActivity.class).putExtra("codename",model.getCodename().getValue()).putExtra("StartFragment", UpROMWelcomeWizardPageFragment.class));
+                            })
+                            .setNegativeButton(R.string.delete, (p1, p2) -> MiscUtils.sure(requireContext(), p1, getString(R.string.delete_msg_2, e.config.get("title")), (p112, p212) -> {
+                                if (e.config.get("xsystem") != null && e.config.get("xdata") != null)
+                                    if (e.config.get("xsystem").equals("real") || e.config.get("xdata").equals("real")) {
+                                        new AlertDialog.Builder(requireContext())
+                                                .setTitle(R.string.failed)
+                                                .setMessage(R.string.delete_real_rom)
+                                                .setCancelable(true)
+                                                .setNegativeButton(R.string.ok, (d2, p) -> d2.dismiss())
+                                                .show();
+                                        return;
+                                    }
+
+                                if (!SuFile.open(e.file).delete())
+                                    Toast.makeText(requireContext(),"Deleting configuration file: Error.",Toast.LENGTH_LONG).show();
+                                Shell.su("rm -rf /data/abm/bootset/" + e.file.replace("/data/abm/bootset/lk2nd/entries/","").replace(".conf","")).submit();
+                                updateEntries();
+                            }))
+                            .setPositiveButton(R.string.save, (p1, p2) -> {
+                                e.config = proposed;
+                                e.save();
+                                updateEntries();
+                            })
+                            .setCustomTitle(t)
+                            .setView(dialog)
+                            .show();
+                    t.setNavigationOnClickListener(a -> d.dismiss());
+                });
+            }
+
+            public void updateEntries() {
+                ROMRecyclerViewAdapter.this.updateEntries();
+            }
+        }
+    }
+
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+        model = new ViewModelProvider(requireActivity()).get(InstalledViewModel.class);
+        final View root = inflater.inflate(R.layout.fragment_roms, container, false);
+        fab = root.findViewById(R.id.roms_fab);
+        fab.setOnClickListener(view -> startActivity(new Intent(requireActivity(), WizardActivity.class).putExtra("codename",model.getCodename().getValue()).putExtra("StartFragment", AddROMWelcomeWizardPageFragment.class)));
+        recyclerView = root.findViewById(R.id.wizard_installer_finddevice);
+        LinearLayoutManager recyclerLayoutManager = new LinearLayoutManager(requireContext());
+        recyclerView.setLayoutManager(recyclerLayoutManager);
+        recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), recyclerLayoutManager.getOrientation()));
+        updateEntries();
+        adapter = new ROMRecyclerViewAdapter(entries);
+        recyclerView.setAdapter(adapter);
+        return root;
+    }
+
+    public void updateEntries() {
+        entries = new ArrayList<>();
+        for (String entryFile : Objects.requireNonNull(SuFile.open("/data/abm/bootset/lk2nd/entries/").list())) {
+            try {
+                entries.add(new Entry("/data/abm/bootset/lk2nd/entries/" + entryFile));
+            } catch (ActionAbortedCleanlyError actionAbortedCleanlyError) {
+                actionAbortedCleanlyError.printStackTrace();
+                Toast.makeText(requireContext(), "Loading entry: Error. Action aborted cleanly.", Toast.LENGTH_LONG).show();
+            }
+        }
+        adapter = new ROMRecyclerViewAdapter(entries);
+        recyclerView.setAdapter(adapter);
+    }
+}
