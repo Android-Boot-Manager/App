@@ -25,6 +25,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.topjohnwu.superuser.Shell
+import com.topjohnwu.superuser.Shell.FLAG_MOUNT_MASTER
+import com.topjohnwu.superuser.Shell.FLAG_REDIRECT_STDERR
 import com.topjohnwu.superuser.io.SuFile
 import com.topjohnwu.superuser.io.SuFileInputStream
 import kotlinx.coroutines.launch
@@ -64,7 +66,7 @@ class MainActivity : ComponentActivity() {
 				Shell.enableVerboseLogging = BuildConfig.DEBUG
 				Shell.setDefaultBuilder(
 					Shell.Builder.create()
-						.setFlags(0)
+						.setFlags(FLAG_MOUNT_MASTER or FLAG_REDIRECT_STDERR)
 						.setTimeout(30)
 				)
 			}
@@ -212,25 +214,45 @@ fun NavGraph(vm: MainActivityState, it: PaddingValues) {
 @Composable
 fun Start(vm: MainActivityState) {
 	val installed: Boolean
+	val booted: Boolean
 	val mounted: Boolean
+	val corrupt: Boolean
 	if (vm.deviceInfo != null) {
 		installed = remember { vm.deviceInfo!!.isInstalled(vm.logic) }
+		booted = remember { vm.deviceInfo!!.isBooted(vm.logic) }
+		corrupt = remember { vm.deviceInfo!!.isCorrupt(vm.logic) }
 		mounted = vm.logic.mounted
 	} else {
 		installed = false
+		booted = false
+		corrupt = true
 		mounted = false
 	}
 	val notOkColor = CardDefaults.cardColors(
 		containerColor = Color(0xFFFF0F0F)
 	)
 	val okColor = CardDefaults.cardColors(
-		containerColor = Color(0xFF0FFF0F)
+		containerColor = Color(0xFF0DDF0F)
 	)
 	val notOkIcon = R.drawable.ic_baseline_error_24
 	val okIcon = R.drawable.ic_baseline_check_circle_24
 	val okText = "Installed"
+	val partiallyOkText = "Installed but not activated"
+	val corruptDeactivatedText = "Deactivated and corrupt"
+	val corruptText = "Activated but corrupt"
 	val notOkText = "Not installed"
-	val ok = remember { installed and mounted }
+	val ok = installed and booted and mounted and !corrupt
+	val usedText = if (ok) {
+		okText
+	} else if (installed and booted and (!mounted || corrupt)) {
+		corruptText
+	} else if (installed and !booted and (!mounted || corrupt)) {
+		corruptDeactivatedText
+	} else if (installed and !booted) {
+		partiallyOkText
+	} else {
+		notOkText
+	}
 	Column {
 		Card(
 			colors = if (ok) okColor else notOkColor, modifier = Modifier
@@ -251,10 +273,14 @@ fun Start(vm: MainActivityState) {
 							"",
 							Modifier.size(48.dp)
 						)
-						Text(if (ok) okText else notOkText, fontSize = 32.sp)
+						Text(usedText, fontSize = 32.sp)
 					}
 					Text("Installed: $installed")
+					Text("Activated: $booted")
 					Text("Mounted bootset: $mounted")
+					if (mounted) {
+						Text("Bootset corrupt: $corrupt")
+					}
 					Text("Device: ${if (vm.deviceInfo == null) "(unsupported)" else vm.deviceInfo!!.codename}")
 				}
 			}

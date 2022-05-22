@@ -31,6 +31,8 @@ import kotlinx.coroutines.launch
 import org.andbootmgr.app.ui.theme.AbmTheme
 import java.io.File
 import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
@@ -42,7 +44,7 @@ class WizardActivity : ComponentActivity() {
 		super.onCreate(savedInstanceState)
 		vm = WizardActivityState(intent.getStringExtra("codename")!!)
 		vm.activity = this
-		vm.cacheDir = File(filesDir.parentFile!!, "cache")
+		vm.logic = MainActivityLogic(this)
 		chooseFile = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
 			if (uri == null) {
 				Toast.makeText(this, "File not available, please try again later!", Toast.LENGTH_LONG).show()
@@ -98,6 +100,10 @@ class WizardActivity : ComponentActivity() {
 		}
 	}
 
+	override fun onBackPressed() {
+		vm.onPrev.value(this)
+	}
+
 	fun navigate(next: String) {
 		vm.navigate(next)
 	}
@@ -118,7 +124,7 @@ class WizardActivity : ComponentActivity() {
 class WizardActivityState(val codename: String) {
 	lateinit var navController: NavHostController
 	lateinit var activity: WizardActivity
-	lateinit var cacheDir: File
+	lateinit var logic: MainActivityLogic
 	val deviceInfo = HardcodedDeviceInfoFactory.get(codename)
 	var current = mutableStateOf("start")
 	var prevText = mutableStateOf("Prev")
@@ -131,32 +137,40 @@ class WizardActivityState(val codename: String) {
 	})
 
 	var flashes: HashMap<String, Uri> = HashMap()
+	var texts: HashMap<String, String> = HashMap()
 
 	fun navigate(next: String) {
 		current.value = next
 		navController.navigate(current.value)
 	}
 
-	fun copyToCache(flashType: String, output: File) {
-		val inputStream = activity.contentResolver.openInputStream(flashes[flashType]!!)
-			?: throw IOException("in == null")
-		Files.copy(inputStream, output.toPath(), StandardCopyOption.REPLACE_EXISTING)
-		inputStream.close()
-	}
-
-	fun copyToBlock(flashType: String, output: File): Long {
-		val inputStream = activity.contentResolver.openInputStream(flashes[flashType]!!)
-			?: throw IOException("in == null")
-		val outStream = SuFileOutputStream.open(output)
+	fun copy(inputStream: InputStream, outputStream: OutputStream): Long {
 		var nread = 0L
 		val buf = ByteArray(8192)
 		var n: Int
 		while (inputStream.read(buf).also { n = it } > 0) {
-			outStream.write(buf, 0, n)
+			outputStream.write(buf, 0, n)
 			nread += n.toLong()
 		}
 		inputStream.close()
+		outputStream.flush()
+		outputStream.close()
 		return nread
+	}
+
+	fun flashStream(flashType: String): InputStream {
+		return activity.contentResolver.openInputStream(flashes[flashType]!!)
+			?: throw IOException("in == null")
+	}
+
+	fun copyUnpriv(inputStream: InputStream, output: File) {
+		Files.copy(inputStream, output.toPath(), StandardCopyOption.REPLACE_EXISTING)
+		inputStream.close()
+	}
+
+	fun copyPriv(inputStream: InputStream, output: File) {
+		val outStream = SuFileOutputStream.open(output)
+		copy(inputStream, outStream)
 	}
 }
 

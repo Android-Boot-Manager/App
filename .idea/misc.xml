@@ -12,8 +12,11 @@
         <entry key="../../../../../layout/compose-model-1651931949692.xml" value="0.15625" />
         <entry key="../../../../../layout/compose-model-1651940616263.xml" value="0.5" />
         <entry key="../../../../../layout/compose-model-1651995463570.xml" value="0.33" />
+        <entry key="app/src/main/java/org/andbootmgr/app/MainActivity.kt" value="0.1831223628691983" />
+        <entry key="app/src/main/java/org/andbootmgr/app/WizardPageFactory.kt" value="0.2810126582278481" />
         <entry key="app/src/main/java/org/androidbootmanager/app/MainActivity.kt" value="0.17130801687763714" />
-        <entry key="app/src/main/java/org/androidbootmanager/app/WizardActivity.kt" value="0.5" />
+        <entry key="app/src/main/java/org/androidbootmanager/app/WizardActivity.kt" value="0.25" />
+        <entry key="app/src/main/java/org/androidbootmanager/app/WizardPageFactory.kt" value="0.18" />
         <entry key="app/src/main/res/layout/activity_debug.xml" value="0.17552083333333332" />
         <entry key="app/src/main/res/layout/fragment_generalcfg.xml" value="0.19322916666666667" />
       </map>

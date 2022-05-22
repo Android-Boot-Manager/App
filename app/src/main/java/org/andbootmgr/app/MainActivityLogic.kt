@@ -13,11 +13,13 @@ class MainActivityLogic(ctx: Context) {
 	val cacheDir = File(rootDir, "cache")
 	val abmDir = File("/data/abm/")
 	val abmBootset = File(abmDir, "bootset")
+	val abmDb = File(abmBootset, "db")
+	val abmEntries = File(abmDb, "entries")
 	var mounted = false
 	fun mount(d: DeviceInfo): Boolean {
 		if (mounted)
 			return true
-		if (SuFile.open(abmBootset.toURI()).exists()) {
+		if (SuFile.open(abmDb.toURI()).exists()) {
 			mounted = true
 			return true
 		}
