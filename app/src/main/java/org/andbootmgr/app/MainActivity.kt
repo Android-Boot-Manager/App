@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,10 +42,10 @@ import java.io.IOException
 import java.lang.Exception
 
 class MainActivityState {
-	fun startInstall() {
+	fun startFlow(flow: String) {
 		val i = Intent(activity!!, WizardActivity::class.java)
 		i.putExtra("codename", deviceInfo!!.codename)
-		i.putExtra("flow", "droidboot")
+		i.putExtra("flow", flow)
 		activity!!.startActivity(i)
 		activity!!.finish()
 	}
@@ -182,7 +183,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppContent(vm: MainActivityState, view: @Composable (PaddingValues) -> Unit) {
+private fun AppContent(vm: MainActivityState, view: @Composable (PaddingValues) -> Unit) {
 	val drawerState = vm.drawerState!!
 	val scope = vm.scope!!
 	AbmTheme {
@@ -234,7 +235,7 @@ fun AppContent(vm: MainActivityState, view: @Composable (PaddingValues) -> Unit)
 }
 
 @Composable
-fun NavGraph(vm: MainActivityState, it: PaddingValues) {
+private fun NavGraph(vm: MainActivityState, it: PaddingValues) {
 	NavHost(navController = vm.navController!!, startDestination = "start", modifier = Modifier.padding(it)) {
 		composable("start") {
 			vm.currentNav = "start"
@@ -249,7 +250,7 @@ fun NavGraph(vm: MainActivityState, it: PaddingValues) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Start(vm: MainActivityState) {
+private fun Start(vm: MainActivityState) {
 	val installed: Boolean
 	val booted: Boolean
 	val mounted: Boolean
@@ -323,15 +324,32 @@ fun Start(vm: MainActivityState) {
 			}
 		}
 		if (!installed) {
-			Button(onClick = { vm.startInstall() }) {
+			Button(onClick = { vm.startFlow("droidboot") }) {
 				Text("Install")
 			}
+		} else if (installed and !booted) {
+			Text("The device did not boot using DroidBoot, but configuration files are present. If you just installed ABM, you need to reboot. If the bootloader installation repeatedly fails, please consult the documentation.", textAlign = TextAlign.Center)
+			Button(onClick = {
+				vm.startFlow("fix_droidboot")
+			}) {
+				Text("Repair DroidBoot")
+			}
+		}
+		if (mounted && corrupt) {
+			Text("Configuration files are not present. You can restore them from an automated backup. For more information, please consult the documentation.", textAlign = TextAlign.Center)
+			Button(onClick = {
+				vm.startFlow("repair_cfg")
+			}) {
+				Text("Repair bootset")
+			}
+		} else if (!mounted) {
+			Text("Bootset could not be mounted, please consult the documentation.", textAlign = TextAlign.Center)
 		}
 	}
 }
 
 @Composable
-fun Settings(vm: MainActivityState) {
+private fun Settings(vm: MainActivityState) {
 	val c = remember {
 		try {
 			if (vm.logic == null)
@@ -393,13 +411,18 @@ fun Settings(vm: MainActivityState) {
 		}, enabled = !(defaultErr || timeoutErr)) {
 			Text("Save changes")
 		}
+		Button(onClick = {
+			vm.startFlow("update_droidboot")
+		}) {
+			Text("Update DroidBoot")
+		}
 	}
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
-fun DefaultPreview() {
+private fun Preview() {
 	val vm = MainActivityState()
 	val navController = rememberNavController()
 	val drawerState = rememberDrawerState(DrawerValue.Closed)

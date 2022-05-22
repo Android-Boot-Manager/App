@@ -44,7 +44,7 @@ class DroidBootWizardPageFactory(private val vm: WizardActivityState) {
 }
 
 @Composable
-fun Start(vm: WizardActivityState) {
+private fun Start(vm: WizardActivityState) {
 	Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
 		modifier = Modifier.fillMaxSize()
 	) {
@@ -54,7 +54,7 @@ fun Start(vm: WizardActivityState) {
 }
 
 @Composable
-fun Input(vm: WizardActivityState) {
+private fun Input(vm: WizardActivityState) {
 	Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
 		modifier = Modifier.fillMaxSize()
 	) {
@@ -86,7 +86,7 @@ fun Input(vm: WizardActivityState) {
 
 
 @Composable
-fun Select(vm: WizardActivityState) {
+private fun Select(vm: WizardActivityState) {
 	val nextButtonAvailable = remember { mutableStateOf(false) }
 	val flashType = "DroidBootFlashType"
 
@@ -118,7 +118,7 @@ fun Select(vm: WizardActivityState) {
 }
 
 @Composable
-fun Flash(vm: WizardActivityState) {
+private fun Flash(vm: WizardActivityState) {
 	val flashType = "DroidBootFlashType"
 	Terminal(vm) { terminal ->
 		terminal.add("Preparing file system...")
@@ -190,6 +190,7 @@ fun Flash(vm: WizardActivityState) {
 		terminal.add("-- Done.")
 		vm.logic.unmount(vm.deviceInfo)
 		vm.activity.runOnUiThread {
+			vm.btnsOverride = true
 			vm.nextText.value = "Finish"
 			vm.onNext.value = {
 				it.finish()
@@ -201,7 +202,7 @@ fun Flash(vm: WizardActivityState) {
 
 @Composable
 @Preview
-fun Preview() {
+private fun Preview() {
 	val vm = WizardActivityState("null")
 	AbmTheme {
 		Surface(

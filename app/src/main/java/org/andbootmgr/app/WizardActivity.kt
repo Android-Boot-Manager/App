@@ -40,6 +40,8 @@ class WizardPageFactory(private val vm: WizardActivityState) {
 	fun get(flow: String): List<IWizardPage> {
 		return when (flow) {
 			"droidboot" -> DroidBootWizardPageFactory(vm).get()
+			"fix_droidboot" -> FixDroidBootWizardPageFactory(vm).get()
+			"update_droidboot" -> UpdateDroidBootWizardPageFactory(vm).get()
 			else -> listOf()
 		}
 	}
@@ -92,10 +94,12 @@ class WizardActivity : ComponentActivity() {
 						) {
 							for (i in wizardPages) {
 								composable(i.name) {
-									vm.prevText.value = i.prev.text
-									vm.nextText.value = i.next.text
-									vm.onPrev.value = i.prev.onClick
-									vm.onNext.value = i.next.onClick
+									if (!vm.btnsOverride) {
+										vm.prevText.value = i.prev.text
+										vm.nextText.value = i.next.text
+										vm.onPrev.value = i.prev.onClick
+										vm.onNext.value = i.next.onClick
+									}
 									i.run()
 								}
 							}
@@ -131,6 +135,7 @@ class WizardActivity : ComponentActivity() {
 }
 
 class WizardActivityState(val codename: String) {
+	var btnsOverride = false
 	lateinit var navController: NavHostController
 	lateinit var activity: WizardActivity
 	lateinit var logic: DeviceLogic
@@ -149,6 +154,7 @@ class WizardActivityState(val codename: String) {
 	var texts: HashMap<String, String> = HashMap()
 
 	fun navigate(next: String) {
+		btnsOverride = false
 		current.value = next
 		navController.navigate(current.value)
 	}
@@ -196,7 +202,7 @@ interface IWizardPage {
 }
 
 @Composable
-fun BtnsRow(vm: WizardActivityState) {
+private fun BtnsRow(vm: WizardActivityState) {
 	Row {
 		TextButton(onClick = {
 			vm.onPrev.value(vm.activity)
@@ -213,7 +219,7 @@ fun BtnsRow(vm: WizardActivityState) {
 
 @Preview(showBackground = true)
 @Composable
-fun DefaultPreview2() {
+private fun Preview() {
 	val vm = WizardActivityState("null")
 	AbmTheme {
 		// A surface container using the 'background' color from the theme
@@ -226,7 +232,7 @@ fun DefaultPreview2() {
 					Modifier
 						.fillMaxWidth()
 						.weight(1.0f)) {
-					Select(vm)
+					//Select(vm)
 				}
 				Box(Modifier.fillMaxWidth()) {
 					BtnsRow(vm)
