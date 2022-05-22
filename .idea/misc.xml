@@ -19,6 +19,21 @@
         <entry key="app/src/main/java/org/androidbootmanager/app/MainActivity.kt" value="0.17130801687763714" />
         <entry key="app/src/main/java/org/androidbootmanager/app/WizardActivity.kt" value="0.25" />
         <entry key="app/src/main/java/org/androidbootmanager/app/WizardPageFactory.kt" value="0.18" />
+        <entry key="app/src/main/res/drawable-anydpi/ic_about.xml" value="0.186" />
+        <entry key="app/src/main/res/drawable-anydpi/ic_droidbooticon.xml" value="0.186" />
+        <entry key="app/src/main/res/drawable-anydpi/ic_menu_home.xml" value="0.186" />
+        <entry key="app/src/main/res/drawable-anydpi/ic_no.xml" value="0.186" />
+        <entry key="app/src/main/res/drawable-anydpi/ic_ok.xml" value="0.186" />
+        <entry key="app/src/main/res/drawable/ic_adopted.xml" value="0.186" />
+        <entry key="app/src/main/res/drawable/ic_baseline_check_circle_24.xml" value="0.186" />
+        <entry key="app/src/main/res/drawable/ic_baseline_error_24.xml" value="0.186" />
+        <entry key="app/src/main/res/drawable/ic_data.xml" value="0.186" />
+        <entry key="app/src/main/res/drawable/ic_launcher_foreground.xml" value="0.186" />
+        <entry key="app/src/main/res/drawable/ic_meta.xml" value="0.186" />
+        <entry key="app/src/main/res/drawable/ic_roms.xml" value="0.186" />
+        <entry key="app/src/main/res/drawable/ic_sailfish_os_logo.xml" value="0.186" />
+        <entry key="app/src/main/res/drawable/ic_sd.xml" value="0.186" />
+        <entry key="app/src/main/res/drawable/ic_settings.xml" value="0.186" />
         <entry key="app/src/main/res/layout/activity_debug.xml" value="0.17552083333333332" />
         <entry key="app/src/main/res/layout/fragment_generalcfg.xml" value="0.19322916666666667" />
       </map>

@@ -9,7 +9,9 @@ import android.view.ViewTreeObserver
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
@@ -334,8 +336,7 @@ private fun Start(vm: MainActivityState) {
 			}) {
 				Text("Repair DroidBoot")
 			}
-		}
-		if (mounted && corrupt) {
+		} else if (mounted && corrupt) {
 			Text("Configuration files are not present. You can restore them from an automated backup. For more information, please consult the documentation.", textAlign = TextAlign.Center)
 			Button(onClick = {
 				vm.startFlow("repair_cfg")
@@ -344,7 +345,319 @@ private fun Start(vm: MainActivityState) {
 			}
 		} else if (!mounted) {
 			Text("Bootset could not be mounted, please consult the documentation.", textAlign = TextAlign.Center)
+		} else if (vm.isOk) {
+			PartTool(vm)
 		}
+	}
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun PartTool(vm: MainActivityState) {
+	var parts by remember { mutableStateOf(SDUtils.generateMeta(vm.deviceInfo!!.bdev, vm.deviceInfo!!.pbdev)) }
+	if (parts == null) {
+		Text("Partition wizard failed to load")
+		return
+	}
+	var processing by remember { mutableStateOf(false) }
+	var bnr by remember { mutableStateOf(false) }
+	var create by remember { mutableStateOf(false) }
+	var rename by remember { mutableStateOf(false) }
+	var delete by remember { mutableStateOf(false) }
+	var result: String? by remember { mutableStateOf(null) }
+	var editPartID: SDUtils.Partition? by remember { mutableStateOf(null) }
+	for (p in parts!!.s) {
+		Row(horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+			.fillMaxWidth()
+			.clickable { editPartID = p }) {
+			Text("Partition ${p.id}, ${p.name}")
+		}
+	}
+	if (editPartID != null) {
+		val p = editPartID!!
+		AlertDialog(
+			onDismissRequest = {
+				editPartID = null
+			},
+			title = {
+				val name = if (p.type == SDUtils.PartitionType.FREE)
+					"Free space"
+				else if (p.name.isBlank())
+					"Partition ${p.id}"
+				else
+					p.name.trim()
+
+				Text(text = "\"${name}\"")
+			},
+			icon = {
+				   Icon(painterResource(id = R.drawable.ic_sd), "Icon")
+			},
+			text = {
+				Column {
+					val fancyType = when (p.type) {
+						SDUtils.PartitionType.RESERVED -> "Reserved"
+						SDUtils.PartitionType.ADOPTED -> "Adoptable Storage Metadata"
+						SDUtils.PartitionType.PORTABLE -> "Portable Storage"
+						SDUtils.PartitionType.UNKNOWN -> "Unknown"
+						SDUtils.PartitionType.FREE -> "Free space"
+						SDUtils.PartitionType.SYSTEM -> "OS system data"
+						SDUtils.PartitionType.DATA -> "OS user data"
+					}
+					if (p.type != SDUtils.PartitionType.FREE)
+						Text("Id: ${p.id} (${parts?.major}:${p.minor})")
+					Text("Type: ${fancyType}${if (p.type != SDUtils.PartitionType.FREE) " (code ${p.code})" else ""}")
+					Text("Size: ${p.sizeFancy} (${p.size} sectors)")
+					Text("Position: ${p.startSector} -> ${p.endSector}")
+					if (p.type != SDUtils.PartitionType.FREE) {
+						Row {
+							Button(onClick = {
+								rename = true
+							}, Modifier.padding(end = 5.dp)) {
+								Text("Rename")
+							}
+							Button(onClick = {
+								delete = true
+							}) {
+								Text("Delete")
+							}
+						}
+						Row {
+							Button(onClick = {
+								processing = true
+								Shell.cmd(p.mount()).submit {
+									processing = false
+									result = it.out.join("\n") + it.err.join("\n")
+								}
+							}, Modifier.padding(end = 5.dp)) {
+								Text("Mount")
+							}
+							Button(onClick = {
+								processing = true
+								Shell.cmd(p.unmount()).submit {
+									processing = false
+									result = it.out.join("\n") + it.err.join("\n")
+								}
+							}) {
+								Text("Unmount")
+							}
+						}
+						Button(onClick = { bnr = true }) {
+							Text("Backup & Restore")
+						}
+					} else {
+						Button(onClick = { create = true }) {
+							Text("Create")
+						}
+					}
+				}
+			},
+			confirmButton = {
+				Button(
+					onClick = {
+						editPartID = null
+					}) {
+					Text("Cancel")
+				}
+			}
+		)
+		if (bnr) {
+			AlertDialog(
+				onDismissRequest = {
+					bnr = false
+				},
+				title = {
+					Text("Backup & Restore")
+				},
+				text = {
+					Text("TODO")
+				},
+				confirmButton = {
+					Button(onClick = { bnr = false }) {
+						Text("Cancel")
+					}
+				}
+			)
+		} else if (rename) {
+			var e by remember { mutableStateOf(false) }
+			var t by remember { mutableStateOf(p.name) }
+			AlertDialog(
+				onDismissRequest = {
+					rename = false
+				},
+				title = {
+					Text("Rename")
+				},
+				text = {
+					TextField(value = t, onValueChange = {
+						t = it
+						e = !t.matches(Regex("\\A\\p{ASCII}*\\z"))
+					}, isError = e, label = {
+						Text("Partition name")
+					})
+				},
+				dismissButton = {
+					Button(onClick = { rename = false }) {
+						Text("Cancel")
+					}
+				},
+				confirmButton = {
+					Button(onClick = {
+						if (!e) {
+							processing = true
+							rename = false
+							Shell.cmd(SDUtils.umsd(parts!!) + " && " + p.rename(t)).submit { r ->
+								processing = false
+								result = r.out.join("\n") + r.err.join("\n")
+								parts = SDUtils.generateMeta(vm.deviceInfo!!.bdev, vm.deviceInfo!!.pbdev)
+								editPartID = parts?.s!!.findLast { it.id == p.id }
+							}
+						}
+					}, enabled = !e) {
+						Text("Rename")
+					}
+				}
+			)
+		} else if (delete) {
+			AlertDialog(
+				onDismissRequest = {
+					delete = false
+				},
+				title = {
+					Text("Delete")
+				},
+				text = {
+					Text("Do you REALLY want to delete this partition and loose ALL data on it?")
+				},
+				dismissButton = {
+					Button(onClick = { delete = false }) {
+						Text("Cancel")
+					}
+				},
+				confirmButton = {
+					Button(onClick = {
+						processing = true
+						delete = false
+						Shell.cmd(SDUtils.umsd(parts!!) + " && " + p.delete()).submit {
+							processing = false
+							editPartID = null
+							parts =
+								SDUtils.generateMeta(vm.deviceInfo!!.bdev, vm.deviceInfo!!.pbdev)
+							result = it.out.join("\n") + it.err.join("\n")
+						}
+					}) {
+						Text("Delete")
+					}
+				}
+			)
+		} else if (create) {
+			val f = p as SDUtils.Partition.FreeSpace
+			var et by remember { mutableStateOf(false) }
+			var el by remember { mutableStateOf(false) }
+			var eu by remember { mutableStateOf(false) }
+			var e by remember { mutableStateOf(false) }
+			var t by remember { mutableStateOf(p.name) }
+			var l by remember { mutableStateOf("0") }
+			var u by remember { mutableStateOf(p.size.toString()) }
+			var lu by remember { mutableStateOf(l.toFloat()..u.toFloat()) }
+			AlertDialog(
+				onDismissRequest = {
+					create = false
+				},
+				title = {
+					Text("Create")
+				},
+				text = {
+					Column {
+						TextField(value = t, onValueChange = {
+							t = it
+							et = !t.matches(Regex("\\A\\p{ASCII}*\\z"))
+							e = et and el and eu
+						}, isError = et, label = {
+							Text("Partition name")
+						})
+						TextField(value = l, onValueChange = {
+							l = it
+							lu = l.toFloat()..u.toFloat()
+							el = !l.matches(Regex("[0-9]+"))
+							e = et and el and eu
+						}, isError = el, label = {
+							Text("Start sector (relative)")
+						})
+						TextField(value = u, onValueChange = {
+							u = it
+							lu = l.toFloat()..u.toFloat()
+							eu = !u.matches(Regex("[0-9]+"))
+							e = et and el and eu
+						}, isError = eu, label = {
+							Text("End sector (relative)")
+						})
+						RangeSlider(values = lu, onValueChange = {
+							l = it.start.toLong().toString()
+							u = it.endInclusive.toLong().toString()
+							lu = l.toFloat()..u.toFloat()
+							el = !l.matches(Regex("[0-9]+"))
+							eu = !u.matches(Regex("[0-9]+"))
+							e = et and el and eu
+						}, valueRange = 0F..p.size.toFloat(), steps = p.size.toInt() / 2048)
+					}
+				},
+				dismissButton = {
+					Button(onClick = { create = false }) {
+						Text("Cancel")
+					}
+				},
+				confirmButton = {
+					Button(onClick = {
+						if (!e) {
+							processing = true
+							create = false
+							Shell.cmd(SDUtils.umsd(parts!!) + " && " + f.create(l.toLong(), u.toLong(), "0700", t)).submit { r ->
+								processing = false
+								result = r.out.join("\n") + r.err.join("\n")
+								parts = SDUtils.generateMeta(vm.deviceInfo!!.bdev, vm.deviceInfo!!.pbdev)
+								editPartID = null
+							}
+						}
+					}, enabled = !e) {
+						Text("Create")
+					}
+				}
+			)
+		}
+	}
+	if (processing) {
+		AlertDialog(
+			onDismissRequest = {},
+			title = {
+				Text("Please wait...")
+			},
+			text = {
+				   Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceAround) {
+					   CircularProgressIndicator(Modifier.padding(end = 20.dp))
+					   Text("Loading...")
+				   }
+			},
+			confirmButton = {}
+		)
+	} else if (result != null) {
+		AlertDialog(
+			onDismissRequest = {
+				result = null
+			},
+			title = {
+				Text("Done")
+			},
+			text = {
+				result?.let {
+					Text(it)
+				}
+			},
+			confirmButton = {
+				Button(onClick = { result = null }) {
+					Text("Ok")
+				}
+			}
+		)
 	}
 }
 
@@ -432,7 +745,7 @@ private fun Preview() {
 	vm.scope = scope
 	AppContent(vm) {
 		Box(modifier = Modifier.padding(it)) {
-			Settings(vm)
+			Start(vm)
 		}
 	}
 }

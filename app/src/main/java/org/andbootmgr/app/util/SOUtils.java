@@ -1,4 +1,4 @@
-package org.andbootmgr.app.legacy.util;
+package org.andbootmgr.app.util;
 
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;

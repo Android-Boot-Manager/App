@@ -360,7 +360,7 @@ fun Terminal(vm: WizardActivityState, r: (MutableList<String>) -> Unit) {
 			try {
 				r(s)
 			} catch (e: Throwable) {
-				s.add("--- Installation failed ---")
+				s.add("--- Failure ---")
 				s.add("Details for developers:")
 				s.add(Log.getStackTraceString(e))
 			}

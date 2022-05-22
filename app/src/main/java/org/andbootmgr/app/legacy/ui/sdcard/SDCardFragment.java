@@ -43,7 +43,7 @@ import org.andbootmgr.app.legacy.ui.activities.SplashActivity;
 import org.andbootmgr.app.legacy.ui.home.InstalledViewModel;
 import org.andbootmgr.app.legacy.util.MiscUtils;
 import org.andbootmgr.app.legacy.util.SDUtils;
-import org.andbootmgr.app.legacy.util.SOUtils;
+import org.andbootmgr.app.util.SOUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;

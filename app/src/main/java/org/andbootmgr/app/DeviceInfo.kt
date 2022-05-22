@@ -7,6 +7,8 @@ import java.io.File
 interface DeviceInfo {
 	val codename: String
 	val blBlock: String
+	val bdev: String
+	val pbdev: String
 	fun isInstalled(logic: DeviceLogic): Boolean
 	fun isBooted(logic: DeviceLogic): Boolean
 	fun isCorrupt(logic: DeviceLogic): Boolean
@@ -17,6 +19,8 @@ object HardcodedDeviceInfoFactory {
 		return object : DeviceInfo {
 			override val codename: String = "yggdrasil"
 			override val blBlock: String = "/dev/block/by-name/lk"
+			override val bdev: String = "/dev/block/mmcblk1"
+			override val pbdev: String = bdev + "p"
 			override fun isInstalled(logic: DeviceLogic): Boolean {
 				return SuFile.open(logic.abmDir, "codename.cfg").exists()
 			}

@@ -10,6 +10,7 @@ import com.topjohnwu.superuser.Shell;
 
 import org.andbootmgr.app.R;
 import org.andbootmgr.app.legacy.devices.DeviceModel;
+import org.andbootmgr.app.util.SOUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
