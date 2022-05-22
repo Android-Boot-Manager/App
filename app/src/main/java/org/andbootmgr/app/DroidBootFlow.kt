@@ -3,25 +3,22 @@ package org.andbootmgr.app
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
 import com.topjohnwu.superuser.io.SuFileInputStream
 import com.topjohnwu.superuser.io.SuFileOutputStream
 import org.andbootmgr.app.ui.theme.AbmTheme
+import org.andbootmgr.app.util.ConfigFile
 import java.io.File
 import java.io.IOException
-import java.io.OutputStream
 
-class WizardPageFactory(private val vm: WizardActivityState) {
-	fun get(flow: String): List<IWizardPage> {
+class DroidBootWizardPageFactory(private val vm: WizardActivityState) {
+	fun get(): List<IWizardPage> {
 		return listOf(WizardPage("start",
 			NavButton("Cancel") { it.finish() },
 			NavButton("Next") { it.navigate("input") })

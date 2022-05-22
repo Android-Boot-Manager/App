@@ -1,4 +1,4 @@
-package org.andbootmgr.app
+package org.andbootmgr.app.util
 
 import android.content.Context
 import android.content.res.AssetManager

@@ -36,6 +36,15 @@ import java.io.OutputStream
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
+class WizardPageFactory(private val vm: WizardActivityState) {
+	fun get(flow: String): List<IWizardPage> {
+		return when (flow) {
+			"droidboot" -> DroidBootWizardPageFactory(vm).get()
+			else -> listOf()
+		}
+	}
+}
+
 class WizardActivity : ComponentActivity() {
 	private lateinit var vm: WizardActivityState
 	private lateinit var chooseFile: ActivityResultLauncher<String>
@@ -44,7 +53,7 @@ class WizardActivity : ComponentActivity() {
 		super.onCreate(savedInstanceState)
 		vm = WizardActivityState(intent.getStringExtra("codename")!!)
 		vm.activity = this
-		vm.logic = MainActivityLogic(this)
+		vm.logic = DeviceLogic(this)
 		chooseFile = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
 			if (uri == null) {
 				Toast.makeText(this, "File not available, please try again later!", Toast.LENGTH_LONG).show()
@@ -124,7 +133,7 @@ class WizardActivity : ComponentActivity() {
 class WizardActivityState(val codename: String) {
 	lateinit var navController: NavHostController
 	lateinit var activity: WizardActivity
-	lateinit var logic: MainActivityLogic
+	lateinit var logic: DeviceLogic
 	val deviceInfo = HardcodedDeviceInfoFactory.get(codename)
 	var current = mutableStateOf("start")
 	var prevText = mutableStateOf("Prev")

@@ -1,5 +1,6 @@
 package org.andbootmgr.app
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -21,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -29,9 +31,34 @@ import com.topjohnwu.superuser.Shell.FLAG_MOUNT_MASTER
 import com.topjohnwu.superuser.Shell.FLAG_REDIRECT_STDERR
 import com.topjohnwu.superuser.io.SuFile
 import com.topjohnwu.superuser.io.SuFileInputStream
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.andbootmgr.app.ui.theme.AbmTheme
+import org.andbootmgr.app.util.Toolkit
 import java.io.IOException
+
+class MainActivityState {
+	fun startInstall() {
+		val i = Intent(activity, WizardActivity::class.java)
+		i.putExtra("codename", deviceInfo!!.codename)
+		i.putExtra("flow", "droidboot")
+		activity.startActivity(i)
+		activity.finish()
+	}
+
+	lateinit var activity: MainActivity
+	var deviceInfo: DeviceInfo? = null
+	var currentNav: String = "start"
+	var isReady = false
+	var name by mutableStateOf("Android")
+	var navController: NavHostController? = null
+	@OptIn(ExperimentalMaterial3Api::class)
+	var drawerState: DrawerState? = null
+	var scope: CoroutineScope? = null
+	var root = false
+	lateinit var logic: DeviceLogic
+}
+
 
 class MainActivity : ComponentActivity() {
 
@@ -40,7 +67,7 @@ class MainActivity : ComponentActivity() {
 		super.onCreate(savedInstanceState)
 		val vm = MainActivityState()
 		vm.activity = this
-		vm.logic = MainActivityLogic(this)
+		vm.logic = DeviceLogic(this)
 
 		val content: View = findViewById(android.R.id.content)
 		content.viewTreeObserver.addOnPreDrawListener(

@@ -1,7 +1,9 @@
-package org.andbootmgr.app
+package org.andbootmgr.app.util
 
 import com.topjohnwu.superuser.io.SuFileInputStream
 import com.topjohnwu.superuser.io.SuFileOutputStream
+import org.andbootmgr.app.ActionAbortedCleanlyError
+import org.andbootmgr.app.ActionAbortedError
 import java.io.*
 
 class ConfigFile {

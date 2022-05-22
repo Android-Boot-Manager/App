@@ -6,7 +6,7 @@ import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
 import java.io.File
 
-class MainActivityLogic(ctx: Context) {
+class DeviceLogic(ctx: Context) {
 	val rootDir = ctx.filesDir.parentFile!!
 	val assetDir = File(rootDir, "assets")
 	val fileDir = File(rootDir, "files")
