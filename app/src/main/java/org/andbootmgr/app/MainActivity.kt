@@ -34,19 +34,22 @@ import com.topjohnwu.superuser.io.SuFileInputStream
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.andbootmgr.app.ui.theme.AbmTheme
+import org.andbootmgr.app.util.ConfigFile
 import org.andbootmgr.app.util.Toolkit
+import java.io.File
 import java.io.IOException
+import java.lang.Exception
 
 class MainActivityState {
 	fun startInstall() {
-		val i = Intent(activity, WizardActivity::class.java)
+		val i = Intent(activity!!, WizardActivity::class.java)
 		i.putExtra("codename", deviceInfo!!.codename)
 		i.putExtra("flow", "droidboot")
-		activity.startActivity(i)
-		activity.finish()
+		activity!!.startActivity(i)
+		activity!!.finish()
 	}
 
-	lateinit var activity: MainActivity
+	var activity: MainActivity? = null
 	var deviceInfo: DeviceInfo? = null
 	var currentNav: String = "start"
 	var isReady = false
@@ -56,7 +59,8 @@ class MainActivityState {
 	var drawerState: DrawerState? = null
 	var scope: CoroutineScope? = null
 	var root = false
-	lateinit var logic: DeviceLogic
+	var isOk = false
+	var logic: DeviceLogic? = null
 }
 
 
@@ -112,7 +116,7 @@ class MainActivity : ComponentActivity() {
 						var b: ByteArray? = null
 						if (vm.root) {
 							try {
-								val f = SuFile.open(vm.logic.abmDir, "codename.cfg")
+								val f = SuFile.open(vm.logic!!.abmDir, "codename.cfg")
 								val s = SuFileInputStream.open(f)
 								b = s.readBytes()
 								s.close()
@@ -126,8 +130,13 @@ class MainActivity : ComponentActivity() {
 							Build.DEVICE
 						}
 						vm.deviceInfo = HardcodedDeviceInfoFactory.get(codename)
-						if (vm.deviceInfo != null && vm.deviceInfo!!.isInstalled(vm.logic)) {
-							vm.logic.mount(vm.deviceInfo!!)
+						if (vm.deviceInfo != null && vm.deviceInfo!!.isInstalled(vm.logic!!)) {
+							vm.logic!!.mount(vm.deviceInfo!!)
+						}
+						if (vm.deviceInfo != null) {
+							vm.isOk = (vm.deviceInfo!!.isInstalled(vm.logic!!) &&
+							 vm.deviceInfo!!.isBooted(vm.logic!!) &&
+							 !(!vm.logic!!.mounted || vm.deviceInfo!!.isCorrupt(vm.logic!!)))
 						}
 						runOnUiThread {
 							setContent {
@@ -194,10 +203,11 @@ fun AppContent(vm: MainActivityState, view: @Composable (PaddingValues) -> Unit)
 					modifier = Modifier
 						.align(Alignment.CenterHorizontally)
 						.padding(top = 16.dp),
-					onClick = { scope.launch {
+					onClick = { if (vm.isOk) scope.launch {
 						vm.navController!!.navigate("settings")
 						drawerState.close()
 					} },
+					enabled = vm.isOk,
 					content = { Text("Settings") }
 				)
 			},
@@ -245,10 +255,10 @@ fun Start(vm: MainActivityState) {
 	val mounted: Boolean
 	val corrupt: Boolean
 	if (vm.deviceInfo != null) {
-		installed = remember { vm.deviceInfo!!.isInstalled(vm.logic) }
-		booted = remember { vm.deviceInfo!!.isBooted(vm.logic) }
-		corrupt = remember { vm.deviceInfo!!.isCorrupt(vm.logic) }
-		mounted = vm.logic.mounted
+		installed = remember { vm.deviceInfo!!.isInstalled(vm.logic!!) }
+		booted = remember { vm.deviceInfo!!.isBooted(vm.logic!!) }
+		corrupt = remember { vm.deviceInfo!!.isCorrupt(vm.logic!!) }
+		mounted = vm.logic!!.mounted
 	} else {
 		installed = false
 		booted = false
@@ -322,7 +332,68 @@ fun Start(vm: MainActivityState) {
 
 @Composable
 fun Settings(vm: MainActivityState) {
-
+	val c = remember {
+		try {
+			if (vm.logic == null)
+				throw ActionAbortedCleanlyError(Exception("Compose preview special-casing"))
+			ConfigFile.importFromFile(File(vm.logic!!.abmDb, "db.conf"))
+		} catch (e: ActionAbortedCleanlyError) {
+			if (vm.activity != null) // Compose preview special-casing
+				Toast.makeText(vm.activity, "Malformed db.conf - recreating", Toast.LENGTH_LONG).show()
+			ConfigFile().also {
+				it["default"] = "Entry 01"
+				it["timeout"] = "5"
+			}
+		}
+	}
+	var defaultText by remember { mutableStateOf(c["default"]!!) }
+	val defaultErr = defaultText.isBlank() || !defaultText.matches(Regex("[0-9A-Za-z ]+"))
+	var timeoutText by remember { mutableStateOf(c["timeout"]!!) }
+	val timeoutErr = timeoutText.isBlank() || !timeoutText.matches(Regex("[0-9]+"))
+	Column {
+		TextField(
+			value = defaultText,
+			onValueChange = {
+				defaultText = it
+				c["default"] = it.trim()
+			},
+			label = { Text("Default entry") },
+			isError = defaultErr
+		)
+		if (defaultErr) {
+			Text("Invalid input", color = MaterialTheme.colorScheme.error)
+		} else {
+			Text("") // Budget spacer
+		}
+		TextField(
+			value = timeoutText,
+			onValueChange = {
+				timeoutText = it
+				c["timeout"] = it.trim()
+			},
+			label = { Text("Timeout (seconds)") },
+			isError = timeoutErr
+		)
+		if (timeoutErr) {
+			Text("Invalid input", color = MaterialTheme.colorScheme.error)
+		} else {
+			Text("") // Budget spacer
+		}
+		Button(onClick = {
+			if (defaultErr || timeoutErr)
+				Toast.makeText(vm.activity!!, "Invalid input", Toast.LENGTH_LONG).show()
+			else {
+				try {
+					c.exportToFile(File(vm.logic!!.abmDb, "db.conf"))
+				} catch (e: ActionAbortedError) {
+					Toast.makeText(vm.activity!!, "Failed to save changes...", Toast.LENGTH_LONG)
+						.show()
+				}
+			}
+		}, enabled = !(defaultErr || timeoutErr)) {
+			Text("Save changes")
+		}
+	}
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -338,7 +409,7 @@ fun DefaultPreview() {
 	vm.scope = scope
 	AppContent(vm) {
 		Box(modifier = Modifier.padding(it)) {
-			Start(vm)
+			Settings(vm)
 		}
 	}
 }

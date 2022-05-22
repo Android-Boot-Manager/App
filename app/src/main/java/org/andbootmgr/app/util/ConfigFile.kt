@@ -40,10 +40,11 @@ class ConfigFile {
 			val out = ConfigFile()
 			var line: String
 			for (lline in s.split("\n").toTypedArray()) {
-				line = lline.trim { it <= ' ' }
+				line = lline.trim()
 				val delim = line.indexOf(" ")
-				out[line.substring(0, delim)] =
-					line.substring(delim).trim { it <= ' ' }
+				if (delim != -1)
+					out[line.substring(0, delim)] =
+						line.substring(delim).trim()
 			}
 			return out
 		}

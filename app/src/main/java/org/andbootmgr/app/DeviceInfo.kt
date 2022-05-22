@@ -25,7 +25,7 @@ object HardcodedDeviceInfoFactory {
 				return result.isSuccess && result.out.join("\n").contains("ABM.bootloader=1")
 			}
 			override fun isCorrupt(logic: DeviceLogic): Boolean {
-				return SuFile.open(logic.abmDir, "db.cofg").exists()
+				return !SuFile.open(logic.abmDb, "db.conf").exists()
 			}
 		}
 	}
