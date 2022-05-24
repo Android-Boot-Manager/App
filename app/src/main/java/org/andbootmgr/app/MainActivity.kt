@@ -52,6 +52,15 @@ class MainActivityState {
 		activity!!.finish()
 	}
 
+	fun startCreateFlow(freeSpace: SDUtils.Partition.FreeSpace) {
+		val i = Intent(activity!!, WizardActivity::class.java)
+		i.putExtra("codename", deviceInfo!!.codename)
+		i.putExtra("flow", "create_part")
+		i.putExtra("part_sid", freeSpace.startSector)
+		activity!!.startActivity(i)
+		activity!!.finish()
+	}
+
 	var activity: MainActivity? = null
 	var deviceInfo: DeviceInfo? = null
 	var currentNav: String = "start"
@@ -351,7 +360,6 @@ private fun Start(vm: MainActivityState) {
 	}
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PartTool(vm: MainActivityState) {
 	var parts by remember { mutableStateOf(SDUtils.generateMeta(vm.deviceInfo!!.bdev, vm.deviceInfo!!.pbdev)) }
@@ -361,7 +369,6 @@ private fun PartTool(vm: MainActivityState) {
 	}
 	var processing by remember { mutableStateOf(false) }
 	var bnr by remember { mutableStateOf(false) }
-	var create by remember { mutableStateOf(false) }
 	var rename by remember { mutableStateOf(false) }
 	var delete by remember { mutableStateOf(false) }
 	var result: String? by remember { mutableStateOf(null) }
@@ -445,7 +452,7 @@ private fun PartTool(vm: MainActivityState) {
 							Text("Backup & Restore")
 						}
 					} else {
-						Button(onClick = { create = true }) {
+						Button(onClick = { vm.startCreateFlow(p as SDUtils.Partition.FreeSpace) }) {
 							Text("Create")
 						}
 					}
@@ -546,80 +553,6 @@ private fun PartTool(vm: MainActivityState) {
 						}
 					}) {
 						Text("Delete")
-					}
-				}
-			)
-		} else if (create) {
-			val f = p as SDUtils.Partition.FreeSpace
-			var et by remember { mutableStateOf(false) }
-			var el by remember { mutableStateOf(false) }
-			var eu by remember { mutableStateOf(false) }
-			var e by remember { mutableStateOf(false) }
-			var t by remember { mutableStateOf(p.name) }
-			var l by remember { mutableStateOf("0") }
-			var u by remember { mutableStateOf(p.size.toString()) }
-			var lu by remember { mutableStateOf(l.toFloat()..u.toFloat()) }
-			AlertDialog(
-				onDismissRequest = {
-					create = false
-				},
-				title = {
-					Text("Create")
-				},
-				text = {
-					Column {
-						TextField(value = t, onValueChange = {
-							t = it
-							et = !t.matches(Regex("\\A\\p{ASCII}*\\z"))
-							e = et and el and eu
-						}, isError = et, label = {
-							Text("Partition name")
-						})
-						TextField(value = l, onValueChange = {
-							l = it
-							lu = l.toFloat()..u.toFloat()
-							el = !l.matches(Regex("[0-9]+"))
-							e = et and el and eu
-						}, isError = el, label = {
-							Text("Start sector (relative)")
-						})
-						TextField(value = u, onValueChange = {
-							u = it
-							lu = l.toFloat()..u.toFloat()
-							eu = !u.matches(Regex("[0-9]+"))
-							e = et and el and eu
-						}, isError = eu, label = {
-							Text("End sector (relative)")
-						})
-						RangeSlider(values = lu, onValueChange = {
-							l = it.start.toLong().toString()
-							u = it.endInclusive.toLong().toString()
-							lu = l.toFloat()..u.toFloat()
-							el = !l.matches(Regex("[0-9]+"))
-							eu = !u.matches(Regex("[0-9]+"))
-							e = et and el and eu
-						}, valueRange = 0F..p.size.toFloat(), steps = p.size.toInt() / 2048)
-					}
-				},
-				dismissButton = {
-					Button(onClick = { create = false }) {
-						Text("Cancel")
-					}
-				},
-				confirmButton = {
-					Button(onClick = {
-						if (!e) {
-							processing = true
-							create = false
-							Shell.cmd(SDUtils.umsd(parts!!) + " && " + f.create(l.toLong(), u.toLong(), "0700", t)).submit { r ->
-								processing = false
-								result = r.out.join("\n") + r.err.join("\n")
-								parts = SDUtils.generateMeta(vm.deviceInfo!!.bdev, vm.deviceInfo!!.pbdev)
-								editPartID = null
-							}
-						}
-					}, enabled = !e) {
-						Text("Create")
 					}
 				}
 			)

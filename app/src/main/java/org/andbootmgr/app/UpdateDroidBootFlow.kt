@@ -27,7 +27,7 @@ class UpdateDroidBootWizardPageFactory(private val vm: WizardActivityState) {
 		{
 			Start(vm)
 		}, WizardPage("select",
-			NavButton("Prev") { it.navigate("input") },
+			NavButton("Prev") { it.navigate("start") },
 			NavButton("") {}
 		) {
 			Select(vm)
