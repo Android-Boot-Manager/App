@@ -129,4 +129,7 @@ dependencies {
     implementation "com.github.topjohnwu.libsu:io:${libsuVersion}"
     implementation "com.mikepenz:aboutlibraries-core:8.4.2"
     implementation "com.mikepenz:aboutlibraries:8.4.2"
+
+    implementation "com.squareup.okhttp3:okhttp:4.9.3"
+
 }

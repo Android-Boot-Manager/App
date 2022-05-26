@@ -15,6 +15,7 @@
         <entry key="app/src/main/java/org/andbootmgr/app/DroidBootFlow.kt" value="0.18327702702702703" />
         <entry key="app/src/main/java/org/andbootmgr/app/DroidBootWizardPageFactory.kt" value="0.1831223628691983" />
         <entry key="app/src/main/java/org/andbootmgr/app/MainActivity.kt" value="0.1831223628691983" />
+        <entry key="app/src/main/java/org/andbootmgr/app/WizardActivity.kt" value="0.18327702702702703" />
         <entry key="app/src/main/java/org/andbootmgr/app/WizardPageFactory.kt" value="0.2810126582278481" />
         <entry key="app/src/main/java/org/androidbootmanager/app/MainActivity.kt" value="0.17130801687763714" />
         <entry key="app/src/main/java/org/androidbootmanager/app/WizardActivity.kt" value="0.25" />
@@ -27,6 +28,8 @@
         <entry key="app/src/main/res/drawable/ic_adopted.xml" value="0.186" />
         <entry key="app/src/main/res/drawable/ic_baseline_check_circle_24.xml" value="0.186" />
         <entry key="app/src/main/res/drawable/ic_baseline_error_24.xml" value="0.186" />
+        <entry key="app/src/main/res/drawable/ic_baseline_keyboard_arrow_down_24.xml" value="0.305" />
+        <entry key="app/src/main/res/drawable/ic_baseline_keyboard_arrow_up_24.xml" value="0.305" />
         <entry key="app/src/main/res/drawable/ic_data.xml" value="0.186" />
         <entry key="app/src/main/res/drawable/ic_launcher_foreground.xml" value="0.186" />
         <entry key="app/src/main/res/drawable/ic_meta.xml" value="0.186" />

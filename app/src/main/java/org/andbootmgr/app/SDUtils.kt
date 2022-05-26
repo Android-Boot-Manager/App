@@ -254,8 +254,12 @@ object SDUtils {
 			fun create(start: Long, end: Long, typecode: String, name: String): String {
 				val rstart = startSector + start
 				val rend = startSector + end
-				if ((rstart > endSector) || (start < 0) || (rend > endSector) || (end < start)) {
-					return "echo 'Invalid values. Aborting...'"
+				val a = rstart > endSector
+				val b = start < 0
+				val c = rend > endSector
+				val d = end < start
+				if (a || b || c || d) {
+					return "echo 'Invalid values ($start:$end - $a $b $c $d). Aborting...'"
 				}
 				return "sgdisk ${meta.path} --new ${meta.nid}:$rstart:$rend --typecode ${meta.nid}:$typecode --change-name ${meta.nid}:'${name.replace("'", "")}' && sleep 1 && ls ${meta.ppath}${meta.nid}" + when(typecode) {
 					 "0700" -> " && sm format public:${meta.major},${meta.minor+meta.nid}"

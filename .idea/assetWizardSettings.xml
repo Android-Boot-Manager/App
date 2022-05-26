@@ -323,7 +323,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="file:$PROJECT_DIR$/../../Sdk/icons/material/materialicons/check_circle/baseline_check_circle_24.xml" />
+                                      <entry key="url" value="file:$PROJECT_DIR$/../../Sdk/icons/material/materialicons/keyboard_arrow_up/baseline_keyboard_arrow_up_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -333,7 +333,7 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="outputName" value="ic_baseline_check_circle_24" />
+                            <entry key="outputName" value="ic_baseline_keyboard_arrow_up_24" />
                             <entry key="sourceFile" value="$USER_HOME$/Downloads/Sailfish_OS-Logo.wine.svg" />
                           </map>
                         </option>
