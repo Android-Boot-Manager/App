@@ -53,6 +53,7 @@ private fun Start(vm: WizardActivityState) {
 	}
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Input(vm: WizardActivityState) {
 	Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,

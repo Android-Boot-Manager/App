@@ -13,12 +13,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -334,7 +336,9 @@ private fun Start(vm: MainActivityState) {
 				}
 			}
 		}
-		if (!installed) {
+		if (Shell.isAppGrantedRoot() == false) {
+			Text("Root access is not granted, but required for this app.", textAlign = TextAlign.Center)
+		} else if (!installed) {
 			Button(onClick = { vm.startFlow("droidboot") }) {
 				Text("Install")
 			}
@@ -360,12 +364,82 @@ private fun Start(vm: MainActivityState) {
 	}
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PartTool(vm: MainActivityState) {
+	var filterUnifiedView by remember { mutableStateOf(true) }
+	var filterPartView by remember { mutableStateOf(false) }
+	var filterEntryView by remember { mutableStateOf(false) }
+	Row {
+		FilterChip(
+			selected = filterUnifiedView,
+			onClick = { filterUnifiedView = true; filterPartView = false; filterEntryView = false },
+			label = { Text("Unified") },
+			Modifier.padding(start = 5.dp),
+			leadingIcon = if (filterUnifiedView) {
+				{
+					Icon(
+						imageVector = Icons.Filled.Done,
+						contentDescription = "Enabled",
+						modifier = Modifier.size(FilterChipDefaults.IconSize)
+					)
+				}
+			} else {
+				null
+			}
+		)
+		FilterChip(
+			selected = filterPartView,
+			onClick = { filterPartView = true; filterUnifiedView = false; filterEntryView = false },
+			label = { Text("Partitions") },
+			Modifier.padding(start = 5.dp),
+			leadingIcon = if (filterPartView) {
+				{
+					Icon(
+						imageVector = Icons.Filled.Done,
+						contentDescription = "Enabled",
+						modifier = Modifier.size(FilterChipDefaults.IconSize)
+					)
+				}
+			} else {
+				null
+			}
+		)
+		FilterChip(
+			selected = filterEntryView,
+			onClick = { filterPartView = false; filterUnifiedView = false; filterEntryView = true },
+			label = { Text("Entries") },
+			Modifier.padding(start = 5.dp),
+			leadingIcon = if (filterEntryView) {
+				{
+					Icon(
+						imageVector = Icons.Filled.Done,
+						contentDescription = "Enabled",
+						modifier = Modifier.size(FilterChipDefaults.IconSize)
+					)
+				}
+			} else {
+				null
+			}
+		)
+	}
+
 	var parts by remember { mutableStateOf(SDUtils.generateMeta(vm.deviceInfo!!.bdev, vm.deviceInfo!!.pbdev)) }
 	if (parts == null) {
 		Text("Partition wizard failed to load")
 		return
+	}
+	val entries = remember {
+		val outList = mutableMapOf<ConfigFile, File>()
+		val list = SuFile.open(vm.logic!!.abmEntries.absolutePath).listFiles()
+		for (i in list!!) {
+			try {
+				outList[ConfigFile.importFromFile(i)] = i
+			} catch (e: ActionAbortedCleanlyError) {
+				Log.e("ABM", Log.getStackTraceString(e))
+			}
+		}
+		return@remember outList
 	}
 	var processing by remember { mutableStateOf(false) }
 	var bnr by remember { mutableStateOf(false) }
@@ -373,11 +447,51 @@ private fun PartTool(vm: MainActivityState) {
 	var delete by remember { mutableStateOf(false) }
 	var result: String? by remember { mutableStateOf(null) }
 	var editPartID: SDUtils.Partition? by remember { mutableStateOf(null) }
-	for (p in parts!!.s) {
-		Row(horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically, modifier = Modifier
-			.fillMaxWidth()
-			.clickable { editPartID = p }) {
-			Text("Partition ${p.id}, ${p.name}")
+	var editEntryID: ConfigFile? by remember { mutableStateOf(null) }
+	if (filterUnifiedView) {
+		Text("TODO")
+	}
+	if (filterPartView) {
+		for (p in parts!!.s) {
+			Row(horizontalArrangement = Arrangement.SpaceEvenly,
+				verticalAlignment = Alignment.CenterVertically,
+				modifier = Modifier
+					.fillMaxWidth()
+					.clickable { editPartID = p }) {
+				Text("Partition ${p.id}, ${p.name}")
+			}
+		}
+	}
+	if (filterEntryView) {
+		for (e in entries.keys) {
+			Row(horizontalArrangement = Arrangement.SpaceEvenly,
+				verticalAlignment = Alignment.CenterVertically,
+				modifier = Modifier
+					.fillMaxWidth()
+					.clickable { editEntryID = e }) {
+				/* format:
+				entry["title"] = str
+				entry["linux"] = path(str)
+				entry["initrd"] = path(str)
+				entry["dtb"] = path(str)
+				entry["options"] = str
+				entry["xtype"] = str
+				entry["xpart"] = array (str.split(":"))
+				 */
+				Text(if (e.has("title")) {
+					"Entry \"${e["title"]}\""
+				} else {
+					"(Invalid entry)"
+				})
+			}
+		}
+		val e = ConfigFile()
+		Row(horizontalArrangement = Arrangement.SpaceEvenly,
+			verticalAlignment = Alignment.CenterVertically,
+			modifier = Modifier
+				.fillMaxWidth()
+				.clickable { editEntryID = e }) {
+			Text("(Create new entry)")
 		}
 	}
 	if (editPartID != null) {
@@ -558,6 +672,138 @@ private fun PartTool(vm: MainActivityState) {
 			)
 		}
 	}
+	if (editEntryID != null) {
+		val ctx = LocalContext.current
+		val fn = Regex("[0-9a-zA-Z]+\\.conf")
+		val ascii = Regex("\\A\\p{ASCII}+\\z")
+		val xtype = arrayOf("droid", "SFOS", "UT", "")
+		val xpart = Regex("^$|^real$|^[0-9](:[0-9]+)*$")
+		val e = editEntryID!!
+		var f = entries[e]
+		var newFileName by remember { mutableStateOf(f?.name ?: "NewEntry.conf") }
+		var newFileNameErr by remember { mutableStateOf(!newFileName.matches(fn)) }
+		var titleT by remember { mutableStateOf(e["title"] ?: "") }
+		var titleE by remember { mutableStateOf(!titleT.matches(ascii)) }
+		var linuxT by remember { mutableStateOf(e["linux"] ?: "") }
+		var linuxE by remember { mutableStateOf(!linuxT.matches(ascii)) }
+		var initrdT by remember { mutableStateOf(e["initrd"] ?: "") }
+		var initrdE by remember { mutableStateOf(!initrdT.matches(ascii)) }
+		var dtbT by remember { mutableStateOf(e["dtb"] ?: "") }
+		var dtbE by remember { mutableStateOf(!dtbT.matches(ascii)) }
+		var optionsT by remember { mutableStateOf(e["options"] ?: "") }
+		var optionsE by remember { mutableStateOf(!optionsT.matches(ascii)) }
+		var xtypeT by remember { mutableStateOf(e["xtype"] ?: "") }
+		var xtypeE by remember { mutableStateOf(!xtype.contains(xtypeT)) }
+		var xpartT by remember { mutableStateOf(e["xpart"] ?: "") }
+		var xpartE by remember { mutableStateOf(!xpartT.matches(xpart)) }
+		val isOk = !(newFileNameErr || titleE)
+		AlertDialog(
+			onDismissRequest = {
+				editEntryID = null
+			},
+			title = {
+				Text(text = if (e.has("title")) "\"${e["title"]}\"" else if (f != null) "Invalid entry" else "New entry")
+			},
+			icon = {
+				Icon(painterResource(id = R.drawable.ic_roms), "Icon")
+			},
+			text = {
+				Column {
+					TextField(value = newFileName, onValueChange = {
+						if (f != null) return@TextField
+						newFileName = it
+						newFileNameErr = !(newFileName.matches(fn))
+					}, isError = newFileNameErr, enabled = f == null, label = {
+						Text("File name")
+					})
+
+					TextField(value = titleT, onValueChange = {
+						titleT = it
+						titleE = !(titleT.matches(ascii))
+					}, isError = titleE, label = {
+						Text("Title")
+					})
+
+					TextField(value = linuxT, onValueChange = {
+						linuxT = it
+						linuxE = !(linuxT.matches(ascii))
+					}, isError = linuxE, label = {
+						Text("Linux")
+					})
+
+					TextField(value = initrdT, onValueChange = {
+						initrdT = it
+						initrdE = !(initrdT.matches(ascii))
+					}, isError = initrdE, label = {
+						Text("Initrd")
+					})
+
+					TextField(value = dtbT, onValueChange = {
+						dtbT = it
+						dtbE = !(dtbT.matches(ascii))
+					}, isError = dtbE, label = {
+						Text("Dtb")
+					})
+
+					TextField(value = optionsT, onValueChange = {
+						optionsT = it
+						optionsE = !(optionsT.matches(ascii))
+					}, isError = optionsE, label = {
+						Text("Options")
+					})
+
+					TextField(value = xtypeT, onValueChange = {
+						xtypeT = it
+						xtypeE = !(xtype.contains(xtypeT))
+					}, isError = xtypeE, label = {
+						Text("ROM type")
+					})
+
+					TextField(value = xpartT, onValueChange = {
+						xpartT = it
+						xpartE = !(xpartT.matches(xpart))
+					}, isError = xpartE, label = {
+						Text("Assigned partitions")
+					})
+				}
+			},
+			confirmButton = {
+				if (f != null) {
+					Button(
+						onClick = {
+							f!!.delete()
+							entries.remove(e)
+							editEntryID = null
+						}) {
+						Text("Delete")
+					}
+				}
+				Button(
+					onClick = {
+						if (!isOk) return@Button
+						if (f == null) {
+							f = SuFile.open(vm.logic!!.abmEntries, newFileName)
+							if (f!!.exists()) {
+								Toast.makeText(ctx, "File already exists, choose a different name", Toast.LENGTH_LONG).show()
+								f = null
+								return@Button
+							}
+						}
+						entries[e] = f!!
+						e.exportToFile(f!!)
+						editEntryID = null
+					}, enabled = isOk) {
+					Text(if (f != null) "Update" else "Create")
+				}
+				Button(
+					onClick = {
+						editEntryID = null
+					}) {
+					Text("Cancel")
+				}
+			}
+		)
+	}
 	if (processing) {
 		AlertDialog(
 			onDismissRequest = {},
@@ -594,6 +840,7 @@ private fun PartTool(vm: MainActivityState) {
 	}
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Settings(vm: MainActivityState) {
 	val c = remember {
