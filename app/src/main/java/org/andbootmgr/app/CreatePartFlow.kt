@@ -1,5 +1,6 @@
 package org.andbootmgr.app
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
@@ -15,6 +16,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,8 +47,13 @@ class CreatePartWizardPageFactory(private val vm: WizardActivityState) {
 			NavButton("") {}
 		) {
 			Start(c)
-		}, WizardPage("os",
+		}, WizardPage("shop",
 			NavButton("Prev") { it.navigate("start") },
+			NavButton("") {}
+		) {
+			Shop(c)
+		}, WizardPage("os",
+			NavButton("Prev") { it.navigate("shop") },
 			NavButton("Next") { it.navigate("dload") }
 		) {
 			Os(c)
@@ -120,7 +128,12 @@ private class CreatePartDataHolder(val vm: WizardActivityState): ProgressListene
 	lateinit var u: String
 	var f = 0L
 	var t: String? = null
+	var noobMode: Boolean = false
 
+	var painter: @Composable (() -> Painter)? = null
+	var rtype by mutableStateOf("")
+	var cmdline by mutableStateOf("")
+	var shName by mutableStateOf("")
 	val dmaMeta = ArrayMap<String, String>()
 	val count = mutableStateOf(0)
 	val intVals = mutableStateListOf<Long>()
@@ -147,7 +160,8 @@ private class CreatePartDataHolder(val vm: WizardActivityState): ProgressListene
 		pl?.update(bytesRead, contentLength, done)
 	}
 
-	private fun addDefault(i: Long, sel: Int, code: String, id: String, needUnsparse: Boolean) {
+	fun addDefault(i: Long, sel: Int, code: String, id: String, needUnsparse: Boolean) {
+		if (idVals.contains(id)) return
 		count.value++
 		intVals.add(i)
 		selVals.add(sel)
@@ -160,26 +174,12 @@ private class CreatePartDataHolder(val vm: WizardActivityState): ProgressListene
 		idNeeded.addAll(idVals)
 	}
 
+	@SuppressLint("ComposableNaming")
+	@Composable
 	fun lateInit() {
+		noobMode = LocalContext.current.getSharedPreferences("abm", 0).getBoolean("noob_mode", BuildConfig.DEFAULT_NOOB_MODE)
 		meta = SDUtils.generateMeta(vm.deviceInfo!!.bdev, vm.deviceInfo.pbdev)
 		(meta?.s?.find { vm.activity.intent.getLongExtra("part_sid", -1L) == it.startSector } as SDUtils.Partition.FreeSpace?)?.also { p = it }
-
-		//TODO: Load from .dma
-		dmaMeta["name"] = "Sailfish OS"
-		dmaMeta["creator"] = "ABM Open ROM Project"
-		t3.value = "Sailfish OS"
-		inetAvailable["vendor"] = "https://temp.nift4.org/vendor.img"
-		inetDesc["vendor"] = "VollaOS 10 vendor image"
-		addDefault(838860288L, 0, "8305", "vendor", false)
-		inetAvailable["system"] = "https://temp.nift4.org/system.img"
-		inetDesc["system"] = "VollaOS 10 system image"
-		addDefault(3758095872L, 0, "8305", "system", false)
-		inetAvailable["sfos"] = "https://gitlab.com/sailfishos-porters-ci/yggdrasil-ci/-/jobs/2114113029/artifacts/raw/sfe-yggdrasil/Sailfish_OS/sailfish.img001"
-		inetDesc["sfos"] = "Sailfish OS system image"
-		addDefault(100L, 1, "8302", "sfos", true)
-		inetAvailable["boot"] = "https://gitlab.com/sailfishos-porters-ci/yggdrasil-ci/-/jobs/2114113029/artifacts/raw/sfe-yggdrasil/Sailfish_OS/hybris-boot.img"
-		inetDesc["boot"] = "Boot image"
-		idNeeded.add("boot")
 	}
 }
 
@@ -302,7 +302,7 @@ private fun Start(c: CreatePartDataHolder) {
 						c.u = u
 						c.t = null
 						c.f = c.p.size - c.u.toLong()
-						c.vm.navigate("os")
+						c.vm.navigate("shop")
 					}) {
 						Text("Continue")
 					}
@@ -310,6 +310,38 @@ private fun Start(c: CreatePartDataHolder) {
 			}
 		}
 	}
+}
+
+@Composable
+private fun Shop(c: CreatePartDataHolder) {
+	LaunchedEffect(Unit) {
+		c.run {
+			//TODO: Load from .dma
+			dmaMeta["name"] = "Sailfish OS"
+			dmaMeta["creator"] = "ABM Open ROM Project"
+			t3.value = "Sailfish OS"
+			inetAvailable["vendor"] = "https://temp.nift4.org/vendor.img"
+			inetDesc["vendor"] = "VollaOS 10 vendor image"
+			addDefault(838860288L, 0, "8305", "vendor", false)
+			inetAvailable["system"] = "https://temp.nift4.org/system.img"
+			inetDesc["system"] = "VollaOS 10 system image"
+			addDefault(3758095872L, 0, "8305", "system", false)
+			inetAvailable["sfos"] = "https://gitlab.com/sailfishos-porters-ci/yggdrasil-ci/-/jobs/2114113029/artifacts/raw/sfe-yggdrasil/Sailfish_OS/sailfish.img001"
+			inetDesc["sfos"] = "Sailfish OS system image"
+			addDefault(100L, 1, "8302", "sfos", true)
+			inetAvailable["boot"] = "https://gitlab.com/sailfishos-porters-ci/yggdrasil-ci/-/jobs/2114113029/artifacts/raw/sfe-yggdrasil/Sailfish_OS/hybris-boot.img"
+			inetDesc["boot"] = "Boot image"
+			idNeeded.add("boot")
+			painter = @Composable { painterResource(id = R.drawable.ic_sailfish_os_logo) }
+			rtype = "SFOS"
+			cmdline = "bootopt=64S3,32N2,64N2 androidboot.selinux=permissive audit=0 loop.max_part=7"
+			shName = "add_sailfish.sh"
+		}
+	}
+	Text("This is an placeholder Store implementation that supplies SailfishOS. To continue, press Next.")
+	c.vm.btnsOverride = true
+	c.vm.nextText.value = "Next"
+	c.vm.onNext.value = { c.vm.navigate("os") }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -340,7 +372,7 @@ private fun Os(c: CreatePartDataHolder) {
 					.fillMaxWidth(),
 				horizontalAlignment = Alignment.CenterHorizontally
 			) {
-				Icon(painterResource(id = R.drawable.ic_sailfish_os_logo) /*TODO*/, contentDescription = "ROM logo", modifier = Modifier.size(256.dp))
+				Icon(c.painter!!(), contentDescription = "ROM logo", modifier = Modifier.size(256.dp))
 				Text(c.dmaMeta["name"]!!)
 				Text(c.dmaMeta["creator"]!!, color = MaterialTheme.colorScheme.onSurfaceVariant)
 				Card {
@@ -355,6 +387,7 @@ private fun Os(c: CreatePartDataHolder) {
 				}
 			}
 		}
+		if (!c.noobMode)
 		Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier
 			.fillMaxWidth()
 			.padding(5.dp)
@@ -368,13 +401,14 @@ private fun Os(c: CreatePartDataHolder) {
 				Icon(painterResource(id = R.drawable.ic_baseline_keyboard_arrow_down_24), "Expand")
 			}
 		}
-		if (expanded == 1) {
+		if (expanded == 1 || c.noobMode) {
 			Column(
 				Modifier
 					.fillMaxWidth()
 			) {
 				var et2 by remember { mutableStateOf(false) }
 				var et3 by remember { mutableStateOf(false) }
+				if (!c.noobMode)
 				TextField(value = c.t2.value, onValueChange = {
 					c.t2.value = it
 					et2 = !(c.t2.value.matches(Regex("\\A\\p{ASCII}*\\z")))
@@ -391,6 +425,7 @@ private fun Os(c: CreatePartDataHolder) {
 				})
 			}
 		}
+		if (!c.noobMode)
 		Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier
 			.fillMaxWidth()
 			.padding(5.dp)
@@ -582,6 +617,7 @@ private class DledFile(val safFile: Uri?, val netFile: File?) {
 	fun delete() {
 		netFile?.delete()
 	}
+
 	fun openInputStream(vm: WizardActivityState): InputStream {
 		netFile?.let {
 			return FileInputStream(it)
@@ -594,6 +630,7 @@ private class DledFile(val safFile: Uri?, val netFile: File?) {
 		}
 		throw IllegalStateException("invalid DledFile OR failure")
 	}
+
 	fun toFile(vm: WizardActivityState): File {
 		netFile?.let { return it }
 		safFile?.let {
@@ -609,7 +646,6 @@ private class DledFile(val safFile: Uri?, val netFile: File?) {
 	}
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Download(c: CreatePartDataHolder) {
 	LaunchedEffect(Unit) {
@@ -629,12 +665,16 @@ private fun Download(c: CreatePartDataHolder) {
 		var downloading by remember { mutableStateOf(false) }
 		var progressText by remember { mutableStateOf("(Connecting...)") }
 		if (downloading) {
-			AlertDialog(onDismissRequest = {}, confirmButton = {}, title = { Text("Downloading...") }, text = {
-				Row(verticalAlignment = Alignment.CenterVertically) {
-					CircularProgressIndicator(Modifier.padding(end = 10.dp))
-					Text(progressText)
-				}
-			})
+			AlertDialog(
+				onDismissRequest = {},
+				confirmButton = {},
+				title = { Text("Downloading...") },
+				text = {
+					Row(verticalAlignment = Alignment.CenterVertically) {
+						CircularProgressIndicator(Modifier.padding(end = 10.dp))
+						Text(progressText)
+					}
+				})
 		}
 		for (i in c.idNeeded) {
 			val inet = c.inetAvailable.containsKey(i)
@@ -645,7 +685,10 @@ private fun Download(c: CreatePartDataHolder) {
 			) {
 				Column {
 					Text(i)
-					Text(if (inet) c.inetDesc[i]!! else "User-selected", color = MaterialTheme.colorScheme.onSurfaceVariant)
+					Text(
+						if (inet) c.inetDesc[i]!! else "User-selected",
+						color = MaterialTheme.colorScheme.onSurfaceVariant
+					)
 				}
 				Column {
 					if (c.chosen.containsKey(i)) {
@@ -661,9 +704,16 @@ private fun Download(c: CreatePartDataHolder) {
 								downloading = true
 								Thread {
 									c.pl = object : ProgressListener {
-										override fun update(bytesRead: Long, contentLength: Long, done: Boolean) {
+										override fun update(
+											bytesRead: Long,
+											contentLength: Long,
+											done: Boolean
+										) {
 											c.vm.activity.runOnUiThread {
-												progressText = SOUtils.humanReadableByteCountBin(bytesRead) + " of " +  SOUtils.humanReadableByteCountBin(contentLength) + " downloaded"
+												progressText =
+													SOUtils.humanReadableByteCountBin(bytesRead) + " of " + SOUtils.humanReadableByteCountBin(
+														contentLength
+													) + " downloaded"
 											}
 										}
 									}
@@ -738,8 +788,8 @@ private fun Flash(c: CreatePartDataHolder) {
 				entry["linux"] = "$fn/zImage"
 				entry["initrd"] = "$fn/initrd.cpio.gz"
 				entry["dtb"] = "$fn/dtb.dtb"
-				entry["options"] = "bootopt=64S3,32N2,64N2 androidboot.selinux=permissive audit=0 loop.max_part=7"
-				entry["xtype"] = "SFOS" //TODO unhardcode
+				entry["options"] = c.cmdline
+				entry["xtype"] = c.rtype
 				entry["xpart"] = parts.values.join(":")
 				entry.exportToFile(File(vm.logic.abmEntries, "$fn.conf"))
 				if (!SuFile.open(File(vm.logic.abmBootset, fn).toURI()).mkdir()) {
@@ -749,7 +799,7 @@ private fun Flash(c: CreatePartDataHolder) {
 
 				terminal.add("-- Patching boot image...")
 				val boot = c.chosen["boot"]!!.toFile(vm)
-				var cmd = File(c.vm.logic.assetDir, "Scripts/add_os/${c.vm.deviceInfo!!.codename}/add_sailfish.sh")/*TODO*/.absolutePath + " $fn ${boot.absolutePath}"
+				var cmd = File(c.vm.logic.assetDir, "Scripts/add_os/${c.vm.deviceInfo!!.codename}/${c.shName}.sh").absolutePath + " $fn ${boot.absolutePath}"
 				for (i in parts) {
 					cmd += " " + i.value
 				}

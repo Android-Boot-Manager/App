@@ -243,7 +243,7 @@ private fun Preview() {
 	}
 }
 
-/* Monospace auto-scrolling text view, feeded using MutableList<String>, catching exceptions and running logic on a different thread */
+/* Monospace auto-scrolling text view, fed using MutableList<String>, catching exceptions and running logic on a different thread */
 @Composable
 fun Terminal(vm: WizardActivityState, r: (MutableList<String>) -> Unit) {
 	val scrollH = rememberScrollState()

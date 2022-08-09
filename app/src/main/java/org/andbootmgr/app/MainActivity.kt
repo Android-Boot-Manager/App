@@ -11,7 +11,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Menu
@@ -43,7 +42,6 @@ import org.andbootmgr.app.util.ConfigFile
 import org.andbootmgr.app.util.Toolkit
 import java.io.File
 import java.io.IOException
-import java.lang.Exception
 
 class MainActivityState {
 	fun startFlow(flow: String) {
@@ -63,6 +61,7 @@ class MainActivityState {
 		activity!!.finish()
 	}
 
+	var noobMode: Boolean = false
 	var activity: MainActivity? = null
 	var deviceInfo: DeviceInfo? = null
 	var currentNav: String = "start"
@@ -160,6 +159,7 @@ class MainActivity : ComponentActivity() {
 								vm.navController = navController
 								vm.drawerState = drawerState
 								vm.scope = scope
+								vm.noobMode = LocalContext.current.getSharedPreferences("abm", 0).getBoolean("noob_mode", BuildConfig.DEFAULT_NOOB_MODE)
 								AppContent(vm) {
 									NavGraph(vm, it)
 								}
@@ -261,7 +261,6 @@ private fun NavGraph(vm: MainActivityState, it: PaddingValues) {
 	}
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Start(vm: MainActivityState) {
 	val installed: Boolean
@@ -342,7 +341,7 @@ private fun Start(vm: MainActivityState) {
 			Button(onClick = { vm.startFlow("droidboot") }) {
 				Text("Install")
 			}
-		} else if (installed and !booted) {
+		} else if (!booted) {
 			Text("The device did not boot using DroidBoot, but configuration files are present. If you just installed ABM, you need to reboot. If the bootloader installation repeatedly fails, please consult the documentation.", textAlign = TextAlign.Center)
 			Button(onClick = {
 				vm.startFlow("fix_droidboot")
@@ -370,61 +369,75 @@ private fun PartTool(vm: MainActivityState) {
 	var filterUnifiedView by remember { mutableStateOf(true) }
 	var filterPartView by remember { mutableStateOf(false) }
 	var filterEntryView by remember { mutableStateOf(false) }
-	Row {
-		FilterChip(
-			selected = filterUnifiedView,
-			onClick = { filterUnifiedView = true; filterPartView = false; filterEntryView = false },
-			label = { Text("Unified") },
-			Modifier.padding(start = 5.dp),
-			leadingIcon = if (filterUnifiedView) {
-				{
-					Icon(
-						imageVector = Icons.Filled.Done,
-						contentDescription = "Enabled",
-						modifier = Modifier.size(FilterChipDefaults.IconSize)
-					)
+	if (!vm.noobMode)
+		Row {
+			FilterChip(
+				selected = filterUnifiedView,
+				onClick = {
+					filterUnifiedView = true; filterPartView = false; filterEntryView = false
+				},
+				label = { Text("Unified") },
+				Modifier.padding(start = 5.dp),
+				leadingIcon = if (filterUnifiedView) {
+					{
+						Icon(
+							imageVector = Icons.Filled.Done,
+							contentDescription = "Enabled",
+							modifier = Modifier.size(FilterChipDefaults.IconSize)
+						)
+					}
+				} else {
+					null
 				}
-			} else {
-				null
-			}
-		)
-		FilterChip(
-			selected = filterPartView,
-			onClick = { filterPartView = true; filterUnifiedView = false; filterEntryView = false },
-			label = { Text("Partitions") },
-			Modifier.padding(start = 5.dp),
-			leadingIcon = if (filterPartView) {
-				{
-					Icon(
-						imageVector = Icons.Filled.Done,
-						contentDescription = "Enabled",
-						modifier = Modifier.size(FilterChipDefaults.IconSize)
-					)
+			)
+			FilterChip(
+				selected = filterPartView,
+				onClick = {
+					filterPartView = true; filterUnifiedView = false; filterEntryView = false
+				},
+				label = { Text("Partitions") },
+				Modifier.padding(start = 5.dp),
+				leadingIcon = if (filterPartView) {
+					{
+						Icon(
+							imageVector = Icons.Filled.Done,
+							contentDescription = "Enabled",
+							modifier = Modifier.size(FilterChipDefaults.IconSize)
+						)
+					}
+				} else {
+					null
 				}
-			} else {
-				null
-			}
-		)
-		FilterChip(
-			selected = filterEntryView,
-			onClick = { filterPartView = false; filterUnifiedView = false; filterEntryView = true },
-			label = { Text("Entries") },
-			Modifier.padding(start = 5.dp),
-			leadingIcon = if (filterEntryView) {
-				{
-					Icon(
-						imageVector = Icons.Filled.Done,
-						contentDescription = "Enabled",
-						modifier = Modifier.size(FilterChipDefaults.IconSize)
-					)
+			)
+			FilterChip(
+				selected = filterEntryView,
+				onClick = {
+					filterPartView = false; filterUnifiedView = false; filterEntryView = true
+				},
+				label = { Text("Entries") },
+				Modifier.padding(start = 5.dp),
+				leadingIcon = if (filterEntryView) {
+					{
+						Icon(
+							imageVector = Icons.Filled.Done,
+							contentDescription = "Enabled",
+							modifier = Modifier.size(FilterChipDefaults.IconSize)
+						)
+					}
+				} else {
+					null
 				}
-			} else {
-				null
-			}
+			)
+		}
+
+	var parts by remember {
+		mutableStateOf(
+			SDUtils.generateMeta(
+				vm.deviceInfo!!.bdev,
+				vm.deviceInfo!!.pbdev
+			)
 		)
 	}
-
-	var parts by remember { mutableStateOf(SDUtils.generateMeta(vm.deviceInfo!!.bdev, vm.deviceInfo!!.pbdev)) }
 	if (parts == null) {
 		Text("Partition wizard failed to load")
 		return
@@ -458,7 +471,12 @@ private fun PartTool(vm: MainActivityState) {
 				modifier = Modifier
 					.fillMaxWidth()
 					.clickable { editPartID = p }) {
-				Text("Partition ${p.id}, ${p.name}")
+				Text(
+					if (p.type == SDUtils.PartitionType.FREE)
+						"Free space (${p.sizeFancy})"
+					else
+						"Partition ${p.id} \"${p.name}\""
+				)
 			}
 		}
 	}
@@ -478,11 +496,13 @@ private fun PartTool(vm: MainActivityState) {
 				entry["xtype"] = str
 				entry["xpart"] = array (str.split(":"))
 				 */
-				Text(if (e.has("title")) {
-					"Entry \"${e["title"]}\""
-				} else {
-					"(Invalid entry)"
-				})
+				Text(
+					if (e.has("title")) {
+						"Entry \"${e["title"]}\""
+					} else {
+						"(Invalid entry)"
+					}
+				)
 			}
 		}
 		val e = ConfigFile()
@@ -511,7 +531,7 @@ private fun PartTool(vm: MainActivityState) {
 				Text(text = "\"${name}\"")
 			},
 			icon = {
-				   Icon(painterResource(id = R.drawable.ic_sd), "Icon")
+				Icon(painterResource(id = R.drawable.ic_sd), "Icon")
 			},
 			text = {
 				Column {
@@ -629,7 +649,10 @@ private fun PartTool(vm: MainActivityState) {
 							Shell.cmd(SDUtils.umsd(parts!!) + " && " + p.rename(t)).submit { r ->
 								processing = false
 								result = r.out.join("\n") + r.err.join("\n")
-								parts = SDUtils.generateMeta(vm.deviceInfo!!.bdev, vm.deviceInfo!!.pbdev)
+								parts = SDUtils.generateMeta(
+									vm.deviceInfo!!.bdev,
+									vm.deviceInfo!!.pbdev
+								)
 								editPartID = parts?.s!!.findLast { it.id == p.id }
 							}
 						}
@@ -784,7 +807,11 @@ private fun PartTool(vm: MainActivityState) {
 						if (f == null) {
 							f = SuFile.open(vm.logic!!.abmEntries, newFileName)
 							if (f!!.exists()) {
-								Toast.makeText(ctx, "File already exists, choose a different name", Toast.LENGTH_LONG).show()
+								Toast.makeText(
+									ctx,
+									"File already exists, choose a different name",
+									Toast.LENGTH_LONG
+								).show()
 								f = null
 								return@Button
 							}
@@ -792,7 +819,8 @@ private fun PartTool(vm: MainActivityState) {
 						entries[e] = f!!
 						e.exportToFile(f!!)
 						editEntryID = null
-					}, enabled = isOk) {
+					}, enabled = isOk
+				) {
 					Text(if (f != null) "Update" else "Create")
 				}
 				Button(
@@ -811,10 +839,13 @@ private fun PartTool(vm: MainActivityState) {
 				Text("Please wait...")
 			},
 			text = {
-				   Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceAround) {
-					   CircularProgressIndicator(Modifier.padding(end = 20.dp))
-					   Text("Loading...")
-				   }
+				Row(
+					verticalAlignment = Alignment.CenterVertically,
+					horizontalArrangement = Arrangement.SpaceAround
+				) {
+					CircularProgressIndicator(Modifier.padding(end = 20.dp))
+					Text("Loading...")
+				}
 			},
 			confirmButton = {}
 		)

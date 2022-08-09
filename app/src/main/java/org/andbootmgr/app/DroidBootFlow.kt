@@ -174,7 +174,7 @@ private fun Flash(vm: WizardActivityState) {
 		entry["options"] = "null"
 		entry["xtype"] = "droid"
 		entry["xpart"] = "real"
-		entry.exportToFile(File(vm.logic.abmEntries, "hjacked.conf"))
+		entry.exportToFile(File(vm.logic.abmEntries, "hijacked.conf"))
 		terminal.add("Flashing DroidBoot...")
 		val f = SuFile.open(vm.deviceInfo.blBlock)
 		if (!f.canWrite())

@@ -44,6 +44,7 @@ android {
 	        if (project.hasProperty('ABM_RELEASE_KEY_ALIAS')) {
 	    	    signingConfig signingConfigs.release
 	        }
+            buildConfigField "boolean", "DEFAULT_NOOB_MODE", "false" // Noob mode default
         }
         debug {
             if (project.hasProperty('ABM_DEBUG_KEY_ALIAS')) {
@@ -51,6 +52,7 @@ android {
             } else if (project.hasProperty('ABM_RELEASE_KEY_ALIAS')) {
                 signingConfig signingConfigs.release
             }
+            buildConfigField "boolean", "DEFAULT_NOOB_MODE", "false" // Noob mode default
         }
     }
     compileOptions {
@@ -130,6 +132,6 @@ dependencies {
     implementation "com.mikepenz:aboutlibraries-core:8.4.2"
     implementation "com.mikepenz:aboutlibraries:8.4.2"
 
-    implementation "com.squareup.okhttp3:okhttp:4.9.3"
+    implementation "com.squareup.okhttp3:okhttp:5.0.0-alpha.2"
 
 }

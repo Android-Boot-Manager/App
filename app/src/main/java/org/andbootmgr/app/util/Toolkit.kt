@@ -26,7 +26,7 @@ class Toolkit(private val ctx: Context) {
 		} catch (e: IOException) {
 			e.printStackTrace()
 			fail = true
-			callback.accept(fail)
+			callback.accept(true)
 			return
 		}
 		val s = String(b).trim()
