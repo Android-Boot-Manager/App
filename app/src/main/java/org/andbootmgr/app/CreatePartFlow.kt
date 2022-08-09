@@ -1,7 +1,5 @@
 package org.andbootmgr.app
 
-import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
@@ -52,7 +50,10 @@ class CreatePartWizardPageFactory(private val vm: WizardActivityState) {
 		) {
 			Os(c)
 		}, WizardPage("dload",
-			NavButton("Prev") { it.navigate("os") },
+			NavButton("Cancel") {
+				it.startActivity(Intent(it, MainActivity::class.java))
+				it.finish()
+		},
 			NavButton("") {}
 		) {
 			Download(c)
@@ -152,8 +153,11 @@ private class CreatePartDataHolder(val vm: WizardActivityState): ProgressListene
 		selVals.add(sel)
 		codeVals.add(code)
 		idVals.add(id)
-		idNeeded.add(id)
 		sparseVals.add(needUnsparse)
+	}
+
+	fun onStartDlPage() {
+		idNeeded.addAll(idVals)
 	}
 
 	fun lateInit() {
@@ -315,13 +319,12 @@ private fun Os(c: CreatePartDataHolder) {
 		c.availableSize = c.u.toLong() - c.l.toLong()
 	}
 
-	remember {
+	LaunchedEffect(Unit) {
 		val a = SuFile.open("/data/abm/bootset/db/entries/").list()!!.toMutableList()
 		a.removeIf { c -> !(c.startsWith("rom") && c.endsWith(".conf") && c.substring(3, c.length - 5).matches(Regex("[0-9]+"))) }
 		a.sortWith(Comparator.comparingInt { c -> c.substring(3, c.length - 5).toInt() })
 		val b = if (a.size > 0) a.last().substring(3, a.last().length - 5).toInt() + 1 else 0
 		c.t2 = mutableStateOf("rom$b")
-		return@remember b
 	}
 
 	val s = rememberScrollState()
@@ -609,6 +612,9 @@ private class DledFile(val safFile: Uri?, val netFile: File?) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Download(c: CreatePartDataHolder) {
+	LaunchedEffect(Unit) {
+		c.onStartDlPage()
+	}
 	Column(Modifier.fillMaxSize()) {
 		Card {
 			Row(

@@ -250,7 +250,7 @@ fun Terminal(vm: WizardActivityState, r: (MutableList<String>) -> Unit) {
 	val scrollV = rememberScrollState()
 	val scope = rememberCoroutineScope()
 	val text = remember { mutableStateOf("") }
-	remember {
+	LaunchedEffect(Unit) {
 		// Budget CallbackList
 		val s = object : MutableList<String> {
 			val internalList = ArrayList<String>()
@@ -366,7 +366,6 @@ fun Terminal(vm: WizardActivityState, r: (MutableList<String>) -> Unit) {
 				s.add(Log.getStackTraceString(e))
 			}
 		}.start()
-		return@remember s
 	}
 	Text(text.value, modifier = Modifier
 		.fillMaxSize()
