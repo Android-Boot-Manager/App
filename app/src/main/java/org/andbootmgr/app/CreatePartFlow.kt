@@ -388,19 +388,19 @@ private fun Os(c: CreatePartDataHolder) {
 			}
 		}
 		if (!c.noobMode)
-		Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier
-			.fillMaxWidth()
-			.padding(5.dp)
-			.clickable {
-				expanded = if (expanded == 1) 0 else 1
-			}) {
-			Text("Bootloader options")
-			if (expanded == 1) {
-				Icon(painterResource(id = R.drawable.ic_baseline_keyboard_arrow_up_24), "Close")
-			} else {
-				Icon(painterResource(id = R.drawable.ic_baseline_keyboard_arrow_down_24), "Expand")
+			Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier
+				.fillMaxWidth()
+				.padding(5.dp)
+				.clickable {
+					expanded = if (expanded == 1) 0 else 1
+				}) {
+				Text("Bootloader options")
+				if (expanded == 1) {
+					Icon(painterResource(id = R.drawable.ic_baseline_keyboard_arrow_up_24), "Close")
+				} else {
+					Icon(painterResource(id = R.drawable.ic_baseline_keyboard_arrow_down_24), "Expand")
+				}
 			}
-		}
 		if (expanded == 1 || c.noobMode) {
 			Column(
 				Modifier
@@ -426,19 +426,19 @@ private fun Os(c: CreatePartDataHolder) {
 			}
 		}
 		if (!c.noobMode)
-		Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier
-			.fillMaxWidth()
-			.padding(5.dp)
-			.clickable {
-				expanded = if (expanded == 2) 0 else 2
-			}) {
-			Text("Partition layout (advanced users)")
-			if (expanded == 2) {
-				Icon(painterResource(id = R.drawable.ic_baseline_keyboard_arrow_up_24), "Close")
-			} else {
-				Icon(painterResource(id = R.drawable.ic_baseline_keyboard_arrow_down_24), "Expand")
+			Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier
+				.fillMaxWidth()
+				.padding(5.dp)
+				.clickable {
+					expanded = if (expanded == 2) 0 else 2
+				}) {
+				Text("Partition layout (advanced users)")
+				if (expanded == 2) {
+					Icon(painterResource(id = R.drawable.ic_baseline_keyboard_arrow_up_24), "Close")
+				} else {
+					Icon(painterResource(id = R.drawable.ic_baseline_keyboard_arrow_down_24), "Expand")
+				}
 			}
-		}
 		if (expanded == 2) {
 			Column(
 				Modifier
