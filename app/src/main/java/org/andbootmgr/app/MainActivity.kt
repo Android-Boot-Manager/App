@@ -462,7 +462,7 @@ private fun PartTool(vm: MainActivityState) {
 	var editPartID: SDUtils.Partition? by remember { mutableStateOf(null) }
 	var editEntryID: ConfigFile? by remember { mutableStateOf(null) }
 	if (filterUnifiedView) {
-		Text("TODO")
+		Text("TODO") //TODO
 	}
 	if (filterPartView) {
 		for (p in parts!!.s) {
@@ -610,7 +610,26 @@ private fun PartTool(vm: MainActivityState) {
 					Text("Backup & Restore")
 				},
 				text = {
-					Text("TODO")
+					Column {
+						Text(stringResource(id = R.string.backup_msg))
+
+						Button(onClick = {
+							//TODO
+						}) {
+							Text("Backup")
+						}
+						Button(onClick = {
+							//TODO
+						}) {
+							Text("Restore")
+						}
+						Button(onClick = {
+							//TODO
+						}) {
+							Text("Flash sparse image")
+						}
+
+					}
 				},
 				confirmButton = {
 					Button(onClick = { bnr = false }) {

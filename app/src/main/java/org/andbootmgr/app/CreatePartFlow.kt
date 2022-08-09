@@ -338,7 +338,7 @@ private fun Shop(c: CreatePartDataHolder) {
 			shName = "add_sailfish.sh"
 		}
 	}
-	Text("This is an placeholder Store implementation that supplies SailfishOS. To continue, press Next.")
+	Text("This is an placeholder Store implementation that supplies SailfishOS. To continue, press Next.") //TODO: download .dma from github or smth
 	c.vm.btnsOverride = true
 	c.vm.nextText.value = "Next"
 	c.vm.onNext.value = { c.vm.navigate("os") }
@@ -409,13 +409,13 @@ private fun Os(c: CreatePartDataHolder) {
 				var et2 by remember { mutableStateOf(false) }
 				var et3 by remember { mutableStateOf(false) }
 				if (!c.noobMode)
-				TextField(value = c.t2.value, onValueChange = {
-					c.t2.value = it
-					et2 = !(c.t2.value.matches(Regex("\\A\\p{ASCII}*\\z")))
-					e = et2 || et3
-				}, isError = et2, label = {
-					Text("ROM internal ID (don't touch if unsure)")
-				})
+					TextField(value = c.t2.value, onValueChange = {
+						c.t2.value = it
+						et2 = !(c.t2.value.matches(Regex("\\A\\p{ASCII}*\\z")))
+						e = et2 || et3
+					}, isError = et2, label = {
+						Text("ROM internal ID (don't touch if unsure)")
+					})
 				TextField(value = c.t3.value, onValueChange = {
 					c.t3.value = it
 					et3 = !(c.t3.value.matches(Regex("\\A\\p{ASCII}*\\z")))
