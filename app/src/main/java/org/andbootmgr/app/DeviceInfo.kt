@@ -33,9 +33,40 @@ object HardcodedDeviceInfoFactory {
 			}
 		}
 	}
+	private fun getMimameid(): DeviceInfo {
+		return object : DeviceInfo {
+			override val codename: String = "mimameid"
+			override val blBlock: String = "/dev/block/by-name/lk"
+			override val bdev: String = "/dev/block/mmcblk1"
+			override val pbdev: String = bdev + "p"
+			override fun isInstalled(logic: DeviceLogic): Boolean {
+				return SuFile.open(logic.abmDir, "codename.cfg").exists()
+			}
+			override fun isBooted(logic: DeviceLogic): Boolean {
+				var hasABM = false
+				try {
+					val c = Class.forName("android.os.SystemProperties")
+					val getBoolean: Method = c.getMethod(
+						"getBoolean",
+						String::class.java,
+						Boolean::class.javaPrimitiveType
+					)
+					hasABM = getBoolean.invoke(c, "ro.boot.has_dualboot", false) as Boolean
+				} catch (e: Exception) {
+					e.printStackTrace()
+				}
+				return hasABM
+			}
+			override fun isCorrupt(logic: DeviceLogic): Boolean {
+				return !SuFile.open(logic.abmDb, "db.conf").exists()
+			}
+		}
+	}
 	fun get(codename: String): DeviceInfo? {
 		return if (codename == "yggdrasil")
 			getYggdrasil()
+		else if (codename == "mimameid")
+		    getMimameid()
 		else
 			null
 	}
