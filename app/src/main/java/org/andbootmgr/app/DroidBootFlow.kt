@@ -19,27 +19,47 @@ import java.io.IOException
 
 class DroidBootWizardPageFactory(private val vm: WizardActivityState) {
 	fun get(): List<IWizardPage> {
-		return listOf(WizardPage("start",
-			NavButton("Cancel") { it.finish() },
-			NavButton("Next") { it.navigate("input") })
-		{
-			Start(vm)
-		}, WizardPage("input",
-			NavButton("Prev") { it.navigate("start") },
-			NavButton("Next") { it.navigate("select") }
-		) {
-			Input(vm)
-		}, WizardPage("select",
-			NavButton("Prev") { it.navigate("input") },
-			NavButton("") {}
-		) {
-			Select(vm)
-		}, WizardPage("flash",
-			NavButton("") {},
-			NavButton("") {}
-		) {
-			Flash(vm)
-		})
+		if(vm.deviceInfo!!.isInstalled(vm.logic)) {
+			return listOf(WizardPage("start",
+				NavButton("Cancel") { it.finish() },
+				NavButton("Next") { it.navigate("input") })
+			{
+				Start(vm)
+			}, WizardPage("input",
+				NavButton("Prev") { it.navigate("start") },
+				NavButton("Next") { it.navigate("select") }
+			) {
+				Input(vm)
+			}, WizardPage("select",
+				NavButton("Prev") { it.navigate("input") },
+				NavButton("") {}
+			) {
+				Select(vm)
+			}, WizardPage("flash",
+				NavButton("") {},
+				NavButton("") {}
+			) {
+				Flash(vm)
+			})
+		}
+		else {
+			return listOf(WizardPage("start",
+				NavButton("Cancel") { it.finish() },
+				NavButton("Next") { it.navigate("input") })
+			{
+				Start(vm)
+			}, WizardPage("input",
+				NavButton("Prev") { it.navigate("start") },
+				NavButton("Next") { it.navigate("flash") }
+			) {
+				Input(vm)
+			}, WizardPage("flash",
+				NavButton("") {},
+				NavButton("") {}
+			) {
+				Flash(vm)
+			})
+		}
 	}
 }
 
@@ -49,7 +69,11 @@ private fun Start(vm: WizardActivityState) {
 		modifier = Modifier.fillMaxSize()
 	) {
 		Text("Welcome to ABM!")
-		Text("This will install ABM + DroidBoot")
+		if(vm.deviceInfo!!.isBooted(vm.logic)){
+			Text("This will install ABM")
+		} else {
+			Text("This will install ABM + DroidBoot")
+		}
 	}
 }
 
@@ -175,17 +199,22 @@ private fun Flash(vm: WizardActivityState) {
 		entry["xtype"] = "droid"
 		entry["xpart"] = "real"
 		entry.exportToFile(File(vm.logic.abmEntries, "hijacked.conf"))
-		terminal.add("Flashing DroidBoot...")
-		val f = SuFile.open(vm.deviceInfo.blBlock)
-		if (!f.canWrite())
-			terminal.add("Note: probably cannot write to bootloader")
-		vm.copyPriv(SuFileInputStream.open(vm.deviceInfo.blBlock), File(vm.logic.abmDir, "backup_lk.img"))
-		try {
-			vm.copyPriv(vm.flashStream(flashType), File(vm.deviceInfo.blBlock))
-		} catch (e: IOException) {
-			terminal.add("-- Failed to flash bootloader, cause:")
-			terminal.add(if (e.message != null) e.message!! else "(null)")
-			terminal.add("-- Please consult documentation to finish the install.")
+		if(!vm.deviceInfo!!.isInstalled(vm.logic)) {
+			terminal.add("Flashing DroidBoot...")
+			val f = SuFile.open(vm.deviceInfo.blBlock)
+			if (!f.canWrite())
+				terminal.add("Note: probably cannot write to bootloader")
+			vm.copyPriv(
+				SuFileInputStream.open(vm.deviceInfo.blBlock),
+				File(vm.logic.abmDir, "backup_lk.img")
+			)
+			try {
+				vm.copyPriv(vm.flashStream(flashType), File(vm.deviceInfo.blBlock))
+			} catch (e: IOException) {
+				terminal.add("-- Failed to flash bootloader, cause:")
+				terminal.add(if (e.message != null) e.message!! else "(null)")
+				terminal.add("-- Please consult documentation to finish the install.")
+			}
 		}
 		terminal.add("-- Done.")
 		vm.logic.unmount(vm.deviceInfo)
