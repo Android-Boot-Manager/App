@@ -147,7 +147,7 @@ class MainActivity : ComponentActivity() {
 							vm.logic!!.mount(vm.deviceInfo!!)
 						}
 						if (vm.deviceInfo != null) {
-							vm.isOk = (vm.deviceInfo!!.isInstalled(vm.logic!!) &&
+							vm.isOk = ((vm.deviceInfo!!.isInstalled(vm.logic!!) || (vm.deviceInfo!!.metaonsd && SuFile.open(vm.deviceInfo!!.bdev).exists())) &&
 							 vm.deviceInfo!!.isBooted(vm.logic!!) &&
 							 !(!vm.logic!!.mounted || vm.deviceInfo!!.isCorrupt(vm.logic!!)))
 						}
@@ -266,17 +266,29 @@ private fun Start(vm: MainActivityState) {
 	val installed: Boolean
 	val booted: Boolean
 	val mounted: Boolean
+	val sdpresent: Boolean
+	val sdformatted: Boolean
 	val corrupt: Boolean
 	if (vm.deviceInfo != null) {
 		installed = remember { vm.deviceInfo!!.isInstalled(vm.logic!!) }
 		booted = remember { vm.deviceInfo!!.isBooted(vm.logic!!) }
 		corrupt = remember { vm.deviceInfo!!.isCorrupt(vm.logic!!) }
 		mounted = vm.logic!!.mounted
+		sdpresent = SuFile.open(vm.deviceInfo!!.bdev).exists();
+		if(sdpresent){
+			val meta: SDUtils.SDPartitionMeta? =
+			SDUtils.generateMeta(vm.deviceInfo!!.bdev, vm.deviceInfo!!.pbdev)
+			sdformatted = (meta!!.countPartitions() > 0) && (meta.dumpPartition(0).type == SDUtils.PartitionType.RESERVED)
+		} else {
+			sdformatted = false
+		}
 	} else {
 		installed = false
 		booted = false
 		corrupt = true
 		mounted = false
+		sdpresent = false
+		sdformatted = false
 	}
 	val notOkColor = CardDefaults.cardColors(
 		containerColor = Color(0xFFFF0F0F)
@@ -325,9 +337,14 @@ private fun Start(vm: MainActivityState) {
 						)
 						Text(usedText, fontSize = 32.sp)
 					}
-					Text("Installed: $installed")
 					Text("Activated: $booted")
 					Text("Mounted bootset: $mounted")
+					if(vm.deviceInfo!!.metaonsd) {
+						Text("SD Card inserted: $sdpresent")
+						Text("SD Card formatted for dualboot: $sdformatted")
+					} else {
+						Text("Installed: $installed")
+					}
 					if (mounted) {
 						Text("Bootset corrupt: $corrupt")
 					}
@@ -337,7 +354,7 @@ private fun Start(vm: MainActivityState) {
 		}
 		if (Shell.isAppGrantedRoot() == false) {
 			Text("Root access is not granted, but required for this app.", textAlign = TextAlign.Center)
-		} else if (!installed) {
+		} else if (!installed && !vm.deviceInfo!!.metaonsd) {
 			Button(onClick = { vm.startFlow("droidboot") }) {
 				Text("Install")
 			}
