@@ -23,7 +23,7 @@ object HardcodedDeviceInfoFactory {
 			override val blBlock: String = "/dev/block/by-name/lk"
 			override val bdev: String = "/dev/block/mmcblk1"
 			override val pbdev: String = bdev + "p"
-			override val metaonsd: Boolean = true
+			override val metaonsd: Boolean = false
 			override fun isInstalled(logic: DeviceLogic): Boolean {
 				return SuFile.open(logic.abmDir, "codename.cfg").exists()
 			}
@@ -36,6 +36,7 @@ object HardcodedDeviceInfoFactory {
 			}
 		}
 	}
+
 	private fun getMimameid(): DeviceInfo {
 		return object : DeviceInfo {
 			override val codename: String = "mimameid"
@@ -44,7 +45,11 @@ object HardcodedDeviceInfoFactory {
 			override val pbdev: String = bdev + "p"
 			override val metaonsd: Boolean = true
 			override fun isInstalled(logic: DeviceLogic): Boolean {
-				return SuFile.open(logic.abmDir, "codename.cfg").exists()
+				return SuFile.open(bdev).exists() && run {
+					val meta: SDUtils.SDPartitionMeta? =
+						SDUtils.generateMeta(bdev, pbdev)
+					meta?.let { (meta.countPartitions() > 0) && (meta.dumpPartition(0).type == SDUtils.PartitionType.RESERVED) } == true
+				}
 			}
 			override fun isBooted(logic: DeviceLogic): Boolean {
 				var hasABM = false

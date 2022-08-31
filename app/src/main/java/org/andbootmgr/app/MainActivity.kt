@@ -147,7 +147,7 @@ class MainActivity : ComponentActivity() {
 							vm.logic!!.mount(vm.deviceInfo!!)
 						}
 						if (vm.deviceInfo != null) {
-							vm.isOk = ((vm.deviceInfo!!.isInstalled(vm.logic!!) || (vm.deviceInfo!!.metaonsd && SuFile.open(vm.deviceInfo!!.bdev).exists())) &&
+							vm.isOk = ((vm.deviceInfo!!.isInstalled(vm.logic!!)) &&
 							 vm.deviceInfo!!.isBooted(vm.logic!!) &&
 							 !(!vm.logic!!.mounted || vm.deviceInfo!!.isCorrupt(vm.logic!!)))
 						}
@@ -267,28 +267,19 @@ private fun Start(vm: MainActivityState) {
 	val booted: Boolean
 	val mounted: Boolean
 	val sdpresent: Boolean
-	val sdformatted: Boolean
 	val corrupt: Boolean
 	if (vm.deviceInfo != null) {
 		installed = remember { vm.deviceInfo!!.isInstalled(vm.logic!!) }
 		booted = remember { vm.deviceInfo!!.isBooted(vm.logic!!) }
 		corrupt = remember { vm.deviceInfo!!.isCorrupt(vm.logic!!) }
 		mounted = vm.logic!!.mounted
-		sdpresent = SuFile.open(vm.deviceInfo!!.bdev).exists();
-		if(sdpresent){
-			val meta: SDUtils.SDPartitionMeta? =
-			SDUtils.generateMeta(vm.deviceInfo!!.bdev, vm.deviceInfo!!.pbdev)
-			sdformatted = (meta!!.countPartitions() > 0) && (meta.dumpPartition(0).type == SDUtils.PartitionType.RESERVED)
-		} else {
-			sdformatted = false
-		}
+		sdpresent = SuFile.open(vm.deviceInfo!!.bdev).exists()
 	} else {
 		installed = false
 		booted = false
 		corrupt = true
 		mounted = false
 		sdpresent = false
-		sdformatted = false
 	}
 	val notOkColor = CardDefaults.cardColors(
 		containerColor = Color(0xFFFF0F0F)
@@ -339,9 +330,9 @@ private fun Start(vm: MainActivityState) {
 					}
 					Text("Activated: $booted")
 					Text("Mounted bootset: $mounted")
-					if(vm.deviceInfo!!.metaonsd) {
+					if (vm.deviceInfo!!.metaonsd) {
 						Text("SD Card inserted: $sdpresent")
-						Text("SD Card formatted for dualboot: $sdformatted")
+						Text("SD Card formatted for dualboot: $installed")
 					} else {
 						Text("Installed: $installed")
 					}
@@ -353,10 +344,15 @@ private fun Start(vm: MainActivityState) {
 			}
 		}
 		if (Shell.isAppGrantedRoot() == false) {
-			Text("Root access is not granted, but required for this app.", textAlign = TextAlign.Center)
-		} else if (!installed && !vm.deviceInfo!!.metaonsd) {
+			Text(
+				"Root access is not granted, but required for this app.",
+				textAlign = TextAlign.Center
+			)
+		} else if (vm.deviceInfo!!.metaonsd && !sdpresent) {
+			Text("An SD card is required for ABM to work, but none could be detected.", textAlign = TextAlign.Center)
+		} else if (!installed) {
 			Button(onClick = { vm.startFlow("droidboot") }) {
-				Text("Install")
+				Text(if (vm.deviceInfo!!.metaonsd) "Setup SD card" else "Install")
 			}
 		} else if (!booted) {
 			Text("The device did not boot using DroidBoot, but configuration files are present. If you just installed ABM, you need to reboot. If the bootloader installation repeatedly fails, please consult the documentation.", textAlign = TextAlign.Center)
@@ -365,7 +361,7 @@ private fun Start(vm: MainActivityState) {
 			}) {
 				Text("Repair DroidBoot")
 			}
-		} else if (mounted && corrupt) {
+		} else if (!vm.deviceInfo!!.metaonsd && mounted && corrupt) {
 			Text("Configuration files are not present. You can restore them from an automated backup. For more information, please consult the documentation.", textAlign = TextAlign.Center)
 			Button(onClick = {
 				vm.startFlow("repair_cfg")
@@ -376,6 +372,8 @@ private fun Start(vm: MainActivityState) {
 			Text("Bootset could not be mounted, please consult the documentation.", textAlign = TextAlign.Center)
 		} else if (vm.isOk) {
 			PartTool(vm)
+		} else {
+			Text("Unknown error, invalid state", textAlign = TextAlign.Center)
 		}
 	}
 }

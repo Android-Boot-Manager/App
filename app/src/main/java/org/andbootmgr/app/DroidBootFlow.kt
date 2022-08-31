@@ -19,47 +19,27 @@ import java.io.IOException
 
 class DroidBootWizardPageFactory(private val vm: WizardActivityState) {
 	fun get(): List<IWizardPage> {
-		if(vm.deviceInfo!!.isInstalled(vm.logic)) {
-			return listOf(WizardPage("start",
-				NavButton("Cancel") { it.finish() },
-				NavButton("Next") { it.navigate("input") })
-			{
-				Start(vm)
-			}, WizardPage("input",
-				NavButton("Prev") { it.navigate("start") },
-				NavButton("Next") { it.navigate("select") }
-			) {
-				Input(vm)
-			}, WizardPage("select",
-				NavButton("Prev") { it.navigate("input") },
-				NavButton("") {}
-			) {
-				Select(vm)
-			}, WizardPage("flash",
-				NavButton("") {},
-				NavButton("") {}
-			) {
-				Flash(vm)
-			})
-		}
-		else {
-			return listOf(WizardPage("start",
-				NavButton("Cancel") { it.finish() },
-				NavButton("Next") { it.navigate("input") })
-			{
-				Start(vm)
-			}, WizardPage("input",
-				NavButton("Prev") { it.navigate("start") },
-				NavButton("Next") { it.navigate("flash") }
-			) {
-				Input(vm)
-			}, WizardPage("flash",
-				NavButton("") {},
-				NavButton("") {}
-			) {
-				Flash(vm)
-			})
-		}
+		return listOf(WizardPage("start",
+			NavButton("Cancel") { it.finish() },
+			NavButton("Next") { it.navigate("input") })
+		{
+			Start(vm)
+		}, WizardPage("input",
+			NavButton("Prev") { it.navigate("start") },
+			NavButton("Next") { it.navigate(if (!vm.deviceInfo!!.isBooted(vm.logic)) "select" else "flash") }
+		) {
+			Input(vm)
+		}, WizardPage("select",
+			NavButton("Prev") { it.navigate("input") },
+			NavButton("") {}
+		) {
+			Select(vm)
+		}, WizardPage("flash",
+			NavButton("") {},
+			NavButton("") {}
+		) {
+			Flash(vm)
+		})
 	}
 }
 
@@ -69,11 +49,13 @@ private fun Start(vm: WizardActivityState) {
 		modifier = Modifier.fillMaxSize()
 	) {
 		Text("Welcome to ABM!")
-		if(vm.deviceInfo!!.isBooted(vm.logic)){
-			Text("This will install ABM")
-		} else {
-			Text("This will install ABM + DroidBoot")
-		}
+		Text(
+			if (vm.deviceInfo!!.isBooted(vm.logic)){
+				"This will install ABM"
+			} else {
+				"This will install ABM + DroidBoot"
+			}
+		)
 	}
 }
 
@@ -199,7 +181,7 @@ private fun Flash(vm: WizardActivityState) {
 		entry["xtype"] = "droid"
 		entry["xpart"] = "real"
 		entry.exportToFile(File(vm.logic.abmEntries, "hijacked.conf"))
-		if(!vm.deviceInfo!!.isInstalled(vm.logic)) {
+		if (!vm.deviceInfo.isBooted(vm.logic)) {
 			terminal.add("Flashing DroidBoot...")
 			val f = SuFile.open(vm.deviceInfo.blBlock)
 			if (!f.canWrite())
