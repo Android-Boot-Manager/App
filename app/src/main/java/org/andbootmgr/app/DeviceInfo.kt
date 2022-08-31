@@ -3,6 +3,7 @@ package org.andbootmgr.app
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
 import java.io.File
+import java.lang.reflect.Method
 
 interface DeviceInfo {
 	val codename: String
