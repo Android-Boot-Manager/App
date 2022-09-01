@@ -133,18 +133,26 @@ private fun Flash(vm: WizardActivityState) {
 			terminal.add("-- inconsistent mount state, aborting")
 			return@Terminal
 		}
-		if (!SuFile.open(vm.logic.abmDir.toURI()).mkdir()) {
-			terminal.add("-- failed to create /data/abm, aborting")
-			return@Terminal
+		if (!SuFile.open(vm.logic.abmDir.toURI()).exists()) {
+			if (!SuFile.open(vm.logic.abmDir.toURI()).mkdir()) {
+				terminal.add("-- failed to create /data/abm, aborting")
+				return@Terminal
+			}
 		}
-		if (!SuFile.open(vm.logic.abmBootset.toURI()).mkdir()) {
-			terminal.add("-- failed to create mount point, aborting")
-			return@Terminal
+		if (!SuFile.open(vm.logic.abmBootset.toURI()).exists()) {
+			if(!SuFile.open(vm.logic.abmBootset.toURI()).mkdir()) {
+				terminal.add("-- failed to create mount point, aborting")
+				return@Terminal
+			}
 		}
-		if (!SuFile.open(File(vm.logic.abmBootset, ".NOT_MOUNTED").toURI()).createNewFile()) {
-			terminal.add("-- failed to create placeholder, aborting")
-			return@Terminal
+
+		if (!SuFile.open(File(vm.logic.abmBootset, ".NOT_MOUNTED").toURI()).exists()) {
+			if (!SuFile.open(File(vm.logic.abmBootset, ".NOT_MOUNTED").toURI()).createNewFile()) {
+				terminal.add("-- failed to create placeholder, aborting")
+				return@Terminal
+			}
 		}
+
 		if (!vm.logic.mount(vm.deviceInfo!!)) {
 			terminal.add("-- failed to mount, aborting")
 			return@Terminal
@@ -153,20 +161,27 @@ private fun Flash(vm: WizardActivityState) {
 			terminal.add("-- inconsistent mount failure, aborting")
 			return@Terminal
 		}
-		if (!SuFile.open(vm.logic.abmDb.toURI()).mkdir()) {
-			terminal.add("-- failed to create db directory, aborting")
-			vm.logic.unmount(vm.deviceInfo)
-			return@Terminal
+
+		if (!SuFile.open(vm.logic.abmDb.toURI()).exists()) {
+			if (!SuFile.open(vm.logic.abmDb.toURI()).mkdir()) {
+				terminal.add("-- failed to create db directory, aborting")
+				vm.logic.unmount(vm.deviceInfo)
+				return@Terminal
+			}
 		}
-		if (!SuFile.open(vm.logic.abmEntries.toURI()).mkdir()) {
-			terminal.add("-- failed to create entries directory, aborting")
-			vm.logic.unmount(vm.deviceInfo)
-			return@Terminal
+		if (!SuFile.open(vm.logic.abmEntries.toURI()).exists()) {
+			if (!SuFile.open(vm.logic.abmEntries.toURI()).mkdir()) {
+				terminal.add("-- failed to create entries directory, aborting")
+				vm.logic.unmount(vm.deviceInfo)
+				return@Terminal
+			}
 		}
-		val o = SuFileOutputStream.open(File(vm.logic.abmDir, "codename.cfg"))
-		o.write(vm.deviceInfo.codename.toByteArray())
-		o.flush()
-		o.close()
+		if(!vm.deviceInfo!!.metaonsd) {
+			val o = SuFileOutputStream.open(File(vm.logic.abmDir, "codename.cfg"))
+			o.write(vm.deviceInfo.codename.toByteArray())
+			o.flush()
+			o.close()
+		}
 		terminal.add("Building configuration...")
 		val db = ConfigFile()
 		db["default"] = "Entry 01"
