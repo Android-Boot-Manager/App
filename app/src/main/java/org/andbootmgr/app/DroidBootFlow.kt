@@ -163,7 +163,7 @@ private fun Flash(vm: WizardActivityState) {
 			var meta: SDPartitionMeta? = null
 			meta = SDUtils.generateMeta(vm.deviceInfo!!.bdev, vm.deviceInfo.pbdev)
 			if (meta != null) {
-				Shell.cmd(SDUtils.umsd(meta))
+				Shell.cmd(SDUtils.umsd(meta)).to(terminal).exec()
 			} else {
 				terminal.add("-- failed to get meta, aborting")
 				return@Terminal
