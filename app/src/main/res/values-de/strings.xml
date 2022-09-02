@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">Android Boot Manager</string>
-	<string name="selected">Datei ausgewählt.</string>
 	<string name="nav_header_subtitle">Ein Handy, um alle zu starten!</string>
-	<!-- Assistant page navigation -->
 	<string name="backup_msg">Willkommen beim einfachen Backup- &amp; Wiederherstellungswerkzeug. Was möchten Sie mit dieser Partition tun?</string>
-	<string name="label">Bezeichnung</string>
-	<!-- How an partition is used -->
 </resources>
