@@ -81,20 +81,20 @@ class Toolkit(private val ctx: Context) {
 			out.flush()
 			out.close()
 		} catch (e: FileNotFoundException) {
-			/*Log.d(
+			Log.d(
 				"ABM_AssetCopy",
 				"Result of mkdir #1: " + File(targetPath, outp).mkdir()
 			)
-			Log.d("ABM_AssetCopy", Log.getStackTraceString(e))*/
+			Log.d("ABM_AssetCopy", Log.getStackTraceString(e))
 			try {
 				assetManager.open(src + File.separator + filename).close()
 				copyAssets(src, outp, assetManager, filename)
 			} catch (e2: FileNotFoundException) {
-				/*Log.d(
+				Log.d(
 					"ABM_AssetCopy",
 					"Result of mkdir #2: " + File(File(targetPath, outp), filename).mkdir()
 				)
-				Log.d("ABM_AssetCopy", Log.getStackTraceString(e2))*/
+				Log.d("ABM_AssetCopy", Log.getStackTraceString(e2))
 				copyAssets(src + File.separator + filename, outp + File.separator + filename)
 			} catch (ex: IOException) {
 				Log.e("ABM_AssetCopy", "Failed to copy asset file: $filename", ex)
