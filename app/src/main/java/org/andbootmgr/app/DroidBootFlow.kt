@@ -9,9 +9,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
 import com.topjohnwu.superuser.io.SuFileInputStream
 import com.topjohnwu.superuser.io.SuFileOutputStream
+import org.andbootmgr.app.SDUtils.SDPartitionMeta
 import org.andbootmgr.app.ui.theme.AbmTheme
 import org.andbootmgr.app.util.ConfigFile
 import java.io.File
@@ -56,6 +58,9 @@ private fun Start(vm: WizardActivityState) {
 				"This will install ABM + DroidBoot"
 			}
 		)
+		if(vm.deviceInfo!!.metaonsd){
+			Text("Warning: All data on SD card will be removed!")
+		}
 	}
 }
 
@@ -150,6 +155,34 @@ private fun Flash(vm: WizardActivityState) {
 			if (!SuFile.open(File(vm.logic.abmBootset, ".NOT_MOUNTED").toURI()).createNewFile()) {
 				terminal.add("-- failed to create placeholder, aborting")
 				return@Terminal
+			}
+		}
+
+		if(vm.deviceInfo!!.metaonsd) {
+			var meta: SDPartitionMeta? = null
+			meta = SDUtils.generateMeta(vm.deviceInfo!!.bdev, vm.deviceInfo.pbdev)
+			if (meta != null) {
+				Shell.cmd(SDUtils.umsd(meta))
+			} else {
+				terminal.add("-- failed to get meta, aborting")
+				return@Terminal
+			}
+			Shell.cmd("sgdisk --mbrtogpt --clear ${vm.deviceInfo.bdev}").to(terminal).submit { r ->
+				if (!r.isSuccess) {
+					terminal.add("-- failed to create partition table, aborting")
+					return@submit
+				}
+			}
+			meta = SDUtils.generateMeta(vm.deviceInfo!!.bdev, vm.deviceInfo.pbdev)
+			Shell.cmd(SDUtils.umsd(meta!!) + " && " + (meta!!.dump(0) as SDUtils.Partition.FreeSpace).create(2048, (meta!!.sectors - 2048) / 41 + 2048, "8301", "abm_settings")).to(terminal).submit { r ->
+				if (r.out.join("\n").contains("old")) {
+					terminal.add("-- Please reboot AS SOON AS POSSIBLE!!!")
+				}
+				if (r.isSuccess) {
+					terminal.add("-- Done.")
+				} else {
+					terminal.add("-- failed to create metadata partition.")
+				}
 			}
 		}
 
