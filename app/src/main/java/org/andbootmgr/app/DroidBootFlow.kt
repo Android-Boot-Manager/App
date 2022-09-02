@@ -59,7 +59,8 @@ private fun Start(vm: WizardActivityState) {
 			}
 		)
 		if(vm.deviceInfo!!.metaonsd){
-			Text("Warning: All data on SD card will be removed!")
+			Text("WARNING: Your SD card will be fully erased.")
+			Text("Please make sure you have an backup!")
 		}
 	}
 }
@@ -167,11 +168,9 @@ private fun Flash(vm: WizardActivityState) {
 				terminal.add("-- failed to get meta, aborting")
 				return@Terminal
 			}
-			Shell.cmd("sgdisk --mbrtogpt --clear ${vm.deviceInfo.bdev}").to(terminal).submit { r ->
-				if (!r.isSuccess) {
-					terminal.add("-- failed to create partition table, aborting")
-					return@submit
-				}
+			if (!Shell.cmd("sgdisk --mbrtogpt --clear ${vm.deviceInfo.bdev}").to(terminal).exec().isSuccess) {
+				terminal.add("-- failed to create partition table, aborting")
+				return@Terminal
 			}
 			meta = SDUtils.generateMeta(vm.deviceInfo!!.bdev, vm.deviceInfo.pbdev)
 			Shell.cmd(SDUtils.umsd(meta!!) + " && " + (meta!!.dump(0) as SDUtils.Partition.FreeSpace).create(2048, (meta!!.sectors - 2048) / 41 + 2048, "8301", "abm_settings")).to(terminal).submit { r ->
