@@ -23,7 +23,6 @@
 			android:theme="@style/AppTheme" />
 		<activity
 			android:name=".MainActivity"
-			android:enabled="false"
 			android:exported="true"
 			android:label="@string/title_activity_main"
 			android:theme="@style/AppTheme">
@@ -33,23 +32,6 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
-		<activity android:name=".legacy.ui.debug.DebugActivity" />
-		<activity
-			android:name=".legacy.ui.wizard.WizardActivity"
-			android:theme="@style/AppTheme" />
-		<activity
-			android:name=".legacy.ui.activities.SplashActivity"
-			android:exported="true">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
-
-				<category android:name="android.intent.category.LAUNCHER" />
-			</intent-filter>
-		</activity>
-		<activity
-			android:name=".legacy.ui.activities.MainActivity"
-			android:label="@string/title_activity_main"
-			android:theme="@style/AppTheme.NoActionBar" />
 	</application>
 
 </manifest>

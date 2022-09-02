@@ -23,7 +23,7 @@ fun AbmTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable ()
 
 	MaterialTheme(
 			colorScheme = colorScheme,
-			typography = Typography,
+			typography = Typography(),
 			content = content
 	)
 }

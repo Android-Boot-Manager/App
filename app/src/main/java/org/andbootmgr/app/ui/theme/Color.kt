@@ -1,1 +1,0 @@
-package org.andbootmgr.app.ui.theme
