@@ -799,7 +799,7 @@ private fun Flash(c: CreatePartDataHolder) {
 
 				terminal.add("-- Patching boot image...")
 				val boot = c.chosen["boot"]!!.toFile(vm)
-				var cmd = File(c.vm.logic.assetDir, "Scripts/add_os/${c.vm.deviceInfo!!.codename}/${c.shName}.sh").absolutePath + " $fn ${boot.absolutePath}"
+				var cmd = File(c.vm.logic.assetDir, "Scripts/add_os/${c.vm.deviceInfo!!.codename}/${c.shName}").absolutePath + " $fn ${boot.absolutePath}"
 				for (i in parts) {
 					cmd += " " + i.value
 				}
