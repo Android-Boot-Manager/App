@@ -13,7 +13,6 @@ import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
 import com.topjohnwu.superuser.io.SuFileInputStream
 import com.topjohnwu.superuser.io.SuFileOutputStream
-import org.andbootmgr.app.SDUtils.SDPartitionMeta
 import org.andbootmgr.app.ui.theme.AbmTheme
 import org.andbootmgr.app.util.ConfigFile
 import java.io.File
@@ -58,7 +57,7 @@ private fun Start(vm: WizardActivityState) {
 				"This will install ABM + DroidBoot"
 			}
 		)
-		if(vm.deviceInfo!!.metaonsd){
+		if(vm.deviceInfo.metaonsd){
 			Text("WARNING: Your SD card will be fully erased.")
 			Text("Please make sure you have an backup!")
 		}
@@ -160,32 +159,36 @@ private fun Flash(vm: WizardActivityState) {
 		}
 
 		if(vm.deviceInfo!!.metaonsd) {
-			var meta: SDPartitionMeta? = null
-			meta = SDUtils.generateMeta(vm.deviceInfo!!.bdev, vm.deviceInfo.pbdev)
+			var meta = SDUtils.generateMeta(vm.deviceInfo.bdev, vm.deviceInfo.pbdev)
 			if (meta != null) {
 				Shell.cmd(SDUtils.umsd(meta)).to(terminal).exec()
 			} else {
 				terminal.add("-- failed to get meta, aborting")
 				return@Terminal
 			}
-			if (!Shell.cmd("sgdisk --mbrtogpt --clear ${vm.deviceInfo.bdev}").to(terminal).exec().isSuccess) {
+			if (!Shell.cmd("sgdisk --mbrtogpt --clear ${vm.deviceInfo.bdev}").to(terminal)
+					.exec().isSuccess
+			) {
 				terminal.add("-- failed to create partition table, aborting")
 				return@Terminal
 			}
-			meta = SDUtils.generateMeta(vm.deviceInfo!!.bdev, vm.deviceInfo.pbdev)
-			Shell.cmd(SDUtils.umsd(meta!!) + " && " + (meta!!.dump(0) as SDUtils.Partition.FreeSpace).create(2048, (meta!!.sectors - 2048) / 41 + 2048, "8301", "abm_settings")).to(terminal).submit { r ->
-				if (r.out.join("\n").contains("old")) {
-					terminal.add("-- Please reboot AS SOON AS POSSIBLE!!!")
-				}
-				if (r.isSuccess) {
-					terminal.add("-- Done.")
-				} else {
-					terminal.add("-- failed to create metadata partition.")
-				}
+			meta = SDUtils.generateMeta(vm.deviceInfo.bdev, vm.deviceInfo.pbdev)
+			val r = Shell.cmd(
+				SDUtils.umsd(meta!!) + " && " + (meta.dump(0) as SDUtils.Partition.FreeSpace)
+					.create(2048, (meta.sectors - 2048) / 41 + 2048, "8301", "abm_settings")
+			).to(terminal).exec()
+			if (r.out.join("\n").contains("old")) {
+				terminal.add("-- Please reboot AS SOON AS POSSIBLE!!!")
+			}
+			if (r.isSuccess) {
+				terminal.add("-- Done.")
+			} else {
+				terminal.add("-- failed to create metadata partition.")
+				return@Terminal
 			}
 		}
 
-		if (!vm.logic.mount(vm.deviceInfo!!)) {
+		if (!vm.logic.mount(vm.deviceInfo)) {
 			terminal.add("-- failed to mount, aborting")
 			return@Terminal
 		}
@@ -208,7 +211,7 @@ private fun Flash(vm: WizardActivityState) {
 				return@Terminal
 			}
 		}
-		if(!vm.deviceInfo!!.metaonsd) {
+		if (!vm.deviceInfo.metaonsd) {
 			val o = SuFileOutputStream.open(File(vm.logic.abmDir, "codename.cfg"))
 			o.write(vm.deviceInfo.codename.toByteArray())
 			o.flush()

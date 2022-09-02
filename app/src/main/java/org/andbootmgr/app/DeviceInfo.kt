@@ -1,5 +1,6 @@
 package org.andbootmgr.app
 
+import android.annotation.SuppressLint
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
 import java.io.File
@@ -51,6 +52,7 @@ object HardcodedDeviceInfoFactory {
 					meta?.let { (meta.countPartitions() > 0) && (meta.dumpPartition(0).type == SDUtils.PartitionType.RESERVED) } == true
 				}
 			}
+			@SuppressLint("PrivateApi")
 			override fun isBooted(logic: DeviceLogic): Boolean {
 				var hasABM = false
 				try {
@@ -72,11 +74,10 @@ object HardcodedDeviceInfoFactory {
 		}
 	}
 	fun get(codename: String): DeviceInfo? {
-		return if (codename == "yggdrasil")
-			getYggdrasil()
-		else if (codename == "mimameid")
-		    getMimameid()
-		else
-			null
+		return when (codename) {
+			"yggdrasil" -> getYggdrasil()
+			"mimameid" -> getMimameid()
+			else -> null
+		}
 	}
 }

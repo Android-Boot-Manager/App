@@ -319,7 +319,6 @@ private fun Shop(c: CreatePartDataHolder) {
 			//TODO: Load from .dma
 			dmaMeta["name"] = "Sailfish OS"
 			dmaMeta["creator"] = "ABM Open ROM Project"
-			t3.value = "Sailfish OS"
 			inetAvailable["vendor"] = "https://temp.nift4.org/vendor.img"
 			inetDesc["vendor"] = "VollaOS 10 vendor image"
 			addDefault(838860288L, 0, "8305", "vendor", false)
@@ -357,6 +356,7 @@ private fun Os(c: CreatePartDataHolder) {
 		a.sortWith(Comparator.comparingInt { c -> c.substring(3, c.length - 5).toInt() })
 		val b = if (a.size > 0) a.last().substring(3, a.last().length - 5).toInt() + 1 else 0
 		c.t2 = mutableStateOf("rom$b")
+		c.t3.value = c.dmaMeta["name"]!!
 	}
 
 	val s = rememberScrollState()
