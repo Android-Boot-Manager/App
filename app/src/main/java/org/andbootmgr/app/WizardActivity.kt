@@ -43,6 +43,7 @@ class WizardPageFactory(private val vm: WizardActivityState) {
 			"fix_droidboot" -> FixDroidBootWizardPageFactory(vm).get()
 			"update_droidboot" -> UpdateDroidBootWizardPageFactory(vm).get()
 			"create_part" -> CreatePartWizardPageFactory(vm).get()
+			"backup_restore" -> BackupRestoreWizardPageFactory(vm).get()
 			else -> listOf()
 		}
 	}

@@ -617,41 +617,7 @@ private fun PartTool(vm: MainActivityState) {
 			}
 		)
 		if (bnr) {
-			AlertDialog(
-				onDismissRequest = {
-					bnr = false
-				},
-				title = {
-					Text("Backup & Restore")
-				},
-				text = {
-					Column {
-						Text(stringResource(id = R.string.backup_msg))
-
-						Button(onClick = {
-							//TODO
-						}) {
-							Text("Backup")
-						}
-						Button(onClick = {
-							//TODO
-						}) {
-							Text("Restore")
-						}
-						Button(onClick = {
-							//TODO
-						}) {
-							Text("Flash sparse image")
-						}
-
-					}
-				},
-				confirmButton = {
-					Button(onClick = { bnr = false }) {
-						Text("Cancel")
-					}
-				}
-			)
+			vm.startFlow("backup_restore")
 		} else if (rename) {
 			var e by remember { mutableStateOf(false) }
 			var t by remember { mutableStateOf(p.name) }
