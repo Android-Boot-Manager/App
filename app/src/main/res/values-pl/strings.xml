@@ -2,8 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">Menedżer uruchamiania Androida</string>
 	<string name="selected">File selected.</string>
-	<string name="title_activity_main">MainActivity</string>
-    <string name="nav_header_subtitle">Jeden telefon do uruchomienia wszystkiego!</string>
+	<string name="nav_header_subtitle">Jeden telefon do uruchomienia wszystkiego!</string>
 	<!-- Assistant page navigation -->
 	<string name="backup_msg">Welcome to the simple Backup &amp; Restore tool. What do you want to do with this partition?</string>
 	<string name="label">Label</string>

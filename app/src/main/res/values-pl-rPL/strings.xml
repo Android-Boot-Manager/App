@@ -2,12 +2,10 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
 	<string name="app_name">Menedżer uruchamiania Androida</string>
 	<string name="selected">Wybrano plik.</string>
-	<string name="title_activity_main">MainActivity</string>
 	<string name="nav_header_subtitle">Jeden telefon do uruchomienia wszystkiego!</string>
 	<!-- Assistant page navigation -->
 	<string name="backup_msg">Witamy w prostym narzędziu kopii zapasowej &amp; Przywracania. Co chcesz zrobić z tą partycją?</string>
 	<string name="label">Etykieta</string>
 	<!-- How an partition is used -->
 	<string name="menu">Menu</string>
-	<string name="title_activity_wizard">WizardActivity</string>
 </resources>

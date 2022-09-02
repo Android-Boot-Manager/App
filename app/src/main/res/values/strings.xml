@@ -1,17 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-
 	<string name="app_name">Android Boot Manager</string>
-	<string name="selected">File selected.</string>
-	<string name="title_activity_main">MainActivity</string>
 	<string name="nav_header_subtitle">One phone to start them all!</string>
 	<string name="aboutLibraries_description_showIcon" translatable="false" tools:keep="@string/aboutLibraries_description_showIcon">true</string>
 	<string name="aboutLibraries_description_showVersion" translatable="false" tools:keep="@string/aboutLibraries_description_showVersion">true</string>
 	<string name="aboutLibraries_description_text" translatable="false" tools:keep="@string/aboutLibraries_description_text">@string/nav_header_subtitle</string>
-	<!-- Assistant page navigation -->
 	<string name="backup_msg">Welcome to the simple Backup &amp; Restore tool. What do you want to do with this partition?</string>
-	<string name="label">Label</string>
-	<!-- How an partition is used -->
 	<string name="menu">Menu</string>
-	<string name="title_activity_wizard">WizardActivity</string>
 </resources>
