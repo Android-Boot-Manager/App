@@ -1,5 +1,6 @@
 package org.andbootmgr.app
 
+import android.content.Intent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -21,7 +22,7 @@ import java.io.IOException
 class DroidBootWizardPageFactory(private val vm: WizardActivityState) {
 	fun get(): List<IWizardPage> {
 		return listOf(WizardPage("start",
-			NavButton("Cancel") { it.finish() },
+			NavButton("Cancel") { it.startActivity(Intent(it, MainActivity::class.java)); it.finish() },
 			NavButton("Next") { it.navigate("input") })
 		{
 			Start(vm)
@@ -57,7 +58,7 @@ private fun Start(vm: WizardActivityState) {
 				"This will install ABM + DroidBoot"
 			}
 		)
-		if(vm.deviceInfo.metaonsd){
+		if (vm.deviceInfo.metaonsd){
 			Text("WARNING: Your SD card will be fully erased.")
 			Text("Please make sure you have an backup!")
 		}
@@ -254,6 +255,9 @@ private fun Flash(vm: WizardActivityState) {
 			vm.btnsOverride = true
 			vm.nextText.value = "Finish"
 			vm.onNext.value = {
+				if (vm.deviceInfo.isBooted(vm.logic)) {
+					it.startActivity(Intent(it, MainActivity::class.java))
+				}
 				it.finish()
 			}
 		}
