@@ -61,6 +61,15 @@ class MainActivityState {
 		activity!!.finish()
 	}
 
+	fun startBackupAndRestoreFlow(partition: SDUtils.Partition) {
+		val i = Intent(activity!!, WizardActivity::class.java)
+		i.putExtra("codename", deviceInfo!!.codename)
+		i.putExtra("flow", "backup_restore")
+		i.putExtra("partitionid", partition.id)
+		activity!!.startActivity(i)
+		activity!!.finish()
+	}
+
 	var noobMode: Boolean = false
 	var activity: MainActivity? = null
 	var deviceInfo: DeviceInfo? = null
@@ -617,7 +626,7 @@ private fun PartTool(vm: MainActivityState) {
 			}
 		)
 		if (bnr) {
-			vm.startFlow("backup_restore")
+			vm.startBackupAndRestoreFlow(p)
 		} else if (rename) {
 			var e by remember { mutableStateOf(false) }
 			var t by remember { mutableStateOf(p.name) }
