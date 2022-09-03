@@ -2,6 +2,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
 	<string name="app_name">Menedżer uruchamiania Androida</string>
 	<string name="nav_header_subtitle">Jeden telefon do uruchomienia wszystkiego!</string>
-	<string name="backup_msg">Witamy w prostym narzędziu kopii zapasowej &amp; Przywracania. Co chcesz zrobić z tą partycją?</string>
+	<string name="backup_msg">Welcome to the simple Backup &amp; Restore tool. What do you want to do with this partition %1$s?</string>
 	<string name="menu">Menu</string>
 </resources>
