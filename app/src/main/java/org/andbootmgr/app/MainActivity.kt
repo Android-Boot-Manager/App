@@ -479,7 +479,6 @@ private fun PartTool(vm: MainActivityState) {
 		return@remember outList
 	}
 	var processing by remember { mutableStateOf(false) }
-	var bnr by remember { mutableStateOf(false) }
 	var rename by remember { mutableStateOf(false) }
 	var delete by remember { mutableStateOf(false) }
 	var result: String? by remember { mutableStateOf(null) }
@@ -606,7 +605,7 @@ private fun PartTool(vm: MainActivityState) {
 								Text("Unmount")
 							}
 						}
-						Button(onClick = { bnr = true }) {
+						Button(onClick = { vm.startBackupAndRestoreFlow(p) }) {
 							Text("Backup & Restore")
 						}
 					} else {
@@ -625,9 +624,7 @@ private fun PartTool(vm: MainActivityState) {
 				}
 			}
 		)
-		if (bnr) {
-			vm.startBackupAndRestoreFlow(p)
-		} else if (rename) {
+		if (rename) {
 			var e by remember { mutableStateOf(false) }
 			var t by remember { mutableStateOf(p.name) }
 			AlertDialog(
