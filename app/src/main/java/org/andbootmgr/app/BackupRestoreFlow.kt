@@ -109,8 +109,6 @@ private fun Flash(c: CreateBackupDataHolder) {
             terminal.add("-- Please consult documentation to finish the backup")
         }
         terminal.add("-- Flash successful")
-        c.vm.nextText.value = "Finish"
-        c.vm.onNext.value = { it.startActivity(Intent(it, MainActivity::class.java)); it.finish() }
         c.vm.activity.runOnUiThread {
             c.vm.btnsOverride = true
             c.vm.nextText.value = "Finish"
