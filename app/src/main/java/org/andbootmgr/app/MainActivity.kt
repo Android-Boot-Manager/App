@@ -66,6 +66,7 @@ class MainActivityState {
 		i.putExtra("codename", deviceInfo!!.codename)
 		i.putExtra("flow", "backup_restore")
 		i.putExtra("partitionid", partition.id)
+		i.putExtra("context", partition.id)
 		activity!!.startActivity(i)
 		activity!!.finish()
 	}
