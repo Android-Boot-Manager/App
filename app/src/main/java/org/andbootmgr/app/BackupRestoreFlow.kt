@@ -15,6 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.core.net.toFile
+import com.topjohnwu.superuser.Shell
 import java.io.File
 import java.io.IOException
 
@@ -102,7 +104,17 @@ private fun Flash(c: CreateBackupDataHolder) {
     Terminal(c.vm) { terminal ->
         terminal.add("-- Going to flash ${c.path} to ${c.vm.deviceInfo!!.pbdev+(c.vm.activity.intent.getIntExtra("partitionid", -1))}")
         try {
-            c.vm.copyPriv(c.vm.activity.contentResolver.openInputStream(c.path!!)!!, File(c.vm.deviceInfo!!.pbdev+(c.vm.activity.intent.getIntExtra("partitionid", -1))))
+            if(c.action==2){
+                c.vm.copyPriv(c.vm.activity.contentResolver.openInputStream(c.path!!)!!, File(c.vm.deviceInfo.pbdev+(c.vm.activity.intent.getIntExtra("partitionid", -1))))
+            } else {
+                val f = File(c.vm.logic.cacheDir, System.currentTimeMillis().toString())
+                c.vm.copyUnpriv(c.vm.activity.contentResolver.openInputStream(c.path!!)!!, f)
+                val result2 = Shell.cmd(File(c.vm.logic.assetDir, "Toolkit/simg2img").absolutePath + " ${f.absolutePath} ${c.vm.deviceInfo.pbdev+(c.vm.activity.intent.getIntExtra("partitionid", -1))}").exec()
+                if (!result2.isSuccess) {
+                    terminal.add("-- FAILURE!")
+                    return@Terminal
+                }
+            }
         } catch (e: IOException) {
             terminal.add("-- Failed to flash bootloader, cause:")
             terminal.add(if (e.message != null) e.message!! else "(null)")
