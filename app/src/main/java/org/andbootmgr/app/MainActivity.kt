@@ -11,6 +11,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Menu
@@ -66,7 +68,6 @@ class MainActivityState {
 		i.putExtra("codename", deviceInfo!!.codename)
 		i.putExtra("flow", "backup_restore")
 		i.putExtra("partitionid", partition.id)
-		i.putExtra("context", partition.id)
 		activity!!.startActivity(i)
 		activity!!.finish()
 	}
@@ -519,6 +520,7 @@ private fun PartTool(vm: MainActivityState) {
 				entry["options"] = str
 				entry["xtype"] = str
 				entry["xpart"] = array (str.split(":"))
+				entry["xupdate"] = uri(str)
 				 */
 				Text(
 					if (e.has("title")) {
@@ -654,13 +656,13 @@ private fun PartTool(vm: MainActivityState) {
 							processing = true
 							rename = false
 							Shell.cmd(SDUtils.umsd(parts!!) + " && " + p.rename(t)).submit { r ->
-								processing = false
 								result = r.out.join("\n") + r.err.join("\n")
 								parts = SDUtils.generateMeta(
 									vm.deviceInfo!!.bdev,
 									vm.deviceInfo!!.pbdev
 								)
 								editPartID = parts?.s!!.findLast { it.id == p.id }
+								processing = false
 							}
 						}
 					}, enabled = !e) {
@@ -726,7 +728,8 @@ private fun PartTool(vm: MainActivityState) {
 		var xtypeE by remember { mutableStateOf(!xtype.contains(xtypeT)) }
 		var xpartT by remember { mutableStateOf(e["xpart"] ?: "") }
 		var xpartE by remember { mutableStateOf(!xpartT.matches(xpart)) }
-		val isOk = !(newFileNameErr || titleE)
+		var xupdateT by remember { mutableStateOf(e["xupdate"] ?: "") }
+		val isOk = !(newFileNameErr || titleE || linuxE || initrdE || dtbE || optionsE || xtypeE || xpartE)
 		AlertDialog(
 			onDismissRequest = {
 				editEntryID = null
@@ -738,7 +741,7 @@ private fun PartTool(vm: MainActivityState) {
 				Icon(painterResource(id = R.drawable.ic_roms), "Icon")
 			},
 			text = {
-				Column {
+				Column(Modifier.verticalScroll(rememberScrollState())) {
 					TextField(value = newFileName, onValueChange = {
 						if (f != null) return@TextField
 						newFileName = it
@@ -794,6 +797,12 @@ private fun PartTool(vm: MainActivityState) {
 						xpartE = !(xpartT.matches(xpart))
 					}, isError = xpartE, label = {
 						Text("Assigned partitions")
+					})
+
+					TextField(value = xupdateT, onValueChange = {
+						xupdateT = it
+					}, label = {
+						Text("Updater URL")
 					})
 				}
 			},
