@@ -3,66 +3,13 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="../../../../../layout/compose-model-1643529241482.xml" value="2.0" />
-        <entry key="../../../../../layout/compose-model-1643532938246.xml" value="0.5" />
-        <entry key="../../../../../layout/compose-model-1643535013971.xml" value="0.17060810810810811" />
-        <entry key="../../../../../layout/compose-model-1643547946881.xml" value="0.15751689189189189" />
-        <entry key="../../../../../layout/compose-model-1646574158722.xml" value="0.25" />
-        <entry key="../../../../../layout/compose-model-1651910911001.xml" value="0.1545608108108108" />
-        <entry key="../../../../../layout/compose-model-1651931949692.xml" value="0.15625" />
-        <entry key="../../../../../layout/compose-model-1651940616263.xml" value="0.5" />
-        <entry key="../../../../../layout/compose-model-1651995463570.xml" value="0.33" />
-        <entry key="../../../../layout/compose-model-1661947342678.xml" value="0.1" />
-        <entry key="../../../../layout/compose-model-1661948389796.xml" value="0.1" />
-        <entry key="../../../../layout/compose-model-1661962234330.xml" value="0.1574074074074074" />
-        <entry key="../../../../layout/compose-model-1661962765852.xml" value="1.0" />
-        <entry key="../../../../layout/compose-model-1661962769856.xml" value="0.1574074074074074" />
-        <entry key="../../../../layout/compose-model-1662042085452.xml" value="0.14074074074074075" />
-        <entry key="../../../../layout/compose-model-1662096359467.xml" value="0.14074074074074075" />
-        <entry key="../../../../layout/compose-model-1662109780111.xml" value="0.14074074074074075" />
-        <entry key="../../../../layout/compose-model-1662110924632.xml" value="0.14074074074074075" />
-        <entry key="../../../../layout/compose-model-1662111787258.xml" value="0.14074074074074075" />
-        <entry key="../../../../layout/compose-model-1662116091799.xml" value="0.20092592592592592" />
-        <entry key="../../../../layout/compose-model-1662134053242.xml" value="0.20092592592592592" />
-        <entry key="../../../../layout/compose-model-1662134224025.xml" value="0.1" />
-        <entry key="../../../../layout/compose-model-1662135032263.xml" value="0.17060810810810811" />
-        <entry key="../../../../layout/compose-model-1662207728183.xml" value="0.1574074074074074" />
-        <entry key="../../../../layout/compose-model-1662233183529.xml" value="0.1574074074074074" />
-        <entry key="app/src/main/java/org/andbootmgr/app/DroidBootFlow.kt" value="0.18327702702702703" />
-        <entry key="app/src/main/java/org/andbootmgr/app/DroidBootWizardPageFactory.kt" value="0.1831223628691983" />
-        <entry key="app/src/main/java/org/andbootmgr/app/MainActivity.kt" value="0.1831223628691983" />
-        <entry key="app/src/main/java/org/andbootmgr/app/WizardActivity.kt" value="0.18327702702702703" />
-        <entry key="app/src/main/java/org/andbootmgr/app/WizardPageFactory.kt" value="0.2810126582278481" />
-        <entry key="app/src/main/java/org/androidbootmanager/app/MainActivity.kt" value="0.17130801687763714" />
-        <entry key="app/src/main/java/org/androidbootmanager/app/WizardActivity.kt" value="0.25" />
-        <entry key="app/src/main/java/org/androidbootmanager/app/WizardPageFactory.kt" value="0.18" />
-        <entry key="app/src/main/res/drawable-anydpi/ic_about.xml" value="0.186" />
-        <entry key="app/src/main/res/drawable-anydpi/ic_droidbooticon.xml" value="0.186" />
-        <entry key="app/src/main/res/drawable-anydpi/ic_menu_home.xml" value="0.186" />
-        <entry key="app/src/main/res/drawable-anydpi/ic_no.xml" value="0.186" />
-        <entry key="app/src/main/res/drawable-anydpi/ic_ok.xml" value="0.186" />
-        <entry key="app/src/main/res/drawable/ic_adopted.xml" value="0.186" />
-        <entry key="app/src/main/res/drawable/ic_baseline_check_circle_24.xml" value="0.186" />
-        <entry key="app/src/main/res/drawable/ic_baseline_error_24.xml" value="0.186" />
-        <entry key="app/src/main/res/drawable/ic_baseline_keyboard_arrow_down_24.xml" value="0.305" />
-        <entry key="app/src/main/res/drawable/ic_baseline_keyboard_arrow_up_24.xml" value="0.305" />
-        <entry key="app/src/main/res/drawable/ic_data.xml" value="0.186" />
-        <entry key="app/src/main/res/drawable/ic_launcher_foreground.xml" value="0.186" />
-        <entry key="app/src/main/res/drawable/ic_meta.xml" value="0.186" />
-        <entry key="app/src/main/res/drawable/ic_roms.xml" value="0.186" />
-        <entry key="app/src/main/res/drawable/ic_sailfish_os_logo.xml" value="0.186" />
-        <entry key="app/src/main/res/drawable/ic_sd.xml" value="0.186" />
-        <entry key="app/src/main/res/drawable/ic_settings.xml" value="0.186" />
-        <entry key="app/src/main/res/layout/activity_debug.xml" value="0.17552083333333332" />
-        <entry key="app/src/main/res/layout/fragment_generalcfg.xml" value="0.19322916666666667" />
+        <entry key="../../../../../layout/compose-model-1662370190141.xml" value="0.22771767130345183" />
       </map>
     </option>
   </component>
   <component name="EntryPointsManager">
     <entry_points version="2.0">
       <entry_point TYPE="field" FQNAME="org.androidbootmanager.app.util.SDUtils.SDPartitionMeta path" />
-      <entry_point TYPE="field" FQNAME="org.androidbootmanager.app.legacy.util.SDUtils.SDPartitionMeta path" />
-      <entry_point TYPE="field" FQNAME="org.androidbootmanager.app.legacy.roms.ROM type" />
     </entry_points>
     <pattern value="org.androidbootmanager.app.util.SDUtils.SDPartitionMeta" method="countPartition" />
     <pattern value="org.androidbootmanager.app.ui.roms.ROMFragment.Entry" />
@@ -70,21 +17,8 @@
     <pattern value="org.androidbootmanager.app.ui.roms.ROMFragment.Entry" method="save" />
     <pattern value="org.androidbootmanager.app.util.SDUtils.SDPartitionMeta" method="dump" />
     <pattern value="org.androidbootmanager.app.util.MiscUtils" method="sure" />
-    <pattern value="org.androidbootmanager.app.legacy.util.SDUtils.SDPartitionMeta" method="dumpPartition" />
-    <pattern value="org.androidbootmanager.app.legacy.util.SDUtils.SDPartitionMeta" method="dump" />
-    <pattern value="org.androidbootmanager.app.legacy.util.SDUtils.SDPartitionMeta" method="countPartition" />
-    <pattern value="org.androidbootmanager.app.legacy.util.MiscUtils" method="sure" />
-    <pattern value="org.androidbootmanager.app.legacy.util.MiscUtils" method="w2" />
   </component>
-  <component name="ExternalStorageConfigurationManager" enabled="true" />
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
-  </component>
-  <component name="StateStore">
-    <option name="mTargetDirectory" value="Current Path" />
-    <option name="mFastbootTarget" value="boot" />
-  </component>
-  <component name="SuppressKotlinCodeStyleNotification">
-    <option name="disableForAll" value="true" />
   </component>
 </project>

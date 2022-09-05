@@ -146,7 +146,7 @@ private fun Flash(vm: WizardActivityState) {
 			}
 		}
 		if (!SuFile.open(vm.logic.abmBootset.toURI()).exists()) {
-			if(!SuFile.open(vm.logic.abmBootset.toURI()).mkdir()) {
+			if (!SuFile.open(vm.logic.abmBootset.toURI()).mkdir()) {
 				terminal.add("-- failed to create mount point, aborting")
 				return@Terminal
 			}
@@ -159,12 +159,14 @@ private fun Flash(vm: WizardActivityState) {
 			}
 		}
 
-		if(vm.deviceInfo!!.metaonsd) {
+		if (vm.deviceInfo!!.metaonsd) {
 			var meta = SDUtils.generateMeta(vm.deviceInfo.bdev, vm.deviceInfo.pbdev)
-			if (meta != null) {
-				Shell.cmd(SDUtils.umsd(meta)).to(terminal).exec()
-			} else {
+			if (meta == null) {
 				terminal.add("-- failed to get meta, aborting")
+				return@Terminal
+			}
+			if (Shell.cmd(SDUtils.umsd(meta)).to(terminal).exec().isSuccess) {
+				terminal.add("-- failed unmount drive, aborting")
 				return@Terminal
 			}
 			if (!Shell.cmd("sgdisk --mbrtogpt --clear ${vm.deviceInfo.bdev}").to(terminal)
@@ -176,7 +178,12 @@ private fun Flash(vm: WizardActivityState) {
 			meta = SDUtils.generateMeta(vm.deviceInfo.bdev, vm.deviceInfo.pbdev)
 			val r = Shell.cmd(
 				SDUtils.umsd(meta!!) + " && " + (meta.dump(0) as SDUtils.Partition.FreeSpace)
-					.create(2048, (meta.sectors - 2048) / 41 + 2048, "8301", "abm_settings")
+					.create(
+						0,
+						(meta.logicalSectorSizeBytes * 512L * 1024 * 1024 /* 512 mb */),
+						"8301",
+						"abm_settings"
+					)
 			).to(terminal).exec()
 			if (r.out.join("\n").contains("old")) {
 				terminal.add("-- Please reboot AS SOON AS POSSIBLE!!!")
@@ -212,12 +219,11 @@ private fun Flash(vm: WizardActivityState) {
 				return@Terminal
 			}
 		}
-		if (!vm.deviceInfo.metaonsd) {
-			val o = SuFileOutputStream.open(File(vm.logic.abmDir, "codename.cfg"))
-			o.write(vm.deviceInfo.codename.toByteArray())
-			o.flush()
-			o.close()
-		}
+		val o = SuFileOutputStream.open(File(vm.logic.abmDir, "codename.cfg"))
+		o.write(vm.deviceInfo.codename.toByteArray())
+		o.flush()
+		o.close()
+
 		terminal.add("Building configuration...")
 		val db = ConfigFile()
 		db["default"] = "Entry 01"
@@ -261,7 +267,6 @@ private fun Flash(vm: WizardActivityState) {
 				it.finish()
 			}
 		}
-
 	}
 }
 

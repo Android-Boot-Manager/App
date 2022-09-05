@@ -9,14 +9,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.core.net.toFile
 import com.topjohnwu.superuser.Shell
+import com.topjohnwu.superuser.io.SuFileInputStream
 import java.io.File
 import java.io.IOException
 
@@ -33,7 +36,7 @@ class BackupRestoreWizardPageFactory(private val vm: WizardActivityState) {
             NavButton("") {}
         ) {
             Select(c)
-        }, WizardPage("Complete_action",
+        }, WizardPage("go",
             NavButton("") {},
             NavButton("") {}
         ) {
@@ -43,6 +46,7 @@ class BackupRestoreWizardPageFactory(private val vm: WizardActivityState) {
 }
 
 private class CreateBackupDataHolder(val vm: WizardActivityState){
+    var pi: Int = -1
     var action: Int = 0
     var path: Uri? = null
     var meta: SDUtils.SDPartitionMeta? = null
@@ -51,12 +55,13 @@ private class CreateBackupDataHolder(val vm: WizardActivityState){
 
 @Composable
 private fun ChooseAction(c: CreateBackupDataHolder) {
-    c.meta = SDUtils.generateMeta(c.vm.deviceInfo!!.bdev, c.vm.deviceInfo.pbdev)
+    c.meta = remember { SDUtils.generateMeta(c.vm.deviceInfo!!.bdev, c.vm.deviceInfo.pbdev) }
+    c.pi = remember { c.vm.activity.intent.getIntExtra("partitionid", -1) }
+
     Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxSize()
     ) {
-        Text("Backup & Restore")
-        Text(stringResource(id = R.string.backup_msg, c.meta!!.dump(c.vm.activity.intent.getIntExtra("partitionid", -1)).name))
+        Text(stringResource(id = R.string.backup_msg, c.meta!!.dumpKernelPartition(c.pi).name), textAlign = TextAlign.Center)
         Button(onClick = { c.action=1; c.vm.navigate("select") }) {
             Text("Backup")
         }
@@ -67,33 +72,52 @@ private fun ChooseAction(c: CreateBackupDataHolder) {
             Text("Flash sparse image")
         }
     }
-    Log.i("backupandrestore","Partition is ${c.vm.activity.intent.getIntExtra("partitionid", -1)}")
 }
 
 @Composable
 private fun Select(c: CreateBackupDataHolder) {
     val nextButtonAvailable = remember { mutableStateOf(false) }
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxSize()
     ) {
         if (nextButtonAvailable.value) {
             Text("Successfully selected.")
             c.vm.nextText.value = "Next"
-            c.vm.onNext.value = { it.navigate("Complete_action") }
+            c.vm.onNext.value = { it.navigate("go") }
         } else {
-            if(c.action==1) Text("Create backup file") else if(c.action==2) Text("Select file to restore") else Text("Select sparse file to write to the partition")
+            Text(
+                if (c.action == 1)
+                    "Create backup file"
+                else if (c.action == 2)
+                    "Select file to restore"
+                else if (c.action == 3)
+                    "Select sparse file to write to the partition"
+                else
+                    ""
+            )
             Button(onClick = {
-                c.vm.activity.chooseFile("*/*") {
-                    c.path=it
-                    nextButtonAvailable.value = true
+                if (c.action != 1) {
+                    c.vm.activity.chooseFile("*/*") {
+                        c.path = it
+                        nextButtonAvailable.value = true
+                    }
+                } else {
+                    c.vm.activity.createFile("${c.meta!!.dumpKernelPartition(c.pi).name}.img") {
+                        c.path = it
+                        nextButtonAvailable.value = true
+                    }
                 }
             }) {
-                if(c.action!=1) {
-                    Text("Choose file")
-                } else {
-                    Text("Create file")
-                }
+                Text(
+                    if (c.action != 1) {
+                        "Choose file"
+                    } else {
+                        "Create file"
+                    }
+                )
             }
         }
     }
@@ -102,29 +126,52 @@ private fun Select(c: CreateBackupDataHolder) {
 @Composable
 private fun Flash(c: CreateBackupDataHolder) {
     Terminal(c.vm) { terminal ->
-        terminal.add("-- Going to flash ${c.path} to ${c.vm.deviceInfo!!.pbdev+(c.vm.activity.intent.getIntExtra("partitionid", -1))}")
+        terminal.add("-- Starting...")
         try {
-            if(c.action==2){
-                c.vm.copyPriv(c.vm.activity.contentResolver.openInputStream(c.path!!)!!, File(c.vm.deviceInfo.pbdev+(c.vm.activity.intent.getIntExtra("partitionid", -1))))
-            } else {
+            if (!Shell.cmd(SDUtils.umsd(c.meta!!.dumpKernelPartition(c.pi))).to(terminal).exec().isSuccess)
+                throw IOException("Cannot umount. Nothing has been changed")
+            if (c.action == 1) {
+                c.vm.copy(
+                    SuFileInputStream.open(
+                        File(
+                            c.vm.deviceInfo!!.pbdev + (c.pi)
+                        )
+                    ),
+                    c.vm.activity.contentResolver.openOutputStream(c.path!!)!!
+                )
+            } else if (c.action == 2) {
+                c.vm.copyPriv(
+                    c.vm.activity.contentResolver.openInputStream(c.path!!)!!,
+                    File(
+                        c.vm.deviceInfo!!.pbdev + (c.pi)
+                    )
+                )
+            } else if (c.action == 3) {
                 val f = File(c.vm.logic.cacheDir, System.currentTimeMillis().toString())
                 c.vm.copyUnpriv(c.vm.activity.contentResolver.openInputStream(c.path!!)!!, f)
-                val result2 = Shell.cmd(File(c.vm.logic.assetDir, "Toolkit/simg2img").absolutePath + " ${f.absolutePath} ${c.vm.deviceInfo.pbdev+(c.vm.activity.intent.getIntExtra("partitionid", -1))}").exec()
+                val result2 = Shell.cmd(
+                    File(
+                        c.vm.logic.assetDir,
+                        "Toolkit/simg2img"
+                    ).absolutePath + " ${f.absolutePath} ${
+                        c.vm.deviceInfo!!.pbdev + (c.pi)
+                    }"
+                ).to(terminal).exec()
                 if (!result2.isSuccess) {
                     terminal.add("-- FAILURE!")
                     return@Terminal
                 }
+            } else {
+                throw IOException("Invalid action, nothing has been changed")
             }
         } catch (e: IOException) {
-            terminal.add("-- Failed to flash bootloader, cause:")
+            terminal.add("-- Failed to backup/restore, cause:")
             terminal.add(if (e.message != null) e.message!! else "(null)")
-            terminal.add("-- Please consult documentation to finish the backup")
+            terminal.add("-- Please contact support")
         }
-        terminal.add("-- Flash successful")
-        c.vm.activity.runOnUiThread {
-            c.vm.btnsOverride = true
-            c.vm.nextText.value = "Finish"
-            c.vm.onNext.value = { it.startActivity(Intent(it, MainActivity::class.java)); it.finish() }
-            }
+        terminal.add("-- Successful!")
+        c.vm.btnsOverride = true
+        c.vm.nextText.value = "Finish"
+        c.vm.onNext.value = { it.startActivity(Intent(it, MainActivity::class.java)); it.finish() }
     }
 }

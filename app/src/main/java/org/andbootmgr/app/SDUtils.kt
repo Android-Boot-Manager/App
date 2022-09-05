@@ -327,6 +327,11 @@ object SDUtils {
 			return p[id]
 		}
 
+		// Get partition by kernel id
+		fun dumpKernelPartition(id: Int): Partition {
+			return p.stream().filter { it.id == id }.findFirst().get()
+		}
+
 		// Count entries for partition wizard
 		fun count(): Int {
 			return u.size
