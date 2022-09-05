@@ -180,7 +180,7 @@ private fun Flash(vm: WizardActivityState) {
 				SDUtils.umsd(meta!!) + " && " + (meta.dump(0) as SDUtils.Partition.FreeSpace)
 					.create(
 						0,
-						(meta.logicalSectorSizeBytes * 512L * 1024 * 1024 /* 512 mb */),
+						(512L * 1024 * 1024 /* 512 mb */ / meta.logicalSectorSizeBytes),
 						"8301",
 						"abm_settings"
 					)
