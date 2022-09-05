@@ -1,4 +1,4 @@
-package org.andbootmgr.app.ui.theme
+package org.andbootmgr.app.util
 
 import android.annotation.TargetApi
 import android.os.Build

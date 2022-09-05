@@ -26,7 +26,7 @@ import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
 import okhttp3.*
 import okio.*
-import org.andbootmgr.app.ui.theme.AbmTheme
+import org.andbootmgr.app.util.AbmTheme
 import org.andbootmgr.app.util.ConfigFile
 import org.andbootmgr.app.util.SOUtils
 import java.io.File
@@ -889,7 +889,7 @@ private fun Flash(c: CreatePartDataHolder) {
 					parts[it] = c.meta!!.nid.toString()
 					c.meta = SDUtils.generateMeta(c.vm.deviceInfo!!.bdev, c.vm.deviceInfo.pbdev)
 					if (it + 1 < c.count.value) {
-						c.p = c.meta!!.s.find { it1 -> (offset + k) < it1.startSector } as SDUtils.Partition.FreeSpace
+						c.p = c.meta!!.s.findLast { it1 -> (offset + k) < it1.startSector } as SDUtils.Partition.FreeSpace
 					}
 					if (r.isSuccess) {
 						terminal.add("Created partition.")

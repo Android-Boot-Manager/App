@@ -39,7 +39,7 @@ import com.topjohnwu.superuser.io.SuFile
 import com.topjohnwu.superuser.io.SuFileInputStream
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import org.andbootmgr.app.ui.theme.AbmTheme
+import org.andbootmgr.app.util.AbmTheme
 import org.andbootmgr.app.util.ConfigFile
 import org.andbootmgr.app.util.Toolkit
 import java.io.File
@@ -487,7 +487,58 @@ private fun PartTool(vm: MainActivityState) {
 	var editPartID: SDUtils.Partition? by remember { mutableStateOf(null) }
 	var editEntryID: ConfigFile? by remember { mutableStateOf(null) }
 	if (filterUnifiedView) {
-		Text("TODO") //TODO
+		var i = 0
+		while (i < parts!!.s.size) {
+			var found = false
+			if (parts!!.s[i].type != SDUtils.PartitionType.FREE) {
+				for (e in entries.keys) {
+					if (e.has("xpart") && e["xpart"] != null && !e["xpart"]!!.isBlank()) {
+						for (j in e["xpart"]!!.split(":")) {
+							if ("${parts!!.s[i].id}" == j) {
+								found = true
+								Row(horizontalArrangement = Arrangement.SpaceEvenly,
+									verticalAlignment = Alignment.CenterVertically,
+									modifier = Modifier
+										.fillMaxWidth()
+										.clickable { editEntryID = e }) {
+									Text(
+										if (e.has("title")) {
+											"Entry \"${e["title"]}\""
+										} else {
+											"(Invalid entry)"
+										}
+									)
+								}
+								while (e["xpart"]!!.split(":").contains("${parts!!.s[i].id}")) {
+									if (i + 1 == parts!!.s.size) break
+									if (!e["xpart"]!!.split(":").contains("${parts!!.s[++i].id}")) {
+										i--; break
+									}
+								}
+								break
+							}
+						}
+					}
+					if (found) break
+				}
+			}
+			if (!found) {
+				val p = parts!!.s[i]
+				Row(horizontalArrangement = Arrangement.SpaceEvenly,
+					verticalAlignment = Alignment.CenterVertically,
+					modifier = Modifier
+						.fillMaxWidth()
+						.clickable { editPartID = p }) {
+					Text(
+						if (p.type == SDUtils.PartitionType.FREE)
+							"Free space (${p.sizeFancy})"
+						else
+							"Partition ${p.id} \"${p.name}\""
+					)
+				}
+			}
+			i++
+		}
 	}
 	if (filterPartView) {
 		for (p in parts!!.s) {
@@ -571,10 +622,11 @@ private fun PartTool(vm: MainActivityState) {
 						SDUtils.PartitionType.DATA -> "OS user data"
 					}
 					if (p.type != SDUtils.PartitionType.FREE)
-						Text("Id: ${p.id} (${parts?.major}:${p.minor})")
-					Text("Type: ${fancyType}${if (p.type != SDUtils.PartitionType.FREE) " (code ${p.code})" else ""}")
-					Text("Size: ${p.sizeFancy} (${p.size} sectors)")
-					Text("Position: ${p.startSector} -> ${p.endSector}")
+						Text("Id: ${p.id}${if (!filterUnifiedView) " (${parts?.major}:${p.minor})" else ""}")
+					Text("Type: ${fancyType}${if (p.type != SDUtils.PartitionType.FREE && !filterUnifiedView) " (code ${p.code})" else ""}")
+					Text("Size: ${p.sizeFancy}${if (!filterUnifiedView) "  (${p.size} sectors)" else ""}")
+					if (!filterUnifiedView)
+						Text("Position: ${p.startSector} -> ${p.endSector}")
 					if (p.type != SDUtils.PartitionType.FREE) {
 						Row {
 							Button(onClick = {
@@ -588,24 +640,26 @@ private fun PartTool(vm: MainActivityState) {
 								Text("Delete")
 							}
 						}
-						Row {
-							Button(onClick = {
-								processing = true
-								Shell.cmd(p.mount()).submit {
-									processing = false
-									result = it.out.join("\n") + it.err.join("\n")
+						if (!filterUnifiedView) {
+							Row {
+								Button(onClick = {
+									processing = true
+									Shell.cmd(p.mount()).submit {
+										processing = false
+										result = it.out.join("\n") + it.err.join("\n")
+									}
+								}, Modifier.padding(end = 5.dp)) {
+									Text("Mount")
 								}
-							}, Modifier.padding(end = 5.dp)) {
-								Text("Mount")
-							}
-							Button(onClick = {
-								processing = true
-								Shell.cmd(p.unmount()).submit {
-									processing = false
-									result = it.out.join("\n") + it.err.join("\n")
+								Button(onClick = {
+									processing = true
+									Shell.cmd(p.unmount()).submit {
+										processing = false
+										result = it.out.join("\n") + it.err.join("\n")
+									}
+								}) {
+									Text("Unmount")
 								}
-							}) {
-								Text("Unmount")
 							}
 						}
 						Button(onClick = { vm.startBackupAndRestoreFlow(p) }) {
@@ -704,7 +758,7 @@ private fun PartTool(vm: MainActivityState) {
 			)
 		}
 	}
-	if (editEntryID != null) {
+	if (editEntryID != null && !filterUnifiedView) {
 		val ctx = LocalContext.current
 		val fn = Regex("[0-9a-zA-Z]+\\.conf")
 		val ascii = Regex("\\A\\p{ASCII}+\\z")
@@ -833,6 +887,14 @@ private fun PartTool(vm: MainActivityState) {
 							}
 						}
 						entries[e] = f!!
+						e["title"] = titleT
+						e["linux"] = linuxT
+						e["initrd"] = initrdT
+						e["dtb"] = dtbT
+						e["options"] = optionsT
+						e["xtype"] = xtypeT
+						e["xpart"] = xpartT
+						e["xupdate"] = xupdateT
 						e.exportToFile(f!!)
 						editEntryID = null
 					}, enabled = isOk
@@ -847,6 +909,71 @@ private fun PartTool(vm: MainActivityState) {
 				}
 			}
 		)
+	} else if (editEntryID != null && filterUnifiedView) {
+		val e = editEntryID!!
+		AlertDialog(
+			onDismissRequest = {
+				editEntryID = null
+			},
+			title = {
+				Text(text = if (e.has("title")) "\"${e["title"]}\"" else "Invalid entry")
+			},
+			icon = {
+				Icon(painterResource(id = R.drawable.ic_roms), "Icon")
+			},
+			text = {
+				Column(Modifier.verticalScroll(rememberScrollState())) {
+					Button(
+						onClick = {
+							//TODO: implement this
+						}) {
+						Text("Update")
+					}
+					Button(
+						onClick = {
+							delete = true
+						}) {
+						Text("Delete")
+					}
+				}
+			},
+			confirmButton = {
+				Button(
+					onClick = {
+						editEntryID = null
+					}) {
+					Text("Cancel")
+				}
+			}
+		)
+
+		if (delete) {
+			AlertDialog(
+				onDismissRequest = {
+					delete = false
+				},
+				title = {
+					Text("Delete")
+				},
+				text = {
+					Text("Do you REALLY want to delete this operating system and loose ALL it's data?")
+				},
+				dismissButton = {
+					Button(onClick = { delete = false }) {
+						Text("Cancel")
+					}
+				},
+				confirmButton = {
+					Button(onClick = {
+						processing = true
+						delete = false
+						//TODO: implement this: delete parts, entry, bootset files
+					}) {
+						Text("Delete")
+					}
+				}
+			)
+		}
 	}
 	if (processing) {
 		AlertDialog(

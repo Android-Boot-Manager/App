@@ -28,7 +28,7 @@ import androidx.navigation.compose.rememberNavController
 import com.topjohnwu.superuser.io.SuFileOutputStream
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.andbootmgr.app.ui.theme.AbmTheme
+import org.andbootmgr.app.util.AbmTheme
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
