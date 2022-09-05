@@ -144,6 +144,7 @@ private class CreatePartDataHolder(val vm: WizardActivityState): ProgressListene
 	val inetAvailable = HashMap<String, String>()
 	val inetDesc = HashMap<String, String>()
 	val idNeeded = mutableStateListOf<String>()
+	val idUnneeded = mutableStateListOf<String>()
 	val chosen = mutableStateMapOf<String, DledFile>()
 	val client = OkHttpClient().newBuilder().readTimeout(1L, TimeUnit.HOURS).addNetworkInterceptor {
 		val originalResponse: Response = it.proceed(it.request())
@@ -152,6 +153,7 @@ private class CreatePartDataHolder(val vm: WizardActivityState): ProgressListene
 			.build()
 	}.build()
 	var pl: ProgressListener? = null
+	var cl: (() -> Unit)? = null
 	lateinit var t2: MutableState<String>
 	val t3 = mutableStateOf("")
 	var availableSize: Long = 0
@@ -172,6 +174,7 @@ private class CreatePartDataHolder(val vm: WizardActivityState): ProgressListene
 
 	fun onStartDlPage() {
 		idNeeded.addAll(idVals)
+		idNeeded.removeAll(idUnneeded)
 	}
 
 	@SuppressLint("ComposableNaming")
@@ -328,6 +331,7 @@ private fun Shop(c: CreatePartDataHolder) {
 			inetAvailable["sfos"] = "https://gitlab.com/sailfishos-porters-ci/yggdrasil-ci/-/jobs/2114113029/artifacts/raw/sfe-yggdrasil/Sailfish_OS/sailfish.img001"
 			inetDesc["sfos"] = "Sailfish OS system image"
 			addDefault(100L, 1, "8302", "sfos", true)
+			//idUnneeded.add("sfos") not needed for sfos, but needed for ut data which cant be flashed with img
 			inetAvailable["boot"] = "https://gitlab.com/sailfishos-porters-ci/yggdrasil-ci/-/jobs/2114113029/artifacts/raw/sfe-yggdrasil/Sailfish_OS/hybris-boot.img"
 			inetDesc["boot"] = "Boot image"
 			idNeeded.add("boot")
@@ -667,7 +671,11 @@ private fun Download(c: CreatePartDataHolder) {
 		if (downloading) {
 			AlertDialog(
 				onDismissRequest = {},
-				confirmButton = {},
+				confirmButton = {
+					Button(onClick = { c.cl?.invoke() }) {
+						Text("Cancel")
+					}
+				},
 				title = { Text("Downloading...") },
 				text = {
 					Row(verticalAlignment = Alignment.CenterVertically) {
@@ -702,32 +710,39 @@ private fun Download(c: CreatePartDataHolder) {
 						if (inet) {
 							Button(onClick = {
 								downloading = true
-								Thread {
-									c.pl = object : ProgressListener {
-										override fun update(
-											bytesRead: Long,
-											contentLength: Long,
-											done: Boolean
-										) {
-											c.vm.activity.runOnUiThread {
-												progressText =
-													SOUtils.humanReadableByteCountBin(bytesRead) + " of " + SOUtils.humanReadableByteCountBin(
-														contentLength
-													) + " downloaded"
-											}
-										}
+								progressText = "(Connecting...)"
+								c.pl = object : ProgressListener {
+									override fun update(
+										bytesRead: Long,
+										contentLength: Long,
+										done: Boolean
+									) {
+										progressText =
+											SOUtils.humanReadableByteCountBin(bytesRead) + " of " + SOUtils.humanReadableByteCountBin(
+												contentLength
+											) + " downloaded"
 									}
+								}
+								Thread {
 									try {
 										val downloadedFile = File(c.vm.logic.cacheDir, i)
 										val request =
 											Request.Builder().url(c.inetAvailable[i]!!).build()
-										val response = c.client.newCall(request).execute()
+										val call = c.client.newCall(request)
+										val response = call.execute()
+
+										c.cl = {
+											call.cancel()
+											downloadedFile.delete()
+											downloading = false
+										}
 
 										val sink = downloadedFile.sink().buffer()
 										sink.writeAll(response.body!!.source())
 										sink.close()
 
-										c.chosen[i] = DledFile(null, downloadedFile)
+										if (!call.isCanceled())
+											c.chosen[i] = DledFile(null, downloadedFile)
 									} catch (e: Exception) {
 										Log.e("ABM", Log.getStackTraceString(e))
 										c.vm.activity.runOnUiThread {
@@ -797,27 +812,21 @@ private fun Flash(c: CreatePartDataHolder) {
 					return
 				}
 
-				terminal.add("-- Patching boot image...")
-				val boot = c.chosen["boot"]!!.toFile(vm)
-				var cmd = File(c.vm.logic.assetDir, "Scripts/add_os/${c.vm.deviceInfo!!.codename}/${c.shName}").absolutePath + " $fn ${boot.absolutePath}"
-				for (i in parts) {
-					cmd += " " + i.value
-				}
-				val result = Shell.cmd(cmd).to(terminal).exec()
-				if (!result.isSuccess) {
-					terminal.add("-- FAILURE!")
-					return
-				}
-
 				terminal.add("-- Flashing images...")
 				for (i in c.idVals) {
+					if (c.idUnneeded.contains(i)) continue
 					val j = c.idVals.indexOf(i)
 					terminal.add("Flashing $i")
 					val f = c.chosen[i]!!
-					val tp = File(c.vm.deviceInfo.pbdev + parts[j])
+					val tp = File(c.vm.deviceInfo!!.pbdev + parts[j])
 					if (c.sparseVals[j]) {
 						val f2 = f.toFile(c.vm)
-						val result2 = Shell.cmd(File(c.vm.logic.assetDir, "Toolkit/simg2img").absolutePath + " ${f2.absolutePath} ${tp.absolutePath}").exec()
+						val result2 = Shell.cmd(
+							File(
+								c.vm.logic.assetDir,
+								"Toolkit/simg2img"
+							).absolutePath + " ${f2.absolutePath} ${tp.absolutePath}"
+						).exec()
 						if (!result2.isSuccess) {
 							terminal.add("-- FAILURE!")
 							return
@@ -829,14 +838,27 @@ private fun Flash(c: CreatePartDataHolder) {
 					terminal.add("Done.")
 				}
 
+				terminal.add("-- Patching operating system...")
+				val boot = c.chosen["boot"]!!.toFile(vm)
+				var cmd = File(
+					c.vm.logic.assetDir,
+					"Scripts/add_os/${c.vm.deviceInfo!!.codename}/${c.shName}"
+				).absolutePath + " $fn ${boot.absolutePath}"
+				for (i in parts) {
+					cmd += " " + i.value
+				}
+				val result = Shell.cmd(cmd).to(terminal).exec()
+				if (!result.isSuccess) {
+					terminal.add("-- FAILURE!")
+					return
+				}
+
 				terminal.add("-- Done, try it out :)")
-				vm.activity.runOnUiThread {
-					vm.btnsOverride = true
-					vm.nextText.value = "Finish"
-					vm.onNext.value = {
-						it.startActivity(Intent(it, MainActivity::class.java))
-						it.finish()
-					}
+				vm.btnsOverride = true
+				vm.nextText.value = "Finish"
+				vm.onNext.value = {
+					it.startActivity(Intent(it, MainActivity::class.java))
+					it.finish()
 				}
 			}
 
@@ -873,9 +895,7 @@ private fun Flash(c: CreatePartDataHolder) {
 							makeOne(it + 1)
 						} else {
 							terminal.add("-- Created partition layout.")
-							Thread {
-								installMore()
-							}.start()
+							installMore()
 						}
 					} else {
 						terminal.add("-- Failure.")
@@ -888,22 +908,27 @@ private fun Flash(c: CreatePartDataHolder) {
 			makeOne(0)
 		} else { // Portable partition
 			terminal.add("-- Creating partition...")
-			val r = Shell.cmd(SDUtils.umsd(c.meta!!) + " && " + c.p.create(c.l.toLong(), c.u.toLong(), "0700", c.t!!)).to(terminal).exec()
+			val r = Shell.cmd(
+				SDUtils.umsd(c.meta!!) + " && " + c.p.create(
+					c.l.toLong(),
+					c.u.toLong(),
+					"0700",
+					c.t!!
+				)
+			).to(terminal).exec()
 			if (r.out.join("\n").contains("old")) {
 				terminal.add("-- Please reboot AS SOON AS POSSIBLE!!!")
 			}
 			if (r.isSuccess) {
-				terminal.add("-- Done.")
-			} else {
-				terminal.add("-- Failure.")
-			}
-			vm.activity.runOnUiThread {
 				vm.btnsOverride = true
 				vm.nextText.value = "Finish"
 				vm.onNext.value = {
 					it.startActivity(Intent(it, MainActivity::class.java))
 					it.finish()
 				}
+				terminal.add("-- Done.")
+			} else {
+				terminal.add("-- Failure.")
 			}
 		}
 	}
