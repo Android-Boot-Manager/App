@@ -856,55 +856,53 @@ private fun Flash(c: CreatePartDataHolder) {
 					(BigDecimal(c.p.size - (offset + c.f)).multiply(BigDecimal(b).divide(BigDecimal(100)))).toLong()
 				}
 
-				Shell.cmd(SDUtils.umsd(c.meta!!) + " && " + c.p.create(offset, offset + k, code, "")).to(terminal).submit { r ->
-					try {
-						if (r.out.join("\n").contains("old")) {
-							terminal.add("-- Please reboot AS SOON AS POSSIBLE!!!") //TODO fix always appearing
-						}
-						parts[it] = c.meta!!.nid.toString()
-						c.meta = SDUtils.generateMeta(c.vm.deviceInfo!!.bdev, c.vm.deviceInfo.pbdev)
-						if (it + 1 < c.count.value) {
-							c.p = c.meta!!.s.find { it1 -> (offset + k) < it1.startSector } as SDUtils.Partition.FreeSpace
-						}
-						if (r.isSuccess) {
-							terminal.add("Created partition.")
-							offset = 0L
-							if (it + 1 < c.count.value) {
-								makeOne(it + 1)
-							} else {
-								terminal.add("-- Created partition layout.")
-								Thread {
-									installMore()
-								}.start()
-							}
-						} else {
-							terminal.add("-- Failure.")
-						}
-					} catch (e: Exception) {
-						terminal.add("-- FAILURE --")
-						terminal.add(Log.getStackTraceString(e))
+				val r = Shell.cmd(SDUtils.umsd(c.meta!!) + " && " + c.p.create(offset, offset + k, code, "")).to(terminal).exec()
+				try {
+					if (r.out.join("\n").contains("old")) {
+						terminal.add("-- Please reboot AS SOON AS POSSIBLE!!!")
 					}
+					parts[it] = c.meta!!.nid.toString()
+					c.meta = SDUtils.generateMeta(c.vm.deviceInfo!!.bdev, c.vm.deviceInfo.pbdev)
+					if (it + 1 < c.count.value) {
+						c.p = c.meta!!.s.find { it1 -> (offset + k) < it1.startSector } as SDUtils.Partition.FreeSpace
+					}
+					if (r.isSuccess) {
+						terminal.add("Created partition.")
+						offset = 0L
+						if (it + 1 < c.count.value) {
+							makeOne(it + 1)
+						} else {
+							terminal.add("-- Created partition layout.")
+							Thread {
+								installMore()
+							}.start()
+						}
+					} else {
+						terminal.add("-- Failure.")
+					}
+				} catch (e: Exception) {
+					terminal.add("-- FAILURE --")
+					terminal.add(Log.getStackTraceString(e))
 				}
 			}
 			makeOne(0)
 		} else { // Portable partition
 			terminal.add("-- Creating partition...")
-			Shell.cmd(SDUtils.umsd(c.meta!!) + " && " + c.p.create(c.l.toLong(), c.u.toLong(), "0700", c.t!!)).to(terminal).submit { r ->
-				if (r.out.join("\n").contains("old")) {
-					terminal.add("-- Please reboot AS SOON AS POSSIBLE!!!")
-				}
-				if (r.isSuccess) {
-					terminal.add("-- Done.")
-				} else {
-					terminal.add("-- Failure.")
-				}
-				vm.activity.runOnUiThread {
-					vm.btnsOverride = true
-					vm.nextText.value = "Finish"
-					vm.onNext.value = {
-						it.startActivity(Intent(it, MainActivity::class.java))
-						it.finish()
-					}
+			val r = Shell.cmd(SDUtils.umsd(c.meta!!) + " && " + c.p.create(c.l.toLong(), c.u.toLong(), "0700", c.t!!)).to(terminal).exec()
+			if (r.out.join("\n").contains("old")) {
+				terminal.add("-- Please reboot AS SOON AS POSSIBLE!!!")
+			}
+			if (r.isSuccess) {
+				terminal.add("-- Done.")
+			} else {
+				terminal.add("-- Failure.")
+			}
+			vm.activity.runOnUiThread {
+				vm.btnsOverride = true
+				vm.nextText.value = "Finish"
+				vm.onNext.value = {
+					it.startActivity(Intent(it, MainActivity::class.java))
+					it.finish()
 				}
 			}
 		}
