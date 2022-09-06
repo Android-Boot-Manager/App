@@ -29,7 +29,6 @@ import okio.*
 import org.andbootmgr.app.util.AbmTheme
 import org.andbootmgr.app.util.ConfigFile
 import org.andbootmgr.app.util.SOUtils
-import org.json.JSONArray
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
@@ -187,6 +186,14 @@ private class CreatePartDataHolder(val vm: WizardActivityState): ProgressListene
 		meta = SDUtils.generateMeta(vm.deviceInfo!!.bdev, vm.deviceInfo.pbdev)
 		(meta?.s?.find { vm.activity.intent.getLongExtra("part_sid", -1L) == it.startSector } as SDUtils.Partition.FreeSpace?)?.also { p = it }
 	}
+
+	fun painterFromRtype(type: String): @Composable () -> Painter {
+		val id = when (type) {
+			// TODO: implement this
+			else -> R.drawable.ic_sailfish_os_logo
+		}
+		return (@Composable { painterResource(id = id) })
+	}
 }
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
@@ -320,92 +327,87 @@ private fun Start(c: CreatePartDataHolder) {
 
 @Composable
 private fun Shop(c: CreatePartDataHolder) {
-	var downloading by remember { mutableStateOf(true) }
-	var json: JSONObject? by remember { mutableStateOf(null)};
-	var selected by remember { mutableStateOf(-1)};
+ 	var json: JSONObject? by remember { mutableStateOf(null)}
 	LaunchedEffect(Unit) {
 		c.run {
-			//TODO: Load from .dma
 			Thread {
-				var json_text =
+				val json_text =
 					URL("https://raw.githubusercontent.com/Android-Boot-Manager/ABM-json/master/devices/" + c.vm.codename + ".json").readText()
 				json = JSONTokener(json_text).nextValue() as JSONObject
-				Log.i("ABM shop:", json_text)
-				downloading=false
-			}.start()
+				//Log.i("ABM shop:", json_text)
+ 			}.start()
 		}
 	}
-	if(!downloading) {
+	if (json != null) {
 //		Text("This is an ABM Store, please select OS you wish to install.")
 		Log.i("ABM shop:", "Found: ${json!!.getJSONArray("oses").length()} oses")
-		var i =0;
-		while(i<json!!.getJSONArray("oses").length()){
+		var i = 0
+		while(i < json!!.getJSONArray("oses").length()) {
 			val index = i
 			Row(horizontalArrangement = Arrangement.SpaceEvenly,
 				verticalAlignment = Alignment.CenterVertically,
 				modifier = Modifier
 					.fillMaxWidth()
-					.clickable {selected=index}) {
-				var painter = @Composable { painterResource(id = R.drawable.ic_sailfish_os_logo) }
-				Icon(painter =painter(), contentDescription = "OS logo")
-				Text(json!!.getJSONArray("oses").getJSONObject(i).getString("displayname"))
+					.clickable {
+						//Log.i("ABM shop:", "Selected OS: $index")
+						c.run {
+							val o = json!!.getJSONArray("oses").getJSONObject(index)
+							dmaMeta["name"] =
+								o.getString("displayname")
+							dmaMeta["creator"] = o.getString("creator")
+							dmaMeta["updateJson"] = o.getString("updateJson")
+							rtype = o.getString("rtype")
+							cmdline =
+								o.getString("cmdline")
+							shName = o.getString("scriptname")
+							i = 0
+							val partitionParams = o.getJSONArray("partitions")
+							while (i < partitionParams.length()){
+								val l = partitionParams.getJSONObject(i)
+								addDefault(l.getLong("size"),
+									if (l.getBoolean("isPercent")){
+										1
+									} else {
+										0
+									},
+									l.getString("type"),
+									l.getString("id"),
+									l.getBoolean("needUnsparse"))
+								i++
+							}
+							i = 0
+							val inets = o.getJSONArray("inet")
+							while (i < inets.length()){
+								val l = inets.getJSONObject(i)
+								val li = l.getString("id")
+								inetAvailable[li] = l.getString("url")
+								inetDesc[li] = l.getString("desc")
+								i++
+							}
+							i = 0
+							val extraIdNeeded = o.getJSONArray("extraIdNeeded")
+							while (i < extraIdNeeded.length()){
+								idNeeded.add(extraIdNeeded.get(i) as String)
+								i++
+							}
+							i = 0
+							val blockIdNeeded = o.getJSONArray("blockIdNeeded")
+							while (i < blockIdNeeded.length()){
+								idUnneeded.add(blockIdNeeded.get(i) as String)
+								i++
+							}
+
+							painter = painterFromRtype(rtype)
+						}
+						c.vm.navigate("os")
+					}) {
+				val l = json!!.getJSONArray("oses").getJSONObject(i)
+				val painter = c.painterFromRtype(l.getString("rtype"))
+				Icon(painter = painter(), contentDescription = "OS logo")
+				Text(l.getString("displayname"))
 			}
 			i++
 		}
-
-		if(selected!=-1){
-			Log.i("ABM shop:", "Selected Os: $selected")
-			c.run {
-				dmaMeta["name"] =
-					json!!.getJSONArray("oses").getJSONObject(selected).getString("displayname")
-				dmaMeta["creator"] = json!!.getJSONArray("oses").getJSONObject(selected).getString("creator")
-				dmaMeta["updateJson"] = json!!.getJSONArray("oses").getJSONObject(selected).getString("updateJson")
-				painter = @Composable { painterResource(id = R.drawable.ic_sailfish_os_logo) }
-				rtype = json!!.getJSONArray("oses").getJSONObject(selected).getString("rtype")
-				cmdline =
-					json!!.getJSONArray("oses").getJSONObject(selected).getString("cmdline")
-				shName = json!!.getJSONArray("oses").getJSONObject(selected).getString("scriptname")
-				i=0
-				val partitions_params = json!!.getJSONArray("oses").getJSONObject(selected).getJSONArray("partitions")
-				while(i<json!!.getJSONArray("oses").getJSONObject(selected).getJSONArray("partitions").length()){
-					var isPercent = if(partitions_params.getJSONObject(i).getBoolean("isPercent")){
-						1
-					} else {
-						0
-					}
-					addDefault(partitions_params.getJSONObject(i).getLong("size"),
-						isPercent,
-						partitions_params.getJSONObject(i).getString("type"),
-						partitions_params.getJSONObject(i).getString("id"),
-						partitions_params.getJSONObject(i).getBoolean("needUnsparse"))
-					i++
-				}
-				i=0
-				val inets = json!!.getJSONArray("oses").getJSONObject(selected).getJSONArray("inet")
-				while(i<json!!.getJSONArray("oses").getJSONObject(selected).getJSONArray("inet").length()){
-					inetAvailable[inets.getJSONObject(i).getString("id")] = inets.getJSONObject(i).getString("url")
-					inetDesc[inets.getJSONObject(i).getString("id")] = inets.getJSONObject(i).getString("desc")
-					i++
-				}
-				i=0
-				val extraIdNeeded = json!!.getJSONArray("oses").getJSONObject(selected).getJSONArray("extraIdNeeded")
-				while(i<json!!.getJSONArray("oses").getJSONObject(selected).getJSONArray("extraIdNeeded").length()){
-					idNeeded.add(extraIdNeeded.get(i) as String)
-					i++
-				}
-				i=0
-				val blockIdNeeded = json!!.getJSONArray("oses").getJSONObject(selected).getJSONArray("blockIdNeeded")
-				while(i<json!!.getJSONArray("oses").getJSONObject(selected).getJSONArray("blockIdNeeded").length()){
-					idUnneeded.add(blockIdNeeded.get(i) as String)
-					i++
-				}
-			}
-			c.vm.navigate("os")
-
-		}
-		/*c.vm.btnsOverride = true
-		c.vm.nextText.value = "Next"
-		c.vm.onNext.value = { c.vm.navigate("os")*/
 	}
 }
 
