@@ -202,6 +202,7 @@ private fun Start(c: CreatePartDataHolder) {
 	if (c.meta == null) {
 		c.lateInit()
 	}
+	val ctx = LocalContext.current
 
 	// Material3 colors for old RangeSlider
 	val i = SliderDefaults.colors()
@@ -262,6 +263,23 @@ private fun Start(c: CreatePartDataHolder) {
 
 					Text("Approximate size: " + if (!e) SOUtils.humanReadableByteCountBin((u.toLong() - l.toLong()) * c.meta!!.logicalSectorSizeBytes) else "(invalid input)")
 					Text("Available space: ${c.p.sizeFancy} (${c.p.size} sectors)")
+				}
+			}
+		}
+
+		if (remember { ctx.getSharedPreferences("abm", 0).getBoolean("noob_mode", BuildConfig.DEFAULT_NOOB_MODE) }) {
+			Card(
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(10.dp)
+			) {
+				Row(
+					Modifier
+						.fillMaxWidth()
+						.padding(20.dp)
+				) {
+					Icon(painterResource(id = R.drawable.ic_about), "Icon")
+					Text("Please select one of the below options.")
 				}
 			}
 		}
@@ -339,75 +357,84 @@ private fun Shop(c: CreatePartDataHolder) {
 		}
 	}
 	if (json != null) {
-		Column() {
-			Text("This is an ABM Store, please select OS you wish to install.")
-		Log.i("ABM shop:", "Found: ${json!!.getJSONArray("oses").length()} oses")
-		var i = 0
-		while(i < json!!.getJSONArray("oses").length()) {
-			val index = i
-			Row(horizontalArrangement = Arrangement.SpaceEvenly,
-				verticalAlignment = Alignment.CenterVertically,
-				modifier = Modifier
-					.clickable {
-						//Log.i("ABM shop:", "Selected OS: $index")
-						c.run {
-							val o = json!!.getJSONArray("oses").getJSONObject(index)
-							dmaMeta["name"] =
-								o.getString("displayname")
-							dmaMeta["creator"] = o.getString("creator")
-							dmaMeta["updateJson"] = o.getString("updateJson")
-							rtype = o.getString("rtype")
-							cmdline =
-								o.getString("cmdline")
-							shName = o.getString("scriptname")
-							i = 0
-							val partitionParams = o.getJSONArray("partitions")
-							while (i < partitionParams.length()){
-								val l = partitionParams.getJSONObject(i)
-								addDefault(l.getLong("size"),
-									if (l.getBoolean("isPercent")){
-										1
-									} else {
-										0
-									},
-									l.getString("type"),
-									l.getString("id"),
-									l.getBoolean("needUnsparse"))
-								i++
-							}
-							i = 0
-							val inets = o.getJSONArray("inet")
-							while (i < inets.length()){
-								val l = inets.getJSONObject(i)
-								val li = l.getString("id")
-								inetAvailable[li] = l.getString("url")
-								inetDesc[li] = l.getString("desc")
-								i++
-							}
-							i = 0
-							val extraIdNeeded = o.getJSONArray("extraIdNeeded")
-							while (i < extraIdNeeded.length()){
-								idNeeded.add(extraIdNeeded.get(i) as String)
-								i++
-							}
-							i = 0
-							val blockIdNeeded = o.getJSONArray("blockIdNeeded")
-							while (i < blockIdNeeded.length()){
-								idUnneeded.add(blockIdNeeded.get(i) as String)
-								i++
-							}
-
-							painter = painterFromRtype(rtype)
-						}
-						c.vm.navigate("os")
-					}) {
-				val l = json!!.getJSONArray("oses").getJSONObject(i)
-				val painter = c.painterFromRtype(l.getString("rtype"))
-				Icon(painter = painter(), contentDescription = "OS logo")
-				Text(l.getString("displayname"))
+		Column {
+			Card {
+				Row(
+					Modifier
+						.fillMaxWidth()
+						.padding(20.dp)
+				) {
+					Icon(painterResource(id = R.drawable.ic_about), "Icon")
+					Text("Please select the operating system you wish to install.")
+				}
 			}
-			i++
-		}
+			//Log.i("ABM shop:", "Found: ${json!!.getJSONArray("oses").length()} oses")
+			var i = 0
+			while(i < json!!.getJSONArray("oses").length()) {
+				val index = i
+				Row(horizontalArrangement = Arrangement.SpaceEvenly,
+					verticalAlignment = Alignment.CenterVertically,
+					modifier = Modifier.fillMaxWidth()
+						.clickable {
+							//Log.i("ABM shop:", "Selected OS: $index")
+							c.run {
+								val o = json!!.getJSONArray("oses").getJSONObject(index)
+								dmaMeta["name"] =
+									o.getString("displayname")
+								dmaMeta["creator"] = o.getString("creator")
+								dmaMeta["updateJson"] = o.getString("updateJson")
+								rtype = o.getString("rtype")
+								cmdline =
+									o.getString("cmdline")
+								shName = o.getString("scriptname")
+								i = 0
+								val partitionParams = o.getJSONArray("partitions")
+								while (i < partitionParams.length()){
+									val l = partitionParams.getJSONObject(i)
+									addDefault(l.getLong("size"),
+										if (l.getBoolean("isPercent")){
+											1
+										} else {
+											0
+										},
+										l.getString("type"),
+										l.getString("id"),
+										l.getBoolean("needUnsparse"))
+									i++
+								}
+								i = 0
+								val inets = o.getJSONArray("inet")
+								while (i < inets.length()){
+									val l = inets.getJSONObject(i)
+									val li = l.getString("id")
+									inetAvailable[li] = l.getString("url")
+									inetDesc[li] = l.getString("desc")
+									i++
+								}
+								i = 0
+								val extraIdNeeded = o.getJSONArray("extraIdNeeded")
+								while (i < extraIdNeeded.length()){
+									idNeeded.add(extraIdNeeded.get(i) as String)
+									i++
+								}
+								i = 0
+								val blockIdNeeded = o.getJSONArray("blockIdNeeded")
+								while (i < blockIdNeeded.length()){
+									idUnneeded.add(blockIdNeeded.get(i) as String)
+									i++
+								}
+
+								painter = painterFromRtype(rtype)
+							}
+							c.vm.navigate("os")
+						}) {
+					val l = json!!.getJSONArray("oses").getJSONObject(i)
+					val painter = c.painterFromRtype(l.getString("rtype"))
+					Icon(painter = painter(), contentDescription = "OS logo")
+					Text(l.getString("displayname"))
+				}
+				i++
+			}
 		}
 	}
 }
@@ -473,7 +500,7 @@ private fun Os(c: CreatePartDataHolder) {
 		if (expanded == 1 || c.noobMode) {
 			Column(
 				Modifier
-					.fillMaxWidth()
+					.fillMaxWidth().padding(5.dp)
 			) {
 				var et2 by remember { mutableStateOf(false) }
 				var et3 by remember { mutableStateOf(false) }
@@ -759,7 +786,7 @@ private fun Download(c: CreatePartDataHolder) {
 				Column {
 					Text(i)
 					Text(
-						if (inet) c.inetDesc[i]!! else "User-selected",
+						if (c.inetDesc.containsKey(i)) c.inetDesc[i]!! else "User-selected",
 						color = MaterialTheme.colorScheme.onSurfaceVariant
 					)
 				}
