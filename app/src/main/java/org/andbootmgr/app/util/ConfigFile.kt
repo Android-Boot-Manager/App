@@ -35,6 +35,10 @@ class ConfigFile {
 		}
 	}
 
+	fun has(s: String): Boolean {
+		return data.containsKey(s)
+	}
+
 	companion object {
 		fun importFromString(s: String): ConfigFile {
 			val out = ConfigFile()

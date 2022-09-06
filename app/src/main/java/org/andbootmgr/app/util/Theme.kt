@@ -1,4 +1,4 @@
-package org.andbootmgr.app.ui.theme
+package org.andbootmgr.app.util
 
 import android.annotation.TargetApi
 import android.os.Build
@@ -23,7 +23,7 @@ fun AbmTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable ()
 
 	MaterialTheme(
 			colorScheme = colorScheme,
-			typography = Typography,
+			typography = Typography(),
 			content = content
 	)
 }

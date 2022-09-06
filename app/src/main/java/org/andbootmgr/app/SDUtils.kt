@@ -151,6 +151,10 @@ object SDUtils {
 					if (meta.nid == p.id) meta.nid++
 					meta.p.add(p)
 					meta.u.add(p)
+				} else if (o=="Found invalid GPT and valid MBR; converting MBR to GPT format"){
+					meta.ismbr=true
+				} else if(o=="***************************************************************" || o=="in memory. ") {
+
 				} else {
 					Log.e("ABM SDUtils", "can't handle $o")
 					return null
@@ -197,7 +201,7 @@ object SDUtils {
 	}
 
 	open class Partition(
-		val meta: SDPartitionMeta,
+		var meta: SDPartitionMeta,
 		val type: PartitionType,
 		val id: Int,
 		val startSector: Long,
@@ -284,6 +288,7 @@ object SDUtils {
 		var maxEntries = 0
 		var firstUsableSector: Long = 0
 		var lastUsableSector: Long = 0
+		var ismbr : Boolean = false
 		var alignSector: Long = 0
 		var totalFreeSectors: Long = 0
 		var totalFreeFancy: String? = null
@@ -320,6 +325,11 @@ object SDUtils {
 		// Get partition
 		fun dumpPartition(id: Int): Partition {
 			return p[id]
+		}
+
+		// Get partition by kernel id
+		fun dumpKernelPartition(id: Int): Partition {
+			return p.stream().filter { it.id == id }.findFirst().get()
 		}
 
 		// Count entries for partition wizard

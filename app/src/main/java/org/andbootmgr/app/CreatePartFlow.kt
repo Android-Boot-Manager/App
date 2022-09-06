@@ -1,5 +1,6 @@
 package org.andbootmgr.app
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
@@ -15,6 +16,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
@@ -23,7 +26,7 @@ import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
 import okhttp3.*
 import okio.*
-import org.andbootmgr.app.ui.theme.AbmTheme
+import org.andbootmgr.app.util.AbmTheme
 import org.andbootmgr.app.util.ConfigFile
 import org.andbootmgr.app.util.SOUtils
 import java.io.File
@@ -44,8 +47,13 @@ class CreatePartWizardPageFactory(private val vm: WizardActivityState) {
 			NavButton("") {}
 		) {
 			Start(c)
-		}, WizardPage("os",
+		}, WizardPage("shop",
 			NavButton("Prev") { it.navigate("start") },
+			NavButton("") {}
+		) {
+			Shop(c)
+		}, WizardPage("os",
+			NavButton("Prev") { it.navigate("shop") },
 			NavButton("Next") { it.navigate("dload") }
 		) {
 			Os(c)
@@ -120,7 +128,12 @@ private class CreatePartDataHolder(val vm: WizardActivityState): ProgressListene
 	lateinit var u: String
 	var f = 0L
 	var t: String? = null
+	var noobMode: Boolean = false
 
+	var painter: @Composable (() -> Painter)? = null
+	var rtype by mutableStateOf("")
+	var cmdline by mutableStateOf("")
+	var shName by mutableStateOf("")
 	val dmaMeta = ArrayMap<String, String>()
 	val count = mutableStateOf(0)
 	val intVals = mutableStateListOf<Long>()
@@ -131,6 +144,7 @@ private class CreatePartDataHolder(val vm: WizardActivityState): ProgressListene
 	val inetAvailable = HashMap<String, String>()
 	val inetDesc = HashMap<String, String>()
 	val idNeeded = mutableStateListOf<String>()
+	val idUnneeded = mutableStateListOf<String>()
 	val chosen = mutableStateMapOf<String, DledFile>()
 	val client = OkHttpClient().newBuilder().readTimeout(1L, TimeUnit.HOURS).addNetworkInterceptor {
 		val originalResponse: Response = it.proceed(it.request())
@@ -139,6 +153,7 @@ private class CreatePartDataHolder(val vm: WizardActivityState): ProgressListene
 			.build()
 	}.build()
 	var pl: ProgressListener? = null
+	var cl: (() -> Unit)? = null
 	lateinit var t2: MutableState<String>
 	val t3 = mutableStateOf("")
 	var availableSize: Long = 0
@@ -147,7 +162,8 @@ private class CreatePartDataHolder(val vm: WizardActivityState): ProgressListene
 		pl?.update(bytesRead, contentLength, done)
 	}
 
-	private fun addDefault(i: Long, sel: Int, code: String, id: String, needUnsparse: Boolean) {
+	fun addDefault(i: Long, sel: Int, code: String, id: String, needUnsparse: Boolean) {
+		if (idVals.contains(id)) return
 		count.value++
 		intVals.add(i)
 		selVals.add(sel)
@@ -158,28 +174,15 @@ private class CreatePartDataHolder(val vm: WizardActivityState): ProgressListene
 
 	fun onStartDlPage() {
 		idNeeded.addAll(idVals)
+		idNeeded.removeAll(idUnneeded)
 	}
 
+	@SuppressLint("ComposableNaming")
+	@Composable
 	fun lateInit() {
+		noobMode = LocalContext.current.getSharedPreferences("abm", 0).getBoolean("noob_mode", BuildConfig.DEFAULT_NOOB_MODE)
 		meta = SDUtils.generateMeta(vm.deviceInfo!!.bdev, vm.deviceInfo.pbdev)
 		(meta?.s?.find { vm.activity.intent.getLongExtra("part_sid", -1L) == it.startSector } as SDUtils.Partition.FreeSpace?)?.also { p = it }
-
-		//TODO: Load from .dma
-		dmaMeta["name"] = "Sailfish OS"
-		dmaMeta["creator"] = "ABM Open ROM Project"
-		t3.value = "Sailfish OS"
-		inetAvailable["vendor"] = "https://temp.nift4.org/vendor.img"
-		inetDesc["vendor"] = "VollaOS 10 vendor image"
-		addDefault(838860288L, 0, "8305", "vendor", false)
-		inetAvailable["system"] = "https://temp.nift4.org/system.img"
-		inetDesc["system"] = "VollaOS 10 system image"
-		addDefault(3758095872L, 0, "8305", "system", false)
-		inetAvailable["sfos"] = "https://gitlab.com/sailfishos-porters-ci/yggdrasil-ci/-/jobs/2114113029/artifacts/raw/sfe-yggdrasil/Sailfish_OS/sailfish.img001"
-		inetDesc["sfos"] = "Sailfish OS system image"
-		addDefault(100L, 1, "8302", "sfos", true)
-		inetAvailable["boot"] = "https://gitlab.com/sailfishos-porters-ci/yggdrasil-ci/-/jobs/2114113029/artifacts/raw/sfe-yggdrasil/Sailfish_OS/hybris-boot.img"
-		inetDesc["boot"] = "Boot image"
-		idNeeded.add("boot")
 	}
 }
 
@@ -302,7 +305,7 @@ private fun Start(c: CreatePartDataHolder) {
 						c.u = u
 						c.t = null
 						c.f = c.p.size - c.u.toLong()
-						c.vm.navigate("os")
+						c.vm.navigate("shop")
 					}) {
 						Text("Continue")
 					}
@@ -310,6 +313,39 @@ private fun Start(c: CreatePartDataHolder) {
 			}
 		}
 	}
+}
+
+@Composable
+private fun Shop(c: CreatePartDataHolder) {
+	LaunchedEffect(Unit) {
+		c.run {
+			//TODO: Load from .dma
+			dmaMeta["name"] = "Sailfish OS"
+			dmaMeta["creator"] = "ABM Open ROM Project"
+			dmaMeta["updateJson"] = "https//example.com/update.json"
+			inetAvailable["vendor"] = "https://temp.nift4.org/vendor.img"
+			inetDesc["vendor"] = "VollaOS 10 vendor image"
+			addDefault(838860288L, 0, "8305", "vendor", false)
+			inetAvailable["system"] = "https://temp.nift4.org/system.img"
+			inetDesc["system"] = "VollaOS 10 system image"
+			addDefault(3758095872L, 0, "8305", "system", false)
+			inetAvailable["sfos"] = "https://gitlab.com/sailfishos-porters-ci/yggdrasil-ci/-/jobs/2114113029/artifacts/raw/sfe-yggdrasil/Sailfish_OS/sailfish.img001"
+			inetDesc["sfos"] = "Sailfish OS system image"
+			addDefault(100L, 1, "8302", "sfos", true)
+			//idUnneeded.add("sfos") not needed for sfos, but needed for ut data which cant be flashed with img
+			inetAvailable["boot"] = "https://gitlab.com/sailfishos-porters-ci/yggdrasil-ci/-/jobs/2114113029/artifacts/raw/sfe-yggdrasil/Sailfish_OS/hybris-boot.img"
+			inetDesc["boot"] = "Boot image"
+			idNeeded.add("boot")
+			painter = @Composable { painterResource(id = R.drawable.ic_sailfish_os_logo) }
+			rtype = "SFOS"
+			cmdline = "bootopt=64S3,32N2,64N2 androidboot.selinux=permissive audit=0 loop.max_part=7"
+			shName = "add_sailfish.sh"
+		}
+	}
+	Text("This is an placeholder Store implementation that supplies SailfishOS. To continue, press Next.") //TODO: download .dma from github or smth
+	c.vm.btnsOverride = true
+	c.vm.nextText.value = "Next"
+	c.vm.onNext.value = { c.vm.navigate("os") }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -325,6 +361,7 @@ private fun Os(c: CreatePartDataHolder) {
 		a.sortWith(Comparator.comparingInt { c -> c.substring(3, c.length - 5).toInt() })
 		val b = if (a.size > 0) a.last().substring(3, a.last().length - 5).toInt() + 1 else 0
 		c.t2 = mutableStateOf("rom$b")
+		c.t3.value = c.dmaMeta["name"]!!
 	}
 
 	val s = rememberScrollState()
@@ -340,7 +377,7 @@ private fun Os(c: CreatePartDataHolder) {
 					.fillMaxWidth(),
 				horizontalAlignment = Alignment.CenterHorizontally
 			) {
-				Icon(painterResource(id = R.drawable.ic_sailfish_os_logo) /*TODO*/, contentDescription = "ROM logo", modifier = Modifier.size(256.dp))
+				Icon(c.painter!!(), contentDescription = "ROM logo", modifier = Modifier.size(256.dp))
 				Text(c.dmaMeta["name"]!!)
 				Text(c.dmaMeta["creator"]!!, color = MaterialTheme.colorScheme.onSurfaceVariant)
 				Card {
@@ -355,33 +392,35 @@ private fun Os(c: CreatePartDataHolder) {
 				}
 			}
 		}
-		Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier
-			.fillMaxWidth()
-			.padding(5.dp)
-			.clickable {
-				expanded = if (expanded == 1) 0 else 1
-			}) {
-			Text("Bootloader options")
-			if (expanded == 1) {
-				Icon(painterResource(id = R.drawable.ic_baseline_keyboard_arrow_up_24), "Close")
-			} else {
-				Icon(painterResource(id = R.drawable.ic_baseline_keyboard_arrow_down_24), "Expand")
+		if (!c.noobMode)
+			Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier
+				.fillMaxWidth()
+				.padding(5.dp)
+				.clickable {
+					expanded = if (expanded == 1) 0 else 1
+				}) {
+				Text("Bootloader options")
+				if (expanded == 1) {
+					Icon(painterResource(id = R.drawable.ic_baseline_keyboard_arrow_up_24), "Close")
+				} else {
+					Icon(painterResource(id = R.drawable.ic_baseline_keyboard_arrow_down_24), "Expand")
+				}
 			}
-		}
-		if (expanded == 1) {
+		if (expanded == 1 || c.noobMode) {
 			Column(
 				Modifier
 					.fillMaxWidth()
 			) {
 				var et2 by remember { mutableStateOf(false) }
 				var et3 by remember { mutableStateOf(false) }
-				TextField(value = c.t2.value, onValueChange = {
-					c.t2.value = it
-					et2 = !(c.t2.value.matches(Regex("\\A\\p{ASCII}*\\z")))
-					e = et2 || et3
-				}, isError = et2, label = {
-					Text("ROM internal ID (don't touch if unsure)")
-				})
+				if (!c.noobMode)
+					TextField(value = c.t2.value, onValueChange = {
+						c.t2.value = it
+						et2 = !(c.t2.value.matches(Regex("\\A\\p{ASCII}*\\z")))
+						e = et2 || et3
+					}, isError = et2, label = {
+						Text("ROM internal ID (don't touch if unsure)")
+					})
 				TextField(value = c.t3.value, onValueChange = {
 					c.t3.value = it
 					et3 = !(c.t3.value.matches(Regex("\\A\\p{ASCII}*\\z")))
@@ -391,19 +430,20 @@ private fun Os(c: CreatePartDataHolder) {
 				})
 			}
 		}
-		Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier
-			.fillMaxWidth()
-			.padding(5.dp)
-			.clickable {
-				expanded = if (expanded == 2) 0 else 2
-			}) {
-			Text("Partition layout (advanced users)")
-			if (expanded == 2) {
-				Icon(painterResource(id = R.drawable.ic_baseline_keyboard_arrow_up_24), "Close")
-			} else {
-				Icon(painterResource(id = R.drawable.ic_baseline_keyboard_arrow_down_24), "Expand")
+		if (!c.noobMode)
+			Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier
+				.fillMaxWidth()
+				.padding(5.dp)
+				.clickable {
+					expanded = if (expanded == 2) 0 else 2
+				}) {
+				Text("Partition layout (advanced users)")
+				if (expanded == 2) {
+					Icon(painterResource(id = R.drawable.ic_baseline_keyboard_arrow_up_24), "Close")
+				} else {
+					Icon(painterResource(id = R.drawable.ic_baseline_keyboard_arrow_down_24), "Expand")
+				}
 			}
-		}
 		if (expanded == 2) {
 			Column(
 				Modifier
@@ -582,6 +622,7 @@ private class DledFile(val safFile: Uri?, val netFile: File?) {
 	fun delete() {
 		netFile?.delete()
 	}
+
 	fun openInputStream(vm: WizardActivityState): InputStream {
 		netFile?.let {
 			return FileInputStream(it)
@@ -594,6 +635,7 @@ private class DledFile(val safFile: Uri?, val netFile: File?) {
 		}
 		throw IllegalStateException("invalid DledFile OR failure")
 	}
+
 	fun toFile(vm: WizardActivityState): File {
 		netFile?.let { return it }
 		safFile?.let {
@@ -609,7 +651,6 @@ private class DledFile(val safFile: Uri?, val netFile: File?) {
 	}
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Download(c: CreatePartDataHolder) {
 	LaunchedEffect(Unit) {
@@ -629,12 +670,20 @@ private fun Download(c: CreatePartDataHolder) {
 		var downloading by remember { mutableStateOf(false) }
 		var progressText by remember { mutableStateOf("(Connecting...)") }
 		if (downloading) {
-			AlertDialog(onDismissRequest = {}, confirmButton = {}, title = { Text("Downloading...") }, text = {
-				Row(verticalAlignment = Alignment.CenterVertically) {
-					CircularProgressIndicator(Modifier.padding(end = 10.dp))
-					Text(progressText)
-				}
-			})
+			AlertDialog(
+				onDismissRequest = {},
+				confirmButton = {
+					Button(onClick = { c.cl?.invoke() }) {
+						Text("Cancel")
+					}
+				},
+				title = { Text("Downloading...") },
+				text = {
+					Row(verticalAlignment = Alignment.CenterVertically) {
+						CircularProgressIndicator(Modifier.padding(end = 10.dp))
+						Text(progressText)
+					}
+				})
 		}
 		for (i in c.idNeeded) {
 			val inet = c.inetAvailable.containsKey(i)
@@ -645,7 +694,10 @@ private fun Download(c: CreatePartDataHolder) {
 			) {
 				Column {
 					Text(i)
-					Text(if (inet) c.inetDesc[i]!! else "User-selected", color = MaterialTheme.colorScheme.onSurfaceVariant)
+					Text(
+						if (inet) c.inetDesc[i]!! else "User-selected",
+						color = MaterialTheme.colorScheme.onSurfaceVariant
+					)
 				}
 				Column {
 					if (c.chosen.containsKey(i)) {
@@ -659,25 +711,39 @@ private fun Download(c: CreatePartDataHolder) {
 						if (inet) {
 							Button(onClick = {
 								downloading = true
-								Thread {
-									c.pl = object : ProgressListener {
-										override fun update(bytesRead: Long, contentLength: Long, done: Boolean) {
-											c.vm.activity.runOnUiThread {
-												progressText = SOUtils.humanReadableByteCountBin(bytesRead) + " of " +  SOUtils.humanReadableByteCountBin(contentLength) + " downloaded"
-											}
-										}
+								progressText = "(Connecting...)"
+								c.pl = object : ProgressListener {
+									override fun update(
+										bytesRead: Long,
+										contentLength: Long,
+										done: Boolean
+									) {
+										progressText =
+											SOUtils.humanReadableByteCountBin(bytesRead) + " of " + SOUtils.humanReadableByteCountBin(
+												contentLength
+											) + " downloaded"
 									}
+								}
+								Thread {
 									try {
 										val downloadedFile = File(c.vm.logic.cacheDir, i)
 										val request =
 											Request.Builder().url(c.inetAvailable[i]!!).build()
-										val response = c.client.newCall(request).execute()
+										val call = c.client.newCall(request)
+										val response = call.execute()
+
+										c.cl = {
+											call.cancel()
+											downloadedFile.delete()
+											downloading = false
+										}
 
 										val sink = downloadedFile.sink().buffer()
 										sink.writeAll(response.body!!.source())
 										sink.close()
 
-										c.chosen[i] = DledFile(null, downloadedFile)
+										if (!call.isCanceled())
+											c.chosen[i] = DledFile(null, downloadedFile)
 									} catch (e: Exception) {
 										Log.e("ABM", Log.getStackTraceString(e))
 										c.vm.activity.runOnUiThread {
@@ -738,36 +804,32 @@ private fun Flash(c: CreatePartDataHolder) {
 				entry["linux"] = "$fn/zImage"
 				entry["initrd"] = "$fn/initrd.cpio.gz"
 				entry["dtb"] = "$fn/dtb.dtb"
-				entry["options"] = "bootopt=64S3,32N2,64N2 androidboot.selinux=permissive audit=0 loop.max_part=7"
-				entry["xtype"] = "SFOS" //TODO unhardcode
+				entry["options"] = c.cmdline
+				entry["xtype"] = c.rtype
 				entry["xpart"] = parts.values.join(":")
+				if (c.dmaMeta.contains("updateJson") && c.dmaMeta["updateJson"] != null)
+					entry["xupdate"] = c.dmaMeta["updateJson"]!!
 				entry.exportToFile(File(vm.logic.abmEntries, "$fn.conf"))
 				if (!SuFile.open(File(vm.logic.abmBootset, fn).toURI()).mkdir()) {
 					terminal.add("-- FAILED to mkdir")
 					return
 				}
 
-				terminal.add("-- Patching boot image...")
-				val boot = c.chosen["boot"]!!.toFile(vm)
-				var cmd = File(c.vm.logic.assetDir, "Scripts/add_os/${c.vm.deviceInfo!!.codename}/add_sailfish.sh")/*TODO*/.absolutePath + " $fn ${boot.absolutePath}"
-				for (i in parts) {
-					cmd += " " + i.value
-				}
-				val result = Shell.cmd(cmd).to(terminal).exec()
-				if (!result.isSuccess) {
-					terminal.add("-- FAILURE!")
-					return
-				}
-
 				terminal.add("-- Flashing images...")
 				for (i in c.idVals) {
+					if (c.idUnneeded.contains(i)) continue
 					val j = c.idVals.indexOf(i)
 					terminal.add("Flashing $i")
 					val f = c.chosen[i]!!
-					val tp = File(c.vm.deviceInfo.pbdev + parts[j])
+					val tp = File(c.vm.deviceInfo!!.pbdev + parts[j])
 					if (c.sparseVals[j]) {
 						val f2 = f.toFile(c.vm)
-						val result2 = Shell.cmd(File(c.vm.logic.assetDir, "Toolkit/simg2img").absolutePath + " ${f2.absolutePath} ${tp.absolutePath}").exec()
+						val result2 = Shell.cmd(
+							File(
+								c.vm.logic.assetDir,
+								"Toolkit/simg2img"
+							).absolutePath + " ${f2.absolutePath} ${tp.absolutePath}"
+						).exec()
 						if (!result2.isSuccess) {
 							terminal.add("-- FAILURE!")
 							return
@@ -779,14 +841,27 @@ private fun Flash(c: CreatePartDataHolder) {
 					terminal.add("Done.")
 				}
 
+				terminal.add("-- Patching operating system...")
+				val boot = c.chosen["boot"]!!.toFile(vm)
+				var cmd = File(
+					c.vm.logic.assetDir,
+					"Scripts/add_os/${c.vm.deviceInfo!!.codename}/${c.shName}"
+				).absolutePath + " $fn ${boot.absolutePath}"
+				for (i in parts) {
+					cmd += " " + i.value
+				}
+				val result = Shell.cmd(cmd).to(terminal).exec()
+				if (!result.isSuccess) {
+					terminal.add("-- FAILURE!")
+					return
+				}
+
 				terminal.add("-- Done, try it out :)")
-				vm.activity.runOnUiThread {
-					vm.btnsOverride = true
-					vm.nextText.value = "Finish"
-					vm.onNext.value = {
-						it.startActivity(Intent(it, MainActivity::class.java))
-						it.finish()
-					}
+				vm.btnsOverride = true
+				vm.nextText.value = "Finish"
+				vm.onNext.value = {
+					it.startActivity(Intent(it, MainActivity::class.java))
+					it.finish()
 				}
 			}
 
@@ -806,56 +881,57 @@ private fun Flash(c: CreatePartDataHolder) {
 					(BigDecimal(c.p.size - (offset + c.f)).multiply(BigDecimal(b).divide(BigDecimal(100)))).toLong()
 				}
 
-				Shell.cmd(SDUtils.umsd(c.meta!!) + " && " + c.p.create(offset, offset + k, code, "")).to(terminal).submit { r ->
-					try {
-						if (r.out.join("\n").contains("old")) {
-							terminal.add("-- Please reboot AS SOON AS POSSIBLE!!!") //TODO fix always appearing
-						}
-						parts[it] = c.meta!!.nid.toString()
-						c.meta = SDUtils.generateMeta(c.vm.deviceInfo!!.bdev, c.vm.deviceInfo.pbdev)
-						if (it + 1 < c.count.value) {
-							c.p = c.meta!!.s.find { it1 -> (offset + k) < it1.startSector } as SDUtils.Partition.FreeSpace
-						}
-						if (r.isSuccess) {
-							terminal.add("Created partition.")
-							offset = 0L
-							if (it + 1 < c.count.value) {
-								makeOne(it + 1)
-							} else {
-								terminal.add("-- Created partition layout.")
-								Thread {
-									installMore()
-								}.start()
-							}
-						} else {
-							terminal.add("-- Failure.")
-						}
-					} catch (e: Exception) {
-						terminal.add("-- FAILURE --")
-						terminal.add(Log.getStackTraceString(e))
+				val r = Shell.cmd(SDUtils.umsd(c.meta!!) + " && " + c.p.create(offset, offset + k, code, "")).to(terminal).exec()
+				try {
+					if (r.out.join("\n").contains("old")) {
+						terminal.add("-- Please reboot AS SOON AS POSSIBLE!!!")
 					}
+					parts[it] = c.meta!!.nid.toString()
+					c.meta = SDUtils.generateMeta(c.vm.deviceInfo!!.bdev, c.vm.deviceInfo.pbdev)
+					if (it + 1 < c.count.value) {
+						c.p = c.meta!!.s.findLast { it1 -> (offset + k) < it1.startSector } as SDUtils.Partition.FreeSpace
+					}
+					if (r.isSuccess) {
+						terminal.add("Created partition.")
+						offset = 0L
+						if (it + 1 < c.count.value) {
+							makeOne(it + 1)
+						} else {
+							terminal.add("-- Created partition layout.")
+							installMore()
+						}
+					} else {
+						terminal.add("-- Failure.")
+					}
+				} catch (e: Exception) {
+					terminal.add("-- FAILURE --")
+					terminal.add(Log.getStackTraceString(e))
 				}
 			}
 			makeOne(0)
 		} else { // Portable partition
 			terminal.add("-- Creating partition...")
-			Shell.cmd(SDUtils.umsd(c.meta!!) + " && " + c.p.create(c.l.toLong(), c.u.toLong(), "0700", c.t!!)).to(terminal).submit { r ->
-				if (r.out.join("\n").contains("old")) {
-					terminal.add("-- Please reboot AS SOON AS POSSIBLE!!!")
+			val r = Shell.cmd(
+				SDUtils.umsd(c.meta!!) + " && " + c.p.create(
+					c.l.toLong(),
+					c.u.toLong(),
+					"0700",
+					c.t!!
+				)
+			).to(terminal).exec()
+			if (r.out.join("\n").contains("old")) {
+				terminal.add("-- Please reboot AS SOON AS POSSIBLE!!!")
+			}
+			if (r.isSuccess) {
+				vm.btnsOverride = true
+				vm.nextText.value = "Finish"
+				vm.onNext.value = {
+					it.startActivity(Intent(it, MainActivity::class.java))
+					it.finish()
 				}
-				if (r.isSuccess) {
-					terminal.add("-- Done.")
-				} else {
-					terminal.add("-- Failure.")
-				}
-				vm.activity.runOnUiThread {
-					vm.btnsOverride = true
-					vm.nextText.value = "Finish"
-					vm.onNext.value = {
-						it.startActivity(Intent(it, MainActivity::class.java))
-						it.finish()
-					}
-				}
+				terminal.add("-- Done.")
+			} else {
+				terminal.add("-- Failure.")
 			}
 		}
 	}

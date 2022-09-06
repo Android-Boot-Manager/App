@@ -15,7 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.topjohnwu.superuser.io.SuFile
 import com.topjohnwu.superuser.io.SuFileInputStream
-import org.andbootmgr.app.ui.theme.AbmTheme
+import org.andbootmgr.app.util.AbmTheme
 import java.io.File
 import java.io.IOException
 

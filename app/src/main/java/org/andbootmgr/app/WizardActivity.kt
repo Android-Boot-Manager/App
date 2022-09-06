@@ -28,7 +28,7 @@ import androidx.navigation.compose.rememberNavController
 import com.topjohnwu.superuser.io.SuFileOutputStream
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.andbootmgr.app.ui.theme.AbmTheme
+import org.andbootmgr.app.util.AbmTheme
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -43,6 +43,7 @@ class WizardPageFactory(private val vm: WizardActivityState) {
 			"fix_droidboot" -> FixDroidBootWizardPageFactory(vm).get()
 			"update_droidboot" -> UpdateDroidBootWizardPageFactory(vm).get()
 			"create_part" -> CreatePartWizardPageFactory(vm).get()
+			"backup_restore" -> BackupRestoreWizardPageFactory(vm).get()
 			else -> listOf()
 		}
 	}
@@ -50,6 +51,8 @@ class WizardPageFactory(private val vm: WizardActivityState) {
 
 class WizardActivity : ComponentActivity() {
 	private lateinit var vm: WizardActivityState
+	private lateinit var newFile: ActivityResultLauncher<String>
+	private var onFileCreated: ((Uri) -> Unit)? = null
 	private lateinit var chooseFile: ActivityResultLauncher<String>
 	private var onFileChosen: ((Uri) -> Unit)? = null
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,6 +63,7 @@ class WizardActivity : ComponentActivity() {
 		chooseFile = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
 			if (uri == null) {
 				Toast.makeText(this, "File not available, please try again later!", Toast.LENGTH_LONG).show()
+				onFileChosen = null
 				return@registerForActivityResult
 			}
 			if (onFileChosen != null) {
@@ -72,7 +76,23 @@ class WizardActivity : ComponentActivity() {
 					Toast.LENGTH_LONG
 				).show()
 			}
-
+		}
+		newFile = registerForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream")) { uri: Uri? ->
+			if (uri == null) {
+				Toast.makeText(this, "File not available, please try again later!", Toast.LENGTH_LONG).show()
+				onFileCreated = null
+				return@registerForActivityResult
+			}
+			if (onFileCreated != null) {
+				onFileCreated!!(uri)
+				onFileCreated = null
+			} else {
+				Toast.makeText(
+					this@WizardActivity,
+					"Internal error - no file handler added!! Please cancel install",
+					Toast.LENGTH_LONG
+				).show()
+			}
 		}
 		val wizardPages = WizardPageFactory(vm).get(intent.getStringExtra("flow")!!)
 		setContent {
@@ -133,6 +153,18 @@ class WizardActivity : ComponentActivity() {
 		onFileChosen = callback
 		chooseFile.launch(mime)
 	}
+	fun createFile(name: String, callback: (Uri) -> Unit) {
+		if (onFileCreated != null) {
+			Toast.makeText(
+				this,
+				"Internal error - double file choose!! Please cancel install",
+				Toast.LENGTH_LONG
+			).show()
+			return
+		}
+		onFileCreated = callback
+		newFile.launch(name)
+	}
 }
 
 class WizardActivityState(val codename: String) {
@@ -142,14 +174,10 @@ class WizardActivityState(val codename: String) {
 	lateinit var logic: DeviceLogic
 	val deviceInfo = HardcodedDeviceInfoFactory.get(codename)
 	var current = mutableStateOf("start")
-	var prevText = mutableStateOf("Prev")
-	var nextText = mutableStateOf("Next")
-	var onPrev: MutableState<(WizardActivity) -> Unit> = mutableStateOf({
-		it.finish()
-	})
-	var onNext: MutableState<(WizardActivity) -> Unit> = mutableStateOf({
-		it.finish()
-	})
+	var prevText = mutableStateOf("")
+	var nextText = mutableStateOf("")
+	var onPrev: MutableState<(WizardActivity) -> Unit> = mutableStateOf({})
+	var onNext: MutableState<(WizardActivity) -> Unit> = mutableStateOf({})
 
 	var flashes: HashMap<String, Uri> = HashMap()
 	var texts: HashMap<String, String> = HashMap()
@@ -243,7 +271,7 @@ private fun Preview() {
 	}
 }
 
-/* Monospace auto-scrolling text view, feeded using MutableList<String>, catching exceptions and running logic on a different thread */
+/* Monospace auto-scrolling text view, fed using MutableList<String>, catching exceptions and running logic on a different thread */
 @Composable
 fun Terminal(vm: WizardActivityState, r: (MutableList<String>) -> Unit) {
 	val scrollH = rememberScrollState()
