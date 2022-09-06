@@ -29,12 +29,15 @@ import okio.*
 import org.andbootmgr.app.util.AbmTheme
 import org.andbootmgr.app.util.ConfigFile
 import org.andbootmgr.app.util.SOUtils
+import org.json.JSONArray
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
 import java.math.BigDecimal
 import java.util.concurrent.TimeUnit
-
+import org.json.JSONObject
+import org.json.JSONTokener
+import java.net.URL
 
 class CreatePartWizardPageFactory(private val vm: WizardActivityState) {
 	fun get(): List<IWizardPage> {
@@ -317,35 +320,93 @@ private fun Start(c: CreatePartDataHolder) {
 
 @Composable
 private fun Shop(c: CreatePartDataHolder) {
+	var downloading by remember { mutableStateOf(true) }
+	var json: JSONObject? by remember { mutableStateOf(null)};
+	var selected by remember { mutableStateOf(-1)};
 	LaunchedEffect(Unit) {
 		c.run {
 			//TODO: Load from .dma
-			dmaMeta["name"] = "Sailfish OS"
-			dmaMeta["creator"] = "ABM Open ROM Project"
-			dmaMeta["updateJson"] = "https//example.com/update.json"
-			inetAvailable["vendor"] = "https://temp.nift4.org/vendor.img"
-			inetDesc["vendor"] = "VollaOS 10 vendor image"
-			addDefault(838860288L, 0, "8305", "vendor", false)
-			inetAvailable["system"] = "https://temp.nift4.org/system.img"
-			inetDesc["system"] = "VollaOS 10 system image"
-			addDefault(3758095872L, 0, "8305", "system", false)
-			inetAvailable["sfos"] = "https://gitlab.com/sailfishos-porters-ci/yggdrasil-ci/-/jobs/2114113029/artifacts/raw/sfe-yggdrasil/Sailfish_OS/sailfish.img001"
-			inetDesc["sfos"] = "Sailfish OS system image"
-			addDefault(100L, 1, "8302", "sfos", true)
-			//idUnneeded.add("sfos") not needed for sfos, but needed for ut data which cant be flashed with img
-			inetAvailable["boot"] = "https://gitlab.com/sailfishos-porters-ci/yggdrasil-ci/-/jobs/2114113029/artifacts/raw/sfe-yggdrasil/Sailfish_OS/hybris-boot.img"
-			inetDesc["boot"] = "Boot image"
-			idNeeded.add("boot")
-			painter = @Composable { painterResource(id = R.drawable.ic_sailfish_os_logo) }
-			rtype = "SFOS"
-			cmdline = "bootopt=64S3,32N2,64N2 androidboot.selinux=permissive audit=0 loop.max_part=7"
-			shName = "add_sailfish.sh"
+			Thread {
+				var json_text =
+					URL("https://raw.githubusercontent.com/Android-Boot-Manager/ABM-json/master/devices/" + c.vm.codename + ".json").readText()
+				json = JSONTokener(json_text).nextValue() as JSONObject
+				Log.i("ABM shop:", json_text)
+				downloading=false
+			}.start()
 		}
 	}
-	Text("This is an placeholder Store implementation that supplies SailfishOS. To continue, press Next.") //TODO: download .dma from github or smth
-	c.vm.btnsOverride = true
-	c.vm.nextText.value = "Next"
-	c.vm.onNext.value = { c.vm.navigate("os") }
+	if(!downloading) {
+//		Text("This is an ABM Store, please select OS you wish to install.")
+		Log.i("ABM shop:", "Found: ${json!!.getJSONArray("oses").length()} oses")
+		var i =0;
+		while(i<json!!.getJSONArray("oses").length()){
+			val index = i
+			Row(horizontalArrangement = Arrangement.SpaceEvenly,
+				verticalAlignment = Alignment.CenterVertically,
+				modifier = Modifier
+					.fillMaxWidth()
+					.clickable {selected=index}) {
+				var painter = @Composable { painterResource(id = R.drawable.ic_sailfish_os_logo) }
+				Icon(painter =painter(), contentDescription = "OS logo")
+				Text(json!!.getJSONArray("oses").getJSONObject(i).getString("displayname"))
+			}
+			i++
+		}
+
+		if(selected!=-1){
+			Log.i("ABM shop:", "Selected Os: $selected")
+			c.run {
+				dmaMeta["name"] =
+					json!!.getJSONArray("oses").getJSONObject(selected).getString("displayname")
+				dmaMeta["creator"] = json!!.getJSONArray("oses").getJSONObject(selected).getString("creator")
+				dmaMeta["updateJson"] = json!!.getJSONArray("oses").getJSONObject(selected).getString("updateJson")
+				painter = @Composable { painterResource(id = R.drawable.ic_sailfish_os_logo) }
+				rtype = json!!.getJSONArray("oses").getJSONObject(selected).getString("rtype")
+				cmdline =
+					json!!.getJSONArray("oses").getJSONObject(selected).getString("cmdline")
+				shName = json!!.getJSONArray("oses").getJSONObject(selected).getString("scriptname")
+				i=0
+				val partitions_params = json!!.getJSONArray("oses").getJSONObject(selected).getJSONArray("partitions")
+				while(i<json!!.getJSONArray("oses").getJSONObject(selected).getJSONArray("partitions").length()){
+					var isPercent = if(partitions_params.getJSONObject(i).getBoolean("isPercent")){
+						1
+					} else {
+						0
+					}
+					addDefault(partitions_params.getJSONObject(i).getLong("size"),
+						isPercent,
+						partitions_params.getJSONObject(i).getString("type"),
+						partitions_params.getJSONObject(i).getString("id"),
+						partitions_params.getJSONObject(i).getBoolean("needUnsparse"))
+					i++
+				}
+				i=0
+				val inets = json!!.getJSONArray("oses").getJSONObject(selected).getJSONArray("inet")
+				while(i<json!!.getJSONArray("oses").getJSONObject(selected).getJSONArray("inet").length()){
+					inetAvailable[inets.getJSONObject(i).getString("id")] = inets.getJSONObject(i).getString("url")
+					inetDesc[inets.getJSONObject(i).getString("id")] = inets.getJSONObject(i).getString("desc")
+					i++
+				}
+				i=0
+				val extraIdNeeded = json!!.getJSONArray("oses").getJSONObject(selected).getJSONArray("extraIdNeeded")
+				while(i<json!!.getJSONArray("oses").getJSONObject(selected).getJSONArray("extraIdNeeded").length()){
+					idNeeded.add(extraIdNeeded.get(i) as String)
+					i++
+				}
+				i=0
+				val blockIdNeeded = json!!.getJSONArray("oses").getJSONObject(selected).getJSONArray("blockIdNeeded")
+				while(i<json!!.getJSONArray("oses").getJSONObject(selected).getJSONArray("blockIdNeeded").length()){
+					idUnneeded.add(blockIdNeeded.get(i) as String)
+					i++
+				}
+			}
+			c.vm.navigate("os")
+
+		}
+		/*c.vm.btnsOverride = true
+		c.vm.nextText.value = "Next"
+		c.vm.onNext.value = { c.vm.navigate("os")*/
+	}
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
