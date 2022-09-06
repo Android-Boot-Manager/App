@@ -944,6 +944,7 @@ private fun Flash(c: CreatePartDataHolder) {
 					(BigDecimal(c.p.size - (offset + c.f)).multiply(BigDecimal(b).divide(BigDecimal(100)))).toLong()
 				}
 
+				vm.logic.unmount(vm.deviceInfo!!)
 				val r = Shell.cmd(SDUtils.umsd(c.meta!!) + " && " + c.p.create(offset, offset + k, code, "")).to(terminal).exec()
 				try {
 					if (r.out.join("\n").contains("kpartx")) {
@@ -961,6 +962,7 @@ private fun Flash(c: CreatePartDataHolder) {
 							makeOne(it + 1)
 						} else {
 							terminal.add("-- Created partition layout.")
+							vm.logic.mount(vm.deviceInfo)
 							installMore()
 						}
 					} else {
