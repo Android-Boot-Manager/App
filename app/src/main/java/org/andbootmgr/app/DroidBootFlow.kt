@@ -166,8 +166,7 @@ private fun Flash(vm: WizardActivityState) {
 				return@Terminal
 			}
 			if (Shell.cmd(SDUtils.umsd(meta)).to(terminal).exec().isSuccess) {
-				terminal.add("-- failed unmount drive, aborting")
-				return@Terminal
+				terminal.add("-- warning: failed unmount drive")
 			}
 			if (!Shell.cmd("sgdisk --mbrtogpt --clear ${vm.deviceInfo.bdev}").to(terminal)
 					.exec().isSuccess
@@ -180,7 +179,7 @@ private fun Flash(vm: WizardActivityState) {
 				SDUtils.umsd(meta!!) + " && " + (meta.dump(0) as SDUtils.Partition.FreeSpace)
 					.create(
 						0,
-						(512L * 1024 * 1024 /* 512 mb */ / meta.logicalSectorSizeBytes),
+						(meta.sectors - 2048) / 41 + 2048,
 						"8301",
 						"abm_settings"
 					)
