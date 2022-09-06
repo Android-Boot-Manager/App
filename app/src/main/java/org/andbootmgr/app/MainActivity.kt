@@ -44,6 +44,7 @@ import org.andbootmgr.app.util.ConfigFile
 import org.andbootmgr.app.util.Toolkit
 import java.io.File
 import java.io.IOException
+import java.util.stream.Collectors
 
 class MainActivityState {
 	fun startFlow(flow: String) {
@@ -967,7 +968,36 @@ private fun PartTool(vm: MainActivityState) {
 					Button(onClick = {
 						processing = true
 						delete = false
-						//TODO: implement this: delete parts, entry, bootset files
+						Thread {
+							var tresult = ""
+							if (e.has("xpart") && !e["xpart"].isNullOrBlank()) {
+								val allp = e["xpart"]!!.split(":").stream()
+									.map { parts!!.dumpKernelPartition(Integer.valueOf(it)) }
+									.map { it.delete() }.collect(
+										Collectors.toList()
+									)
+								for (s in allp) { // Do not chain, but regenerate meta and unmount every time. Thanks vold
+									val r = Shell.cmd(
+										SDUtils.umsd(parts!!) + " && " + s
+									).exec()
+									parts =
+										SDUtils.generateMeta(vm.deviceInfo!!.bdev, vm.deviceInfo!!.pbdev)
+									tresult += r.out.join("\n") + r.err.join("\n") + "\n"
+								}
+							}
+							val f = entries[e]!!
+							val f2 = SuFile(vm.logic!!.abmBootset, f.nameWithoutExtension)
+							if (!f2.deleteRecursive())
+								tresult += "Cannot delete ${f2.absolutePath}"
+							entries.remove(e)
+							if (!f.delete())
+								tresult += "Cannot delete ${f.absolutePath}"
+							editEntryID = null
+							processing = false
+							parts =
+								SDUtils.generateMeta(vm.deviceInfo!!.bdev, vm.deviceInfo!!.pbdev)
+							result = tresult
+						}.start()
 					}) {
 						Text("Delete")
 					}

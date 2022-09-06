@@ -883,7 +883,7 @@ private fun Flash(c: CreatePartDataHolder) {
 
 				val r = Shell.cmd(SDUtils.umsd(c.meta!!) + " && " + c.p.create(offset, offset + k, code, "")).to(terminal).exec()
 				try {
-					if (r.out.join("\n").contains("old")) {
+					if (r.out.join("\n").contains("kpartx")) {
 						terminal.add("-- Please reboot AS SOON AS POSSIBLE!!!")
 					}
 					parts[it] = c.meta!!.nid.toString()
