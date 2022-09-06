@@ -532,7 +532,7 @@ private fun PartTool(vm: MainActivityState) {
 						.clickable { editPartID = p }) {
 					Text(
 						if (p.type == SDUtils.PartitionType.FREE)
-							"Free space (${p.sizeFancy})"
+							"Free space (${p.sizeFancy}) click here to install OS"
 						else
 							"Partition ${p.id} \"${p.name}\""
 					)

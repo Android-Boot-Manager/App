@@ -339,7 +339,8 @@ private fun Shop(c: CreatePartDataHolder) {
 		}
 	}
 	if (json != null) {
-//		Text("This is an ABM Store, please select OS you wish to install.")
+		Column() {
+			Text("This is an ABM Store, please select OS you wish to install.")
 		Log.i("ABM shop:", "Found: ${json!!.getJSONArray("oses").length()} oses")
 		var i = 0
 		while(i < json!!.getJSONArray("oses").length()) {
@@ -347,7 +348,6 @@ private fun Shop(c: CreatePartDataHolder) {
 			Row(horizontalArrangement = Arrangement.SpaceEvenly,
 				verticalAlignment = Alignment.CenterVertically,
 				modifier = Modifier
-					.fillMaxWidth()
 					.clickable {
 						//Log.i("ABM shop:", "Selected OS: $index")
 						c.run {
@@ -407,6 +407,7 @@ private fun Shop(c: CreatePartDataHolder) {
 				Text(l.getString("displayname"))
 			}
 			i++
+		}
 		}
 	}
 }
