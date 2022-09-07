@@ -65,6 +65,15 @@ class MainActivityState {
 		activity!!.finish()
 	}
 
+	fun startUpdateFlow(e: String) {
+		val i = Intent(activity!!, WizardActivity::class.java)
+		i.putExtra("codename", deviceInfo!!.codename)
+		i.putExtra("flow", "update")
+		i.putExtra("entryFilename", e)
+		activity!!.startActivity(i)
+		activity!!.finish()
+	}
+
 	fun startBackupAndRestoreFlow(partition: SDUtils.Partition) {
 		val i = Intent(activity!!, WizardActivity::class.java)
 		i.putExtra("codename", deviceInfo!!.codename)
@@ -959,8 +968,9 @@ private fun PartTool(vm: MainActivityState) {
 					Column(Modifier.verticalScroll(rememberScrollState())) {
 						Button(
 							onClick = {
-								//TODO: implement this
-							}) {
+								if (e.has("xupdate") && !e["xupdate"].isNullOrBlank())
+									vm.startUpdateFlow(entries[e]!!.absolutePath)
+							}, enabled = e.has("xupdate") && !e["xupdate"].isNullOrBlank()) {
 							Text("Update")
 						}
 						Button(

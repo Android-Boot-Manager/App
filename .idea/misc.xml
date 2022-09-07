@@ -57,6 +57,7 @@
         <entry key="app/src/main/res/drawable/ic_sailfish_os_logo.xml" value="0.186" />
         <entry key="app/src/main/res/drawable/ic_sd.xml" value="0.186" />
         <entry key="app/src/main/res/drawable/ic_settings.xml" value="0.186" />
+        <entry key="app/src/main/res/drawable/ut_logo.xml" value="0.268" />
         <entry key="app/src/main/res/layout/activity_debug.xml" value="0.17552083333333332" />
         <entry key="app/src/main/res/layout/fragment_generalcfg.xml" value="0.19322916666666667" />
       </map>

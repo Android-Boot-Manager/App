@@ -189,8 +189,10 @@ private class CreatePartDataHolder(val vm: WizardActivityState): ProgressListene
 
 	fun painterFromRtype(type: String): @Composable () -> Painter {
 		val id = when (type) {
-			// TODO: implement this
-			else -> R.drawable.ic_sailfish_os_logo
+			"SFOS" -> R.drawable.ic_sailfish_os_logo
+			"UT" -> R.drawable.ut_logo
+			"droid" -> R.drawable.ic_roms
+			else -> R.drawable.ic_roms
 		}
 		return (@Composable { painterResource(id = id) })
 	}
