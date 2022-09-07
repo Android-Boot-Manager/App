@@ -922,7 +922,8 @@ private fun Flash(c: CreatePartDataHolder) {
 								c.vm.logic.assetDir,
 								"Toolkit/simg2img"
 							).absolutePath + " ${f2.absolutePath} ${tp.absolutePath}"
-						).exec()
+						).to(terminal).exec()
+						f.delete()
 						if (!result2.isSuccess) {
 							terminal.add("-- FAILURE!")
 							return
@@ -936,7 +937,7 @@ private fun Flash(c: CreatePartDataHolder) {
 
 				terminal.add("-- Patching operating system...")
 				val boot = c.chosen["boot"]!!.toFile(vm)
-				var cmd = File(
+				var cmd = "FORMATDATA=true " + File(
 					c.vm.logic.assetDir,
 					"Scripts/add_os/${c.vm.deviceInfo!!.codename}/${c.shName}"
 				).absolutePath + " $fn ${boot.absolutePath}"
