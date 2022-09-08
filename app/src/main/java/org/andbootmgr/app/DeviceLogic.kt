@@ -43,8 +43,8 @@ class DeviceLogic(ctx: Context) {
 		return true
 	}
 	fun unmount(d: DeviceInfo): Boolean {
-		if (!mounted)
-			return true
+		//if (!mounted)
+			//return true
 		val result: Shell.Result = Shell
 			.cmd(assetDir.absolutePath + "/Scripts/config/umount/" + d.codename + ".sh")
 			.exec()
