@@ -38,6 +38,30 @@ object HardcodedDeviceInfoFactory {
 		}
 	}
 
+	private fun getCedric(): DeviceInfo {
+		return object : DeviceInfo {
+			override val codename: String = "cedric"
+			override val blBlock: String = "/dev/block/bootdevice/by-name/boot"
+			override val bdev: String = "/dev/block/mmcblk1"
+			override val pbdev: String = bdev + "p"
+			override val metaonsd: Boolean = true
+			override fun isInstalled(logic: DeviceLogic): Boolean {
+				return SuFile.open(bdev).exists() && run {
+					val meta: SDUtils.SDPartitionMeta? =
+						SDUtils.generateMeta(bdev, pbdev)
+					meta?.let { (meta.countPartitions() > 0) && (meta.dumpPartition(0).type == SDUtils.PartitionType.RESERVED) } == true
+				}
+			}
+			override fun isBooted(logic: DeviceLogic): Boolean {
+				val result = Shell.cmd(File(logic.assetDir, "Scripts/is_installed.sh").absolutePath).exec()
+				return result.isSuccess && result.out.join("\n").contains("ABM.bootloader=1")
+			}
+			override fun isCorrupt(logic: DeviceLogic): Boolean {
+				return !SuFile.open(logic.abmDb, "db.conf").exists()
+			}
+		}
+	}
+
 	private fun getMimameid(): DeviceInfo {
 		return object : DeviceInfo {
 			override val codename: String = "mimameid"
@@ -73,9 +97,11 @@ object HardcodedDeviceInfoFactory {
 			}
 		}
 	}
+
 	fun get(codename: String): DeviceInfo? {
 		return when (codename) {
 			"yggdrasil" -> getYggdrasil()
+			"cedric" -> getCedric()
 			"mimameid" -> getMimameid()
 			else -> null
 		}
