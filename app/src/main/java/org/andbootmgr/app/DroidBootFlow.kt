@@ -230,10 +230,10 @@ private fun Flash(vm: WizardActivityState) {
 		db.exportToFile(File(vm.logic.abmDb, "db.conf"))
 		val entry = ConfigFile()
 		entry["title"] = vm.texts["OsName"]!!
-		entry["linux"] = "null"
-		entry["initrd"] = "null"
-		entry["dtb"] = "null"
-		entry["options"] = "null"
+		entry["linux"] = "real/kernel"
+		entry["initrd"] = "real/initrd.cpio.gz"
+		entry["dtb"] = "real/dtb.dtb"
+		entry["options"] = "REPLACECMDLINE"
 		entry["xtype"] = "droid"
 		entry["xpart"] = "real"
 		entry.exportToFile(File(vm.logic.abmEntries, "hijacked.conf"))
@@ -253,6 +253,13 @@ private fun Flash(vm: WizardActivityState) {
 				terminal.add(if (e.message != null) e.message!! else "(null)")
 				terminal.add("-- Please consult documentation to finish the install.")
 			}
+		}
+		if (vm.deviceInfo.postInstallScript) {
+			terminal.add("Device setup...")
+			Shell.cmd(
+				"BOOTED=${vm.deviceInfo.isBooted(vm.logic)} " +
+				"${File(vm.logic.assetDir, "Scripts/install/${vm.deviceInfo.codename}.sh").absolutePath} hijacked"
+			).to(terminal).exec()
 		}
 		terminal.add("-- Done.")
 		vm.logic.unmount(vm.deviceInfo)

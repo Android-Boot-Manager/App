@@ -12,6 +12,7 @@ interface DeviceInfo {
 	val bdev: String
 	val pbdev: String
 	val metaonsd: Boolean
+	val postInstallScript: Boolean
 	fun isInstalled(logic: DeviceLogic): Boolean
 	fun isBooted(logic: DeviceLogic): Boolean
 	fun isCorrupt(logic: DeviceLogic): Boolean
@@ -25,6 +26,7 @@ object HardcodedDeviceInfoFactory {
 			override val bdev: String = "/dev/block/mmcblk1"
 			override val pbdev: String = bdev + "p"
 			override val metaonsd: Boolean = false
+			override val postInstallScript: Boolean = false
 			override fun isInstalled(logic: DeviceLogic): Boolean {
 				return SuFile.open(logic.abmDir, "codename.cfg").exists()
 			}
@@ -45,6 +47,7 @@ object HardcodedDeviceInfoFactory {
 			override val bdev: String = "/dev/block/mmcblk1"
 			override val pbdev: String = bdev + "p"
 			override val metaonsd: Boolean = true
+			override val postInstallScript: Boolean = true
 			override fun isInstalled(logic: DeviceLogic): Boolean {
 				return SuFile.open(bdev).exists() && run {
 					val meta: SDUtils.SDPartitionMeta? =
@@ -69,6 +72,7 @@ object HardcodedDeviceInfoFactory {
 			override val bdev: String = "/dev/block/mmcblk1"
 			override val pbdev: String = bdev + "p"
 			override val metaonsd: Boolean = true
+			override val postInstallScript: Boolean = false
 			override fun isInstalled(logic: DeviceLogic): Boolean {
 				return SuFile.open(bdev).exists() && run {
 					val meta: SDUtils.SDPartitionMeta? =
