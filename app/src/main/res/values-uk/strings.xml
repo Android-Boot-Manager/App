@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">Менеджер завантаження Android</string>
-	<string name="nav_header_subtitle">Один телефон, щоб запустити їх усіх!</string>
+    <string name="nav_header_subtitle">Один телефон, щоб запустити їх усіх!</string>
+    <string name="menu">Меню</string>
+    <string name="restore">Відновлення</string>
+    <string name="backup">Резервна копія</string>
+    <string name="successfully_selected">Успішно вибрано.</string>
+    <string name="next">Далі</string>
+    <string name="make_backup">Створити резервну копію</string>
+    <string name="restore_backup">Вибрати файл для відновлення</string>
+    <string name="choose_file">Виберіть файл</string>
+    <string name="create_file">Створити файл</string>
+    <string name="backup_msg">Раді вітати у Розділі Збереження та Відновлення. Що ви хочете зробити з цим розділом %1$s\?</string>
 </resources>
