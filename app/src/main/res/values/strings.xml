@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-	<string name="app_name">Android Boot Manager</string>
+	<string name="app_name" translatable="false">Android Boot Manager</string>
 	<string name="nav_header_subtitle">One phone to start them all!</string>
 	<string name="aboutLibraries_description_showIcon" translatable="false" tools:keep="@string/aboutLibraries_description_showIcon">true</string>
 	<string name="aboutLibraries_description_showVersion" translatable="false" tools:keep="@string/aboutLibraries_description_showVersion">true</string>
