@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.topjohnwu.superuser.io.SuFile
@@ -22,12 +23,12 @@ import java.io.IOException
 class FixDroidBootWizardPageFactory(private val vm: WizardActivityState) {
 	fun get(): List<IWizardPage> {
 		return listOf(WizardPage("start",
-			NavButton("Cancel") { it.finish() },
-			NavButton("Next") { it.navigate("select") })
+			NavButton(vm.activity.getString(R.string.cancel)) { it.finish() },
+			NavButton(vm.activity.getString(R.string.next)) { it.navigate("select") })
 		{
 			Start(vm)
 		}, WizardPage("select",
-			NavButton("Prev") { it.navigate("start") },
+			NavButton(vm.activity.getString(R.string.prev)) { it.navigate("start") },
 			NavButton("") {}
 		) {
 			Select(vm)
@@ -45,8 +46,8 @@ private fun Start(vm: WizardActivityState) {
 	Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
 		modifier = Modifier.fillMaxSize()
 	) {
-		Text("Welcome to ABM!")
-		Text("This will reinstall DroidBoot")
+		Text(stringResource(id = R.string.welcome_text))
+		Text(stringResource(R.string.reinstall_dboot))
 	}
 }
 
@@ -60,23 +61,23 @@ private fun Select(vm: WizardActivityState) {
 	) {
 		Icon(
 			painterResource(R.drawable.ic_droidbooticon),
-			"DroidBoot Icon",
+			stringResource(id = R.string.droidboot_icon_content_desc),
 			Modifier.defaultMinSize(32.dp, 32.dp)
 		)
 
 		if (nextButtonAvailable.value) {
-			Text("Successfully selected.")
-			vm.nextText.value = "Next"
+			Text(stringResource(id = R.string.successfully_selected))
+			vm.nextText.value = stringResource(id = R.string.next)
 			vm.onNext.value = { it.navigate("flash") }
 		} else {
-			Text("Please choose DroidBoot image!")
+			Text(stringResource(id = R.string.choose_droidboot))
 			Button(onClick = {
 				vm.activity.chooseFile("*/*") {
 					vm.flashes[flashType] = it
 					nextButtonAvailable.value = true
 				}
 			}) {
-				Text("Choose file")
+				Text(stringResource(id = R.string.choose_file))
 			}
 		}
 	}
@@ -101,7 +102,7 @@ private fun Flash(vm: WizardActivityState) {
 		terminal.add("-- Done.")
 		vm.activity.runOnUiThread {
 			vm.btnsOverride = true
-			vm.nextText.value = "Finish"
+			vm.nextText.value = vm.activity.getString(R.string.finish)
 			vm.onNext.value = {
 				it.finish()
 			}

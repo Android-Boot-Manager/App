@@ -1,8 +1,8 @@
-package org.andbootmgr.app
+package org.andbootmgr.app.util
 
 import android.util.Log
 import com.topjohnwu.superuser.Shell
-import org.andbootmgr.app.util.SOUtils
+import org.andbootmgr.app.join
 import java.util.*
 import java.util.stream.Collectors
 
@@ -168,7 +168,8 @@ object SDUtils {
 			}
 			for (p in l) {
 				if (p.startSector > temp + meta.alignSector) meta.u.add(
-					Partition.FreeSpace(meta,
+					Partition.FreeSpace(
+						meta,
 						temp,
 						p.startSector - 1,
 						meta.logicalSectorSizeBytes
@@ -177,7 +178,8 @@ object SDUtils {
 				temp = p.endSector
 			}
 			if (meta.lastUsableSector > temp + meta.alignSector) meta.u.add(
-				Partition.FreeSpace(meta,
+				Partition.FreeSpace(
+					meta,
 					temp,
 					meta.lastUsableSector - 1,
 					meta.logicalSectorSizeBytes
@@ -243,7 +245,8 @@ object SDUtils {
 		}
 
 		class FreeSpace(meta: SDPartitionMeta, start: Long, end: Long, bytes: Int) :
-			Partition(meta, PartitionType.FREE, 0, (start / 2048 + 1) * 2048, end, bytes, "", "", 0, 0) {
+			Partition(meta,
+				PartitionType.FREE, 0, (start / 2048 + 1) * 2048, end, bytes, "", "", 0, 0) {
 
 			override fun toString(): String {
 				return "FreeSpace{" +

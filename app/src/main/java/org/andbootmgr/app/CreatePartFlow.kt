@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -28,6 +29,7 @@ import okhttp3.*
 import okio.*
 import org.andbootmgr.app.util.AbmTheme
 import org.andbootmgr.app.util.ConfigFile
+import org.andbootmgr.app.util.SDUtils
 import org.andbootmgr.app.util.SOUtils
 import java.io.File
 import java.io.FileInputStream
@@ -42,7 +44,7 @@ class CreatePartWizardPageFactory(private val vm: WizardActivityState) {
 	fun get(): List<IWizardPage> {
 		val c = CreatePartDataHolder(vm)
 		return listOf(WizardPage("start",
-			NavButton("Cancel") {
+			NavButton(vm.activity.getString(R.string.cancel)) {
 				it.startActivity(Intent(it, MainActivity::class.java))
 				it.finish()
 			},
@@ -50,17 +52,17 @@ class CreatePartWizardPageFactory(private val vm: WizardActivityState) {
 		) {
 			Start(c)
 		}, WizardPage("shop",
-			NavButton("Prev") { it.navigate("start") },
+			NavButton(vm.activity.getString(R.string.prev)) { it.navigate("start") },
 			NavButton("") {}
 		) {
 			Shop(c)
 		}, WizardPage("os",
-			NavButton("Prev") { it.navigate("shop") },
-			NavButton("Next") { it.navigate("dload") }
+			NavButton(vm.activity.getString(R.string.prev)) { it.navigate("shop") },
+			NavButton(vm.activity.getString(R.string.next)) { it.navigate("dload") }
 		) {
 			Os(c)
 		}, WizardPage("dload",
-			NavButton("Cancel") {
+			NavButton(vm.activity.getString(R.string.cancel)) {
 				it.startActivity(Intent(it, MainActivity::class.java))
 				it.finish()
 		},
@@ -230,8 +232,8 @@ private fun Start(c: CreatePartDataHolder) {
 				.fillMaxWidth()
 				.padding(10.dp)) {
 				Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(10.dp)) {
-					Icon(painterResource(id = R.drawable.ic_settings), "Icon", Modifier.padding(end = 10.dp))
-					Text("General settings")
+					Icon(painterResource(id = R.drawable.ic_settings), stringResource(R.string.icon_content_desc), Modifier.padding(end = 10.dp))
+					Text(stringResource(R.string.general_settings))
 				}
 				Column(
 					Modifier
@@ -243,7 +245,7 @@ private fun Start(c: CreatePartDataHolder) {
 						e = el || eu
 						if (!e) lu = l.toFloat()..u.toFloat()
 					}, isError = el, label = {
-						Text("Start sector (relative)")
+						Text(stringResource(R.string.start_sector))
 					})
 					TextField(modifier = Modifier.fillMaxWidth(), value = u, onValueChange = {
 						u = it
@@ -251,7 +253,7 @@ private fun Start(c: CreatePartDataHolder) {
 						e = el || eu
 						if (!e) lu = l.toFloat()..u.toFloat()
 					}, isError = eu, label = {
-						Text("End sector (relative)")
+						Text(stringResource(R.string.end_sector))
 					})
 					// Material3 RangeSlider is absolutely buggy trash
 					androidx.compose.material.RangeSlider(modifier = Modifier.fillMaxWidth(), colors = sc, values = lu, onValueChange = {
@@ -263,8 +265,8 @@ private fun Start(c: CreatePartDataHolder) {
 						if (!e) lu = l.toFloat()..u.toFloat()
 					}, valueRange = 0F..c.p.size.toFloat())
 
-					Text("Approximate size: " + if (!e) SOUtils.humanReadableByteCountBin((u.toLong() - l.toLong()) * c.meta!!.logicalSectorSizeBytes) else "(invalid input)")
-					Text("Available space: ${c.p.sizeFancy} (${c.p.size} sectors)")
+					Text(stringResource(R.string.approx_size, if (!e) SOUtils.humanReadableByteCountBin((u.toLong() - l.toLong()) * c.meta!!.logicalSectorSizeBytes) else stringResource(R.string.invalid_input)))
+					Text(stringResource(R.string.available_space, c.p.sizeFancy, c.p.size))
 				}
 			}
 		}
@@ -281,7 +283,7 @@ private fun Start(c: CreatePartDataHolder) {
 						.padding(20.dp)
 				) {
 					Icon(painterResource(id = R.drawable.ic_about), "Icon")
-					Text("Please select one of the below options.")
+					Text(stringResource(R.string.option_select))
 				}
 			}
 		}
@@ -293,14 +295,14 @@ private fun Start(c: CreatePartDataHolder) {
 				.fillMaxWidth()
 				.padding(10.dp)) {
 				Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(10.dp)) {
-					Icon(painterResource(id = R.drawable.ic_sd), "Icon", Modifier.padding(end = 10.dp))
-					Text("Portable partition")
+					Icon(painterResource(id = R.drawable.ic_sd), stringResource(R.string.icon_content_desc), Modifier.padding(end = 10.dp))
+					Text(stringResource(R.string.portable_part))
 				}
 				TextField(value = t, onValueChange = {
 					t = it
 					et = !t.matches(Regex("\\A\\p{ASCII}*\\z"))
 				}, isError = et, label = {
-					Text("Partition name")
+					Text(stringResource(R.string.part_name))
 				})
 				Row(horizontalArrangement = Arrangement.End, modifier = Modifier
 					.fillMaxWidth()
@@ -312,7 +314,7 @@ private fun Start(c: CreatePartDataHolder) {
 						c.f = c.p.size - c.u.toLong()
 						c.vm.navigate("flash")
 					}) {
-						Text("Create")
+						Text(stringResource(id = R.string.create))
 					}
 				}
 			}
@@ -324,8 +326,8 @@ private fun Start(c: CreatePartDataHolder) {
 				.fillMaxWidth()
 				.padding(10.dp)) {
 				Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(10.dp)) {
-					Icon(painterResource(id = R.drawable.ic_droidbooticon), "Icon", Modifier.padding(end = 10.dp))
-					Text("Install OS")
+					Icon(painterResource(id = R.drawable.ic_droidbooticon), stringResource(R.string.icon_content_desc), Modifier.padding(end = 10.dp))
+					Text(stringResource(R.string.install_os))
 				}
 				Row(horizontalArrangement = Arrangement.End, modifier = Modifier
 					.fillMaxWidth()
@@ -337,7 +339,7 @@ private fun Start(c: CreatePartDataHolder) {
 						c.f = c.p.size - c.u.toLong()
 						c.vm.navigate("shop")
 					}) {
-						Text("Continue")
+						Text(stringResource(R.string.cont))
 					}
 				}
 			}
@@ -366,8 +368,8 @@ private fun Shop(c: CreatePartDataHolder) {
 						.fillMaxWidth()
 						.padding(20.dp)
 				) {
-					Icon(painterResource(id = R.drawable.ic_about), "Icon")
-					Text("Please select the operating system you wish to install.")
+					Icon(painterResource(id = R.drawable.ic_about), stringResource(R.string.icon_content_desc))
+					Text(stringResource(R.string.select_os))
 				}
 			}
 			//Log.i("ABM shop:", "Found: ${json!!.getJSONArray("oses").length()} oses")
@@ -376,11 +378,14 @@ private fun Shop(c: CreatePartDataHolder) {
 				val index = i
 				Row(horizontalArrangement = Arrangement.SpaceEvenly,
 					verticalAlignment = Alignment.CenterVertically,
-					modifier = Modifier.fillMaxWidth()
+					modifier = Modifier
+						.fillMaxWidth()
 						.clickable {
 							//Log.i("ABM shop:", "Selected OS: $index")
 							c.run {
-								val o = json!!.getJSONArray("oses").getJSONObject(index)
+								val o = json!!
+									.getJSONArray("oses")
+									.getJSONObject(index)
 								dmaMeta["name"] =
 									o.getString("displayname")
 								dmaMeta["creator"] = o.getString("creator")
@@ -391,22 +396,24 @@ private fun Shop(c: CreatePartDataHolder) {
 								shName = o.getString("scriptname")
 								i = 0
 								val partitionParams = o.getJSONArray("partitions")
-								while (i < partitionParams.length()){
+								while (i < partitionParams.length()) {
 									val l = partitionParams.getJSONObject(i)
-									addDefault(l.getLong("size"),
-										if (l.getBoolean("isPercent")){
+									addDefault(
+										l.getLong("size"),
+										if (l.getBoolean("isPercent")) {
 											1
 										} else {
 											0
 										},
 										l.getString("type"),
 										l.getString("id"),
-										l.getBoolean("needUnsparse"))
+										l.getBoolean("needUnsparse")
+									)
 									i++
 								}
 								i = 0
 								val inets = o.getJSONArray("inet")
-								while (i < inets.length()){
+								while (i < inets.length()) {
 									val l = inets.getJSONObject(i)
 									val li = l.getString("id")
 									inetAvailable[li] = l.getString("url")
@@ -415,13 +422,13 @@ private fun Shop(c: CreatePartDataHolder) {
 								}
 								i = 0
 								val extraIdNeeded = o.getJSONArray("extraIdNeeded")
-								while (i < extraIdNeeded.length()){
+								while (i < extraIdNeeded.length()) {
 									idNeeded.add(extraIdNeeded.get(i) as String)
 									i++
 								}
 								i = 0
 								val blockIdNeeded = o.getJSONArray("blockIdNeeded")
-								while (i < blockIdNeeded.length()){
+								while (i < blockIdNeeded.length()) {
 									idUnneeded.add(blockIdNeeded.get(i) as String)
 									i++
 								}
@@ -432,7 +439,7 @@ private fun Shop(c: CreatePartDataHolder) {
 						}) {
 					val l = json!!.getJSONArray("oses").getJSONObject(i)
 					val painter = c.painterFromRtype(l.getString("rtype"))
-					Icon(painter = painter(), contentDescription = "OS logo")
+					Icon(painter = painter(), contentDescription = stringResource(R.string.os_logo_content_desc))
 					Text(l.getString("displayname"))
 				}
 				i++
@@ -470,7 +477,7 @@ private fun Os(c: CreatePartDataHolder) {
 					.fillMaxWidth(),
 				horizontalAlignment = Alignment.CenterHorizontally
 			) {
-				Icon(c.painter!!(), contentDescription = "ROM logo", modifier = Modifier.size(256.dp))
+				Icon(c.painter!!(), contentDescription = stringResource(R.string.rom_logo_content_desc), modifier = Modifier.size(256.dp))
 				Text(c.dmaMeta["name"]!!)
 				Text(c.dmaMeta["creator"]!!, color = MaterialTheme.colorScheme.onSurfaceVariant)
 				Card {
@@ -480,7 +487,7 @@ private fun Os(c: CreatePartDataHolder) {
 							.padding(20.dp)
 					) {
 						Icon(painterResource(id = R.drawable.ic_about), "Icon")
-						Text("You almost installed this ROM! There's only a few more steps to go. Below, you have some optional settings to further customize your install...")
+						Text(stringResource(R.string.almost_installed_rom))
 					}
 				}
 			}
@@ -492,17 +499,18 @@ private fun Os(c: CreatePartDataHolder) {
 				.clickable {
 					expanded = if (expanded == 1) 0 else 1
 				}) {
-				Text("Bootloader options")
+				Text(stringResource(R.string.bl_option))
 				if (expanded == 1) {
-					Icon(painterResource(id = R.drawable.ic_baseline_keyboard_arrow_up_24), "Close")
+					Icon(painterResource(id = R.drawable.ic_baseline_keyboard_arrow_up_24), stringResource(R.string.close_content_desc))
 				} else {
-					Icon(painterResource(id = R.drawable.ic_baseline_keyboard_arrow_down_24), "Expand")
+					Icon(painterResource(id = R.drawable.ic_baseline_keyboard_arrow_down_24), stringResource(R.string.expand_content_desc))
 				}
 			}
 		if (expanded == 1 || c.noobMode) {
 			Column(
 				Modifier
-					.fillMaxWidth().padding(5.dp)
+					.fillMaxWidth()
+					.padding(5.dp)
 			) {
 				var et2 by remember { mutableStateOf(false) }
 				var et3 by remember { mutableStateOf(false) }
@@ -512,14 +520,14 @@ private fun Os(c: CreatePartDataHolder) {
 						et2 = !(c.t2.value.matches(Regex("\\A\\p{ASCII}*\\z")))
 						e = et2 || et3
 					}, isError = et2, label = {
-						Text("ROM internal ID (don't touch if unsure)")
+						Text(stringResource(R.string.internal_id))
 					})
 				TextField(value = c.t3.value, onValueChange = {
 					c.t3.value = it
 					et3 = !(c.t3.value.matches(Regex("\\A\\p{ASCII}*\\z")))
 					e = et2 || et3
 				}, isError = et3, label = {
-					Text("ROM name in bootmenu")
+					Text(stringResource(R.string.name_in_boot))
 				})
 			}
 		}
@@ -530,11 +538,11 @@ private fun Os(c: CreatePartDataHolder) {
 				.clickable {
 					expanded = if (expanded == 2) 0 else 2
 				}) {
-				Text("Partition layout (advanced users)")
+				Text(stringResource(R.string.part_layout))
 				if (expanded == 2) {
-					Icon(painterResource(id = R.drawable.ic_baseline_keyboard_arrow_up_24), "Close")
+					Icon(painterResource(id = R.drawable.ic_baseline_keyboard_arrow_up_24), stringResource(R.string.close_content_desc))
 				} else {
-					Icon(painterResource(id = R.drawable.ic_baseline_keyboard_arrow_down_24), "Expand")
+					Icon(painterResource(id = R.drawable.ic_baseline_keyboard_arrow_down_24), stringResource(R.string.expand_content_desc))
 				}
 			}
 		if (expanded == 2) {
@@ -551,7 +559,7 @@ private fun Os(c: CreatePartDataHolder) {
 					var sparse by remember { mutableStateOf(c.sparseVals.getOrElse(i-1) { false }) }
 					val items = listOf("bytes", "percent")
 					val items2 = listOf("0700", "8302", "8305")
-					val codes = listOf("Portable data partition", "OS userdata",  "OS system data")
+					val codes = listOf(stringResource(R.string.portable_part), stringResource(R.string.os_userdata), stringResource(R.string.os_system))
 					val isSelectedItem: (String) -> Boolean = { items[selectedValue.value] == it }
 					val onChangeState: (String) -> Unit = { selectedValue.value = items.indexOf(it) }
 
@@ -604,13 +612,13 @@ private fun Os(c: CreatePartDataHolder) {
 							}
 							remaining += sts
 
-							Text(text = "Selected value: ${intValue.value} ${items[selectedValue.value]} (using $sts from $remaining sectors)")
+							Text(text = stringResource(R.string.sector_used, intValue.value, items[selectedValue.value], sts, remaining))
 							TextField(value = intValue.value.toString(), onValueChange = {
 								if (it.matches(Regex("[0-9]+"))) {
 									intValue.value = it.toLong()
 								}
 							}, label = {
-								Text("Size")
+								Text(stringResource(R.string.size))
 							})
 							Row(Modifier.padding(8.dp)) {
 								items.forEach { item ->
@@ -639,7 +647,7 @@ private fun Os(c: CreatePartDataHolder) {
 									readOnly = true,
 									value = codes[items2.indexOf(codeValue)],
 									onValueChange = { },
-									label = { Text("Type") },
+									label = { Text(stringResource(R.string.type)) },
 									trailingIcon = {
 										ExposedDropdownMenuDefaults.TrailingIcon(
 											expanded = d
@@ -669,11 +677,11 @@ private fun Os(c: CreatePartDataHolder) {
 							TextField(
 								value = idValue,
 								onValueChange = { idValue = it },
-								label = { Text("ID") }
+								label = { Text(stringResource(R.string.id)) }
 							)
 							Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable { sparse = !sparse }) {
 								Checkbox(checked = sparse, onCheckedChange = { sparse = it })
-								Text("Sparsed")
+								Text(stringResource(R.string.sparse))
 							}
 						}
 					}
@@ -696,7 +704,7 @@ private fun Os(c: CreatePartDataHolder) {
 						}
 						remaining -= sts
 					}
-					Text("Remaining $remaining from ${c.availableSize}")
+					Text(stringResource(R.string.remaining_sector, remaining, c.availableSize))
 				}
 			}
 		}
@@ -707,7 +715,7 @@ private fun Os(c: CreatePartDataHolder) {
 		c.vm.nextText.value = ""
 	} else {
 		c.vm.onNext.value = { it.navigate("dload") }
-		c.vm.nextText.value = "Install"
+		c.vm.nextText.value = stringResource(R.string.install)
 	}
 }
 
@@ -756,21 +764,21 @@ private fun Download(c: CreatePartDataHolder) {
 					.fillMaxWidth()
 					.padding(20.dp)
 			) {
-				Icon(painterResource(id = R.drawable.ic_about), "Icon")
-				Text("Please now provide images for all required IDs. You can use the recommended ones using the \"Download\" button!")
+				Icon(painterResource(id = R.drawable.ic_about), stringResource(id = R.string.icon_content_desc))
+				Text(stringResource(id = R.string.provide_images))
 			}
 		}
 		var downloading by remember { mutableStateOf(false) }
-		var progressText by remember { mutableStateOf("(Connecting...)") }
+		var progressText by remember { mutableStateOf(c.vm.activity.getString(R.string.connecting_text)) }
 		if (downloading) {
 			AlertDialog(
 				onDismissRequest = {},
 				confirmButton = {
 					Button(onClick = { c.cl?.invoke() }) {
-						Text("Cancel")
+						Text(stringResource(id = R.string.cancel))
 					}
 				},
-				title = { Text("Downloading...") },
+				title = { Text(stringResource(R.string.downloading)) },
 				text = {
 					Row(verticalAlignment = Alignment.CenterVertically) {
 						CircularProgressIndicator(Modifier.padding(end = 10.dp))
@@ -788,7 +796,7 @@ private fun Download(c: CreatePartDataHolder) {
 				Column {
 					Text(i)
 					Text(
-						if (c.inetDesc.containsKey(i)) c.inetDesc[i]!! else "User-selected",
+						if (c.inetDesc.containsKey(i)) c.inetDesc[i]!! else stringResource(R.string.user_selected),
 						color = MaterialTheme.colorScheme.onSurfaceVariant
 					)
 				}
@@ -798,23 +806,21 @@ private fun Download(c: CreatePartDataHolder) {
 							c.chosen[i]!!.delete()
 							c.chosen.remove(i)
 						}) {
-							Text("Undo")
+							Text(stringResource(R.string.undo))
 						}
 					} else {
 						if (inet) {
 							Button(onClick = {
 								downloading = true
-								progressText = "(Connecting...)"
+								progressText = c.vm.activity.getString(R.string.connecting_text)
 								c.pl = object : ProgressListener {
 									override fun update(
 										bytesRead: Long,
 										contentLength: Long,
 										done: Boolean
 									) {
-										progressText =
-											SOUtils.humanReadableByteCountBin(bytesRead) + " of " + SOUtils.humanReadableByteCountBin(
-												contentLength
-											) + " downloaded"
+										progressText = c.vm.activity.getString(R.string.download_progress,
+											SOUtils.humanReadableByteCountBin(bytesRead), SOUtils.humanReadableByteCountBin(contentLength))
 									}
 								}
 								Thread {
@@ -851,7 +857,7 @@ private fun Download(c: CreatePartDataHolder) {
 									downloading = false
 								}.start()
 							}) {
-								Text("Download")
+								Text(stringResource(R.string.download))
 							}
 						}
 						Button(onClick = {
@@ -859,7 +865,7 @@ private fun Download(c: CreatePartDataHolder) {
 								c.chosen[i] = DledFile(it, null)
 							}
 						}) {
-							Text("Choose")
+							Text(stringResource(R.string.choose))
 						}
 					}
 				}
@@ -868,7 +874,7 @@ private fun Download(c: CreatePartDataHolder) {
 		c.vm.btnsOverride = true
 		if (c.idNeeded.find { !c.chosen.containsKey(it) } == null) {
 			c.vm.onNext.value = { it.navigate("flash") }
-			c.vm.nextText.value = "Install"
+			c.vm.nextText.value = stringResource(id = R.string.install)
 		} else {
 			c.vm.onNext.value = {}
 			c.vm.nextText.value = ""
@@ -1020,7 +1026,7 @@ private fun Flash(c: CreatePartDataHolder) {
 			}
 			if (r.isSuccess) {
 				vm.btnsOverride = true
-				vm.nextText.value = "Finish"
+				vm.nextText.value = c.vm.activity.getString(R.string.finish)
 				vm.onNext.value = {
 					it.startActivity(Intent(it, MainActivity::class.java))
 					it.finish()

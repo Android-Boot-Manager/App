@@ -2,24 +2,21 @@ package org.andbootmgr.app
 
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.core.net.toFile
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFileInputStream
+import org.andbootmgr.app.util.SDUtils
 import java.io.File
 import java.io.IOException
 
@@ -27,12 +24,12 @@ class BackupRestoreWizardPageFactory(private val vm: WizardActivityState) {
     fun get(): List<IWizardPage> {
         val c = CreateBackupDataHolder(vm)
         return listOf(WizardPage("start",
-            NavButton("Cancel") { it.startActivity(Intent(it, MainActivity::class.java)); it.finish() },
+            NavButton(vm.activity.getString(R.string.cancel)) { it.startActivity(Intent(it, MainActivity::class.java)); it.finish() },
             NavButton("") {})
         {
             ChooseAction(c)
         }, WizardPage("select",
-            NavButton("Prev") { it.navigate("start") },
+            NavButton(vm.activity.getString(R.string.prev)) { it.navigate("start") },
             NavButton("") {}
         ) {
             Select(c)
@@ -63,13 +60,13 @@ private fun ChooseAction(c: CreateBackupDataHolder) {
     ) {
         Text(stringResource(id = R.string.backup_msg, c.meta!!.dumpKernelPartition(c.pi).name), textAlign = TextAlign.Center)
         Button(onClick = { c.action=1; c.vm.navigate("select") }) {
-            Text("Backup")
+            Text(stringResource(R.string.backup))
         }
         Button(onClick = { c.action=2; c.vm.navigate("select") }) {
-            Text("Restore")
+            Text(stringResource(R.string.restore))
         }
         Button(onClick = { c.action=3; c.vm.navigate("select") }) {
-            Text("Flash sparse image")
+            Text(stringResource(R.string.flash_sparse))
         }
     }
 }
@@ -84,17 +81,17 @@ private fun Select(c: CreateBackupDataHolder) {
         modifier = Modifier.fillMaxSize()
     ) {
         if (nextButtonAvailable.value) {
-            Text("Successfully selected.")
-            c.vm.nextText.value = "Next"
+            Text(stringResource(R.string.successfully_selected))
+            c.vm.nextText.value = stringResource(R.string.next)
             c.vm.onNext.value = { it.navigate("go") }
         } else {
             Text(
                 if (c.action == 1)
-                    "Create backup file"
+                    stringResource(R.string.make_backup)
                 else if (c.action == 2)
-                    "Select file to restore"
+                    stringResource(R.string.restore_backup)
                 else if (c.action == 3)
-                    "Select sparse file to write to the partition"
+                    stringResource(R.string.restore_backup_sparse)
                 else
                     ""
             )
@@ -113,9 +110,9 @@ private fun Select(c: CreateBackupDataHolder) {
             }) {
                 Text(
                     if (c.action != 1) {
-                        "Choose file"
+                        stringResource(R.string.choose_file)
                     } else {
-                        "Create file"
+                        stringResource(R.string.create_file)
                     }
                 )
             }
@@ -171,7 +168,7 @@ private fun Flash(c: CreateBackupDataHolder) {
         }
         terminal.add("-- Successful!")
         c.vm.btnsOverride = true
-        c.vm.nextText.value = "Finish"
+        c.vm.nextText.value = c.vm.activity.getString(R.string.finish)
         c.vm.onNext.value = { it.startActivity(Intent(it, MainActivity::class.java)); it.finish() }
     }
 }

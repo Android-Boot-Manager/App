@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
 import okhttp3.Call
@@ -21,6 +22,7 @@ import okhttp3.internal.http2.StreamResetException
 import okio.buffer
 import okio.sink
 import org.andbootmgr.app.util.ConfigFile
+import org.andbootmgr.app.util.SDUtils
 import org.json.JSONObject
 import org.json.JSONTokener
 import java.io.File
@@ -32,19 +34,19 @@ class UpdateFlowWizardPageFactory(private val vm: WizardActivityState) {
         val c = UpdateFlowDataHolder(vm)
         val noobMode = c.vm.activity.getSharedPreferences("abm", 0).getBoolean("noob_mode", BuildConfig.DEFAULT_NOOB_MODE)
         return listOf(WizardPage("start",
-            NavButton("Cancel") {
+            NavButton(vm.activity.getString(R.string.cancel)) {
                 it.startActivity(Intent(it, MainActivity::class.java))
                 it.finish()
             },
-            if (noobMode) NavButton("") {} else NavButton("Local update") { vm.navigate("local") }
+            if (noobMode) NavButton("") {} else NavButton(vm.activity.getString(R.string.local_update)) { vm.navigate("local") }
         ) {
             Start(c)
         }, WizardPage("local",
-            NavButton("Cancel") {
+            NavButton(vm.activity.getString(R.string.cancel)) {
                 it.startActivity(Intent(it, MainActivity::class.java))
                 it.finish()
             },
-            NavButton("Online update") { vm.navigate("start") }
+            NavButton(vm.activity.getString(R.string.online_update)) { vm.navigate("start") }
         ) {
             Local(c)
         }, WizardPage("flash",
@@ -105,15 +107,10 @@ private fun Start(u: UpdateFlowDataHolder) {
     Column {
         if (u.hasChecked) {
             if (u.json == null) {
-                Text("Failed to check for updates! Please try again later.")
+                Text(stringResource(R.string.update_check_failed))
             } else {
                 if (u.hasUpdate) {
-                    Text(
-                        "An update is available for installation.\n\n" +
-                                "Continuing this process will download image data over the internet, which may use over 4 gigabytes of data. Please make sure you are on an unmetered connection.\n" +
-                                "Please make sure you have an backup of your data before continuing.\n" +
-                                "While the update process is automatic, please do not exit the app while the update is in progress.\n"
-                    )
+                    Text(stringResource(id = R.string.found_update))
                     Button(onClick = {
                         try {
                             u.run {
@@ -146,10 +143,10 @@ private fun Start(u: UpdateFlowDataHolder) {
                             u.json = null
                         }
                     }) {
-                        Text("Install update")
+                        Text(stringResource(R.string.install_update))
                     }
                 } else {
-                    Text("No updates are currently available, your operating system is up to date!")
+                    Text(stringResource(R.string.up2date))
                 }
             }
         }
@@ -161,9 +158,9 @@ private fun Start(u: UpdateFlowDataHolder) {
 private fun Local(u: UpdateFlowDataHolder) {
     Column(verticalArrangement = Arrangement.SpaceEvenly) {
         Column {
-            Text("Welcome to the local updater.")
-            Text("This allows you to manually update the boot image of an operating system.")
-            Text("Please only continue if you know what you are doing.")
+            Text(stringResource(R.string.local_updater_1))
+            Text(stringResource(R.string.local_updater_2))
+            Text(stringResource(R.string.local_updater_3))
         }
         Column {
             var text by remember { mutableStateOf("") }
@@ -172,19 +169,19 @@ private fun Local(u: UpdateFlowDataHolder) {
                 text = it
                 error = text.isBlank() || !File(u.vm.logic.assetDir, "Scripts/add_os/${u.vm.deviceInfo!!.codename}/${text}").exists()
             }, label = {
-                Text("Script name")
+                Text(stringResource(R.string.script_name))
             })
             if (u.sbootfile == null) {
-                Text("No file selected")
+                Text(stringResource(R.string.no_file_selected))
                 Button(onClick = { u.vm.activity.chooseFile("*/*") {
                     u.sbootfile = it
                 } }) {
-                    Text("Choose file")
+                    Text(stringResource(id = R.string.choose_file))
                 }
             } else {
-                Text("File selected")
+                Text(stringResource(R.string.file_selected))
                 Button(onClick = { u.sbootfile = null }) {
-                    Text("Undo")
+                    Text(stringResource(id = R.string.undo))
                 }
                 Button(onClick = {
                     if (!error) {
@@ -193,7 +190,7 @@ private fun Local(u: UpdateFlowDataHolder) {
                         u.vm.navigate("flash")
                     }
                 }, enabled = !error) {
-                    Text("Install update")
+                    Text(stringResource(R.string.install_update))
                 }
             }
         }
@@ -241,7 +238,7 @@ private fun Flash(u: UpdateFlowDataHolder) {
 
         if (u.hasUpdate) { // online
             u.vm.btnsOverride = true
-            u.vm.nextText.value = "Cancel"
+            u.vm.nextText.value = u.vm.activity.getString(R.string.cancel)
             u.vm.onNext.value = { u.currentDl?.cancel() }
             try {
                 var bootfile: File? = null
@@ -340,7 +337,7 @@ private fun Flash(u: UpdateFlowDataHolder) {
         } else {
             terminal.add("-- Failed to prepare update. Nothing has been changed.")
         }
-        u.vm.nextText.value = "Finish"
+        u.vm.nextText.value = u.vm.activity.getString(R.string.finish)
         u.vm.onNext.value = {
             it.startActivity(Intent(it, MainActivity::class.java))
             it.finish()

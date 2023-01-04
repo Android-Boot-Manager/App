@@ -63,7 +63,7 @@ class WizardActivity : ComponentActivity() {
 		vm.logic = DeviceLogic(this)
 		chooseFile = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
 			if (uri == null) {
-				Toast.makeText(this, "File not available, please try again later!", Toast.LENGTH_LONG).show()
+				Toast.makeText(this, getString(R.string.file_unavailable), Toast.LENGTH_LONG).show()
 				onFileChosen = null
 				return@registerForActivityResult
 			}
@@ -73,14 +73,14 @@ class WizardActivity : ComponentActivity() {
 			} else {
 				Toast.makeText(
 					this@WizardActivity,
-					"Internal error - no file handler added!! Please cancel install",
+					getString(R.string.internal_file_error1),
 					Toast.LENGTH_LONG
 				).show()
 			}
 		}
 		newFile = registerForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream")) { uri: Uri? ->
 			if (uri == null) {
-				Toast.makeText(this, "File not available, please try again later!", Toast.LENGTH_LONG).show()
+				Toast.makeText(this, getString(R.string.file_unavailable), Toast.LENGTH_LONG).show()
 				onFileCreated = null
 				return@registerForActivityResult
 			}
@@ -90,7 +90,7 @@ class WizardActivity : ComponentActivity() {
 			} else {
 				Toast.makeText(
 					this@WizardActivity,
-					"Internal error - no file handler added!! Please cancel install",
+					getString(R.string.internal_file_error1),
 					Toast.LENGTH_LONG
 				).show()
 			}
@@ -146,7 +146,7 @@ class WizardActivity : ComponentActivity() {
 		if (onFileChosen != null) {
 			Toast.makeText(
 				this,
-				"Internal error - double file choose!! Please cancel install",
+				getString(R.string.internal_file_error2),
 				Toast.LENGTH_LONG
 			).show()
 			return
@@ -158,7 +158,7 @@ class WizardActivity : ComponentActivity() {
 		if (onFileCreated != null) {
 			Toast.makeText(
 				this,
-				"Internal error - double file choose!! Please cancel install",
+				getString(R.string.internal_file_error2),
 				Toast.LENGTH_LONG
 			).show()
 			return

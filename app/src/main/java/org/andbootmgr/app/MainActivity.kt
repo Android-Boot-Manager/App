@@ -42,6 +42,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.andbootmgr.app.util.AbmTheme
 import org.andbootmgr.app.util.ConfigFile
+import org.andbootmgr.app.util.SDUtils
 import org.andbootmgr.app.util.Toolkit
 import java.io.File
 import java.io.IOException
@@ -88,7 +89,7 @@ class MainActivityState {
 	var deviceInfo: DeviceInfo? = null
 	var currentNav by mutableStateOf("start")
 	var isReady = false
-	var name by mutableStateOf("Android")
+	var name by mutableStateOf("") /* default value moved to onCreate() */
 	var navController: NavHostController? = null
 	@OptIn(ExperimentalMaterial3Api::class)
 	var drawerState: DrawerState? = null
@@ -105,6 +106,7 @@ class MainActivity : ComponentActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		val vm = MainActivityState()
+		vm.name = getString(R.string.android)
 		vm.activity = this
 		vm.logic = DeviceLogic(this)
 
@@ -126,7 +128,7 @@ class MainActivity : ComponentActivity() {
 		)
 
 		val toast =
-			Toast.makeText(this, "Toolkit extracting, please be patient...", Toast.LENGTH_LONG)
+			Toast.makeText(this, getString(R.string.toolkit_extracting), Toast.LENGTH_LONG)
 		Thread {
 			if (Shell.getCachedShell() == null) {
 				Shell.enableVerboseLogging = BuildConfig.DEBUG
@@ -197,14 +199,14 @@ class MainActivity : ComponentActivity() {
 								Text(text = "Error")
 							},
 							text = {
-								Text("Toolkit unpacking has not successfully completed. Please report this to the developers!")
+								Text(getString(R.string.toolkit_error))
 							},
 							confirmButton = {
 								Button(
 									onClick = {
 										finish()
 									}) {
-									Text("Quit")
+									Text(getString(R.string.quit))
 								}
 							}
 						)
@@ -225,7 +227,7 @@ private fun AppContent(vm: MainActivityState, view: @Composable (PaddingValues) 
 	val fab = @Composable {
 		if (vm.noobMode && vm.currentNav == "start") {
 			FloatingActionButton(onClick = { fabhint = true }) {
-				Icon(Icons.Default.Add, "Add icon")
+				Icon(Icons.Default.Add, stringResource(R.string.add_icon_content_desc))
 			}
 		}
 	}
@@ -241,7 +243,7 @@ private fun AppContent(vm: MainActivityState, view: @Composable (PaddingValues) 
 						vm.navController!!.navigate("start")
 						drawerState.close()
 					} },
-					content = { Text("Home") }
+					content = { Text(stringResource(R.string.home)) }
 				)
 				Button(
 					modifier = Modifier
@@ -252,17 +254,17 @@ private fun AppContent(vm: MainActivityState, view: @Composable (PaddingValues) 
 						drawerState.close()
 					} },
 					enabled = vm.isOk,
-					content = { Text("Settings") }
+					content = { Text(stringResource(R.string.settings)) }
 				)
 			},
 				drawerState = drawerState,
 				content = {
 					if (fabhint) {
 						AlertDialog(onDismissRequest = { fabhint = false }, text = {
-							Text("Select an \"Free space\" to begin adding an operating system or an portable partition at the selected position.")
+							Text(stringResource(R.string.select_free_space))
 						}, confirmButton = {
 							Button(onClick = { fabhint = false }) {
-								Text("OK")
+								Text(stringResource(R.string.ok))
 							}
 						})
 					}
@@ -328,11 +330,11 @@ private fun Start(vm: MainActivityState) {
 	)
 	val notOkIcon = R.drawable.ic_baseline_error_24
 	val okIcon = R.drawable.ic_baseline_check_circle_24
-	val okText = "Installed"
-	val partiallyOkText = "Installed but not activated"
-	val corruptDeactivatedText = "Deactivated and corrupt"
-	val corruptText = "Activated but corrupt"
-	val notOkText = "Not installed"
+	val okText = stringResource(R.string.installed)
+	val partiallyOkText = stringResource(R.string.installed_deactivated)
+	val corruptDeactivatedText = stringResource(R.string.deactivated_corrupt)
+	val corruptText = stringResource(R.string.activated_corrupt)
+	val notOkText = stringResource(R.string.not_installed)
 	val ok = installed and booted and mounted and !corrupt
 	val usedText = if (ok) {
 		okText
@@ -367,52 +369,52 @@ private fun Start(vm: MainActivityState) {
 						)
 						Text(usedText, fontSize = 32.sp)
 					}
-					Text("Activated: $booted")
-					Text("Mounted bootset: $mounted")
+					Text(stringResource(id = R.string.activated, stringResource(if (booted) R.string.yes else R.string.no)))
+					Text(stringResource(id = R.string.mounted_b, stringResource(if (mounted) R.string.yes else R.string.no)))
 					if (vm.deviceInfo!!.metaonsd) {
-						Text("SD Card inserted: $sdpresent")
-						Text("SD Card formatted for dualboot: $installed")
+						Text(stringResource(id = R.string.sd_inserted, stringResource(if (sdpresent) R.string.yes else R.string.no)))
+						Text(stringResource(id = R.string.sd_formatted, stringResource(if (installed) R.string.yes else R.string.no)))
 					} else {
-						Text("Installed: $installed")
+						Text(stringResource(id = R.string.installed_status, stringResource(if (installed) R.string.yes else R.string.no)))
 					}
 					if (mounted) {
-						Text("Bootset corrupt: $corrupt")
+						Text(stringResource(id = R.string.corrupt_b, stringResource(if (corrupt) R.string.yes else R.string.no)))
 					}
-					Text("Device: ${if (vm.deviceInfo == null) "(unsupported)" else vm.deviceInfo!!.codename}")
+					Text(stringResource(R.string.device, if (vm.deviceInfo == null) stringResource(id = R.string.unsupported) else vm.deviceInfo!!.codename))
 				}
 			}
 		}
 		if (Shell.isAppGrantedRoot() == false) {
 			Text(
-				"Root access is not granted, but required for this app.",
+				stringResource(R.string.need_root),
 				textAlign = TextAlign.Center
 			)
 		} else if (vm.deviceInfo!!.metaonsd && !sdpresent) {
-			Text("An SD card is required for ABM to work, but none could be detected.", textAlign = TextAlign.Center)
+			Text(stringResource(R.string.need_sd), textAlign = TextAlign.Center)
 		} else if (!installed) {
 			Button(onClick = { vm.startFlow("droidboot") }) {
 				Text(if (vm.deviceInfo!!.metaonsd) "Setup SD card" else "Install")
 			}
 		} else if (!booted) {
-			Text("The device did not boot using DroidBoot, but configuration files are present. If you just installed ABM, you need to reboot. If the bootloader installation repeatedly fails, please consult the documentation.", textAlign = TextAlign.Center)
+			Text(stringResource(R.string.installed_not_booted), textAlign = TextAlign.Center)
 			Button(onClick = {
 				vm.startFlow("fix_droidboot")
 			}) {
 				Text("Repair DroidBoot")
 			}
 		} else if (!vm.deviceInfo!!.metaonsd && mounted && corrupt) {
-			Text("Configuration files are not present. You can restore them from an automated backup. For more information, please consult the documentation.", textAlign = TextAlign.Center)
+			Text(stringResource(R.string.missing_cfg), textAlign = TextAlign.Center)
 			Button(onClick = {
-				vm.startFlow("repair_cfg")
+				//vm.startFlow("repair_cfg") TODO:Implement this
 			}) {
 				Text("Repair bootset")
 			}
 		} else if (!mounted) {
-			Text("Bootset could not be mounted, please consult the documentation.", textAlign = TextAlign.Center)
+			Text(stringResource(R.string.cannot_mount), textAlign = TextAlign.Center)
 		} else if (vm.isOk) {
 			PartTool(vm)
 		} else {
-			Text("Unknown error, invalid state", textAlign = TextAlign.Center)
+			Text(stringResource(R.string.invalid), textAlign = TextAlign.Center)
 		}
 	}
 }
@@ -430,7 +432,7 @@ private fun PartTool(vm: MainActivityState) {
 				onClick = {
 					filterUnifiedView = true; filterPartView = false; filterEntryView = false
 				},
-				label = { Text("Unified") },
+				label = { Text(stringResource(R.string.unified)) },
 				Modifier.padding(start = 5.dp),
 				leadingIcon = if (filterUnifiedView) {
 					{
@@ -449,13 +451,13 @@ private fun PartTool(vm: MainActivityState) {
 				onClick = {
 					filterPartView = true; filterUnifiedView = false; filterEntryView = false
 				},
-				label = { Text("Partitions") },
+				label = { Text(stringResource(R.string.partitions)) },
 				Modifier.padding(start = 5.dp),
 				leadingIcon = if (filterPartView) {
 					{
 						Icon(
 							imageVector = Icons.Filled.Done,
-							contentDescription = "Enabled",
+							contentDescription = stringResource(R.string.enabled_content_desc),
 							modifier = Modifier.size(FilterChipDefaults.IconSize)
 						)
 					}
@@ -468,13 +470,13 @@ private fun PartTool(vm: MainActivityState) {
 				onClick = {
 					filterPartView = false; filterUnifiedView = false; filterEntryView = true
 				},
-				label = { Text("Entries") },
+				label = { Text(stringResource(R.string.entries)) },
 				Modifier.padding(start = 5.dp),
 				leadingIcon = if (filterEntryView) {
 					{
 						Icon(
 							imageVector = Icons.Filled.Done,
-							contentDescription = "Enabled",
+							contentDescription = stringResource(R.string.enabled_content_desc),
 							modifier = Modifier.size(FilterChipDefaults.IconSize)
 						)
 					}
@@ -493,7 +495,7 @@ private fun PartTool(vm: MainActivityState) {
 		)
 	}
 	if (parts == null) {
-		Text("Partition wizard failed to load")
+		Text(stringResource(R.string.part_wizard_err))
 		return
 	}
 	val entries = remember {
@@ -514,7 +516,10 @@ private fun PartTool(vm: MainActivityState) {
 	var result: String? by remember { mutableStateOf(null) }
 	var editPartID: SDUtils.Partition? by remember { mutableStateOf(null) }
 	var editEntryID: ConfigFile? by remember { mutableStateOf(null) }
-	Column(Modifier.verticalScroll(rememberScrollState()).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+	Column(
+		Modifier
+			.verticalScroll(rememberScrollState())
+			.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
 		if (vm.noobMode) {
 			Card(modifier = Modifier
 				.fillMaxWidth()
@@ -524,8 +529,8 @@ private fun PartTool(vm: MainActivityState) {
 						.fillMaxWidth()
 						.padding(20.dp)
 				) {
-					Icon(painterResource(id = R.drawable.ic_about), "Icon")
-					Text("Click one of the below options to inspect them.")
+					Icon(painterResource(id = R.drawable.ic_about), stringResource(id = R.string.icon_content_desc))
+					Text(stringResource(R.string.click2inspect))
 				}
 			}
 		}
@@ -535,7 +540,7 @@ private fun PartTool(vm: MainActivityState) {
 				var found = false
 				if (parts!!.s[i].type != SDUtils.PartitionType.FREE) {
 					for (e in entries.keys) {
-						if (e.has("xpart") && e["xpart"] != null && !e["xpart"]!!.isBlank()) {
+						if (e.has("xpart") && e["xpart"] != null && e["xpart"]!!.isNotBlank()) {
 							for (j in e["xpart"]!!.split(":")) {
 								if ("${parts!!.s[i].id}" == j) {
 									found = true
@@ -546,9 +551,9 @@ private fun PartTool(vm: MainActivityState) {
 											.clickable { editEntryID = e }) {
 										Text(
 											if (e.has("title")) {
-												"Entry \"${e["title"]}\""
+												stringResource(R.string.entry_title, e["title"]!!)
 											} else {
-												"(Invalid entry)"
+												stringResource(R.string.invalid_entry)
 											}
 										)
 									}
@@ -574,9 +579,9 @@ private fun PartTool(vm: MainActivityState) {
 							.clickable { editPartID = p }) {
 						Text(
 							if (p.type == SDUtils.PartitionType.FREE)
-								"Free space (${p.sizeFancy})"
+								stringResource(id = R.string.free_space_item, p.sizeFancy)
 							else
-								"Partition ${p.id} \"${p.name}\""
+								stringResource(id = R.string.part_item, p.id, p.name)
 						)
 					}
 				}
@@ -592,9 +597,9 @@ private fun PartTool(vm: MainActivityState) {
 						.clickable { editPartID = p }) {
 					Text(
 						if (p.type == SDUtils.PartitionType.FREE)
-							"Free space (${p.sizeFancy})"
+							stringResource(id = R.string.free_space_item, p.sizeFancy)
 						else
-							"Partition ${p.id} \"${p.name}\""
+							stringResource(id = R.string.part_item, p.id, p.name)
 					)
 				}
 			}
@@ -618,9 +623,9 @@ private fun PartTool(vm: MainActivityState) {
 					 */
 					Text(
 						if (e.has("title")) {
-							"Entry \"${e["title"]}\""
+							stringResource(R.string.entry_title, e["title"]!!)
 						} else {
-							"(Invalid entry)"
+							stringResource(R.string.invalid_entry)
 						}
 					)
 				}
@@ -631,7 +636,7 @@ private fun PartTool(vm: MainActivityState) {
 				modifier = Modifier
 					.fillMaxWidth()
 					.clickable { editEntryID = e }) {
-				Text("(Create new entry)")
+				Text(stringResource(R.string.new_entry))
 			}
 		}
 		if (editPartID != null) {
@@ -641,46 +646,50 @@ private fun PartTool(vm: MainActivityState) {
 					editPartID = null
 				},
 				title = {
-					val name = if (p.type == SDUtils.PartitionType.FREE)
-						"Free space"
-					else if (p.name.isBlank())
-						"Partition ${p.id}"
-					else
-						p.name.trim()
+						val name = if (p.type == SDUtils.PartitionType.FREE)
+							stringResource(R.string.free_space)
+						else if (p.name.isBlank())
+							stringResource(R.string.part_title, p.id)
+						else
+							p.name.trim()
 
 						Text(text = "\"${name}\"")
 					},
 					icon = {
-						Icon(painterResource(id = R.drawable.ic_sd), "Icon")
+						Icon(painterResource(id = R.drawable.ic_sd), stringResource(id = R.string.icon_content_desc))
 					},
 					text = {
 						Column {
-							val fancyType = when (p.type) {
-								SDUtils.PartitionType.RESERVED -> "Reserved"
-								SDUtils.PartitionType.ADOPTED -> "Adoptable Storage Metadata"
-								SDUtils.PartitionType.PORTABLE -> "Portable Storage"
-								SDUtils.PartitionType.UNKNOWN -> "Unknown"
-								SDUtils.PartitionType.FREE -> "Free space"
-								SDUtils.PartitionType.SYSTEM -> "OS system data"
-								SDUtils.PartitionType.DATA -> "OS user data"
-							}
+							val fancyType = stringResource(when (p.type) {
+								SDUtils.PartitionType.RESERVED -> R.string.reserved
+								SDUtils.PartitionType.ADOPTED -> R.string.adoptable_meta
+								SDUtils.PartitionType.PORTABLE -> R.string.portable_part
+								SDUtils.PartitionType.UNKNOWN -> R.string.unknown
+								SDUtils.PartitionType.FREE -> R.string.free_space
+								SDUtils.PartitionType.SYSTEM -> R.string.os_system
+								SDUtils.PartitionType.DATA -> R.string.os_userdata
+							})
 							if (p.type != SDUtils.PartitionType.FREE && !filterUnifiedView)
-								Text("Id: ${p.id} (${parts?.major}:${p.minor})")
-							Text("Type: ${fancyType}${if (p.type != SDUtils.PartitionType.FREE && !filterUnifiedView) " (code ${p.code})" else ""}")
-							Text("Size: ${p.sizeFancy}${if (!filterUnifiedView) "  (${p.size} sectors)" else ""}")
+								Text(stringResource(id = R.string.detail_id, p.id, p.major, p.minor))
+							Text(stringResource(id = R.string.detail_type, fancyType, if (p.type != SDUtils.PartitionType.FREE && !filterUnifiedView) stringResource(id = R.string.detail_type_code, p.code) else ""))
+							Text(stringResource(id = R.string.detail_size, p.sizeFancy, if (!filterUnifiedView) stringResource(id = R.string.detail_size_sectors, p.size) else ""))
 							if (!filterUnifiedView)
-								Text("Position: ${p.startSector} -> ${p.endSector}")
+								Text(stringResource(
+									id = R.string.detail_position,
+									p.startSector,
+									p.endSector
+								))
 							if (p.type != SDUtils.PartitionType.FREE) {
 								Row {
 									Button(onClick = {
 										rename = true
 									}, Modifier.padding(end = 5.dp)) {
-										Text("Rename")
+										Text(stringResource(R.string.rename))
 									}
 									Button(onClick = {
 										delete = true
 									}) {
-										Text("Delete")
+										Text(stringResource(R.string.delete))
 									}
 								}
 								if (!filterUnifiedView) {
@@ -692,7 +701,7 @@ private fun PartTool(vm: MainActivityState) {
 												result = it.out.join("\n") + it.err.join("\n")
 											}
 										}, Modifier.padding(end = 5.dp)) {
-											Text("Mount")
+											Text(stringResource(R.string.mount))
 										}
 										Button(onClick = {
 											processing = true
@@ -701,16 +710,16 @@ private fun PartTool(vm: MainActivityState) {
 												result = it.out.join("\n") + it.err.join("\n")
 											}
 										}) {
-											Text("Unmount")
+											Text(stringResource(R.string.umount))
 										}
 									}
 								}
 								Button(onClick = { vm.startBackupAndRestoreFlow(p) }) {
-									Text("Backup & Restore")
+									Text(stringResource(R.string.backupnrestore))
 								}
 							} else {
 								Button(onClick = { vm.startCreateFlow(p as SDUtils.Partition.FreeSpace) }) {
-									Text("Create")
+									Text(stringResource(R.string.create))
 								}
 							}
 						}
@@ -720,7 +729,7 @@ private fun PartTool(vm: MainActivityState) {
 							onClick = {
 								editPartID = null
 							}) {
-							Text("Cancel")
+							Text(stringResource(R.string.cancel))
 						}
 					}
 				)
@@ -732,19 +741,19 @@ private fun PartTool(vm: MainActivityState) {
 						rename = false
 					},
 					title = {
-						Text("Rename")
+						Text(stringResource(R.string.rename))
 					},
 					text = {
 						TextField(value = t, onValueChange = {
 							t = it
 							e = !t.matches(Regex("\\A\\p{ASCII}*\\z"))
 						}, isError = e, label = {
-							Text("Partition name")
+							Text(stringResource(R.string.part_name))
 						})
 					},
 					dismissButton = {
 						Button(onClick = { rename = false }) {
-							Text("Cancel")
+							Text(stringResource(R.string.cancel))
 						}
 					},
 					confirmButton = {
@@ -763,7 +772,7 @@ private fun PartTool(vm: MainActivityState) {
 								}
 							}
 						}, enabled = !e) {
-							Text("Rename")
+							Text(stringResource(R.string.rename))
 						}
 					}
 				)
@@ -773,14 +782,14 @@ private fun PartTool(vm: MainActivityState) {
 						delete = false
 					},
 					title = {
-						Text("Delete")
+						Text(stringResource(R.string.delete))
 					},
 					text = {
-						Text("Do you REALLY want to delete this partition and loose ALL data on it?")
+						Text(stringResource(R.string.really_delete_part))
 					},
 					dismissButton = {
 						Button(onClick = { delete = false }) {
-							Text("Cancel")
+							Text(stringResource(R.string.cancel))
 						}
 					},
 					confirmButton = {
@@ -795,7 +804,7 @@ private fun PartTool(vm: MainActivityState) {
 								result = it.out.join("\n") + it.err.join("\n")
 							}
 						}) {
-							Text("Delete")
+							Text(stringResource(R.string.delete))
 						}
 					}
 				)
@@ -803,10 +812,10 @@ private fun PartTool(vm: MainActivityState) {
 		}
 		if (editEntryID != null && !filterUnifiedView) {
 			val ctx = LocalContext.current
-			val fn = Regex("[0-9a-zA-Z]+\\.conf")
+			val fn = Regex("[\\da-zA-Z]+\\.conf")
 			val ascii = Regex("\\A\\p{ASCII}+\\z")
 			val xtype = arrayOf("droid", "SFOS", "UT", "")
-			val xpart = Regex("^$|^real$|^[0-9](:[0-9]+)*$")
+			val xpart = Regex("^$|^real$|^\\d(:\\d+)*$")
 			val e = editEntryID!!
 			var f = entries[e]
 			var newFileName by remember { mutableStateOf(f?.name ?: "NewEntry.conf") }
@@ -832,10 +841,10 @@ private fun PartTool(vm: MainActivityState) {
 					editEntryID = null
 				},
 				title = {
-					Text(text = if (e.has("title")) "\"${e["title"]}\"" else if (f != null) "Invalid entry" else "New entry")
+					Text(text = if (e.has("title")) "\"${e["title"]}\"" else if (f != null) stringResource(id = R.string.invalid_entry2) else stringResource(id = R.string.new_entry2))
 				},
 				icon = {
-					Icon(painterResource(id = R.drawable.ic_roms), "Icon")
+					Icon(painterResource(id = R.drawable.ic_roms), stringResource(R.string.icon_content_desc))
 				},
 				text = {
 					Column(Modifier.verticalScroll(rememberScrollState())) {
@@ -844,62 +853,62 @@ private fun PartTool(vm: MainActivityState) {
 							newFileName = it
 							newFileNameErr = !(newFileName.matches(fn))
 						}, isError = newFileNameErr, enabled = f == null, label = {
-							Text("File name")
+							Text(stringResource(R.string.file_name))
 						})
 
 						TextField(value = titleT, onValueChange = {
 							titleT = it
 							titleE = !(titleT.matches(ascii))
 						}, isError = titleE, label = {
-							Text("Title")
+							Text(stringResource(R.string.title))
 						})
 
 						TextField(value = linuxT, onValueChange = {
 							linuxT = it
 							linuxE = !(linuxT.matches(ascii))
 						}, isError = linuxE, label = {
-							Text("Linux")
+							Text(stringResource(R.string.linux))
 						})
 
 						TextField(value = initrdT, onValueChange = {
 							initrdT = it
 							initrdE = !(initrdT.matches(ascii))
 						}, isError = initrdE, label = {
-							Text("Initrd")
+							Text(stringResource(R.string.initrd))
 						})
 
 						TextField(value = dtbT, onValueChange = {
 							dtbT = it
 							dtbE = !(dtbT.matches(ascii))
 						}, isError = dtbE, label = {
-							Text("Dtb")
+							Text(stringResource(R.string.dtb))
 						})
 
 						TextField(value = optionsT, onValueChange = {
 							optionsT = it
 							optionsE = !(optionsT.matches(ascii))
 						}, isError = optionsE, label = {
-							Text("Options")
+							Text(stringResource(R.string.options))
 						})
 
 						TextField(value = xtypeT, onValueChange = {
 							xtypeT = it
 							xtypeE = !(xtype.contains(xtypeT))
 						}, isError = xtypeE, label = {
-							Text("ROM type")
+							Text(stringResource(R.string.rom_type))
 						})
 
 						TextField(value = xpartT, onValueChange = {
 							xpartT = it
 							xpartE = !(xpartT.matches(xpart))
 						}, isError = xpartE, label = {
-							Text("Assigned partitions")
+							Text(stringResource(R.string.assigned_parts))
 						})
 
 						TextField(value = xupdateT, onValueChange = {
 							xupdateT = it
 						}, label = {
-							Text("Updater URL")
+							Text(stringResource(R.string.updater_url))
 						})
 					}
 				},
@@ -911,7 +920,7 @@ private fun PartTool(vm: MainActivityState) {
 								entries.remove(e)
 								editEntryID = null
 							}) {
-							Text("Delete")
+							Text(stringResource(R.string.delete))
 						}
 					}
 					Button(
@@ -922,7 +931,7 @@ private fun PartTool(vm: MainActivityState) {
 								if (f!!.exists()) {
 									Toast.makeText(
 										ctx,
-										"File already exists, choose a different name",
+										vm.activity!!.getString(R.string.file_already_exists),
 										Toast.LENGTH_LONG
 									).show()
 									f = null
@@ -942,13 +951,13 @@ private fun PartTool(vm: MainActivityState) {
 							editEntryID = null
 						}, enabled = isOk
 					) {
-						Text(if (f != null) "Update" else "Create")
+						Text(stringResource(if (f != null) R.string.update else R.string.create))
 					}
 					Button(
 						onClick = {
 							editEntryID = null
 						}) {
-						Text("Cancel")
+						Text(stringResource(R.string.cancel))
 					}
 				}
 			)
@@ -959,10 +968,10 @@ private fun PartTool(vm: MainActivityState) {
 					editEntryID = null
 				},
 				title = {
-					Text(text = if (e.has("title")) "\"${e["title"]}\"" else "Invalid entry")
+					Text(text = if (e.has("title")) "\"${e["title"]}\"" else stringResource(R.string.invalid_entry2))
 				},
 				icon = {
-					Icon(painterResource(id = R.drawable.ic_roms), "Icon")
+					Icon(painterResource(id = R.drawable.ic_roms), stringResource(id = R.string.icon_content_desc))
 				},
 				text = {
 					Column(Modifier.verticalScroll(rememberScrollState())) {
@@ -971,13 +980,13 @@ private fun PartTool(vm: MainActivityState) {
 								if (e.has("xupdate") && !e["xupdate"].isNullOrBlank())
 									vm.startUpdateFlow(entries[e]!!.absolutePath)
 							}, enabled = e.has("xupdate") && !e["xupdate"].isNullOrBlank()) {
-							Text("Update")
+							Text(stringResource(R.string.update))
 						}
 						Button(
 							onClick = {
 								delete = true
 							}) {
-							Text("Delete")
+							Text(stringResource(R.string.delete))
 						}
 					}
 				},
@@ -986,7 +995,7 @@ private fun PartTool(vm: MainActivityState) {
 						onClick = {
 							editEntryID = null
 						}) {
-						Text("Cancel")
+						Text(stringResource(R.string.cancel))
 					}
 				}
 			)
@@ -997,14 +1006,14 @@ private fun PartTool(vm: MainActivityState) {
 						delete = false
 					},
 					title = {
-						Text("Delete")
+						Text(stringResource(R.string.delete))
 					},
 					text = {
-						Text("Do you REALLY want to delete this operating system and loose ALL it's data?")
+						Text(stringResource(R.string.really_delete_os))
 					},
 					dismissButton = {
 						Button(onClick = { delete = false }) {
-							Text("Cancel")
+							Text(stringResource(id = R.string.cancel))
 						}
 					},
 					confirmButton = {
@@ -1019,7 +1028,7 @@ private fun PartTool(vm: MainActivityState) {
 										.map { it.delete() }.collect(
 											Collectors.toList()
 										)
-									for (s in allp) { // Do not chain, but regenerate meta and unmount every time. Thanks vold
+									for (s in allp) { // Do not chain, but regenerate meta and unmount every time. Thanks void
 										val r = Shell.cmd(
 											SDUtils.umsd(parts!!) + " && " + s
 										).exec()
@@ -1042,7 +1051,7 @@ private fun PartTool(vm: MainActivityState) {
 								result = tresult
 							}.start()
 						}) {
-							Text("Delete")
+							Text(stringResource(R.string.delete))
 						}
 					}
 				)
@@ -1052,7 +1061,7 @@ private fun PartTool(vm: MainActivityState) {
 			AlertDialog(
 				onDismissRequest = {},
 				title = {
-					Text("Please wait...")
+					Text(stringResource(R.string.please_wait))
 				},
 				text = {
 					Row(
@@ -1060,7 +1069,7 @@ private fun PartTool(vm: MainActivityState) {
 						horizontalArrangement = Arrangement.SpaceAround
 					) {
 						CircularProgressIndicator(Modifier.padding(end = 20.dp))
-						Text("Loading...")
+						Text(stringResource(R.string.loading))
 					}
 				},
 				confirmButton = {}
@@ -1071,7 +1080,7 @@ private fun PartTool(vm: MainActivityState) {
 					result = null
 				},
 				title = {
-					Text("Done")
+					Text(stringResource(R.string.done))
 				},
 				text = {
 					result?.let {
@@ -1080,7 +1089,7 @@ private fun PartTool(vm: MainActivityState) {
 				},
 				confirmButton = {
 					Button(onClick = { result = null }) {
-						Text("Ok")
+						Text(stringResource(id = R.string.ok))
 					}
 				}
 			)
@@ -1107,9 +1116,9 @@ private fun Settings(vm: MainActivityState) {
 		}
 	}
 	var defaultText by remember { mutableStateOf(c["default"]!!) }
-	val defaultErr = defaultText.isBlank() || !defaultText.matches(Regex("[0-9A-Za-z ]+"))
+	val defaultErr = defaultText.isBlank() || !defaultText.matches(Regex("[\\dA-Za-z ]+"))
 	var timeoutText by remember { mutableStateOf(c["timeout"]!!) }
-	val timeoutErr = timeoutText.isBlank() || !timeoutText.matches(Regex("[0-9]+"))
+	val timeoutErr = timeoutText.isBlank() || !timeoutText.matches(Regex("\\d+"))
 	Column {
 		TextField(
 			value = defaultText,
@@ -1117,11 +1126,11 @@ private fun Settings(vm: MainActivityState) {
 				defaultText = it
 				c["default"] = it.trim()
 			},
-			label = { Text("Default entry") },
+			label = { Text(stringResource(R.string.default_entry)) },
 			isError = defaultErr
 		)
 		if (defaultErr) {
-			Text("Invalid input", color = MaterialTheme.colorScheme.error)
+			Text(stringResource(id = R.string.invalid_in), color = MaterialTheme.colorScheme.error)
 		} else {
 			Text("") // Budget spacer
 		}
@@ -1131,35 +1140,35 @@ private fun Settings(vm: MainActivityState) {
 				timeoutText = it
 				c["timeout"] = it.trim()
 			},
-			label = { Text("Timeout (seconds)") },
+			label = { Text(stringResource(R.string.timeout_secs)) },
 			isError = timeoutErr
 		)
 		if (timeoutErr) {
-			Text("Invalid input", color = MaterialTheme.colorScheme.error)
+			Text(stringResource(id = R.string.invalid_in), color = MaterialTheme.colorScheme.error)
 		} else {
 			Text("") // Budget spacer
 		}
 		Button(onClick = {
 			if (defaultErr || timeoutErr)
-				Toast.makeText(vm.activity!!, "Invalid input", Toast.LENGTH_LONG).show()
+				Toast.makeText(vm.activity!!, vm.activity!!.getString(R.string.invalid_in), Toast.LENGTH_LONG).show()
 			else {
 				try {
 					c.exportToFile(File(vm.logic!!.abmDb, "db.conf"))
 				} catch (e: ActionAbortedError) {
-					Toast.makeText(vm.activity!!, "Failed to save changes...", Toast.LENGTH_LONG)
+					Toast.makeText(vm.activity!!, vm.activity!!.getString(R.string.failed2save), Toast.LENGTH_LONG)
 						.show()
 				}
 			}
 		}, enabled = !(defaultErr || timeoutErr)) {
-			Text("Save changes")
+			Text(stringResource(R.string.save_changes))
 		}
 		Button(onClick = {
 			vm.startFlow("update_droidboot")
 		}) {
-			Text("Update DroidBoot")
+			Text(stringResource(R.string.update_droidboot))
 		}
 		Row(horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-			Text("Simplified mode")
+			Text(stringResource(R.string.noob_mode))
 			Switch(checked = vm.noobMode, onCheckedChange = {
 				vm.noobMode = it
 				ctx.getSharedPreferences("abm", 0).edit().putBoolean("noob_mode", it).apply()

@@ -7,6 +7,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -16,23 +17,24 @@ import com.topjohnwu.superuser.io.SuFileInputStream
 import com.topjohnwu.superuser.io.SuFileOutputStream
 import org.andbootmgr.app.util.AbmTheme
 import org.andbootmgr.app.util.ConfigFile
+import org.andbootmgr.app.util.SDUtils
 import java.io.File
 import java.io.IOException
 
 class DroidBootWizardPageFactory(private val vm: WizardActivityState) {
 	fun get(): List<IWizardPage> {
 		return listOf(WizardPage("start",
-			NavButton("Cancel") { it.startActivity(Intent(it, MainActivity::class.java)); it.finish() },
-			NavButton("Next") { it.navigate("input") })
+			NavButton(vm.activity.getString(R.string.cancel)) { it.startActivity(Intent(it, MainActivity::class.java)); it.finish() },
+			NavButton(vm.activity.getString(R.string.next)) { it.navigate("input") })
 		{
 			Start(vm)
 		}, WizardPage("input",
-			NavButton("Prev") { it.navigate("start") },
-			NavButton("Next") { it.navigate(if (!vm.deviceInfo!!.isBooted(vm.logic)) "select" else "flash") }
+			NavButton(vm.activity.getString(R.string.prev)) { it.navigate("start") },
+			NavButton(vm.activity.getString(R.string.next)) { it.navigate(if (!vm.deviceInfo!!.isBooted(vm.logic)) "select" else "flash") }
 		) {
 			Input(vm)
 		}, WizardPage("select",
-			NavButton("Prev") { it.navigate("input") },
+			NavButton(vm.activity.getString(R.string.prev)) { it.navigate("input") },
 			NavButton("") {}
 		) {
 			Select(vm)
@@ -50,17 +52,17 @@ private fun Start(vm: WizardActivityState) {
 	Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
 		modifier = Modifier.fillMaxSize()
 	) {
-		Text("Welcome to ABM!")
+		Text(stringResource(R.string.welcome_text))
 		Text(
 			if (vm.deviceInfo!!.isBooted(vm.logic)){
-				"This will install ABM"
+				stringResource(R.string.install_abm)
 			} else {
-				"This will install ABM + DroidBoot"
+				stringResource(R.string.install_abm_dboot)
 			}
 		)
 		if (vm.deviceInfo.metaonsd){
-			Text("WARNING: Your SD card will be fully erased.")
-			Text("Please make sure you have an backup!")
+			Text(stringResource(R.string.sd_erase1))
+			Text(stringResource(R.string.sd_erase2))
 		}
 	}
 }
@@ -71,26 +73,26 @@ private fun Input(vm: WizardActivityState) {
 	Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
 		modifier = Modifier.fillMaxSize()
 	) {
-		var text by remember { mutableStateOf("Android") }
+		var text by remember { mutableStateOf(vm.activity.getString(R.string.android)) }
 		vm.texts["OsName"] = text.trim()
 		val e = text.isBlank() || !text.matches(Regex("[0-9A-Za-z]+"))
 
-		Text("Please enter an name for the currently running operating system. You may choose as you wish.", textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 5.dp))
+		Text(stringResource(R.string.enter_name_for_current), textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 5.dp))
 		TextField(
 			value = text,
 			onValueChange = {
 				text = it
 				vm.texts["OsName"] = it.trim()
 			},
-			label = { Text("OS name") },
+			label = { Text(stringResource(R.string.os_name)) },
 			isError = e
 		)
 		if (e) {
 			vm.nextText.value = ""
 			vm.onNext.value = {}
-			Text("Invalid input", color = MaterialTheme.colorScheme.error)
+			Text(stringResource(R.string.invalid_in), color = MaterialTheme.colorScheme.error)
 		} else {
-			vm.nextText.value = "Next"
+			vm.nextText.value = stringResource(id = R.string.next)
 			vm.onNext.value = { it.navigate("select") }
 			Text("") // Budget spacer
 		}
@@ -108,23 +110,23 @@ private fun Select(vm: WizardActivityState) {
 	) {
 		Icon(
 			painterResource(R.drawable.ic_droidbooticon),
-			"DroidBoot Icon",
+			stringResource(R.string.droidboot_icon_content_desc),
 			Modifier.defaultMinSize(32.dp, 32.dp)
 		)
 
 		if (nextButtonAvailable.value) {
-			Text("Successfully selected.")
-			vm.nextText.value = "Next"
+			Text(stringResource(id = R.string.successfully_selected))
+			vm.nextText.value = stringResource(id = R.string.next)
 			vm.onNext.value = { it.navigate("flash") }
 		} else {
-			Text("Please choose DroidBoot image!")
+			Text(stringResource(R.string.choose_droidboot))
 			Button(onClick = {
 				vm.activity.chooseFile("*/*") {
 					vm.flashes[flashType] = it
 					nextButtonAvailable.value = true
 				}
 			}) {
-				Text("Choose file")
+				Text(stringResource(id = R.string.choose_file))
 			}
 		}
 	}
@@ -265,7 +267,7 @@ private fun Flash(vm: WizardActivityState) {
 		vm.logic.unmount(vm.deviceInfo)
 		vm.activity.runOnUiThread {
 			vm.btnsOverride = true
-			vm.nextText.value = "Finish"
+			vm.nextText.value = vm.activity.getString(R.string.finish)
 			vm.onNext.value = {
 				if (vm.deviceInfo.isBooted(vm.logic)) {
 					it.startActivity(Intent(it, MainActivity::class.java))
