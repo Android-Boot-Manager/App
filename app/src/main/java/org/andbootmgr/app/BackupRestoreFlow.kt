@@ -123,10 +123,10 @@ private fun Select(c: CreateBackupDataHolder) {
 @Composable
 private fun Flash(c: CreateBackupDataHolder) {
     Terminal(c.vm) { terminal ->
-        terminal.add("-- Starting...")
+        terminal.add(c.vm.activity.getString(R.string.term_starting))
         try {
             if (!Shell.cmd(SDUtils.umsd(c.meta!!.dumpKernelPartition(c.pi))).to(terminal).exec().isSuccess)
-                throw IOException("Cannot umount. Nothing has been changed")
+                throw IOException(c.vm.activity.getString(R.string.term_cant_umount))
             if (c.action == 1) {
                 c.vm.copy(
                     SuFileInputStream.open(
@@ -155,18 +155,18 @@ private fun Flash(c: CreateBackupDataHolder) {
                     }"
                 ).to(terminal).exec()
                 if (!result2.isSuccess) {
-                    terminal.add("-- FAILURE!")
+                    terminal.add(c.vm.activity.getString(R.string.term_failure))
                     return@Terminal
                 }
             } else {
-                throw IOException("Invalid action, nothing has been changed")
+                throw IOException(c.vm.activity.getString(R.string.term_invalid_action))
             }
         } catch (e: IOException) {
-            terminal.add("-- Failed to backup/restore, cause:")
+            terminal.add(c.vm.activity.getString(R.string.term_backup_restore_fail))
             terminal.add(if (e.message != null) e.message!! else "(null)")
-            terminal.add("-- Please contact support")
+            terminal.add(c.vm.activity.getString(R.string.term_contact_support))
         }
-        terminal.add("-- Successful!")
+        terminal.add(c.vm.activity.getString(R.string.term_success))
         c.vm.btnsOverride = true
         c.vm.nextText.value = c.vm.activity.getString(R.string.finish)
         c.vm.onNext.value = { it.startActivity(Intent(it, MainActivity::class.java)); it.finish() }

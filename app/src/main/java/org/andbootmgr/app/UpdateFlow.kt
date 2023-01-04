@@ -92,9 +92,9 @@ private fun Start(u: UpdateFlowDataHolder) {
 
         Thread {
             try {
-                val json_text =
+                val jsonText =
                     URL(u.e!!["xupdate"]).readText()
-                u.json = JSONTokener(json_text).nextValue() as JSONObject
+                u.json = JSONTokener(jsonText).nextValue() as JSONObject
             } catch (e: Exception) {
                 Log.e("ABM", Log.getStackTraceString(e))
             }
@@ -210,14 +210,14 @@ private fun dlFile(u: UpdateFlowDataHolder, l: String): File? {
             sink.writeAll(response.body!!.source())
         } catch (e: StreamResetException) {
             if (e.message == "stream was reset: CANCEL")
-                throw ActionAbortedCleanlyError(Exception("The installation was canceled. Nothing has been changed."))
+                throw ActionAbortedCleanlyError(Exception(u.vm.activity.getString(R.string.install_canceled)))
             else
                 throw e
         }
         sink.close()
 
         if (u.currentDl!!.isCanceled())
-            throw ActionAbortedCleanlyError(Exception("The installation was canceled. Nothing has been changed."))
+            throw ActionAbortedCleanlyError(Exception(u.vm.activity.getString(R.string.install_canceled)))
 
         u.currentDl = null
         return downloadedFile
@@ -243,29 +243,29 @@ private fun Flash(u: UpdateFlowDataHolder) {
             try {
                 var bootfile: File? = null
                 if (!u.updateBoot.isNullOrBlank()) {
-                    terminal.add("-- Downloading updated boot image...")
+                    terminal.add(u.vm.activity.getString(R.string.term_dl_updated_bi))
                     bootfile = dlFile(u, u.updateBoot!!)
                     if (bootfile == null) {
-                        terminal.add("Download failed, trying again...")
+                        terminal.add(u.vm.activity.getString(R.string.term_dl_fail1))
                         bootfile = dlFile(u, u.updateBoot!!)
                         if (bootfile == null) {
-                            terminal.add("Download failed, giving up.")
-                            throw ActionAbortedCleanlyError(Exception("The installation has been canceled. Nothing has been changed."))
+                            terminal.add(u.vm.activity.getString(R.string.term_dl_fail2))
+                            throw ActionAbortedCleanlyError(Exception(u.vm.activity.getString(R.string.install_canceled)))
                         }
                     }
                 }
                 val pmap = HashMap<Int, File>()
                 for (p in u.partMapping.entries) {
-                    terminal.add("Downloading updated partition image ...")
+                    terminal.add(u.vm.activity.getString(R.string.term_dling_part_image))
                     var f = dlFile(u, p.value)
                     if (f == null) {
-                        terminal.add("Download failed, trying again...")
+                        terminal.add(u.vm.activity.getString(R.string.term_dl_fail1))
                         f = dlFile(u, p.value)
                         if (f == null) {
-                            terminal.add("Download failed, giving up.")
+                            terminal.add(u.vm.activity.getString(R.string.term_dl_fail2))
                             bootfile?.delete()
                             pmap.values.forEach { it.delete() }
-                            throw ActionAbortedCleanlyError(Exception("The installation has been canceled. Nothing has been changed."))
+                            throw ActionAbortedCleanlyError(Exception(u.vm.activity.getString(R.string.install_canceled)))
                         }
                     }
                     pmap[p.key] = f
@@ -275,7 +275,7 @@ private fun Flash(u: UpdateFlowDataHolder) {
 
                 for (p in u.partMapping.entries) {
                     val v = sp.find { p.key.toString() == it }
-                    terminal.add("-- Flashing partition $v...")
+                    terminal.add(u.vm.activity.getString(R.string.term_flashing_p, v))
                     val k = u.vm.deviceInfo!!.pbdev + p.key
                     val f2 = pmap[p.key]!!
                     val tp = File(k)
@@ -287,55 +287,54 @@ private fun Flash(u: UpdateFlowDataHolder) {
                             ).absolutePath + " ${f2.absolutePath} ${tp.absolutePath}"
                         ).to(terminal).exec()
                         if (!result2.isSuccess) {
-                            throw IllegalStateException("simg2img returned failure")
+                            throw IllegalStateException(u.vm.activity.getString(R.string.term_simg2img_fail))
                         }
                     } else {
                         u.vm.copyPriv(f2.inputStream(), tp)
                     }
-                    terminal.add("Done.")
-
+                    terminal.add(u.vm.activity.getString(R.string.term_done))
                 }
                 if (!u.updateBoot.isNullOrBlank()) {
-                    terminal.add("-- Patching update...")
+                    terminal.add(u.vm.activity.getString(R.string.term_patch_update))
                     var cmd = "FORMATDATA=false " + File(
                         u.vm.logic.assetDir,
                         "Scripts/add_os/${u.vm.deviceInfo!!.codename}/${u.script}"
                     ).absolutePath + " ${u.ef!!.nameWithoutExtension} ${bootfile!!.absolutePath}"
                     for (i in sp) {
-                        cmd += " " + i
+                        cmd += " $i"
                     }
                     val r = Shell.cmd(SDUtils.umsd(SDUtils.generateMeta(u.vm.deviceInfo.bdev, u.vm.deviceInfo.pbdev)!!) + " && " + cmd).to(terminal).exec()
                     bootfile.delete()
                     if (!r.isSuccess) {
-                        throw IllegalStateException("Script returned failure")
+                        throw IllegalStateException(u.vm.activity.getString(R.string.term_script_fail))
                     }
                 }
                 u.e!!["xupdate"] = u.updateJson ?: ""
                 u.e!!.exportToFile(u.ef!!)
-                terminal.add("-- Done.")
+                terminal.add(u.vm.activity.getString(R.string.term_success))
             } catch (e: ActionAbortedCleanlyError) {
                 terminal.add("-- " + e.message)
             }
         } else if (u.sbootfile != null) {
             val bootfile = File(u.vm.logic.cacheDir, System.currentTimeMillis().toString())
             u.vm.copyUnpriv(u.vm.activity.contentResolver.openInputStream(u.sbootfile!!)!!, bootfile)
-            terminal.add("-- Patching update...")
+            terminal.add(u.vm.activity.getString(R.string.term_patch_update))
             var cmd = "FORMATDATA=false " + File(
                 u.vm.logic.assetDir,
                 "Scripts/add_os/${u.vm.deviceInfo!!.codename}/${u.script}"
-            ).absolutePath + " ${u.ef!!.nameWithoutExtension} ${bootfile!!.absolutePath}"
+            ).absolutePath + " ${u.ef!!.nameWithoutExtension} ${bootfile.absolutePath}"
             for (i in sp) {
-                cmd += " " + i
+                cmd += " $i"
             }
             val r = Shell.cmd(SDUtils.umsd(SDUtils.generateMeta(u.vm.deviceInfo.bdev, u.vm.deviceInfo.pbdev)!!) + " && " + cmd).to(terminal).exec()
             bootfile.delete()
             if (!r.isSuccess) {
-                throw IllegalStateException("Script returned failure")
+                throw IllegalStateException(u.vm.activity.getString(R.string.term_script_fail))
             }
-            terminal.add("-- Done.")
+            terminal.add(u.vm.activity.getString(R.string.term_success))
             u.vm.btnsOverride = true
         } else {
-            terminal.add("-- Failed to prepare update. Nothing has been changed.")
+            terminal.add(u.vm.activity.getString(R.string.term_update_failed_prep))
         }
         u.vm.nextText.value = u.vm.activity.getString(R.string.finish)
         u.vm.onNext.value = {

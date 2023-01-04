@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -390,8 +391,8 @@ fun Terminal(vm: WizardActivityState, r: (MutableList<String>) -> Unit) {
 			try {
 				r(s)
 			} catch (e: Throwable) {
-				s.add("--- Failure ---")
-				s.add("Details for developers:")
+				s.add(vm.activity.getString(R.string.term_failure))
+				s.add(vm.activity.getString(R.string.dev_details))
 				s.add(Log.getStackTraceString(e))
 			}
 		}.start()

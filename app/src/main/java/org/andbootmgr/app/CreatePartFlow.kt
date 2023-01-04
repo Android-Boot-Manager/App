@@ -241,7 +241,7 @@ private fun Start(c: CreatePartDataHolder) {
 						.padding(5.dp)) {
 					TextField(modifier = Modifier.fillMaxWidth(), value = l, onValueChange = {
 						l = it
-						el = !l.matches(Regex("[0-9]+"))
+						el = !l.matches(Regex("\\d+"))
 						e = el || eu
 						if (!e) lu = l.toFloat()..u.toFloat()
 					}, isError = el, label = {
@@ -249,7 +249,7 @@ private fun Start(c: CreatePartDataHolder) {
 					})
 					TextField(modifier = Modifier.fillMaxWidth(), value = u, onValueChange = {
 						u = it
-						eu = !u.matches(Regex("[0-9]+"))
+						eu = !u.matches(Regex("\\d+"))
 						e = el || eu
 						if (!e) lu = l.toFloat()..u.toFloat()
 					}, isError = eu, label = {
@@ -259,8 +259,8 @@ private fun Start(c: CreatePartDataHolder) {
 					androidx.compose.material.RangeSlider(modifier = Modifier.fillMaxWidth(), colors = sc, values = lu, onValueChange = {
 						l = it.start.toLong().toString()
 						u = it.endInclusive.toLong().toString()
-						el = !l.matches(Regex("[0-9]+"))
-						eu = !u.matches(Regex("[0-9]+"))
+						el = !l.matches(Regex("\\d+"))
+						eu = !u.matches(Regex("\\d+"))
 						e = el || eu
 						if (!e) lu = l.toFloat()..u.toFloat()
 					}, valueRange = 0F..c.p.size.toFloat())
@@ -353,10 +353,10 @@ private fun Shop(c: CreatePartDataHolder) {
 	LaunchedEffect(Unit) {
 		c.run {
 			Thread {
-				val json_text =
+				val jsonText =
 					URL("https://raw.githubusercontent.com/Android-Boot-Manager/ABM-json/master/devices/" + c.vm.codename + ".json").readText()
-				json = JSONTokener(json_text).nextValue() as JSONObject
-				//Log.i("ABM shop:", json_text)
+				json = JSONTokener(jsonText).nextValue() as JSONObject
+				//Log.i("ABM shop:", jsonText)
  			}.start()
 		}
 	}
@@ -457,7 +457,7 @@ private fun Os(c: CreatePartDataHolder) {
 
 	LaunchedEffect(Unit) {
 		val a = SuFile.open("/data/abm/bootset/db/entries/").list()!!.toMutableList()
-		a.removeIf { c -> !(c.startsWith("rom") && c.endsWith(".conf") && c.substring(3, c.length - 5).matches(Regex("[0-9]+"))) }
+		a.removeIf { c -> !(c.startsWith("rom") && c.endsWith(".conf") && c.substring(3, c.length - 5).matches(Regex("\\d+"))) }
 		a.sortWith(Comparator.comparingInt { c -> c.substring(3, c.length - 5).toInt() })
 		val b = if (a.size > 0) a.last().substring(3, a.last().length - 5).toInt() + 1 else 0
 		c.t2 = mutableStateOf("rom$b")
@@ -614,7 +614,7 @@ private fun Os(c: CreatePartDataHolder) {
 
 							Text(text = stringResource(R.string.sector_used, intValue.value, items[selectedValue.value], sts, remaining))
 							TextField(value = intValue.value.toString(), onValueChange = {
-								if (it.matches(Regex("[0-9]+"))) {
+								if (it.matches(Regex("\\d+"))) {
 									intValue.value = it.toLong()
 								}
 							}, label = {
@@ -848,7 +848,7 @@ private fun Download(c: CreatePartDataHolder) {
 										c.vm.activity.runOnUiThread {
 											Toast.makeText(
 												c.vm.activity,
-												"Error downloading file :(",
+												c.vm.activity.getString(R.string.dl_error),
 												Toast.LENGTH_LONG
 											).show()
 										}
@@ -890,13 +890,13 @@ private fun Flash(c: CreatePartDataHolder) {
 			val parts = ArrayMap<Int, String>()
 			val fn = c.t2.value
 			val gn = c.t3.value
-			terminal.add("-- Folder name: $fn")
-			terminal.add("-- GUI name: $gn")
-			terminal.add("-- Creating partition layout...")
+			terminal.add(vm.activity.getString(R.string.term_f_name, fn))
+			terminal.add(vm.activity.getString(R.string.term_g_name, gn))
+			terminal.add(vm.activity.getString(R.string.term_creating_pt))
 
 			// After creating partitions:
 			fun installMore() {
-				terminal.add("-- Building configuration...")
+				terminal.add(vm.activity.getString(R.string.term_building_cfg))
 
 				val entry = ConfigFile()
 				entry["title"] = gn
@@ -910,15 +910,15 @@ private fun Flash(c: CreatePartDataHolder) {
 					entry["xupdate"] = c.dmaMeta["updateJson"]!!
 				entry.exportToFile(File(vm.logic.abmEntries, "$fn.conf"))
 				if (!SuFile.open(File(vm.logic.abmBootset, fn).toURI()).mkdir()) {
-					terminal.add("-- FAILED to mkdir")
+					terminal.add(vm.activity.getString(R.string.term_mkdir_failed))
 					return
 				}
 
-				terminal.add("-- Flashing images...")
+				terminal.add(vm.activity.getString(R.string.term_flashing_imgs))
 				for (i in c.idVals) {
 					if (c.idUnneeded.contains(i)) continue
 					val j = c.idVals.indexOf(i)
-					terminal.add("Flashing $i")
+					terminal.add(vm.activity.getString(R.string.term_flashing_s, i))
 					val f = c.chosen[i]!!
 					val tp = File(c.vm.deviceInfo!!.pbdev + parts[j])
 					if (c.sparseVals[j]) {
@@ -931,17 +931,17 @@ private fun Flash(c: CreatePartDataHolder) {
 						).to(terminal).exec()
 						f.delete()
 						if (!result2.isSuccess) {
-							terminal.add("-- FAILURE!")
+							terminal.add(vm.activity.getString(R.string.term_failure))
 							return
 						}
 					} else {
 						val f2 = f.openInputStream(c.vm)
 						c.vm.copyPriv(f2, tp)
 					}
-					terminal.add("Done.")
+					terminal.add(vm.activity.getString(R.string.term_done))
 				}
 
-				terminal.add("-- Patching operating system...")
+				terminal.add(vm.activity.getString(R.string.term_patching_os))
 				val boot = c.chosen["boot"]!!.toFile(vm)
 				var cmd = "FORMATDATA=true " + File(
 					c.vm.logic.assetDir,
@@ -952,13 +952,13 @@ private fun Flash(c: CreatePartDataHolder) {
 				}
 				val result = Shell.cmd(cmd).to(terminal).exec()
 				if (!result.isSuccess) {
-					terminal.add("-- FAILURE!")
+					terminal.add(vm.activity.getString(R.string.term_failure))
 					return
 				}
 
-				terminal.add("-- Done, try it out :)")
+				terminal.add(vm.activity.getString(R.string.term_success))
 				vm.btnsOverride = true
-				vm.nextText.value = "Finish"
+				vm.nextText.value = vm.activity.getString(R.string.finish)
 				vm.onNext.value = {
 					it.startActivity(Intent(it, MainActivity::class.java))
 					it.finish()
@@ -970,7 +970,7 @@ private fun Flash(c: CreatePartDataHolder) {
 
 			var makeOne: (Int) -> Unit = {}
 			makeOne = {
-				terminal.add("Creating partition..")
+				terminal.add(vm.activity.getString(R.string.term_create_part))
 
 				val b = c.intVals.getOrElse(it) { 0L }
 				val l = c.selVals.getOrElse(it) { 1 }
@@ -985,7 +985,7 @@ private fun Flash(c: CreatePartDataHolder) {
 				val r = Shell.cmd(SDUtils.umsd(c.meta!!) + " && " + c.p.create(offset, offset + k, code, "")).to(terminal).exec()
 				try {
 					if (r.out.join("\n").contains("kpartx")) {
-						terminal.add("-- Please reboot AS SOON AS POSSIBLE!!!")
+						terminal.add(vm.activity.getString(R.string.term_reboot_asap))
 					}
 					parts[it] = c.meta!!.nid.toString()
 					c.meta = SDUtils.generateMeta(c.vm.deviceInfo!!.bdev, c.vm.deviceInfo.pbdev)
@@ -993,26 +993,26 @@ private fun Flash(c: CreatePartDataHolder) {
 						c.p = c.meta!!.s.find { it1 -> it1.type == SDUtils.PartitionType.FREE && (offset + k) < it1.startSector } as SDUtils.Partition.FreeSpace
 					}
 					if (r.isSuccess) {
-						terminal.add("Created partition.")
+						terminal.add(vm.activity.getString(R.string.term_created_part))
 						offset = 0L
 						if (it + 1 < c.count.value) {
 							makeOne(it + 1)
 						} else {
-							terminal.add("-- Created partition layout.")
+							terminal.add(vm.activity.getString(R.string.term_created_pt))
 							vm.logic.mount(vm.deviceInfo)
 							installMore()
 						}
 					} else {
-						terminal.add("-- Failure.")
+						terminal.add(vm.activity.getString(R.string.term_failure))
 					}
 				} catch (e: Exception) {
-					terminal.add("-- FAILURE --")
+					terminal.add(vm.activity.getString(R.string.term_failure))
 					terminal.add(Log.getStackTraceString(e))
 				}
 			}
 			makeOne(0)
 		} else { // Portable partition
-			terminal.add("-- Creating partition...")
+			terminal.add(vm.activity.getString(R.string.term_create_part))
 			val r = Shell.cmd(
 				SDUtils.umsd(c.meta!!) + " && " + c.p.create(
 					c.l.toLong(),
@@ -1021,8 +1021,8 @@ private fun Flash(c: CreatePartDataHolder) {
 					c.t!!
 				)
 			).to(terminal).exec()
-			if (r.out.join("\n").contains("old")) {
-				terminal.add("-- Please reboot AS SOON AS POSSIBLE!!!")
+			if (r.out.join("\n").contains("kpartx")) {
+				terminal.add(vm.activity.getString(R.string.term_reboot_asap))
 			}
 			if (r.isSuccess) {
 				vm.btnsOverride = true
@@ -1031,9 +1031,9 @@ private fun Flash(c: CreatePartDataHolder) {
 					it.startActivity(Intent(it, MainActivity::class.java))
 					it.finish()
 				}
-				terminal.add("-- Done.")
+				terminal.add(vm.activity.getString(R.string.term_success))
 			} else {
-				terminal.add("-- Failure.")
+				terminal.add(vm.activity.getString(R.string.term_failure))
 			}
 		}
 	}

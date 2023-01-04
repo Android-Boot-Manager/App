@@ -87,19 +87,19 @@ private fun Select(vm: WizardActivityState) {
 private fun Flash(vm: WizardActivityState) {
 	val flashType = "DroidBootFlashType"
 	Terminal(vm) { terminal ->
-		terminal.add("Flashing DroidBoot...")
+		terminal.add(vm.activity.getString(R.string.term_flashing_droidboot))
 		val f = SuFile.open(vm.deviceInfo!!.blBlock)
 		if (!f.canWrite())
-			terminal.add("Note: probably cannot write to bootloader")
+			terminal.add(vm.activity.getString(R.string.term_cant_write_bl))
 		vm.copyPriv(SuFileInputStream.open(vm.deviceInfo.blBlock), File(vm.logic.abmDir, "backup2_lk.img"))
 		try {
 			vm.copyPriv(vm.flashStream(flashType), File(vm.deviceInfo.blBlock))
 		} catch (e: IOException) {
-			terminal.add("-- Failed to flash bootloader, cause:")
+			terminal.add(vm.activity.getString(R.string.term_bl_failed))
 			terminal.add(if (e.message != null) e.message!! else "(null)")
-			terminal.add("-- Please consult documentation to finish the install.")
+			terminal.add(vm.activity.getString(R.string.term_consult_doc))
 		}
-		terminal.add("-- Done.")
+		terminal.add(vm.activity.getString(R.string.term_success))
 		vm.activity.runOnUiThread {
 			vm.btnsOverride = true
 			vm.nextText.value = vm.activity.getString(R.string.finish)

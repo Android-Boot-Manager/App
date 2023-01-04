@@ -196,7 +196,7 @@ class MainActivity : ComponentActivity() {
 						AlertDialog(
 							onDismissRequest = {},
 							title = {
-								Text(text = "Error")
+								Text(text = getString(R.string.error))
 							},
 							text = {
 								Text(getString(R.string.toolkit_error))
@@ -393,21 +393,21 @@ private fun Start(vm: MainActivityState) {
 			Text(stringResource(R.string.need_sd), textAlign = TextAlign.Center)
 		} else if (!installed) {
 			Button(onClick = { vm.startFlow("droidboot") }) {
-				Text(if (vm.deviceInfo!!.metaonsd) "Setup SD card" else "Install")
+				Text(stringResource(if (vm.deviceInfo!!.metaonsd) R.string.setup_sd else R.string.install))
 			}
 		} else if (!booted) {
 			Text(stringResource(R.string.installed_not_booted), textAlign = TextAlign.Center)
 			Button(onClick = {
 				vm.startFlow("fix_droidboot")
 			}) {
-				Text("Repair DroidBoot")
+				Text(stringResource(R.string.repair_droidboot))
 			}
 		} else if (!vm.deviceInfo!!.metaonsd && mounted && corrupt) {
 			Text(stringResource(R.string.missing_cfg), textAlign = TextAlign.Center)
 			Button(onClick = {
 				//vm.startFlow("repair_cfg") TODO:Implement this
 			}) {
-				Text("Repair bootset")
+				Text(stringResource(R.string.repair_cfg))
 			}
 		} else if (!mounted) {
 			Text(stringResource(R.string.cannot_mount), textAlign = TextAlign.Center)
@@ -438,7 +438,7 @@ private fun PartTool(vm: MainActivityState) {
 					{
 						Icon(
 							imageVector = Icons.Filled.Done,
-							contentDescription = "Enabled",
+							contentDescription = stringResource(id = R.string.enabled_content_desc),
 							modifier = Modifier.size(FilterChipDefaults.IconSize)
 						)
 					}
@@ -1040,10 +1040,10 @@ private fun PartTool(vm: MainActivityState) {
 								val f = entries[e]!!
 								val f2 = SuFile(vm.logic!!.abmBootset, f.nameWithoutExtension)
 								if (!f2.deleteRecursive())
-									tresult += "Cannot delete ${f2.absolutePath}"
+									tresult += vm.activity!!.getString(R.string.cannot_delete, f2.absolutePath)
 								entries.remove(e)
 								if (!f.delete())
-									tresult += "Cannot delete ${f.absolutePath}"
+									tresult += vm.activity!!.getString(R.string.cannot_delete, f.absolutePath)
 								editEntryID = null
 								processing = false
 								parts =
@@ -1108,7 +1108,7 @@ private fun Settings(vm: MainActivityState) {
 			ConfigFile.importFromFile(File(vm.logic!!.abmDb, "db.conf"))
 		} catch (e: ActionAbortedCleanlyError) {
 			if (vm.activity != null) // Compose preview special-casing
-				Toast.makeText(vm.activity, "Malformed db.conf - recreating", Toast.LENGTH_LONG).show()
+				Toast.makeText(vm.activity, vm.activity!!.getString(R.string.malformed_dbcfg), Toast.LENGTH_LONG).show()
 			ConfigFile().also {
 				it["default"] = "Entry 01"
 				it["timeout"] = "5"

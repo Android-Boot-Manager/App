@@ -75,7 +75,7 @@ private fun Input(vm: WizardActivityState) {
 	) {
 		var text by remember { mutableStateOf(vm.activity.getString(R.string.android)) }
 		vm.texts["OsName"] = text.trim()
-		val e = text.isBlank() || !text.matches(Regex("[0-9A-Za-z]+"))
+		val e = text.isBlank() || !text.matches(Regex("[\\dA-Za-z]+"))
 
 		Text(stringResource(R.string.enter_name_for_current), textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 5.dp))
 		TextField(
@@ -136,27 +136,27 @@ private fun Select(vm: WizardActivityState) {
 private fun Flash(vm: WizardActivityState) {
 	val flashType = "DroidBootFlashType"
 	Terminal(vm) { terminal ->
-		terminal.add("Preparing file system...")
+		terminal.add(vm.activity.getString(R.string.term_preparing_fs))
 		if (vm.logic.mounted) {
-			terminal.add("-- inconsistent mount state, aborting")
+			terminal.add(vm.activity.getString(R.string.term_mount_state_bad))
 			return@Terminal
 		}
 		if (!SuFile.open(vm.logic.abmDir.toURI()).exists()) {
 			if (!SuFile.open(vm.logic.abmDir.toURI()).mkdir()) {
-				terminal.add("-- failed to create /data/abm, aborting")
+				terminal.add(vm.activity.getString(R.string.term_cant_create_abm_dir))
 				return@Terminal
 			}
 		}
 		if (!SuFile.open(vm.logic.abmBootset.toURI()).exists()) {
 			if (!SuFile.open(vm.logic.abmBootset.toURI()).mkdir()) {
-				terminal.add("-- failed to create mount point, aborting")
+				terminal.add(vm.activity.getString(R.string.term_cant_create_mount_point))
 				return@Terminal
 			}
 		}
 
 		if (!SuFile.open(File(vm.logic.abmBootset, ".NOT_MOUNTED").toURI()).exists()) {
 			if (!SuFile.open(File(vm.logic.abmBootset, ".NOT_MOUNTED").toURI()).createNewFile()) {
-				terminal.add("-- failed to create placeholder, aborting")
+				terminal.add(vm.activity.getString(R.string.term_cant_create_placeholder))
 				return@Terminal
 			}
 		}
@@ -164,16 +164,16 @@ private fun Flash(vm: WizardActivityState) {
 		if (vm.deviceInfo!!.metaonsd) {
 			var meta = SDUtils.generateMeta(vm.deviceInfo.bdev, vm.deviceInfo.pbdev)
 			if (meta == null) {
-				terminal.add("-- failed to get meta, aborting")
+				terminal.add(vm.activity.getString(R.string.term_cant_get_meta))
 				return@Terminal
 			}
-			if (Shell.cmd(SDUtils.umsd(meta)).to(terminal).exec().isSuccess) {
-				terminal.add("-- warning: failed unmount drive")
+			if (!Shell.cmd(SDUtils.umsd(meta)).to(terminal).exec().isSuccess) {
+				terminal.add(vm.activity.getString(R.string.term_failed_umount_drive))
 			}
 			if (!Shell.cmd("sgdisk --mbrtogpt --clear ${vm.deviceInfo.bdev}").to(terminal)
 					.exec().isSuccess
 			) {
-				terminal.add("-- failed to create partition table, aborting")
+				terminal.add(vm.activity.getString(R.string.term_failed_create_pt))
 				return@Terminal
 			}
 			meta = SDUtils.generateMeta(vm.deviceInfo.bdev, vm.deviceInfo.pbdev)
@@ -187,35 +187,35 @@ private fun Flash(vm: WizardActivityState) {
 					)
 			).to(terminal).exec()
 			if (r.out.join("\n").contains("old")) {
-				terminal.add("-- Please reboot AS SOON AS POSSIBLE!!!")
+				terminal.add(vm.activity.getString(R.string.term_reboot_asap))
 			}
 			if (r.isSuccess) {
-				terminal.add("-- Done.")
+				terminal.add(vm.activity.getString(R.string.term_done))
 			} else {
-				terminal.add("-- failed to create metadata partition.")
+				terminal.add(vm.activity.getString(R.string.term_failed_create_meta))
 				return@Terminal
 			}
 		}
 
 		if (!vm.logic.mount(vm.deviceInfo)) {
-			terminal.add("-- failed to mount, aborting")
+			terminal.add(vm.activity.getString(R.string.term_failed_mount))
 			return@Terminal
 		}
 		if (SuFile.open(File(vm.logic.abmBootset, ".NOT_MOUNTED").toURI()).exists()) {
-			terminal.add("-- inconsistent mount failure, aborting")
+			terminal.add(vm.activity.getString(R.string.term_mount_failure_inconsist))
 			return@Terminal
 		}
 
 		if (!SuFile.open(vm.logic.abmDb.toURI()).exists()) {
 			if (!SuFile.open(vm.logic.abmDb.toURI()).mkdir()) {
-				terminal.add("-- failed to create db directory, aborting")
+				terminal.add(vm.activity.getString(R.string.term_failed_create_db_dir))
 				vm.logic.unmount(vm.deviceInfo)
 				return@Terminal
 			}
 		}
 		if (!SuFile.open(vm.logic.abmEntries.toURI()).exists()) {
 			if (!SuFile.open(vm.logic.abmEntries.toURI()).mkdir()) {
-				terminal.add("-- failed to create entries directory, aborting")
+				terminal.add(vm.activity.getString(R.string.term_failed_create_entries_dir))
 				vm.logic.unmount(vm.deviceInfo)
 				return@Terminal
 			}
@@ -225,7 +225,7 @@ private fun Flash(vm: WizardActivityState) {
 		o.flush()
 		o.close()
 
-		terminal.add("Building configuration...")
+		terminal.add(vm.activity.getString(R.string.term_building_cfg))
 		val db = ConfigFile()
 		db["default"] = "Entry 01"
 		db["timeout"] = "5"
@@ -240,30 +240,30 @@ private fun Flash(vm: WizardActivityState) {
 		entry["xpart"] = "real"
 		entry.exportToFile(File(vm.logic.abmEntries, "hijacked.conf"))
 		if (!vm.deviceInfo.isBooted(vm.logic)) {
-			terminal.add("Flashing DroidBoot...")
+			terminal.add(vm.activity.getString(R.string.term_flashing_droidboot))
 			val f = SuFile.open(vm.deviceInfo.blBlock)
 			if (!f.canWrite())
-				terminal.add("Note: probably cannot write to bootloader")
+				terminal.add(vm.activity.getString(R.string.term_cant_write_bl))
 			vm.copyPriv(
 				SuFileInputStream.open(vm.deviceInfo.blBlock),
-				File(vm.logic.abmDir, "backup_lk.img")
+				File(vm.logic.abmDir, "backup_lk1.img")
 			)
 			try {
 				vm.copyPriv(vm.flashStream(flashType), File(vm.deviceInfo.blBlock))
 			} catch (e: IOException) {
-				terminal.add("-- Failed to flash bootloader, cause:")
+				terminal.add(vm.activity.getString(R.string.term_bl_failed))
 				terminal.add(if (e.message != null) e.message!! else "(null)")
-				terminal.add("-- Please consult documentation to finish the install.")
+				terminal.add(vm.activity.getString(R.string.term_consult_doc))
 			}
 		}
 		if (vm.deviceInfo.postInstallScript) {
-			terminal.add("Device setup...")
+			terminal.add(vm.activity.getString(R.string.term_device_setup))
 			Shell.cmd(
 				"BOOTED=${vm.deviceInfo.isBooted(vm.logic)} " +
 				"${File(vm.logic.assetDir, "Scripts/install/${vm.deviceInfo.codename}.sh").absolutePath} hijacked"
 			).to(terminal).exec()
 		}
-		terminal.add("-- Done.")
+		terminal.add(vm.activity.getString(R.string.term_success))
 		vm.logic.unmount(vm.deviceInfo)
 		vm.activity.runOnUiThread {
 			vm.btnsOverride = true
