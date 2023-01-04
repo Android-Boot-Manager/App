@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-	<string name="app_name">Android Boot Manager</string>
-	<string name="nav_header_subtitle">Ein Handy, um alle zu starten!</string>
-	<string name="backup_msg">Welcome to the simple Backup &amp; Restore tool. What do you want to do with this partition %1$s?</string>
-	<string name="menu">Menu</string>
-</resources>
