@@ -64,9 +64,9 @@
 	<string name="install_abm">This will install ABM</string>
 	<string name="install_abm_dboot">This will install ABM + DroidBoot</string>
 	<string name="sd_erase1">WARNING: Your SD card will be fully erased.</string>
-	<string name="sd_erase2">Please make sure you have an backup!</string>
+	<string name="sd_erase2">Please make sure you have a backup!</string>
 	<string name="android">Android</string>
-	<string name="enter_name_for_current">Please enter an name for the currently running operating system. You may choose as you wish.</string>
+	<string name="enter_name_for_current">Please enter a name for the currently running operating system. You may choose as you wish.</string>
 	<string name="os_name">OS name</string>
 	<string name="invalid_in">Invalid input</string>
 	<string name="droidboot_icon_content_desc">DroidBoot Icon</string>
@@ -81,7 +81,7 @@
 	<string name="found_update">"An update is available for installation.\n\n
 
 		Continuing this process will download image data over the internet, which may use over 4 gigabytes of data. Please make sure you are on an unmetered connection.\n
-		Please make sure you have an backup of your data before continuing.\n
+		Please make sure you have a backup of your data before continuing.\n
 		While the update process is automatic, please do not exit the app while the update is in progress.\n</string>
 	<string name="install_update">Install update</string>
 	<string name="up2date">No updates are currently available, your operating system is up to date!</string>
@@ -98,7 +98,7 @@
 	<string name="add_icon_content_desc">Add icon</string>
 	<string name="home">Home</string>
 	<string name="settings">Settings</string>
-	<string name="select_free_space">Select free space to begin adding an operating system or an portable partition at the selected position.</string>
+	<string name="select_free_space">Select free space to begin adding an operating system or a portable partition at the selected position.</string>
 	<string name="ok">OK</string>
 	<string name="installed">Installed</string>
 	<string name="installed_deactivated">Installed but not activated</string>
