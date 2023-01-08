@@ -1,2 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="menu">Menü</string>
+    <string name="backup">Yedekle</string>
+    <string name="restore">Geri Yükle</string>
+    <string name="successfully_selected">Başarıyla seçildi.</string>
+    <string name="next">İleri</string>
+    <string name="make_backup">Yedek dosyası oluştur</string>
+    <string name="restore_backup">Geri Yükleme için dosya seçin</string>
+    <string name="choose_file">Dosya seçin</string>
+    <string name="create_file">Dosya oluştur</string>
+    <string name="finish">Bitiş</string>
+    <string name="cancel">İptal</string>
+    <string name="prev">Önceki</string>
+    <string name="general_settings">Genel ayarlar</string>
+    <string name="available_space">Kullanılabilir alan: %s (%d tane sektör)</string>
+    <string name="approx_size">Yaklaşık alam: %s</string>
+    <string name="invalid_input">(geçersiz giriş)</string>
+    <string name="option_select">Lütfen aşağıdaki seçeneklerden birini seçin.</string>
+    <string name="part_name">Bölüm adı</string>
+    <string name="create">Oluştur</string>
+    <string name="install_os">OS Yükle</string>
+    <string name="cont">Devam et</string>
+    <string name="icon_content_desc">İkon</string>
+    <string name="select_os">Yüklemek istediğiniz işletim sistemini seçiniz.</string>
+    <string name="os_logo_content_desc">İS logo</string>
+    <string name="rom_logo_content_desc">ROM logo</string>
+    <string name="bl_option">Ön yükleyici ayarları</string>
+    <string name="close_content_desc">Kapat</string>
+    <string name="expand_content_desc">Genişlet</string>
+    <string name="name_in_boot">Açılış menüsündeki ROM ismi</string>
+    <string name="part_layout">Bölüm dizilimi (gelişmiş kullanıcılar için)</string>
+    <string name="start_sector">Başlangıç sektörü (baştan)</string>
+    <string name="end_sector">Bitiş sektör (baştan)</string>
+    <string name="internal_id">ROM dahili ID (emin değilseniz dokunmayın)</string>
+    <string name="os_system">İS sistem verileri</string>
+    <string name="sector_used">Seçilen değer: %d %s (%d sektörden %d kullanılıyor)</string>
+    <string name="size">Boyut</string>
+    <string name="id">ID</string>
+    <string name="remaining_sector">%d\'den kalan %d</string>
+    <string name="install">Yükle</string>
+    <string name="connecting_text">(Bağlanıyor...)</string>
+    <string name="downloading">İndiriliyor…</string>
+    <string name="type">Yaz</string>
+    <string name="user_selected">Kullanıcı-seçimi</string>
+    <string name="undo">Geri Al</string>
+    <string name="download_progress">%ste %s indirildi</string>
+    <string name="download">İndir</string>
+    <string name="choose">Seç</string>
+    <string name="welcome_text">ABM\'ye hoşgeldiniz!</string>
+    <string name="install_abm">Bu ABM\'yi yükleyecektir</string>
+    <string name="install_abm_dboot">Bu ABM + Drodboot\'u yükleyecektir</string>
+    <string name="sd_erase1">UYARI: SD kardınız tamamıyla silinecektir.</string>
+    <string name="android">Android</string>
+    <string name="enter_name_for_current">Geçerli işletim sisteminiz için lütfen bir isim girin. İstediğinizi seçebilirsiniz.</string>
+    <string name="os_name">İS adı</string>
+    <string name="invalid_in">Geçersiz giriş</string>
+    <string name="droidboot_icon_content_desc">DroidBoot İkonu</string>
+    <string name="choose_droidboot">Lütfen bir DroidBoot imajı seçin!</string>
+    <string name="file_unavailable">Dosya kullanılamıyor, lütfen daha sonra tekrar deneyin!</string>
+    <string name="internal_file_error1">Dahili hata - hiç bir dosya işleyici eklenmedi!! Lütfen yüklemeyi iptal edin</string>
+    <string name="local_update">Yerel güncelleme</string>
+    <string name="online_update">Online güncelleme</string>
+    <string name="install_update">Güncellemeyi yükle</string>
+    <string name="up2date">Hiç bir güncelleme yok, işletim sistemiz en güncel sürümde!</string>
+    <string name="local_updater_1">Yerel yükleyiciye hoş geldiniz.</string>
+    <string name="local_updater_2">Burası işletim sisteminin boot imajını el ile güncellemeye izin vermektedir.</string>
+    <string name="local_updater_3">Lütfen ne yaptığınızdan emin iseniz devam edin.</string>
+    <string name="script_name">Script ismi</string>
+    <string name="no_file_selected">Dosya seçilmedi</string>
+    <string name="file_selected">Dosya seçildi</string>
+    <string name="update_droidboot_text">Bu DroidBoot\'u güncelleyecektir</string>
+    <string name="toolkit_extracting">Toolkit çıkartılıyor, lütfen sabırlı olun…</string>
+    <string name="toolkit_error">Toolkit çıkartılması başarısız oldu. Lütfen hatayı geliştiricilere bildirin!</string>
+    <string name="quit">Çıkış</string>
+    <string name="add_icon_content_desc">İkon ekle</string>
+    <string name="settings">Ayarlar</string>
+    <string name="nav_header_subtitle">Hepsini başlatmak için tek bir telefon!</string>
+    <string name="backup_msg">Basit Yedekle &amp; Geri Yükle aracına hoşgeldiniz. Bu %1$s bölüm ile ne yapmak istiyorsunuz\?</string>
+    <string name="portable_part">Taşınabilir data bölümü</string>
+    <string name="almost_installed_rom">ROM yükleme neredeyse tamamlandı! Sadece bir kaç adım kaldı. Yüklemenizi özelleştirmek için aşağıdaki seçenekleri kullanabilirsiniz…</string>
+    <string name="os_userdata">İS kişisel veriler</string>
+    <string name="provide_images">Gerekli IDler için lütfen imajları sağlayın. \"İndir\" tuşunu kullanarak önerilenleri kullanabilirsiniz!</string>
+    <string name="sd_erase2">Yedeğiniz olduğundan lütfen emin olun!</string>
+    <string name="reinstall_dboot">Bu DroidBoot\'u tekrar yükleyecektir</string>
+    <string name="update_check_failed">Güncellemeler denetlenemedi! Lütfen daha sonra tekrar deneyin.</string>
+    <string name="found_update">Yükleme için bir güncelleme mevcut.
+\n
+\n
+\n
+\n\t\tBu işleme devam etmek, imajları internet üzerinden indirerek 4 gigabayt üzerinde bir veri kullanımı olabilir. Lütfen tarifesiz bir bağlantı kullandığınızdan emin olun.
+\n
+\n\t\tLütfen devam etmeden önce bir yedeğiniz olduğundan emin olun.
+\n
+\n\t\tGüncelleme otomatik yapılırken, lütfen güncelleme gerçekleşirken uygulamadan çıkmayın.
+\n</string>
+    <string name="home">Ev</string>
+</resources>
