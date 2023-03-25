@@ -1,2 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="menu">メニュー</string>
+    <string name="restore">復元</string>
+    <string name="flash_sparse">sparse イメージをフラッシュ</string>
+    <string name="successfully_selected">正常に選択されました。</string>
+    <string name="next">次</string>
+    <string name="restore_backup">復元するファイルを選択</string>
+    <string name="choose_file">ファイル選択</string>
+    <string name="create_file">ファイル作成</string>
+    <string name="finish">完了</string>
+    <string name="cancel">キャンセル</string>
+    <string name="prev">前</string>
+    <string name="start_sector">開始セクタ (相対的)</string>
+    <string name="end_sector">終了セクタ (相対的)</string>
+    <string name="available_space">利用可能領域: %s (%d セクタ)</string>
+    <string name="approx_size">推定サイズ: %s</string>
+    <string name="option_select">以下のオプションから一つ選択してください。</string>
+    <string name="portable_part">ポータブルデータパーティション</string>
+    <string name="part_name">パーティション名</string>
+    <string name="create">作成</string>
+    <string name="cont">続ける</string>
+    <string name="icon_content_desc">アイコン</string>
+    <string name="os_logo_content_desc">OS ロゴ</string>
+    <string name="rom_logo_content_desc">ROM ロゴ</string>
+    <string name="bl_option">ブートローダオプション</string>
+    <string name="close_content_desc">閉じる</string>
+    <string name="expand_content_desc">拡張</string>
+    <string name="internal_id">ROM 内部 ID (よく分からない場合は変更しないでください)</string>
+    <string name="name_in_boot">ブートメニューで利用する ROM 名</string>
+    <string name="part_layout">パーティションレイアウト (高度なユーザー向け)</string>
+    <string name="os_userdata">OS ユーザデータ</string>
+    <string name="os_system">OS システムデータ</string>
+    <string name="sector_used">選択された値: %d %s (%d を %d セクタで使用)</string>
+    <string name="size">サイズ</string>
+    <string name="type">種類</string>
+    <string name="id">ID</string>
+    <string name="sparse">Sparsed</string>
+    <string name="remaining_sector">残り %d (%d)</string>
+    <string name="install">インストール</string>
+    <string name="connecting_text">(接続中...)</string>
+    <string name="downloading">ダウンロード中…</string>
+    <string name="backup_msg">シンプルバックアップ&amp;復元ツールへようこそ。パーティション %1$s に対して何を行いますか？</string>
+    <string name="backup">バックアップ</string>
+    <string name="make_backup">バックアップファイルを作成</string>
+    <string name="restore_backup_sparse">パーティションに書き込む sparse ファイルを選択</string>
+    <string name="general_settings">一般設定</string>
+    <string name="invalid_input">(無効な入力)</string>
+    <string name="install_os">OS インストール</string>
+    <string name="select_os">インストールするオペレーティングシステムを選択してください。</string>
+    <string name="almost_installed_rom">すでにこの ROM がインストールされています！あと少しのステップで完了です。いくつかのオプションを選択してカスタマイズしてください…</string>
+</resources>
