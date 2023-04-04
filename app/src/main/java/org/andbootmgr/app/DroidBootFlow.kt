@@ -235,10 +235,12 @@ private fun Flash(vm: WizardActivityState) {
 		entry["linux"] = "real/kernel"
 		entry["initrd"] = "real/initrd.cpio.gz"
 		entry["dtb"] = "real/dtb.dtb"
+		if(vm.deviceInfo.havedtbo)
+			entry["dtbo"] = "real/dtbo.dtbo"
 		entry["options"] = "REPLACECMDLINE"
 		entry["xtype"] = "droid"
 		entry["xpart"] = "real"
-		entry.exportToFile(File(vm.logic.abmEntries, "hijacked.conf"))
+		entry.exportToFile(File(vm.logic.abmEntries, "real.conf"))
 		if (!vm.deviceInfo.isBooted(vm.logic)) {
 			terminal.add(vm.activity.getString(R.string.term_flashing_droidboot))
 			val f = SuFile.open(vm.deviceInfo.blBlock)
@@ -260,7 +262,7 @@ private fun Flash(vm: WizardActivityState) {
 			terminal.add(vm.activity.getString(R.string.term_device_setup))
 			Shell.cmd(
 				"BOOTED=${vm.deviceInfo.isBooted(vm.logic)} " +
-				"${File(vm.logic.assetDir, "Scripts/install/${vm.deviceInfo.codename}.sh").absolutePath} hijacked"
+				"${File(vm.logic.assetDir, "Scripts/install/${vm.deviceInfo.codename}.sh").absolutePath} real"
 			).to(terminal).exec()
 		}
 		terminal.add(vm.activity.getString(R.string.term_success))

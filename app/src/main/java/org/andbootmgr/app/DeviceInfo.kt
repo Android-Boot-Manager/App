@@ -14,6 +14,7 @@ interface DeviceInfo {
 	val pbdev: String
 	val metaonsd: Boolean
 	val postInstallScript: Boolean
+	val havedtbo: Boolean
 	fun isInstalled(logic: DeviceLogic): Boolean
 	fun isBooted(logic: DeviceLogic): Boolean
 	fun isCorrupt(logic: DeviceLogic): Boolean
@@ -28,6 +29,7 @@ object HardcodedDeviceInfoFactory {
 			override val pbdev: String = bdev + "p"
 			override val metaonsd: Boolean = false
 			override val postInstallScript: Boolean = false
+			override val havedtbo: Boolean = false
 			override fun isInstalled(logic: DeviceLogic): Boolean {
 				return SuFile.open(logic.abmDir, "codename.cfg").exists()
 			}
@@ -49,6 +51,7 @@ object HardcodedDeviceInfoFactory {
 			override val pbdev: String = bdev + "p"
 			override val metaonsd: Boolean = true
 			override val postInstallScript: Boolean = true
+			override val havedtbo: Boolean = false
 			override fun isInstalled(logic: DeviceLogic): Boolean {
 				return SuFile.open(bdev).exists() && run {
 					val meta: SDUtils.SDPartitionMeta? =
@@ -74,6 +77,7 @@ object HardcodedDeviceInfoFactory {
 			override val pbdev: String = bdev + "p"
 			override val metaonsd: Boolean = true
 			override val postInstallScript: Boolean = false
+			override val havedtbo: Boolean = false
 			override fun isInstalled(logic: DeviceLogic): Boolean {
 				return SuFile.open(bdev).exists() && run {
 					val meta: SDUtils.SDPartitionMeta? =
@@ -103,11 +107,38 @@ object HardcodedDeviceInfoFactory {
 		}
 	}
 
+	private fun getVayu(): DeviceInfo {
+		return object : DeviceInfo {
+			override val codename: String = "vayu"
+			override val blBlock: String = "/dev/block/by-name/boot"
+			override val bdev: String = "/dev/block/mmcblk0"
+			override val pbdev: String = bdev + "p"
+			override val metaonsd: Boolean = true
+			override val postInstallScript: Boolean = true
+			override val havedtbo: Boolean = true
+			override fun isInstalled(logic: DeviceLogic): Boolean {
+				return SuFile.open(bdev).exists() && run {
+					val meta: SDUtils.SDPartitionMeta? =
+							SDUtils.generateMeta(bdev, pbdev)
+					meta?.let { (meta.countPartitions() > 0) && (meta.dumpPartition(0).type == SDUtils.PartitionType.RESERVED) } == true
+				}
+			}
+			override fun isBooted(logic: DeviceLogic): Boolean {
+				val result = Shell.cmd(File(logic.assetDir, "Scripts/is_installed.sh").absolutePath).exec()
+				return result.isSuccess && result.out.join("\n").contains("ABM.bootloader=1")
+			}
+			override fun isCorrupt(logic: DeviceLogic): Boolean {
+				return !SuFile.open(logic.abmDb, "db.conf").exists()
+			}
+		}
+	}
+
 	fun get(codename: String): DeviceInfo? {
 		return when (codename) {
 			"yggdrasil" -> getYggdrasil()
 			"cedric" -> getCedric()
 			"mimameid" -> getMimameid()
+			"vayu" -> getVayu()
 			else -> null
 		}
 	}
