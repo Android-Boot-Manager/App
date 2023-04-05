@@ -309,18 +309,21 @@ private fun Start(vm: MainActivityState) {
 	val mounted: Boolean
 	val sdpresent: Boolean
 	val corrupt: Boolean
+	val metaonsd: Boolean
 	if (vm.deviceInfo != null) {
 		installed = remember { vm.deviceInfo!!.isInstalled(vm.logic!!) }
 		booted = remember { vm.deviceInfo!!.isBooted(vm.logic!!) }
 		corrupt = remember { vm.deviceInfo!!.isCorrupt(vm.logic!!) }
 		mounted = vm.logic!!.mounted
 		sdpresent = SuFile.open(vm.deviceInfo!!.bdev).exists()
+		metaonsd = vm.deviceInfo!!.metaonsd
 	} else {
 		installed = false
 		booted = false
 		corrupt = true
 		mounted = false
 		sdpresent = false
+		metaonsd = false
 	}
 	val notOkColor = CardDefaults.cardColors(
 		containerColor = Color(0xFFFF0F0F)
@@ -371,7 +374,7 @@ private fun Start(vm: MainActivityState) {
 					}
 					Text(stringResource(id = R.string.activated, stringResource(if (booted) R.string.yes else R.string.no)))
 					Text(stringResource(id = R.string.mounted_b, stringResource(if (mounted) R.string.yes else R.string.no)))
-					if (vm.deviceInfo!!.metaonsd) {
+					if (metaonsd) {
 						Text(stringResource(id = R.string.sd_inserted, stringResource(if (sdpresent) R.string.yes else R.string.no)))
 						Text(stringResource(id = R.string.sd_formatted, stringResource(if (installed) R.string.yes else R.string.no)))
 					} else {
@@ -389,11 +392,11 @@ private fun Start(vm: MainActivityState) {
 				stringResource(R.string.need_root),
 				textAlign = TextAlign.Center
 			)
-		} else if (vm.deviceInfo!!.metaonsd && !sdpresent) {
+		} else if (metaonsd && !sdpresent) {
 			Text(stringResource(R.string.need_sd), textAlign = TextAlign.Center)
 		} else if (!installed) {
 			Button(onClick = { vm.startFlow("droidboot") }) {
-				Text(stringResource(if (vm.deviceInfo!!.metaonsd) R.string.setup_sd else R.string.install))
+				Text(stringResource(if (metaonsd) R.string.setup_sd else R.string.install))
 			}
 		} else if (!booted) {
 			Text(stringResource(R.string.installed_not_booted), textAlign = TextAlign.Center)
@@ -402,7 +405,7 @@ private fun Start(vm: MainActivityState) {
 			}) {
 				Text(stringResource(R.string.repair_droidboot))
 			}
-		} else if (!vm.deviceInfo!!.metaonsd && mounted && corrupt) {
+		} else if (!metaonsd && mounted && corrupt) {
 			Text(stringResource(R.string.missing_cfg), textAlign = TextAlign.Center)
 			Button(onClick = {
 				//vm.startFlow("repair_cfg") TODO:Implement this

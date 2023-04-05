@@ -228,4 +228,5 @@
 	<string name="term_create_part">Creating partition…</string>
 	<string name="term_created_part">Created partition.</string>
 	<string name="term_created_pt">-- Created partition layout.</string>
+	<string name="shop_error">Failed loading list of ROMs from Open ROM Project</string>
 </resources>

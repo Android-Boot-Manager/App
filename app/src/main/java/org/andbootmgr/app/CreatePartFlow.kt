@@ -148,6 +148,7 @@ private class CreatePartDataHolder(val vm: WizardActivityState): ProgressListene
 	val inetAvailable = HashMap<String, String>()
 	val inetDesc = HashMap<String, String>()
 	val idNeeded = mutableStateListOf<String>()
+	val extraIdNeeded = mutableStateListOf<String>()
 	val idUnneeded = mutableStateListOf<String>()
 	val chosen = mutableStateMapOf<String, DledFile>()
 	val client = OkHttpClient().newBuilder().readTimeout(1L, TimeUnit.HOURS).addNetworkInterceptor {
@@ -349,14 +350,20 @@ private fun Start(c: CreatePartDataHolder) {
 
 @Composable
 private fun Shop(c: CreatePartDataHolder) {
- 	var json: JSONObject? by remember { mutableStateOf(null)}
+ 	var json: JSONObject? by remember { mutableStateOf(null) }
+	var error by remember { mutableStateOf(false) }
 	LaunchedEffect(Unit) {
 		c.run {
 			Thread {
-				val jsonText =
-					URL("https://raw.githubusercontent.com/Android-Boot-Manager/ABM-json/master/devices/" + c.vm.codename + ".json").readText()
-				json = JSONTokener(jsonText).nextValue() as JSONObject
-				//Log.i("ABM shop:", jsonText)
+				try {
+					val jsonText =
+						URL("https://raw.githubusercontent.com/Android-Boot-Manager/ABM-json/master/devices/" + c.vm.codename + ".json").readText()
+					json = JSONTokener(jsonText).nextValue() as JSONObject
+					//Log.i("ABM shop:", jsonText)
+				} catch (e: Exception) {
+					Log.e("ABM shop", Log.getStackTraceString(e))
+				}
+				if (json == null) error = true
  			}.start()
 		}
 	}
@@ -423,9 +430,10 @@ private fun Shop(c: CreatePartDataHolder) {
 								i = 0
 								val extraIdNeeded = o.getJSONArray("extraIdNeeded")
 								while (i < extraIdNeeded.length()) {
-									idNeeded.add(extraIdNeeded.get(i) as String)
+									this.extraIdNeeded.add(extraIdNeeded.get(i) as String)
 									i++
 								}
+								idNeeded.addAll(this.extraIdNeeded)
 								i = 0
 								val blockIdNeeded = o.getJSONArray("blockIdNeeded")
 								while (i < blockIdNeeded.length()) {
@@ -445,6 +453,8 @@ private fun Shop(c: CreatePartDataHolder) {
 				i++
 			}
 		}
+	} else if (error) {
+		Text(stringResource(R.string.shop_error))
 	}
 }
 
@@ -942,11 +952,13 @@ private fun Flash(c: CreatePartDataHolder) {
 				}
 
 				terminal.add(vm.activity.getString(R.string.term_patching_os))
-				val boot = c.chosen["boot"]!!.toFile(vm)
 				var cmd = "FORMATDATA=true " + File(
 					c.vm.logic.assetDir,
 					"Scripts/add_os/${c.vm.deviceInfo!!.codename}/${c.shName}"
-				).absolutePath + " $fn ${boot.absolutePath}"
+				).absolutePath + " $fn"
+				for (i in c.extraIdNeeded) {
+					cmd += " " + c.chosen[i]!!.toFile(vm).absolutePath
+				}
 				for (i in parts) {
 					cmd += " " + i.value
 				}

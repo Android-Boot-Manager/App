@@ -5,6 +5,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -62,14 +63,14 @@ private class UpdateFlowDataHolder(val vm: WizardActivityState) {
     val client = OkHttpClient().newBuilder().readTimeout(1L, TimeUnit.HOURS).build()
     var json: JSONObject? = null
     var currentDl: Call? = null
-    var sbootfile: Uri? by mutableStateOf(null)
+    var sbootfile = mutableStateListOf<Uri>()
 
     var e: ConfigFile? = null
     var ef: File? = null
     var hasUpdate = false
     var hasChecked by mutableStateOf(false)
     val partMapping = HashMap<Int, String>()
-    var updateBoot: String? = null
+    var extraParts = ArrayList<String>()
     var updateJson: String? = null
     var script: String? = null
     val sparse = ArrayList<Int>()
@@ -116,7 +117,12 @@ private fun Start(u: UpdateFlowDataHolder) {
                             u.run {
                                 val j = json!!
                                 if (j.has("boot") && j.has("script")) {
-                                    updateBoot = j.getString("boot")
+                                    val extraIdNeeded = j.getJSONArray("extraIds")
+                                    var i = 0
+                                    while (i < extraIdNeeded.length()) {
+                                        extraParts.add(extraIdNeeded.get(i) as String)
+                                        i++
+                                    }
                                     script = j.getString("script")
                                 }
                                 if (j.has("parts")) {
@@ -171,18 +177,15 @@ private fun Local(u: UpdateFlowDataHolder) {
             }, label = {
                 Text(stringResource(R.string.script_name))
             })
-            if (u.sbootfile == null) {
-                Text(stringResource(R.string.no_file_selected))
-                Button(onClick = { u.vm.activity.chooseFile("*/*") {
-                    u.sbootfile = it
-                } }) {
-                    Text(stringResource(id = R.string.choose_file))
+            for (i in u.sbootfile) {
+                Row {
+                    Text(stringResource(R.string.file_selected) + " " + (i.lastPathSegment ?: "(null)"))
+                    Button(onClick = { u.sbootfile.remove(i) }) {
+                        Text(stringResource(id = R.string.undo))
+                    }
                 }
-            } else {
-                Text(stringResource(R.string.file_selected))
-                Button(onClick = { u.sbootfile = null }) {
-                    Text(stringResource(id = R.string.undo))
-                }
+            }
+            if (u.sbootfile.isNotEmpty()) {
                 Button(onClick = {
                     if (!error) {
                         u.hasUpdate = false
@@ -192,6 +195,11 @@ private fun Local(u: UpdateFlowDataHolder) {
                 }, enabled = !error) {
                     Text(stringResource(R.string.install_update))
                 }
+            }
+            Button(onClick = { u.vm.activity.chooseFile("*/*") {
+                u.sbootfile.add(it)
+            } }) {
+                Text(stringResource(id = R.string.choose_file))
             }
         }
     }
@@ -241,17 +249,20 @@ private fun Flash(u: UpdateFlowDataHolder) {
             u.vm.nextText.value = u.vm.activity.getString(R.string.cancel)
             u.vm.onNext.value = { u.currentDl?.cancel() }
             try {
-                var bootfile: File? = null
-                if (!u.updateBoot.isNullOrBlank()) {
-                    terminal.add(u.vm.activity.getString(R.string.term_dl_updated_bi))
-                    bootfile = dlFile(u, u.updateBoot!!)
-                    if (bootfile == null) {
-                        terminal.add(u.vm.activity.getString(R.string.term_dl_fail1))
-                        bootfile = dlFile(u, u.updateBoot!!)
-                        if (bootfile == null) {
-                            terminal.add(u.vm.activity.getString(R.string.term_dl_fail2))
-                            throw ActionAbortedCleanlyError(Exception(u.vm.activity.getString(R.string.install_canceled)))
+                val bootfile = ArrayList<File>()
+                if (u.extraParts.isNotEmpty()) {
+                    for (boot in u.extraParts) {
+                        terminal.add(u.vm.activity.getString(R.string.term_dl_updated_bi))
+                        var bootf = dlFile(u, boot)
+                        if (bootf == null) {
+                            terminal.add(u.vm.activity.getString(R.string.term_dl_fail1))
+                            bootf = dlFile(u, boot)
+                            if (bootf == null) {
+                                terminal.add(u.vm.activity.getString(R.string.term_dl_fail2))
+                                throw ActionAbortedCleanlyError(Exception(u.vm.activity.getString(R.string.install_canceled)))
+                            }
                         }
+                        bootfile.add(bootf)
                     }
                 }
                 val pmap = HashMap<Int, File>()
@@ -263,7 +274,7 @@ private fun Flash(u: UpdateFlowDataHolder) {
                         f = dlFile(u, p.value)
                         if (f == null) {
                             terminal.add(u.vm.activity.getString(R.string.term_dl_fail2))
-                            bootfile?.delete()
+                            bootfile.forEach { it.delete() }
                             pmap.values.forEach { it.delete() }
                             throw ActionAbortedCleanlyError(Exception(u.vm.activity.getString(R.string.install_canceled)))
                         }
@@ -294,17 +305,20 @@ private fun Flash(u: UpdateFlowDataHolder) {
                     }
                     terminal.add(u.vm.activity.getString(R.string.term_done))
                 }
-                if (!u.updateBoot.isNullOrBlank()) {
+                if (u.extraParts.isNotEmpty()) {
                     terminal.add(u.vm.activity.getString(R.string.term_patch_update))
                     var cmd = "FORMATDATA=false " + File(
                         u.vm.logic.assetDir,
                         "Scripts/add_os/${u.vm.deviceInfo!!.codename}/${u.script}"
-                    ).absolutePath + " ${u.ef!!.nameWithoutExtension} ${bootfile!!.absolutePath}"
+                    ).absolutePath + " ${u.ef!!.nameWithoutExtension}"
+                    for (i in bootfile) {
+                        cmd += " " + i.absolutePath
+                    }
                     for (i in sp) {
                         cmd += " $i"
                     }
                     val r = Shell.cmd(SDUtils.umsd(SDUtils.generateMeta(u.vm.deviceInfo.bdev, u.vm.deviceInfo.pbdev)!!) + " && " + cmd).to(terminal).exec()
-                    bootfile.delete()
+                    bootfile.forEach { it.delete() }
                     if (!r.isSuccess) {
                         throw IllegalStateException(u.vm.activity.getString(R.string.term_script_fail))
                     }
@@ -315,19 +329,29 @@ private fun Flash(u: UpdateFlowDataHolder) {
             } catch (e: ActionAbortedCleanlyError) {
                 terminal.add("-- " + e.message)
             }
-        } else if (u.sbootfile != null) {
-            val bootfile = File(u.vm.logic.cacheDir, System.currentTimeMillis().toString())
-            u.vm.copyUnpriv(u.vm.activity.contentResolver.openInputStream(u.sbootfile!!)!!, bootfile)
+        } else if (u.sbootfile.isNotEmpty()) {
+            val bootfile = ArrayList<File>()
             terminal.add(u.vm.activity.getString(R.string.term_patch_update))
+            u.sbootfile.forEach {
+                val bootf = File(u.vm.logic.cacheDir, System.currentTimeMillis().toString())
+                u.vm.copyUnpriv(
+                    u.vm.activity.contentResolver.openInputStream(it)!!,
+                    bootf
+                )
+                bootfile.add(bootf)
+            }
             var cmd = "FORMATDATA=false " + File(
                 u.vm.logic.assetDir,
                 "Scripts/add_os/${u.vm.deviceInfo!!.codename}/${u.script}"
-            ).absolutePath + " ${u.ef!!.nameWithoutExtension} ${bootfile.absolutePath}"
+            ).absolutePath + " ${u.ef!!.nameWithoutExtension}"
+            for (i in bootfile) {
+                cmd += " " + i.absolutePath
+            }
             for (i in sp) {
                 cmd += " $i"
             }
             val r = Shell.cmd(SDUtils.umsd(SDUtils.generateMeta(u.vm.deviceInfo.bdev, u.vm.deviceInfo.pbdev)!!) + " && " + cmd).to(terminal).exec()
-            bootfile.delete()
+            bootfile.forEach { it.delete() }
             if (!r.isSuccess) {
                 throw IllegalStateException(u.vm.activity.getString(R.string.term_script_fail))
             }
