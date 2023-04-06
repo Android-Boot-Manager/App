@@ -913,6 +913,8 @@ private fun Flash(c: CreatePartDataHolder) {
 				entry["linux"] = "$fn/zImage"
 				entry["initrd"] = "$fn/initrd.cpio.gz"
 				entry["dtb"] = "$fn/dtb.dtb"
+				if(vm.deviceInfo!!.havedtbo)
+					entry["dtbo"] = "$fn/dtbo.dtbo"
 				entry["options"] = c.cmdline
 				entry["xtype"] = c.rtype
 				entry["xpart"] = parts.values.join(":")
