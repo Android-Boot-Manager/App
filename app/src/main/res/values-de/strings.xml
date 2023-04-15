@@ -229,4 +229,5 @@
     <string name="term_simg2img_fail">simg2img gab Fehler zurück</string>
     <string name="term_g_name">-- GUI-Name: %s</string>
     <string name="term_patching_os">-- Bessere Betriebssystem aus…</string>
+    <string name="shop_error">Liste der ROMs aus dem Open ROM Projekt konnte nicht geladen werden</string>
 </resources>
