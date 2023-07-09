@@ -15,76 +15,99 @@
     <string name="cancel">Batal</string>
     <string name="prev">Sebelumnya</string>
     <string name="general_settings">Pengaturan umum</string>
-    <string name="start_sector">Sektor Awal (relatif)</string>
+    <string name="start_sector">Sektor awal (relatif)</string>
     <string name="end_sector">Sektor akhir (relatif)</string>
     <string name="approx_size">Ukuran sekitar: %s</string>
     <string name="invalid_input">(masukan tidak valid)</string>
     <string name="option_select">Silahkan pilih salah satu opsi dibawah ini.</string>
-    <string name="portable_part">Partisi dan portabel</string>
+    <string name="portable_part">Partisi data portabel</string>
     <string name="part_name">Nama partisi</string>
     <string name="create">Buat</string>
-    <string name="install_os">Pasang system operasi</string>
-    <string name="select_os">Silahkan pilih system operasi yang akan kamu pasang.</string>
+    <string name="install_os">Pasang sistem operasi</string>
+    <string name="select_os">Silahkan pilih sistem operasi yang akan Anda pasang.</string>
     <string name="os_logo_content_desc">Logo operasi system</string>
     <string name="rom_logo_content_desc">Logo ROM</string>
     <string name="bl_option">Pengaturan bootloader</string>
     <string name="close_content_desc">Keluar</string>
     <string name="expand_content_desc">Lebarkan</string>
-    <string name="internal_id">ID ROM internal (jangan kalo gak ngerti)</string>
+    <string name="internal_id">ID ROM internal (jangan sentuh/ubah jika tidak mengerti)</string>
     <string name="name_in_boot">Nama ROM di menu boot</string>
     <string name="part_layout">Layout partisi (untuk pengguna lanjutan)</string>
     <string name="os_userdata">Data pengguna OS</string>
-    <string name="os_system">Data system OS</string>
+    <string name="os_system">Data sistem OS</string>
     <string name="sector_used">Pilih nilai : %d %s (gunakan %d untuk sektor %d )</string>
     <string name="size">Ukuran</string>
     <string name="type">Tipe</string>
-    <string name="id">Id</string>
+    <string name="id">ID</string>
     <string name="sparse">Sebagian</string>
     <string name="install">Pasang</string>
     <string name="connecting_text">(Menghubungkan…)</string>
     <string name="downloading">Mengunduh…</string>
     <string name="user_selected">Pilih-pengguna</string>
     <string name="undo">Batal</string>
-    <string name="download_progress">Mengunduh%s dari %s</string>
+    <string name="download_progress">%s dari %s Terunduh</string>
     <string name="download">Mengunduh</string>
     <string name="choose">Pilih</string>
     <string name="welcome_text">Selamat datang di ABM!</string>
-    <string name="install_abm">akan memasang ABM</string>
+    <string name="install_abm">Pasang ABM</string>
     <string name="install_abm_dboot">Pasang ABM + DroidBoot</string>
-    <string name="sd_erase1">Peringatan: SD card akan di format.</string>
+    <string name="sd_erase1">PERINGATAN: SD card akan di format.</string>
     <string name="sd_erase2">Mohon buat cadangan terlebih dahulu!</string>
-    <string name="android">android</string>
+    <string name="android">Android</string>
     <string name="os_name">Nama OS</string>
     <string name="invalid_in">Masukan tidak benar</string>
     <string name="droidboot_icon_content_desc">Ikon DroidBoot</string>
     <string name="choose_droidboot">Silahkan pilih DroidBoot image!</string>
     <string name="reinstall_dboot">Instal ulang DroidBoot</string>
-    <string name="file_unavailable">File tidak tersedia,silahkan ulang kembali!</string>
-    <string name="internal_file_error1">Internal error - tidak dapat dipilih!! Batalkan penginstalan</string>
+    <string name="file_unavailable">Berkas tidak tersedia, silahkan ulang kembali!</string>
+    <string name="internal_file_error1">Internal error - tidak ada berkas yang dipilih!! Batalkan penginstalan</string>
     <string name="local_update">Pembaruan Lokal</string>
     <string name="online_update">Pembaruan online</string>
-    <string name="update_check_failed">Gagal memeriksa pembaruan!coba lagi nanti.</string>
-    <string name="up2date">Tidak ada pembaruan,sistem operasi sudah terbaru!</string>
+    <string name="update_check_failed">Gagal memeriksa pembaruan! Coba lagi nanti.</string>
+    <string name="up2date">Tidak ada pembaruan, sistem operasi sudah terbaru!</string>
     <string name="nav_header_subtitle">Satu perangkat untuk memulai semuanya!</string>
-    <string name="backup_msg">Selamat datang di alat pencadangan &amp; pemulihan yang mudah. Apa yang akan kamu lakukan dengan partisi ini %1$s\?</string>
+    <string name="backup_msg">Selamat datang di alat pencadangan &amp; pemulihan yang mudah. Apa yang akan Anda lakukan dengan partisi ini %1$s\?</string>
     <string name="available_space">Ruang tersedia : %s (%d sektor)</string>
     <string name="cont">Lanjut</string>
     <string name="icon_content_desc">Ikon</string>
     <string name="almost_installed_rom">Anda hampir menginstal ROM ini! Tinggal beberapa langkah lagi. Di bawah ini, Anda memiliki beberapa pengaturan opsional untuk menyesuaikan instalasi Anda lebih lanjut…</string>
     <string name="remaining_sector">tersisa %d dari %d</string>
     <string name="provide_images">Harap sekarang berikan img untuk semua ID yang diperlukan. Anda dapat menggunakan yang direkomendasikan menggunakan tombol \"Unduh\"!</string>
-    <string name="enter_name_for_current">Silahkan masukan nama system operasi yang sedang berjalan sekarang.anda akan memilih sesuai keinginan.</string>
+    <string name="enter_name_for_current">Silahkan masukan nama sistem operasi yang sedang berjalan sekarang. Anda akan memilih sesuai keinginan.</string>
     <string name="internal_file_error2">Internal error - berkas yang dipilih ganda!! Silahkan batalkan penginstalan</string>
-    <string name="found_update">"Pembaruan tersedia untuk diinstal.
+    <string name="found_update">Pembaruan tersedia untuk diinstal.
 \n
 \n
 \n
-\nMelanjutkan proses ini akan mengunduh data gambar melalui internet, yang mungkin menggunakan lebih dari 4gb data.  Pastikan Anda menggunakan koneksi yang cukup.
+\n\t\tMelanjutkan proses ini akan mengunduh image melalui internet, yang mungkin menggunakan lebih dari 4GB data. Pastikan Anda menggunakan koneksi yang cukup.
 \n
-\npastikan Anda memiliki cadangan data Anda sebelum melanjutkan.
+\n\t\tPastikan Anda memiliki cadangan data sebelum melanjutkan.
 \n
-\nMeskipun proses pembaruan berlangsung otomatis, harap jangan keluar dari aplikasi saat pembaruan sedang berlangsung.
-\n"</string>
+\n\t\tMeskipun proses pembaruan berlangsung otomatis, harap jangan keluar dari aplikasi saat pembaruan sedang berlangsung.
+\n</string>
     <string name="install_update">Pasang pembaruan</string>
     <string name="local_updater_1">Selamat datang di pembaruan lokal.</string>
+    <string name="local_updater_2">Ini memungkinkan Anda untuk dapat memperbarui boot image pada sistem operasi.</string>
+    <string name="no_file_selected">Tidak ada berkas yang terpilih</string>
+    <string name="file_selected">Berkas terpilih</string>
+    <string name="script_name">Nama skrip</string>
+    <string name="update_droidboot_text">Perbarui DroidBoot</string>
+    <string name="toolkit_extracting">Mengekstrak Toolkit, mohon tunggu…</string>
+    <string name="toolkit_error">Tidak dapat mengekstrak Toolkit. Mohon laporkan ini pada pengembang!</string>
+    <string name="quit">Keluar</string>
+    <string name="add_icon_content_desc">Tambahkan ikon</string>
+    <string name="home">Beranda</string>
+    <string name="settings">Setelan</string>
+    <string name="ok">OK</string>
+    <string name="installed">Terpasang</string>
+    <string name="term_done">-- Selesai.</string>
+    <string name="term_created_part">Partisi telah dibuat.</string>
+    <string name="term_g_name">-- Nama GUI: %s</string>
+    <string name="term_f_name">-- Nama folder: %s</string>
+    <string name="term_flashing_imgs">-- Memasang image…</string>
+    <string name="term_flashing_s">Memasang %s…</string>
+    <string name="local_updater_3">Mohon untuk mengerti apa yang Anda lakukan sebelum melanjutkan.</string>
+    <string name="term_create_part">Membuat partisi…</string>
+    <string name="term_building_cfg">Membuat konfigurasi…</string>
+    <string name="term_success">-- Berhasil!</string>
 </resources>
