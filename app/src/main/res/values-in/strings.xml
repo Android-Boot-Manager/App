@@ -3,7 +3,7 @@
     <string name="menu">Menu</string>
     <string name="backup">Cadangkan</string>
     <string name="restore">Pulihkan</string>
-    <string name="flash_sparse">Instal sparse image</string>
+    <string name="flash_sparse">Pasang sparse image</string>
     <string name="successfully_selected">Pilihan berhasil.</string>
     <string name="next">Lanjut</string>
     <string name="make_backup">Buat berkas cadangan</string>
@@ -35,7 +35,7 @@
     <string name="part_layout">Layout partisi (untuk pengguna lanjutan)</string>
     <string name="os_userdata">Data pengguna OS</string>
     <string name="os_system">Data sistem OS</string>
-    <string name="sector_used">Pilih nilai : %d %s (gunakan %d untuk sektor %d )</string>
+    <string name="sector_used">Pilih nilai : %d %s (gunakan %d untuk sektor %d)</string>
     <string name="size">Ukuran</string>
     <string name="type">Tipe</string>
     <string name="id">ID</string>
@@ -110,4 +110,11 @@
     <string name="term_create_part">Membuat partisi…</string>
     <string name="term_building_cfg">Membuat konfigurasi…</string>
     <string name="term_success">-- Berhasil!</string>
+    <string name="installed_deactivated">Terpasang namun tidak diaktifkan</string>
+    <string name="deactivated_corrupt">Tidak diaktifkan dan korup</string>
+    <string name="activated_corrupt">Diaktifkan namun korup</string>
+    <string name="not_installed">Tidak terpasang</string>
+    <string name="yes">Ya</string>
+    <string name="no">Tidak</string>
+    <string name="unsupported">(tidak didukung)</string>
 </resources>
