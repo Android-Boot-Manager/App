@@ -86,7 +86,7 @@ private fun Select(vm: WizardActivityState) {
 @Composable
 private fun Flash(vm: WizardActivityState) {
 	val flashType = "DroidBootFlashType"
-	Terminal(vm) { terminal ->
+	Terminal(vm, logFile = "blup_${System.currentTimeMillis()}.txt") { terminal ->
 		terminal.add(vm.activity.getString(R.string.term_flashing_droidboot))
 		val f = SuFile.open(vm.deviceInfo!!.blBlock)
 		if (!f.canWrite())

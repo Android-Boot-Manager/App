@@ -2,6 +2,7 @@ package org.andbootmgr.app
 
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -18,7 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -31,6 +32,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.andbootmgr.app.util.AbmTheme
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -275,12 +277,14 @@ private fun Preview() {
 
 /* Monospace auto-scrolling text view, fed using MutableList<String>, catching exceptions and running logic on a different thread */
 @Composable
-fun Terminal(vm: WizardActivityState, r: (MutableList<String>) -> Unit) {
+fun Terminal(vm: WizardActivityState, logFile: String? = null, r: (MutableList<String>) -> Unit) {
 	val scrollH = rememberScrollState()
 	val scrollV = rememberScrollState()
 	val scope = rememberCoroutineScope()
 	val text = remember { mutableStateOf("") }
-	LaunchedEffect(Unit) {
+	val ctx = LocalContext.current
+	DisposableEffect(Unit) {
+		val log = logFile?.let { FileOutputStream(File(ctx.externalCacheDir, it)) }
 		// Budget CallbackList
 		val s = object : MutableList<String> {
 			val internalList = ArrayList<String>()
@@ -384,6 +388,7 @@ fun Terminal(vm: WizardActivityState, r: (MutableList<String>) -> Unit) {
 						scrollH.animateScrollTo(0)
 					}
 				}
+				log?.write((element + "\n").encodeToByteArray())
 			}
 
 		}
@@ -396,6 +401,9 @@ fun Terminal(vm: WizardActivityState, r: (MutableList<String>) -> Unit) {
 				s.add(Log.getStackTraceString(e))
 			}
 		}.start()
+		onDispose {
+			log?.close()
+		}
 	}
 	Text(text.value, modifier = Modifier
 		.fillMaxSize()

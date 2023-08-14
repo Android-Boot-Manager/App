@@ -241,7 +241,7 @@ private fun dlFile(u: UpdateFlowDataHolder, l: String): File? {
 
 @Composable
 private fun Flash(u: UpdateFlowDataHolder) {
-    Terminal(u.vm) { terminal ->
+    Terminal(u.vm, logFile = "update_${System.currentTimeMillis()}.txt") { terminal ->
         val sp = u.e!!["xpart"]!!.split(":")
 
         if (u.hasUpdate) { // online

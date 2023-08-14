@@ -895,7 +895,7 @@ private fun Download(c: CreatePartDataHolder) {
 @Composable
 private fun Flash(c: CreatePartDataHolder) {
 	val vm = c.vm
-	Terminal(vm) { terminal ->
+	Terminal(vm, logFile = "install_${System.currentTimeMillis()}.txt") { terminal ->
 		if (c.t == null) { // OS install
 			val parts = ArrayMap<Int, String>()
 			val fn = c.t2.value
@@ -913,7 +913,7 @@ private fun Flash(c: CreatePartDataHolder) {
 				entry["linux"] = "$fn/zImage"
 				entry["initrd"] = "$fn/initrd.cpio.gz"
 				entry["dtb"] = "$fn/dtb.dtb"
-				if(vm.deviceInfo!!.havedtbo)
+				if (vm.deviceInfo!!.havedtbo)
 					entry["dtbo"] = "$fn/dtbo.dtbo"
 				entry["options"] = c.cmdline
 				entry["xtype"] = c.rtype

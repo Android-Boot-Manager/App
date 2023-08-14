@@ -135,7 +135,7 @@ private fun Select(vm: WizardActivityState) {
 @Composable
 private fun Flash(vm: WizardActivityState) {
 	val flashType = "DroidBootFlashType"
-	Terminal(vm) { terminal ->
+	Terminal(vm, logFile = "blflash_${System.currentTimeMillis()}.txt") { terminal ->
 		terminal.add(vm.activity.getString(R.string.term_preparing_fs))
 		if (vm.logic.mounted) {
 			terminal.add(vm.activity.getString(R.string.term_mount_state_bad))

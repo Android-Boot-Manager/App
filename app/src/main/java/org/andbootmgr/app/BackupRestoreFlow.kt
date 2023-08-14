@@ -122,7 +122,7 @@ private fun Select(c: CreateBackupDataHolder) {
 
 @Composable
 private fun Flash(c: CreateBackupDataHolder) {
-    Terminal(c.vm) { terminal ->
+    Terminal(c.vm, logFile = "flash_${System.currentTimeMillis()}.txt") { terminal ->
         terminal.add(c.vm.activity.getString(R.string.term_starting))
         try {
             if (!Shell.cmd(SDUtils.umsd(c.meta!!.dumpKernelPartition(c.pi))).to(terminal).exec().isSuccess)
