@@ -32,7 +32,7 @@ class BackupRestoreWizardPageFactory(private val vm: WizardActivityState) {
             NavButton(vm.activity.getString(R.string.prev)) { it.navigate("start") },
             NavButton("") {}
         ) {
-            Select(c)
+            SelectDroidBoot(c)
         }, WizardPage("go",
             NavButton("") {},
             NavButton("") {}
@@ -72,7 +72,7 @@ private fun ChooseAction(c: CreateBackupDataHolder) {
 }
 
 @Composable
-private fun Select(c: CreateBackupDataHolder) {
+private fun SelectDroidBoot(c: CreateBackupDataHolder) {
     val nextButtonAvailable = remember { mutableStateOf(false) }
 
     Column(

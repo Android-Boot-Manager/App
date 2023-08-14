@@ -23,6 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toFile
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -32,10 +33,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.andbootmgr.app.util.AbmTheme
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import java.net.URL
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
@@ -207,8 +210,18 @@ class WizardActivityState(val codename: String) {
 	}
 
 	fun flashStream(flashType: String): InputStream {
-		return activity.contentResolver.openInputStream(flashes[flashType]!!)
-			?: throw IOException("in == null")
+		return flashes[flashType]?.let {
+			when (it.scheme) {
+				"content" ->
+					activity.contentResolver.openInputStream(it)
+						?: throw IOException("in == null")
+				"file" ->
+					FileInputStream(it.toFile())
+				"http", "https" ->
+					URL(it.toString()).openStream()
+				else -> null
+			}
+		} ?: throw IllegalArgumentException()
 	}
 
 	fun copyUnpriv(inputStream: InputStream, output: File) {

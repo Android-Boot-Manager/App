@@ -350,8 +350,8 @@ private fun Start(c: CreatePartDataHolder) {
 
 @Composable
 private fun Shop(c: CreatePartDataHolder) {
- 	var json: JSONObject? by remember { mutableStateOf(null) }
-	var error by remember { mutableStateOf(false) }
+	var json: JSONObject? by remember { mutableStateOf(null) }
+	var	error by remember { mutableStateOf(false) }
 	LaunchedEffect(Unit) {
 		c.run {
 			Thread {

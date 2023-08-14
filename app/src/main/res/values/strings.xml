@@ -70,7 +70,7 @@
 	<string name="os_name">OS name</string>
 	<string name="invalid_in">Invalid input</string>
 	<string name="droidboot_icon_content_desc">DroidBoot Icon</string>
-	<string name="choose_droidboot">Please choose a DroidBoot image!</string>
+	<string name="choose_droidboot_online">Please choose a DroidBoot image, or use the download button to automatically download the latest version from the internet (recommened for most users).</string>
 	<string name="reinstall_dboot">This will reinstall DroidBoot</string>
 	<string name="file_unavailable">File not available, please try again later!</string>
 	<string name="internal_file_error1">Internal error - no file handler added!! Please cancel install</string>

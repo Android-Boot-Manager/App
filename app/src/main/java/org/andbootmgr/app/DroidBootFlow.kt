@@ -1,11 +1,15 @@
 package org.andbootmgr.app
 
 import android.content.Intent
+import android.net.Uri
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -18,8 +22,11 @@ import com.topjohnwu.superuser.io.SuFileOutputStream
 import org.andbootmgr.app.util.AbmTheme
 import org.andbootmgr.app.util.ConfigFile
 import org.andbootmgr.app.util.SDUtils
+import org.json.JSONObject
+import org.json.JSONTokener
 import java.io.File
 import java.io.IOException
+import java.net.URL
 
 class DroidBootWizardPageFactory(private val vm: WizardActivityState) {
 	fun get(): List<IWizardPage> {
@@ -37,7 +44,7 @@ class DroidBootWizardPageFactory(private val vm: WizardActivityState) {
 			NavButton(vm.activity.getString(R.string.prev)) { it.navigate("input") },
 			NavButton("") {}
 		) {
-			Select(vm)
+			SelectDroidBoot(vm)
 		}, WizardPage("flash",
 			NavButton("") {},
 			NavButton("") {}
@@ -99,9 +106,9 @@ private fun Input(vm: WizardActivityState) {
 	}
 }
 
-
+// shared across DroidBootFlow, UpdateDroidBootFlow, FixDroidBootFlow
 @Composable
-private fun Select(vm: WizardActivityState) {
+fun SelectDroidBoot(vm: WizardActivityState) {
 	val nextButtonAvailable = remember { mutableStateOf(false) }
 	val flashType = "DroidBootFlashType"
 
@@ -119,7 +126,7 @@ private fun Select(vm: WizardActivityState) {
 			vm.nextText.value = stringResource(id = R.string.next)
 			vm.onNext.value = { it.navigate("flash") }
 		} else {
-			Text(stringResource(R.string.choose_droidboot))
+			Text(stringResource(R.string.choose_droidboot_online))
 			Button(onClick = {
 				vm.activity.chooseFile("*/*") {
 					vm.flashes[flashType] = it
@@ -127,6 +134,25 @@ private fun Select(vm: WizardActivityState) {
 				}
 			}) {
 				Text(stringResource(id = R.string.choose_file))
+			}
+			val ctx = LocalContext.current
+			Button(onClick = {
+				Thread {
+					try {
+						val jsonText =
+							URL("https://raw.githubusercontent.com/Android-Boot-Manager/ABM-json/master/devices/" + vm.codename + ".json").readText()
+						val json = JSONTokener(jsonText).nextValue() as JSONObject
+						val bl = json.getJSONObject("bootloader")
+						val url = bl.getString("url")
+						vm.flashes[flashType] = Uri.parse(url)
+						nextButtonAvailable.value = true
+					} catch (e: Exception) {
+						Toast.makeText(ctx, R.string.dl_error, Toast.LENGTH_LONG).show()
+						Log.e("ABM droidboot json", Log.getStackTraceString(e))
+					}
+				}.start()
+			}) {
+				Text(stringResource(id = R.string.download))
 			}
 		}
 	}

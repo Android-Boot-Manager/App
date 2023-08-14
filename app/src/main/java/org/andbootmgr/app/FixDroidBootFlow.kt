@@ -2,18 +2,13 @@ package org.andbootmgr.app
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.topjohnwu.superuser.io.SuFile
 import com.topjohnwu.superuser.io.SuFileInputStream
 import org.andbootmgr.app.util.AbmTheme
@@ -31,7 +26,7 @@ class FixDroidBootWizardPageFactory(private val vm: WizardActivityState) {
 			NavButton(vm.activity.getString(R.string.prev)) { it.navigate("start") },
 			NavButton("") {}
 		) {
-			Select(vm)
+			SelectDroidBoot(vm)
 		}, WizardPage("flash",
 			NavButton("") {},
 			NavButton("") {}
@@ -48,38 +43,6 @@ private fun Start(vm: WizardActivityState) {
 	) {
 		Text(stringResource(id = R.string.welcome_text))
 		Text(stringResource(R.string.reinstall_dboot))
-	}
-}
-
-@Composable
-private fun Select(vm: WizardActivityState) {
-	val nextButtonAvailable = remember { mutableStateOf(false) }
-	val flashType = "DroidBootFlashType"
-
-	Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
-		modifier = Modifier.fillMaxSize()
-	) {
-		Icon(
-			painterResource(R.drawable.ic_droidbooticon),
-			stringResource(id = R.string.droidboot_icon_content_desc),
-			Modifier.defaultMinSize(32.dp, 32.dp)
-		)
-
-		if (nextButtonAvailable.value) {
-			Text(stringResource(id = R.string.successfully_selected))
-			vm.nextText.value = stringResource(id = R.string.next)
-			vm.onNext.value = { it.navigate("flash") }
-		} else {
-			Text(stringResource(id = R.string.choose_droidboot))
-			Button(onClick = {
-				vm.activity.chooseFile("*/*") {
-					vm.flashes[flashType] = it
-					nextButtonAvailable.value = true
-				}
-			}) {
-				Text(stringResource(id = R.string.choose_file))
-			}
-		}
 	}
 }
 
@@ -119,7 +82,7 @@ private fun Preview() {
 			modifier = Modifier.fillMaxSize(),
 			color = MaterialTheme.colorScheme.background
 		) {
-			Select(vm)
+			SelectDroidBoot(vm)
 		}
 	}
 }
