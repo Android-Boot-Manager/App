@@ -24,7 +24,6 @@
     <string name="provide_images">Зараз просимо надати образи для всіх передбачених ID. Ви можете скористатися рекомендованими за допомогою кнопки \"Завантаження\"!</string>
     <string name="install_abm_dboot">Встановити ABM + DroidBoot</string>
     <string name="enter_name_for_current">Просимо ввести назву для ОС, яка зараз виконується. Назву можна обрати на власний смак.</string>
-    <string name="choose_droidboot">Виберіть образ DroidBoot!</string>
     <string name="update_check_failed">Помилка з\'єднання з сервером оновлень! Просимо спробувати пізніше.</string>
     <string name="found_update">Знайдено оновлення для встановлення.
 \n

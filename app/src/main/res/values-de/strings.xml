@@ -60,7 +60,6 @@
     <string name="os_name">OS-Name</string>
     <string name="invalid_in">Ungültige Eingabe</string>
     <string name="droidboot_icon_content_desc">DroidBoot-Icon</string>
-    <string name="choose_droidboot">Bitte wähle ein DroidBoot-Image!</string>
     <string name="reinstall_dboot">Dies wird DroidBoot neu installieren</string>
     <string name="file_unavailable">Datei nicht verfügbar, bitte später nochmal probieren!</string>
     <string name="internal_file_error1">Interner Fehler - kein Datei-Handler hinzugefügt! Bitte Installation abbrechen</string>

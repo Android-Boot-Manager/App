@@ -66,7 +66,6 @@
     <string name="provide_images">Теперь выберите образы всех необходимых ID. Вы можете использовать рекомендуемую кнопку \"Загрузить\"!</string>
     <string name="install_abm_dboot">Это установит ABM + DroidBoot</string>
     <string name="sd_erase1">ПРЕДУПРЕЖДЕНИЕ: Ваша SD-карта будет полностью очищена.</string>
-    <string name="choose_droidboot">Пожалуйста выберите образ DroidBoot!</string>
     <string name="update_check_failed">Не удалось проверить обновления! Пожалуйста, попробуйте позже.</string>
     <string name="found_update">Доступно обновление!
 \n

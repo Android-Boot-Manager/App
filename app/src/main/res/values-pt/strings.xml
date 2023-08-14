@@ -53,7 +53,6 @@
     <string name="android">Android</string>
     <string name="os_name">Nome do SO</string>
     <string name="invalid_in">Entrada inválida</string>
-    <string name="choose_droidboot">Por favor, escolha uma imagem do DroidBoot!</string>
     <string name="reinstall_dboot">Isso reinstalará o DroidBoot</string>
     <string name="file_unavailable">Arquivo indisponível. Tente novamente mais tarde!</string>
     <string name="internal_file_error2">Erro interno - escolha de arquivo duplicada!! Por favor, cancele a instalação</string>

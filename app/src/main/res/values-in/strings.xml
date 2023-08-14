@@ -57,7 +57,6 @@
     <string name="os_name">Nama OS</string>
     <string name="invalid_in">Masukan tidak benar</string>
     <string name="droidboot_icon_content_desc">Ikon DroidBoot</string>
-    <string name="choose_droidboot">Silahkan pilih DroidBoot image!</string>
     <string name="reinstall_dboot">Pasang ulang DroidBoot</string>
     <string name="file_unavailable">Berkas tidak tersedia, silahkan ulang kembali!</string>
     <string name="internal_file_error1">Internal error - tidak ada berkas yang dipilih!! Batalkan pemasangan</string>

@@ -56,7 +56,6 @@
     <string name="os_name">İS adı</string>
     <string name="invalid_in">Geçersiz giriş</string>
     <string name="droidboot_icon_content_desc">DroidBoot İkonu</string>
-    <string name="choose_droidboot">Lütfen bir DroidBoot imajı seçin!</string>
     <string name="file_unavailable">Dosya kullanılamıyor, lütfen daha sonra tekrar deneyin!</string>
     <string name="internal_file_error1">Dahili hata - hiç bir dosya işleyici eklenmedi!! Lütfen yüklemeyi iptal edin</string>
     <string name="local_update">Yerel güncelleme</string>

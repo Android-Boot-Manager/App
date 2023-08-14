@@ -60,7 +60,6 @@
     <string name="os_name">Nazwa OS</string>
     <string name="invalid_in">Niepoprawne dane</string>
     <string name="droidboot_icon_content_desc">Ikona DroidBoot</string>
-    <string name="choose_droidboot">Wybierz obraz DroidBoot!</string>
     <string name="file_unavailable">Plik niedostępny, spróbuj ponownie później!</string>
     <string name="local_update">Aktualizacja lokalna</string>
     <string name="online_update">Aktualizacja online</string>
