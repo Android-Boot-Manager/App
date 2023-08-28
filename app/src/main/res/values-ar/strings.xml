@@ -1,2 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="nav_header_subtitle">هاتف واحد لتشغيل كل منهم!</string>
+    <string name="backup_msg">مرحبا بك في أداة النسخ الاحتياطي والاستعادة البسيطة. ماذا تريد أن تفعل بهذا البارتيشن %1$s؟</string>
+    <string name="menu">القائمة</string>
+    <string name="backup">نسخ احتياطي</string>
+    <string name="restore">إستعادة</string>
+</resources>
