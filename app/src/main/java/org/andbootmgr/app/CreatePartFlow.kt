@@ -38,6 +38,7 @@ import java.math.BigDecimal
 import java.util.concurrent.TimeUnit
 import org.json.JSONObject
 import org.json.JSONTokener
+import java.io.FileNotFoundException
 import java.net.URL
 
 class CreatePartWizardPageFactory(private val vm: WizardActivityState) {
@@ -352,12 +353,16 @@ private fun Start(c: CreatePartDataHolder) {
 private fun Shop(c: CreatePartDataHolder) {
 	var json: JSONObject? by remember { mutableStateOf(null) }
 	var	error by remember { mutableStateOf(false) }
+	val ctx = LocalContext.current
 	LaunchedEffect(Unit) {
 		c.run {
 			Thread {
 				try {
-					val jsonText =
+					val jsonText = try {
+						ctx.assets.open("abm.json").readBytes().toString(Charsets.UTF_8)
+					} catch (e: FileNotFoundException) {
 						URL("https://raw.githubusercontent.com/Android-Boot-Manager/ABM-json/master/devices/" + c.vm.codename + ".json").readText()
+					}
 					json = JSONTokener(jsonText).nextValue() as JSONObject
 					//Log.i("ABM shop:", jsonText)
 				} catch (e: Exception) {
