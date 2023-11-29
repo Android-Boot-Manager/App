@@ -7,10 +7,6 @@
 
 <p align="center">
 
-  <a href="https://crowdin.com/project/android-boot-manager">
-    <img src="https://badges.crowdin.net/android-boot-manager/localized.svg" alt="Crowdin"/>
-  </a>
-
   <a href="https://github.com/Android-Boot-Manager/App/actions">
     <img src="https://github.com/android-boot-manager/app/workflows/Android%20CI/badge.svg"
       alt="CI Status" />
