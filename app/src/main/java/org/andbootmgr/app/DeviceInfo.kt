@@ -96,6 +96,7 @@ object HardcodedDeviceInfoFactory {
 						Boolean::class.javaPrimitiveType
 					)
 					hasABM = getBoolean.invoke(c, "ro.boot.has_dualboot", false) as Boolean
+							|| getBoolean.invoke(c, "ro.boot.hasdualboot", false) as Boolean
 				} catch (e: Exception) {
 					e.printStackTrace()
 				}
