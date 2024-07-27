@@ -26,6 +26,7 @@ android {
     defaultConfig {
         applicationId = "org.andbootmgr.app"
         minSdk = 26
+        //noinspection ExpiredTargetSdkVersion
         targetSdk = 32
         versionCode = 3001
         versionName = "0.3.0-m0"
@@ -93,8 +94,8 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.1.1"
     }
-    applicationVariants.forEach {
-        tasks["merge${it.name.replaceFirstChar(Char::titlecase)}Assets"].dependsOn(tasks["setAssetTs"])
+    applicationVariants.configureEach {
+        tasks["merge${name.replaceFirstChar(Char::titlecase)}Assets"].dependsOn(tasks["setAssetTs"])
     }
 }
 

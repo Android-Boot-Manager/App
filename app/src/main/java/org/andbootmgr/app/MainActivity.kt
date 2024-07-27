@@ -11,8 +11,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.FlowColumnScopeInstance.align
-import androidx.compose.foundation.layout.FlowRowScopeInstance.alignBy
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -238,27 +236,33 @@ private fun AppContent(vm: MainActivityState, view: @Composable (PaddingValues) 
 		// A surface container using the 'background' color from the theme
 		Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
 			ModalNavigationDrawer(drawerContent = {
-				Button(
-					modifier = Modifier
-						.align()
-						.padding(top = 16.dp),
-					onClick = { scope.launch {
-						vm.navController!!.navigate("start")
-						drawerState.close()
-					} },
-					content = { Text(stringResource(R.string.home)) }
-				)
-				Button(
-					modifier = Modifier
-						//.align(Alignment.CenterHorizontally)
-						.padding(top = 16.dp),
-					onClick = { if (vm.isOk) scope.launch {
-						vm.navController!!.navigate("settings")
-						drawerState.close()
-					} },
-					enabled = vm.isOk,
-					content = { Text(stringResource(R.string.settings)) }
-				)
+				Box {
+					Button(
+						modifier = Modifier
+							.align(Alignment.Center)
+							.padding(top = 16.dp),
+						onClick = {
+							scope.launch {
+								vm.navController!!.navigate("start")
+								drawerState.close()
+							}
+						},
+						content = { Text(stringResource(R.string.home)) }
+					)
+					Button(
+						modifier = Modifier
+							.align(Alignment.Center)
+							.padding(top = 16.dp),
+						onClick = {
+							if (vm.isOk) scope.launch {
+								vm.navController!!.navigate("settings")
+								drawerState.close()
+							}
+						},
+						enabled = vm.isOk,
+						content = { Text(stringResource(R.string.settings)) }
+					)
+				}
 			},
 				drawerState = drawerState,
 				content = {

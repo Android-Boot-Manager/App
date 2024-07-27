@@ -2,6 +2,8 @@ package org.andbootmgr.app
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
@@ -147,7 +149,9 @@ fun SelectDroidBoot(vm: WizardActivityState) {
 						vm.flashes[flashType] = Uri.parse(url)
 						nextButtonAvailable.value = true
 					} catch (e: Exception) {
-						Toast.makeText(ctx, R.string.dl_error, Toast.LENGTH_LONG).show()
+						Handler(Looper.getMainLooper()).post {
+							Toast.makeText(ctx, R.string.dl_error, Toast.LENGTH_LONG).show()
+						}
 						Log.e("ABM droidboot json", Log.getStackTraceString(e))
 					}
 				}.start()
