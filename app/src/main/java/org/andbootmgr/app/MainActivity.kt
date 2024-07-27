@@ -22,7 +22,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.HorizontalAlignmentLine
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -92,7 +91,6 @@ class MainActivityState {
 	var isReady = false
 	var name by mutableStateOf("") /* default value moved to onCreate() */
 	var navController: NavHostController? = null
-	@OptIn(ExperimentalMaterial3Api::class)
 	var drawerState: DrawerState? = null
 	var scope: CoroutineScope? = null
 	var root = false
@@ -103,7 +101,6 @@ class MainActivityState {
 
 class MainActivity : ComponentActivity() {
 
-	@OptIn(ExperimentalMaterial3Api::class)
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		val vm = MainActivityState()
@@ -429,7 +426,6 @@ private fun Start(vm: MainActivityState) {
 	}
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PartTool(vm: MainActivityState) {
 	var filterUnifiedView by remember { mutableStateOf(true) }
@@ -973,7 +969,7 @@ private fun PartTool(vm: MainActivityState) {
 					}
 				}
 			)
-		} else if (editEntryID != null && filterUnifiedView) {
+		} else if (editEntryID != null) {
 			val e = editEntryID!!
 			AlertDialog(
 				onDismissRequest = {
@@ -1111,7 +1107,6 @@ private fun PartTool(vm: MainActivityState) {
 	}
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Settings(vm: MainActivityState) {
 	val ctx = LocalContext.current

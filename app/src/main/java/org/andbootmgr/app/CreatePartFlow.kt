@@ -253,7 +253,7 @@ private fun Start(c: CreatePartDataHolder) {
 					}, isError = eu, label = {
 						Text(stringResource(R.string.end_sector))
 					})
-					RangeSlider(modifier = Modifier.fillMaxWidth(), value = lu, onValueChange = {
+					RangeSlider(modifier = Modifier.fillMaxWidth(), value =  lu, onValueChange = {
 						l = it.start.toLong().toString()
 						u = it.endInclusive.toLong().toString()
 						el = !l.matches(Regex("\\d+"))
@@ -308,7 +308,7 @@ private fun Start(c: CreatePartDataHolder) {
 						c.l = l
 						c.u = u
 						c.t = t
-						c.f = c.p.size - c.u.toLong()
+						c.f = (c.p.size - c.u.toLong()).coerceAtLeast(0) // TODO fix range slider inaccuracies instead
 						c.vm.navigate("flash")
 					}) {
 						Text(stringResource(id = R.string.create))
@@ -333,7 +333,7 @@ private fun Start(c: CreatePartDataHolder) {
 						c.l = l
 						c.u = u
 						c.t = null
-						c.f = c.p.size - c.u.toLong()
+						c.f = (c.p.size - c.u.toLong()).coerceAtLeast(0) // TODO fix range slider inaccuracies instead
 						c.vm.navigate("shop")
 					}) {
 						Text(stringResource(R.string.cont))
@@ -994,6 +994,7 @@ private fun Flash(c: CreatePartDataHolder) {
 				} else /*percent*/ {
 					(BigDecimal(c.p.size - (offset + c.f)).multiply(BigDecimal(b).divide(BigDecimal(100)))).toLong()
 				}
+				terminal.add("c.p.size=${c.p.size} offset=$offset c.f=${c.f} b=$b k=$k logSectorSizeBytes=${c.meta!!.logicalSectorSizeBytes}")
 
 				vm.logic.unmount(vm.deviceInfo!!)
 				val r = Shell.cmd(SDUtils.umsd(c.meta!!) + " && " + c.p.create(offset, offset + k, code, "")).to(terminal).exec()
