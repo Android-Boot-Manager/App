@@ -806,7 +806,9 @@ private fun PartTool(vm: MainActivityState) {
 						Button(onClick = {
 							processing = true
 							delete = false
+							vm.logic!!.unmount(vm.deviceInfo!!)
 							Shell.cmd(SDUtils.umsd(parts!!) + " && " + p.delete()).submit {
+								vm.logic!!.mount(vm.deviceInfo!!)
 								processing = false
 								editPartID = null
 								parts =
@@ -1038,6 +1040,7 @@ private fun PartTool(vm: MainActivityState) {
 										.map { it.delete() }.collect(
 											Collectors.toList()
 										)
+									vm.logic!!.unmount(vm.deviceInfo!!)
 									for (s in allp) { // Do not chain, but regenerate meta and unmount every time. Thanks void
 										val r = Shell.cmd(
 											SDUtils.umsd(parts!!) + " && " + s
@@ -1046,6 +1049,7 @@ private fun PartTool(vm: MainActivityState) {
 											SDUtils.generateMeta(vm.deviceInfo!!.bdev, vm.deviceInfo!!.pbdev)
 										tresult += r.out.join("\n") + r.err.join("\n") + "\n"
 									}
+									vm.logic!!.mount(vm.deviceInfo!!)
 								}
 								val f = entries[e]!!
 								val f2 = SuFile(vm.logic!!.abmBootset, f.nameWithoutExtension)
@@ -1187,7 +1191,6 @@ private fun Settings(vm: MainActivityState) {
 	}
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
 private fun Preview() {

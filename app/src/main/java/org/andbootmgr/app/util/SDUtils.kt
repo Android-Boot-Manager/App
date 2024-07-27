@@ -266,7 +266,7 @@ object SDUtils {
 				val c = rend > endSector
 				val d = end < start
 				if (a || b || c || d) {
-					return "echo 'Invalid values ($start:$end - $a $b $c $d). Aborting...'"
+					return "echo 'Invalid values ($start:$end - $rstart>$startSector:$endSector>$rend - $a $b $c $d). Aborting...'; exit 1"
 				}
 				return "sgdisk ${meta.path} --new ${meta.nid}:$rstart:$rend --typecode ${meta.nid}:$typecode --change-name ${meta.nid}:'${name.replace("'", "")}' && sleep 1 && ls ${meta.ppath}${meta.nid}" + when(typecode) {
 					 "0700" -> " && sm format public:${meta.major},${meta.minor+meta.nid}"
