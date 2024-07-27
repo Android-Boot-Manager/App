@@ -11,6 +11,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.FlowColumnScopeInstance.align
+import androidx.compose.foundation.layout.FlowRowScopeInstance.alignBy
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -22,6 +24,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.HorizontalAlignmentLine
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -237,7 +240,7 @@ private fun AppContent(vm: MainActivityState, view: @Composable (PaddingValues) 
 			ModalNavigationDrawer(drawerContent = {
 				Button(
 					modifier = Modifier
-						.align(Alignment.CenterHorizontally)
+						.align()
 						.padding(top = 16.dp),
 					onClick = { scope.launch {
 						vm.navController!!.navigate("start")
@@ -247,7 +250,7 @@ private fun AppContent(vm: MainActivityState, view: @Composable (PaddingValues) 
 				)
 				Button(
 					modifier = Modifier
-						.align(Alignment.CenterHorizontally)
+						//.align(Alignment.CenterHorizontally)
 						.padding(top = 16.dp),
 					onClick = { if (vm.isOk) scope.launch {
 						vm.navController!!.navigate("settings")

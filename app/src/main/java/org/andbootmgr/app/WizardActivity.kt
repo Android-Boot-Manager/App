@@ -141,6 +141,7 @@ class WizardActivity : ComponentActivity() {
 		}
 	}
 
+	@Deprecated("Deprecated in Java")
 	override fun onBackPressed() {
 		vm.onPrev.value(this)
 	}

@@ -210,10 +210,6 @@ private fun Start(c: CreatePartDataHolder) {
 	}
 	val ctx = LocalContext.current
 
-	// Material3 colors for old RangeSlider
-	val i = SliderDefaults.colors()
-	val sc = androidx.compose.material.SliderDefaults.colors(activeTickColor = i.tickColor(enabled = true, active = true).value, disabledActiveTickColor = i.tickColor(enabled = false, active = true).value, disabledInactiveTickColor = i.tickColor(enabled = false, active = false).value, activeTrackColor = i.trackColor(enabled = true, active = true).value, disabledActiveTrackColor = i.trackColor(enabled = false, active = true).value, disabledInactiveTrackColor = i.trackColor(enabled = false, active = false).value, disabledThumbColor = i.thumbColor(enabled = false).value, inactiveTickColor = i.tickColor(enabled = true, active = false).value, inactiveTrackColor = i.trackColor(enabled = true, active = false).value, thumbColor = i.thumbColor(enabled = true).value)
-
 	val s = rememberScrollState()
 	var et by remember { mutableStateOf(false) }
 	var el by remember { mutableStateOf(false) }
@@ -257,8 +253,7 @@ private fun Start(c: CreatePartDataHolder) {
 					}, isError = eu, label = {
 						Text(stringResource(R.string.end_sector))
 					})
-					// Material3 RangeSlider is absolutely buggy trash
-					androidx.compose.material.RangeSlider(modifier = Modifier.fillMaxWidth(), colors = sc, values = lu, onValueChange = {
+					RangeSlider(modifier = Modifier.fillMaxWidth(), value = lu, onValueChange = {
 						l = it.start.toLong().toString()
 						u = it.endInclusive.toLong().toString()
 						el = !l.matches(Regex("\\d+"))
