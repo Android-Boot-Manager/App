@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -140,7 +139,7 @@ private class CreatePartDataHolder(val vm: WizardActivityState): ProgressListene
 	var cmdline by mutableStateOf("")
 	var shName by mutableStateOf("")
 	val dmaMeta = ArrayMap<String, String>()
-	val count = mutableStateOf(0)
+	val count = mutableIntStateOf(0)
 	val intVals = mutableStateListOf<Long>()
 	val selVals = mutableStateListOf<Int>()
 	val codeVals = mutableStateListOf<String>()
@@ -170,7 +169,7 @@ private class CreatePartDataHolder(val vm: WizardActivityState): ProgressListene
 
 	fun addDefault(i: Long, sel: Int, code: String, id: String, needUnsparse: Boolean) {
 		if (idVals.contains(id)) return
-		count.value++
+		count.intValue++
 		intVals.add(i)
 		selVals.add(sel)
 		codeVals.add(code)
@@ -202,7 +201,6 @@ private class CreatePartDataHolder(val vm: WizardActivityState): ProgressListene
 	}
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun Start(c: CreatePartDataHolder) {
 	if (c.meta == null) {
@@ -475,7 +473,7 @@ private fun Os(c: CreatePartDataHolder) {
 	}
 
 	val s = rememberScrollState()
-	var expanded by remember { mutableStateOf(0) }
+	var expanded by remember { mutableIntStateOf(0) }
 	var e by remember { mutableStateOf(false) }
 	Column(
 		Modifier
@@ -560,9 +558,9 @@ private fun Os(c: CreatePartDataHolder) {
 				Modifier
 					.fillMaxWidth()) {
 
-				for (i in 1..c.count.value) {
-					val selectedValue = remember { mutableStateOf(c.selVals.getOrElse(i-1) { 1 }) }
-					val intValue = remember { mutableStateOf(c.intVals.getOrElse(i-1) { 100L }) }
+				for (i in 1..c.count.intValue) {
+					val selectedValue = remember { mutableIntStateOf(c.selVals.getOrElse(i-1) { 1 }) }
+					val intValue = remember { mutableLongStateOf(c.intVals.getOrElse(i-1) { 100L }) }
 					var codeValue by remember { mutableStateOf(c.codeVals.getOrElse(i-1) { "8305" }) }
 					var idValue by remember { mutableStateOf(c.idVals.getOrElse(i-1) { "" }) }
 					var d by remember { mutableStateOf(false) }
@@ -570,8 +568,8 @@ private fun Os(c: CreatePartDataHolder) {
 					val items = listOf("bytes", "percent")
 					val items2 = listOf("0700", "8302", "8305")
 					val codes = listOf(stringResource(R.string.portable_part), stringResource(R.string.os_userdata), stringResource(R.string.os_system))
-					val isSelectedItem: (String) -> Boolean = { items[selectedValue.value] == it }
-					val onChangeState: (String) -> Unit = { selectedValue.value = items.indexOf(it) }
+					val isSelectedItem: (String) -> Boolean = { items[selectedValue.intValue] == it }
+					val onChangeState: (String) -> Unit = { selectedValue.intValue = items.indexOf(it) }
 
 					Card(
 						modifier = Modifier
@@ -586,14 +584,14 @@ private fun Os(c: CreatePartDataHolder) {
 							var sts: Long = -1
 							var remaining = c.availableSize
 							if (i-1 < c.selVals.size) {
-								c.selVals[i - 1] = selectedValue.value
+								c.selVals[i - 1] = selectedValue.intValue
 							} else {
-								c.selVals.add(i - 1, selectedValue.value)
+								c.selVals.add(i - 1, selectedValue.intValue)
 							}
 							if (i-1 < c.intVals.size) {
-								c.intVals[i - 1] = intValue.value
+								c.intVals[i - 1] = intValue.longValue
 							} else {
-								c.intVals.add(i - 1, intValue.value)
+								c.intVals.add(i - 1, intValue.longValue)
 							}
 							if (i-1 < c.codeVals.size) {
 								c.codeVals[i - 1] = codeValue
@@ -622,10 +620,10 @@ private fun Os(c: CreatePartDataHolder) {
 							}
 							remaining += sts
 
-							Text(text = stringResource(R.string.sector_used, intValue.value, items[selectedValue.value], sts, remaining))
-							TextField(value = intValue.value.toString(), onValueChange = {
+							Text(text = stringResource(R.string.sector_used, intValue.longValue, items[selectedValue.intValue], sts, remaining))
+							TextField(value = intValue.longValue.toString(), onValueChange = {
 								if (it.matches(Regex("\\d+"))) {
-									intValue.value = it.toLong()
+									intValue.longValue = it.toLong()
 								}
 							}, label = {
 								Text(stringResource(R.string.size))
@@ -697,14 +695,14 @@ private fun Os(c: CreatePartDataHolder) {
 					}
 				}
 				Row(verticalAlignment = Alignment.CenterVertically) {
-					Button(onClick = { c.count.value += 1 }) {
+					Button(onClick = { c.count.intValue += 1 }) {
 						Text("+")
 					}
-					Button(onClick = { c.count.value -= 1 }, enabled = (c.count.value > 1)) {
+					Button(onClick = { c.count.intValue -= 1 }, enabled = (c.count.intValue > 1)) {
 						Text("-")
 					}
 					var remaining = c.availableSize
-					for (j in 1 .. c.count.value) {
+					for (j in 1 .. c.count.intValue) {
 						val k = c.intVals.getOrElse(j-1) { 0L }
 						val l = c.selVals.getOrElse(j-1) { 1 }
 						val sts = if (l == 0 /*bytes*/) {
@@ -1004,13 +1002,13 @@ private fun Flash(c: CreatePartDataHolder) {
 					}
 					parts[it] = c.meta!!.nid.toString()
 					c.meta = SDUtils.generateMeta(c.vm.deviceInfo!!.bdev, c.vm.deviceInfo.pbdev)
-					if (it + 1 < c.count.value) {
+					if (it + 1 < c.count.intValue) {
 						c.p = c.meta!!.s.find { it1 -> it1.type == SDUtils.PartitionType.FREE && (offset + k) < it1.startSector } as SDUtils.Partition.FreeSpace
 					}
 					if (r.isSuccess) {
 						terminal.add(vm.activity.getString(R.string.term_created_part))
 						offset = 0L
-						if (it + 1 < c.count.value) {
+						if (it + 1 < c.count.intValue) {
 							makeOne(it + 1)
 						} else {
 							terminal.add(vm.activity.getString(R.string.term_created_pt))
