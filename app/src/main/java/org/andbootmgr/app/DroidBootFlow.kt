@@ -262,12 +262,12 @@ private fun Flash(vm: WizardActivityState) {
 		db.exportToFile(File(vm.logic.abmDb, "db.conf"))
 		val entry = ConfigFile()
 		entry["title"] = vm.texts["OsName"]!!
-		entry["linux"] = "real/kernel"
-		entry["initrd"] = "real/initrd.cpio.gz"
-		entry["dtb"] = "real/dtb.dtb"
+		entry["linux"] = "null"
+		entry["initrd"] = "null"
+		entry["dtb"] = "null"
 		if(vm.deviceInfo.havedtbo)
-			entry["dtbo"] = "real/dtbo.dtbo"
-		entry["options"] = "REPLACECMDLINE"
+			entry["dtbo"] = "null"
+		entry["options"] = "null"
 		entry["xtype"] = "droid"
 		entry["xpart"] = "real"
 		entry.exportToFile(File(vm.logic.abmEntries, "real.conf"))
