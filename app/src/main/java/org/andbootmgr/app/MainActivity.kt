@@ -921,7 +921,7 @@ private fun PartTool(vm: MainActivityState) {
 					}
 				},
 				confirmButton = {
-					if (f != null) {
+					if (f != null && e["xpart"] != "real") {
 						Button(
 							onClick = {
 								f!!.delete()
