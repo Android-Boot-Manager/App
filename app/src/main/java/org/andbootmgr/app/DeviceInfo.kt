@@ -76,7 +76,7 @@ object HardcodedDeviceInfoFactory {
 			override val bdev: String = "/dev/block/mmcblk1"
 			override val pbdev: String = bdev + "p"
 			override val metaonsd: Boolean = true
-			override val postInstallScript: Boolean = false
+			override val postInstallScript: Boolean = true
 			override val havedtbo: Boolean = false
 			override fun isInstalled(logic: DeviceLogic): Boolean {
 				return SuFile.open(bdev).exists() && run {

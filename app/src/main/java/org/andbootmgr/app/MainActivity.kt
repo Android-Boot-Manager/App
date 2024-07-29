@@ -233,32 +233,31 @@ private fun AppContent(vm: MainActivityState, view: @Composable (PaddingValues) 
 		// A surface container using the 'background' color from the theme
 		Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
 			ModalNavigationDrawer(drawerContent = {
-				Box {
-					Button(
-						modifier = Modifier
-							.align(Alignment.Center)
-							.padding(top = 16.dp),
+				ModalDrawerSheet {
+					NavigationDrawerItem(
+						label = { Text(stringResource(R.string.home)) },
+						selected = vm.currentNav == "start",
 						onClick = {
 							scope.launch {
 								vm.navController!!.navigate("start")
 								drawerState.close()
 							}
 						},
-						content = { Text(stringResource(R.string.home)) }
+						modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp)
 					)
-					Button(
-						modifier = Modifier
-							.align(Alignment.Center)
-							.padding(top = 16.dp),
-						onClick = {
-							if (vm.isOk) scope.launch {
-								vm.navController!!.navigate("settings")
-								drawerState.close()
-							}
-						},
-						enabled = vm.isOk,
-						content = { Text(stringResource(R.string.settings)) }
-					)
+					if (vm.isOk) {
+						NavigationDrawerItem(
+							label = { Text(stringResource(R.string.settings)) },
+							selected = vm.currentNav == "settings",
+							onClick = {
+								scope.launch {
+									vm.navController!!.navigate("settings")
+									drawerState.close()
+								}
+							},
+							modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp)
+						)
+					}
 				}
 			},
 				drawerState = drawerState,

@@ -992,7 +992,6 @@ private fun Flash(c: CreatePartDataHolder) {
 				} else /*percent*/ {
 					(BigDecimal(c.p.size - (offset + c.f)).multiply(BigDecimal(b).divide(BigDecimal(100)))).toLong()
 				}
-				terminal.add("c.p.size=${c.p.size} offset=$offset c.f=${c.f} b=$b k=$k logSectorSizeBytes=${c.meta!!.logicalSectorSizeBytes}")
 
 				vm.logic.unmount(vm.deviceInfo!!)
 				val r = Shell.cmd(SDUtils.umsd(c.meta!!) + " && " + c.p.create(offset, offset + k, code, "")).to(terminal).exec()
