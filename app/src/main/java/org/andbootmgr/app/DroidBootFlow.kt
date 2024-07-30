@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
 import com.topjohnwu.superuser.io.SuFileInputStream
-import com.topjohnwu.superuser.io.SuFileOutputStream
 import org.andbootmgr.app.util.AbmTheme
 import org.andbootmgr.app.util.ConfigFile
 import org.andbootmgr.app.util.SDUtils
@@ -228,7 +227,7 @@ private fun Flash(vm: WizardActivityState) {
 			// TODO provision for sdless
 		}
 
-		if (!vm.logic.mount(vm.deviceInfo)) {
+		if (!vm.logic.mountBootset(vm.deviceInfo)) {
 			terminal.add(vm.activity.getString(R.string.term_failed_mount))
 			return@Terminal
 		}
@@ -240,14 +239,14 @@ private fun Flash(vm: WizardActivityState) {
 		if (!SuFile.open(vm.logic.abmDb.toURI()).exists()) {
 			if (!SuFile.open(vm.logic.abmDb.toURI()).mkdir()) {
 				terminal.add(vm.activity.getString(R.string.term_failed_create_db_dir))
-				vm.logic.unmount(vm.deviceInfo)
+				vm.logic.unmountBootset()
 				return@Terminal
 			}
 		}
 		if (!SuFile.open(vm.logic.abmEntries.toURI()).exists()) {
 			if (!SuFile.open(vm.logic.abmEntries.toURI()).mkdir()) {
 				terminal.add(vm.activity.getString(R.string.term_failed_create_entries_dir))
-				vm.logic.unmount(vm.deviceInfo)
+				vm.logic.unmountBootset()
 				return@Terminal
 			}
 		}
@@ -294,7 +293,7 @@ private fun Flash(vm: WizardActivityState) {
 			).to(terminal).exec()
 		}
 		terminal.add(vm.activity.getString(R.string.term_success))
-		vm.logic.unmount(vm.deviceInfo)
+		vm.logic.unmountBootset()
 		vm.activity.runOnUiThread {
 			vm.btnsOverride = true
 			vm.nextText.value = vm.activity.getString(R.string.finish)

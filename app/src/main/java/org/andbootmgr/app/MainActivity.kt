@@ -37,7 +37,6 @@ import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.Shell.FLAG_MOUNT_MASTER
 import com.topjohnwu.superuser.Shell.FLAG_REDIRECT_STDERR
 import com.topjohnwu.superuser.io.SuFile
-import com.topjohnwu.superuser.io.SuFileInputStream
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.andbootmgr.app.util.AbmTheme
@@ -45,7 +44,6 @@ import org.andbootmgr.app.util.ConfigFile
 import org.andbootmgr.app.util.SDUtils
 import org.andbootmgr.app.util.Toolkit
 import java.io.File
-import java.io.IOException
 import java.util.stream.Collectors
 
 class MainActivityState {
@@ -149,7 +147,7 @@ class MainActivity : ComponentActivity() {
 						vm.root = shell.isRoot
 						vm.deviceInfo = HardcodedDeviceInfoFactory.get(Build.DEVICE)
 						if (vm.deviceInfo != null && vm.deviceInfo!!.isInstalled(vm.logic!!)) {
-							vm.logic!!.mount(vm.deviceInfo!!)
+							vm.logic!!.mountBootset(vm.deviceInfo!!)
 						}
 						if (vm.deviceInfo != null) {
 							vm.isOk = ((vm.deviceInfo!!.isInstalled(vm.logic!!)) &&
@@ -677,7 +675,7 @@ private fun PartTool(vm: MainActivityState) {
 									Row {
 										Button(onClick = {
 											processing = true
-											Shell.cmd(p.mount()).submit {
+											vm.logic!!.mount(p).submit {
 												processing = false
 												result = it.out.join("\n") + it.err.join("\n")
 											}
@@ -686,7 +684,7 @@ private fun PartTool(vm: MainActivityState) {
 										}
 										Button(onClick = {
 											processing = true
-											Shell.cmd(p.unmount()).submit {
+											vm.logic!!.unmount(p).submit {
 												processing = false
 												result = it.out.join("\n") + it.err.join("\n")
 											}
@@ -777,9 +775,9 @@ private fun PartTool(vm: MainActivityState) {
 						Button(onClick = {
 							processing = true
 							delete = false
-							vm.logic!!.unmount(vm.deviceInfo!!)
-							Shell.cmd(SDUtils.umsd(parts!!) + " && " + p.delete()).submit {
-								vm.logic!!.mount(vm.deviceInfo!!)
+							vm.logic!!.unmountBootset()
+							vm.logic!!.delete(p).submit {
+								vm.logic!!.mountBootset(vm.deviceInfo!!)
 								processing = false
 								editPartID = null
 								parts =
@@ -1011,7 +1009,7 @@ private fun PartTool(vm: MainActivityState) {
 										.map { it.delete() }.collect(
 											Collectors.toList()
 										)
-									vm.logic!!.unmount(vm.deviceInfo!!)
+									vm.logic!!.unmountBootset()
 									for (s in allp) { // Do not chain, but regenerate meta and unmount every time. Thanks void
 										val r = Shell.cmd(
 											SDUtils.umsd(parts!!) + " && " + s
@@ -1020,7 +1018,7 @@ private fun PartTool(vm: MainActivityState) {
 											SDUtils.generateMeta(vm.deviceInfo!!.bdev, vm.deviceInfo!!.pbdev)
 										tresult += r.out.join("\n") + r.err.join("\n") + "\n"
 									}
-									vm.logic!!.mount(vm.deviceInfo!!)
+									vm.logic!!.mountBootset(vm.deviceInfo!!)
 								}
 								val f = entries[e]!!
 								val f2 = SuFile(vm.logic!!.abmBootset, f.nameWithoutExtension)

@@ -31,10 +31,11 @@ interface DeviceInfo {
 		} catch (e: Exception) {
 			e.printStackTrace()
 		}
-		val result = Shell.cmd(File(logic.assetDir, "Scripts/is_installed.sh").absolutePath).exec()
+		val result = Shell.cmd("grep ABM.bootloader=1 /proc/cmdline").exec()
 		return result.isSuccess && result.out.join("\n").contains("ABM.bootloader=1")
 	}
 	fun isCorrupt(logic: DeviceLogic): Boolean
+	fun getAbmSettings(logic: DeviceLogic): String?
 }
 
 abstract class MetaOnSdDeviceInfo : DeviceInfo {
@@ -48,6 +49,17 @@ abstract class MetaOnSdDeviceInfo : DeviceInfo {
 	}
 	override fun isCorrupt(logic: DeviceLogic): Boolean {
 		return !SuFile.open(logic.abmDb, "db.conf").exists()
+	}
+	override fun getAbmSettings(logic: DeviceLogic): String? {
+		if (SuFile.open(bdev).exists())
+			SDUtils.generateMeta(bdev, pbdev)?.let { meta ->
+				if (meta.countPartitions() > 0) {
+					val part = meta.dumpPartition(0)
+					if (part.type == SDUtils.PartitionType.RESERVED)
+						return pbdev + part.id
+				}
+			}
+		return null
 	}
 }
 

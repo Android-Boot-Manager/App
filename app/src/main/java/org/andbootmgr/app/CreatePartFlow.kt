@@ -993,7 +993,7 @@ private fun Flash(c: CreatePartDataHolder) {
 					(BigDecimal(c.p.size - (offset + c.f)).multiply(BigDecimal(b).divide(BigDecimal(100)))).toLong()
 				}
 
-				vm.logic.unmount(vm.deviceInfo!!)
+				vm.logic.unmountBootset()
 				val r = Shell.cmd(SDUtils.umsd(c.meta!!) + " && " + c.p.create(offset, offset + k, code, "")).to(terminal).exec()
 				try {
 					if (r.out.join("\n").contains("kpartx")) {
@@ -1011,7 +1011,7 @@ private fun Flash(c: CreatePartDataHolder) {
 							makeOne(it + 1)
 						} else {
 							terminal.add(vm.activity.getString(R.string.term_created_pt))
-							vm.logic.mount(vm.deviceInfo)
+							vm.logic.mountBootset(vm.deviceInfo)
 							installMore()
 						}
 					} else {
