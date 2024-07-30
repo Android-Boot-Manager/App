@@ -147,24 +147,7 @@ class MainActivity : ComponentActivity() {
 				if (!fail) {
 					Shell.getShell { shell ->
 						vm.root = shell.isRoot
-						val codename: String
-						var b: ByteArray? = null
-						if (vm.root) {
-							try {
-								val f = SuFile.open(vm.logic!!.abmDir, "codename.cfg")
-								val s = SuFileInputStream.open(f)
-								b = s.readBytes()
-								s.close()
-							} catch (e: IOException) {
-								Log.e("ABM_GetCodeName", Log.getStackTraceString(e))
-							}
-						}
-						codename = if (b != null) {
-							String(b).trim()
-						} else {
-							Build.DEVICE
-						}
-						vm.deviceInfo = HardcodedDeviceInfoFactory.get(codename)
+						vm.deviceInfo = HardcodedDeviceInfoFactory.get(Build.DEVICE)
 						if (vm.deviceInfo != null && vm.deviceInfo!!.isInstalled(vm.logic!!)) {
 							vm.logic!!.mount(vm.deviceInfo!!)
 						}
@@ -390,30 +373,23 @@ private fun Start(vm: MainActivityState) {
 				}
 			}
 		}
-		if (Shell.isAppGrantedRoot() == false) {
+		if (Shell.isAppGrantedRoot() != true) {
 			Text(
 				stringResource(R.string.need_root),
 				textAlign = TextAlign.Center
 			)
 		} else if (metaonsd && !sdpresent) {
 			Text(stringResource(R.string.need_sd), textAlign = TextAlign.Center)
-		} else if (!installed) {
+		} else if (!installed && !mounted) {
 			Button(onClick = { vm.startFlow("droidboot") }) {
 				Text(stringResource(if (metaonsd) R.string.setup_sd else R.string.install))
 			}
-		} else if (!booted) {
+		} else if (!booted && mounted) {
 			Text(stringResource(R.string.installed_not_booted), textAlign = TextAlign.Center)
 			Button(onClick = {
 				vm.startFlow("fix_droidboot")
 			}) {
 				Text(stringResource(R.string.repair_droidboot))
-			}
-		} else if (!metaonsd && mounted && corrupt) {
-			Text(stringResource(R.string.missing_cfg), textAlign = TextAlign.Center)
-			Button(onClick = {
-				//vm.startFlow("repair_cfg") TODO:Implement this
-			}) {
-				Text(stringResource(R.string.repair_cfg))
 			}
 		} else if (!mounted) {
 			Text(stringResource(R.string.cannot_mount), textAlign = TextAlign.Center)

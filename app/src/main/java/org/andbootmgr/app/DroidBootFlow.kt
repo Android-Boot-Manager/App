@@ -63,13 +63,13 @@ private fun Start(vm: WizardActivityState) {
 	) {
 		Text(stringResource(R.string.welcome_text))
 		Text(
-			if (vm.deviceInfo!!.isBooted(vm.logic)){
+			if (vm.deviceInfo!!.isBooted(vm.logic)) {
 				stringResource(R.string.install_abm)
 			} else {
 				stringResource(R.string.install_abm_dboot)
 			}
 		)
-		if (vm.deviceInfo.metaonsd){
+		if (vm.deviceInfo.metaonsd) {
 			Text(stringResource(R.string.sd_erase1))
 			Text(stringResource(R.string.sd_erase2))
 		}
@@ -224,6 +224,8 @@ private fun Flash(vm: WizardActivityState) {
 				terminal.add(vm.activity.getString(R.string.term_failed_create_meta))
 				return@Terminal
 			}
+		} else {
+			// TODO provision for sdless
 		}
 
 		if (!vm.logic.mount(vm.deviceInfo)) {
@@ -249,13 +251,10 @@ private fun Flash(vm: WizardActivityState) {
 				return@Terminal
 			}
 		}
-		val o = SuFileOutputStream.open(File(vm.logic.abmDir, "codename.cfg"))
-		o.write(vm.deviceInfo.codename.toByteArray())
-		o.flush()
-		o.close()
 
 		terminal.add(vm.activity.getString(R.string.term_building_cfg))
 		val db = ConfigFile()
+		// TODO was this ever used? is it used by vbm maybe?
 		db["default"] = "Entry 01"
 		db["timeout"] = "5"
 		db.exportToFile(File(vm.logic.abmDb, "db.conf"))
@@ -264,7 +263,7 @@ private fun Flash(vm: WizardActivityState) {
 		entry["linux"] = "null"
 		entry["initrd"] = "null"
 		entry["dtb"] = "null"
-		if(vm.deviceInfo.havedtbo)
+		if (vm.deviceInfo.havedtbo)
 			entry["dtbo"] = "null"
 		entry["options"] = "null"
 		entry["xtype"] = "droid"
@@ -302,6 +301,8 @@ private fun Flash(vm: WizardActivityState) {
 			vm.onNext.value = {
 				if (vm.deviceInfo.isBooted(vm.logic)) {
 					it.startActivity(Intent(it, MainActivity::class.java))
+				} else {
+					// TODO prompt user to reboot?
 				}
 				it.finish()
 			}
