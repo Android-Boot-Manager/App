@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
@@ -72,7 +71,6 @@ private class UpdateFlowDataHolder(val vm: WizardActivityState) {
     val partMapping = HashMap<Int, String>()
     var extraParts = ArrayList<String>()
     var updateJson: String? = null
-    var script: String? = null
     val sparse = ArrayList<Int>()
 }
 
@@ -123,7 +121,9 @@ private fun Start(u: UpdateFlowDataHolder) {
                                         extraParts.add(extraIdNeeded.get(i) as String)
                                         i++
                                     }
-                                    script = j.getString("script")
+                                    vm.flashes["InstallShFlashType"] = Pair(
+                                        Uri.parse(j.getString("script")),
+                                        if (j.has("scriptSha256")) j.getString("scriptSha256") else null)
                                 }
                                 if (j.has("parts")) {
                                     val sp = u.e!!["xpart"]!!.split(":")
@@ -158,7 +158,6 @@ private fun Start(u: UpdateFlowDataHolder) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Local(u: UpdateFlowDataHolder) {
     Column(verticalArrangement = Arrangement.SpaceEvenly) {
@@ -168,14 +167,22 @@ private fun Local(u: UpdateFlowDataHolder) {
             Text(stringResource(R.string.local_updater_3))
         }
         Column {
-            var text by remember { mutableStateOf("") }
-            var error by remember { mutableStateOf(true) }
-            TextField(modifier = Modifier.fillMaxWidth(), value = text, isError = error, onValueChange = {
-                text = it
-                error = text.isBlank() || !File(u.vm.logic.assetDir, "Scripts/add_os/${u.vm.deviceInfo!!.codename}/${text}").exists()
-            }, label = {
-                Text(stringResource(R.string.script_name))
-            })
+            Text(stringResource(R.string.script_name))
+            if (u.vm.flashes.containsKey("InstallShFlashType")) {
+                Button(onClick = {
+                    u.vm.flashes.remove("InstallShFlashType")
+                }) {
+                    Text(stringResource(id = R.string.undo))
+                }
+            } else {
+                Button(onClick = {
+                    u.vm.activity.chooseFile("*/*") {
+                        u.vm.flashes["InstallShFlashType"] = Pair(it, null)
+                    }
+                }) {
+                    Text(stringResource(id = R.string.choose_file))
+                }
+            }
             for (i in u.sbootfile) {
                 Row {
                     Text(stringResource(R.string.file_selected) + " " + (i.lastPathSegment ?: "(null)"))
@@ -186,12 +193,11 @@ private fun Local(u: UpdateFlowDataHolder) {
             }
             if (u.sbootfile.isNotEmpty()) {
                 Button(onClick = {
-                    if (!error) {
+                    if (u.vm.flashes.containsKey("InstallShFlashType")) {
                         u.hasUpdate = false
-                        u.script = text
                         u.vm.navigate("flash")
                     }
-                }, enabled = !error) {
+                }, enabled = u.vm.flashes.containsKey("InstallShFlashType")) {
                     Text(stringResource(R.string.install_update))
                 }
             }
@@ -282,6 +288,9 @@ private fun Flash(u: UpdateFlowDataHolder) {
                     }
                     pmap[p.key] = f
                 }
+                val tmpFile = createTempFileSu("abm", ".sh", u.vm.logic.rootTmpDir)
+                u.vm.copyPriv(u.vm.flashStream("InstallShFlashType"), tmpFile)
+                tmpFile.setExecutable(true)
                 u.vm.nextText.value = ""
                 u.vm.onNext.value = {}
 
@@ -307,10 +316,7 @@ private fun Flash(u: UpdateFlowDataHolder) {
                 }
                 if (u.extraParts.isNotEmpty()) {
                     terminal.add(u.vm.activity.getString(R.string.term_patch_update))
-                    var cmd = "FORMATDATA=false " + File(
-                        u.vm.logic.assetDir,
-                        "Scripts/add_os/${u.vm.deviceInfo.codename}/${u.script}"
-                    ).absolutePath + " ${u.ef!!.nameWithoutExtension}"
+                    var cmd = "FORMATDATA=false " + tmpFile.absolutePath + " ${u.ef!!.nameWithoutExtension}"
                     for (i in bootfile) {
                         cmd += " " + i.absolutePath
                     }
@@ -318,6 +324,7 @@ private fun Flash(u: UpdateFlowDataHolder) {
                         cmd += " $i"
                     }
                     val r = u.vm.logic.runShFileWithArgs(cmd).to(terminal).exec()
+                    tmpFile.delete()
                     bootfile.forEach { it.delete() }
                     if (!r.isSuccess) {
                         throw IllegalStateException(u.vm.activity.getString(R.string.term_script_fail))
@@ -331,6 +338,9 @@ private fun Flash(u: UpdateFlowDataHolder) {
             }
         } else if (u.sbootfile.isNotEmpty()) {
             val bootfile = ArrayList<File>()
+            val tmpFile = createTempFileSu("abm", ".sh", u.vm.logic.rootTmpDir)
+            u.vm.copyPriv(u.vm.flashStream("InstallShFlashType"), tmpFile)
+            tmpFile.setExecutable(true)
             terminal.add(u.vm.activity.getString(R.string.term_patch_update))
             u.sbootfile.forEach {
                 val bootf = File(u.vm.logic.cacheDir, System.currentTimeMillis().toString())
@@ -340,10 +350,7 @@ private fun Flash(u: UpdateFlowDataHolder) {
                 )
                 bootfile.add(bootf)
             }
-            var cmd = "FORMATDATA=false " + File(
-                u.vm.logic.assetDir,
-                "Scripts/add_os/${u.vm.deviceInfo!!.codename}/${u.script}"
-            ).absolutePath + " ${u.ef!!.nameWithoutExtension}"
+            var cmd = "FORMATDATA=false " + tmpFile.absolutePath + " ${u.ef!!.nameWithoutExtension}"
             for (i in bootfile) {
                 cmd += " " + i.absolutePath
             }
@@ -351,6 +358,7 @@ private fun Flash(u: UpdateFlowDataHolder) {
                 cmd += " $i"
             }
             val r = u.vm.logic.runShFileWithArgs(cmd).to(terminal).exec()
+            tmpFile.delete()
             bootfile.forEach { it.delete() }
             if (!r.isSuccess) {
                 throw IllegalStateException(u.vm.activity.getString(R.string.term_script_fail))

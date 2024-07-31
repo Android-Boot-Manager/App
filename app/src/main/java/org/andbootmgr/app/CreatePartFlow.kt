@@ -133,11 +133,12 @@ private class CreatePartDataHolder(val vm: WizardActivityState): ProgressListene
 	var f = 0L
 	var t: String? = null
 	var noobMode: Boolean = false
+	var scriptInet: String? = null
+	var scriptShaInet: String? = null
 
 	var painter: @Composable (() -> Painter)? = null
 	var rtype by mutableStateOf("")
 	var cmdline by mutableStateOf("")
-	var shName by mutableStateOf("")
 	val dmaMeta = ArrayMap<String, String>()
 	val count = mutableIntStateOf(0)
 	val intVals = mutableStateListOf<Long>()
@@ -394,11 +395,13 @@ private fun Shop(c: CreatePartDataHolder) {
 								dmaMeta["name"] =
 									o.getString("displayname")
 								dmaMeta["creator"] = o.getString("creator")
+								c.scriptInet = o.getString("scriptname")
+								if (o.has("scriptSha256"))
+									c.scriptShaInet = o.getString("scriptSha256")
 								dmaMeta["updateJson"] = o.getString("updateJson")
 								rtype = o.getString("rtype")
 								cmdline =
 									o.getString("cmdline")
-								shName = o.getString("scriptname")
 								i = 0
 								val partitionParams = o.getJSONArray("partitions")
 								while (i < partitionParams.length()) {
@@ -794,6 +797,39 @@ private fun Download(c: CreatePartDataHolder) {
 					}
 				})
 		}
+		Row(
+			verticalAlignment = Alignment.CenterVertically,
+			horizontalArrangement = Arrangement.SpaceBetween,
+			modifier = Modifier.fillMaxWidth()
+		) {
+			Column {
+				Text(stringResource(id = R.string.installer_sh))
+			}
+			Column {
+				if (c.vm.flashes.containsKey("InstallShFlashType")) {
+					Button(onClick = {
+						c.vm.flashes.remove("InstallShFlashType")
+					}) {
+						Text(stringResource(R.string.undo))
+					}
+				} else {
+					if (c.scriptInet != null) {
+						Button(onClick = {
+							c.vm.flashes["InstallShFlashType"] = Pair(Uri.parse(c.scriptInet!!), c.scriptShaInet)
+						}) {
+							Text(stringResource(R.string.download))
+						}
+					}
+					Button(onClick = {
+						c.vm.activity.chooseFile("*/*") {
+							c.vm.flashes["InstallShFlashType"] = Pair(it, null)
+						}
+					}) {
+						Text(stringResource(R.string.choose))
+					}
+				}
+			}
+		}
 		for (i in c.idNeeded) {
 			val inet = c.inetAvailable.containsKey(i)
 			Row(
@@ -900,6 +936,9 @@ private fun Flash(c: CreatePartDataHolder) {
 			val gn = c.t3.value
 			terminal.add(vm.activity.getString(R.string.term_f_name, fn))
 			terminal.add(vm.activity.getString(R.string.term_g_name, gn))
+			val tmpFile = createTempFileSu("abm", ".sh", vm.logic.rootTmpDir)
+			vm.copyPriv(vm.flashStream("InstallShFlashType"), tmpFile)
+			tmpFile.setExecutable(true)
 			terminal.add(vm.activity.getString(R.string.term_creating_pt))
 
 			// After creating partitions:
@@ -957,10 +996,7 @@ private fun Flash(c: CreatePartDataHolder) {
 				}
 
 				terminal.add(vm.activity.getString(R.string.term_patching_os))
-				var cmd = "FORMATDATA=true " + File(
-					c.vm.logic.assetDir,
-					"Scripts/add_os/${c.vm.deviceInfo!!.codename}/${c.shName}"
-				).absolutePath + " $fn"
+				var cmd = "FORMATDATA=true " + tmpFile.absolutePath + " $fn"
 				for (i in c.extraIdNeeded) {
 					cmd += " " + c.chosen[i]!!.toFile(vm).absolutePath
 				}
@@ -968,6 +1004,7 @@ private fun Flash(c: CreatePartDataHolder) {
 					cmd += " " + i.value
 				}
 				val result = vm.logic.runShFileWithArgs(cmd).to(terminal).exec()
+				tmpFile.delete()
 				if (!result.isSuccess) {
 					terminal.add(vm.activity.getString(R.string.term_failure))
 					return
