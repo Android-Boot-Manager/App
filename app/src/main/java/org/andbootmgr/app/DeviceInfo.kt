@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
 import org.andbootmgr.app.util.SDUtils
-import java.io.File
 import java.lang.reflect.Method
 
 interface DeviceInfo {
@@ -39,7 +38,7 @@ interface DeviceInfo {
 }
 
 abstract class MetaOnSdDeviceInfo : DeviceInfo {
-	override val metaonsd: Boolean = true
+	override val metaonsd = true
 	override fun isInstalled(logic: DeviceLogic): Boolean {
 		return SuFile.open(bdev).exists() && SDUtils.generateMeta(this)?.let { meta ->
 			meta.p.isNotEmpty() && meta.dumpKernelPartition(1).type == SDUtils.PartitionType.RESERVED
@@ -64,56 +63,56 @@ abstract class MetaOnSdDeviceInfo : DeviceInfo {
 object HardcodedDeviceInfoFactory {
 	private fun getYggdrasil(): DeviceInfo {
 		return object : MetaOnSdDeviceInfo() {
-			override val codename: String = "yggdrasil"
-			override val blBlock: String = "/dev/block/by-name/lk"
-			override val bdev: String = "/dev/block/mmcblk1"
-			override val pbdev: String = bdev + "p"
-			override val postInstallScript: Boolean = false
-			override val havedtbo: Boolean = false
+			override val codename = "yggdrasil"
+			override val blBlock = "/dev/block/by-name/lk"
+			override val bdev = "/dev/block/mmcblk1"
+			override val pbdev = bdev + "p"
+			override val postInstallScript = false
+			override val havedtbo = false
 		}
 	}
 
 	private fun getMimameid(): DeviceInfo {
 		return object : MetaOnSdDeviceInfo() {
-			override val codename: String = "mimameid"
-			override val blBlock: String = "/dev/block/by-name/lk"
-			override val bdev: String = "/dev/block/mmcblk1"
-			override val pbdev: String = bdev + "p"
-			override val postInstallScript: Boolean = true
-			override val havedtbo: Boolean = false
+			override val codename = "mimameid"
+			override val blBlock = "/dev/block/by-name/lk"
+			override val bdev = "/dev/block/mmcblk1"
+			override val pbdev = bdev + "p"
+			override val postInstallScript = true
+			override val havedtbo = false
 		}
 	}
 
 	private fun getYggdrasilx(): DeviceInfo {
 		return object : MetaOnSdDeviceInfo() {
-			override val codename: String = "yggdrasilx"
-			override val blBlock: String = "/dev/block/by-name/lk"
-			override val bdev: String = "/dev/block/mmcblk1"
-			override val pbdev: String = bdev + "p"
-			override val postInstallScript: Boolean = true
-			override val havedtbo: Boolean = false
+			override val codename = "yggdrasilx"
+			override val blBlock = "/dev/block/by-name/lk"
+			override val bdev = "/dev/block/mmcblk1"
+			override val pbdev = bdev + "p"
+			override val postInstallScript = true
+			override val havedtbo = false
 		}
 	}
 
 	private fun getVidofnir(): DeviceInfo {
 		return object : MetaOnSdDeviceInfo() {
-			override val codename: String = "vidofnir"
-			override val blBlock: String = "/dev/block/by-name/lk"
-			override val bdev: String = "/dev/block/mmcblk0"
-			override val pbdev: String = bdev + "p"
-			override val postInstallScript: Boolean = false
-			override val havedtbo: Boolean = false
+			override val codename = "vidofnir"
+			override val blBlock = "/dev/block/by-name/lk"
+			override val bdev = "/dev/block/mmcblk0"
+			override val pbdev = bdev + "p"
+			override val postInstallScript = false
+			override val havedtbo = false
 		}
 	}
 
 	private fun getVayu(): DeviceInfo {
 		return object : MetaOnSdDeviceInfo() {
-			override val codename: String = "vayu"
-			override val blBlock: String = "/dev/block/by-name/boot"
-			override val bdev: String = "/dev/block/mmcblk0"
-			override val pbdev: String = bdev + "p"
-			override val postInstallScript: Boolean = true
-			override val havedtbo: Boolean = true
+			override val codename = "vayu"
+			override val blBlock = "/dev/block/by-name/boot"
+			override val bdev = "/dev/block/mmcblk0"
+			override val pbdev = bdev + "p"
+			override val postInstallScript = true
+			override val havedtbo = true
 		}
 	}
 

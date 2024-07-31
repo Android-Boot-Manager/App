@@ -1,5 +1,6 @@
 package org.andbootmgr.app
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -141,6 +142,7 @@ class WizardActivity : ComponentActivity() {
 		}
 	}
 
+	@SuppressLint("MissingSuperCall")
 	@Deprecated("Deprecated in Java")
 	override fun onBackPressed() {
 		vm.onPrev.value(this)
@@ -187,7 +189,7 @@ class WizardActivityState(val codename: String) {
 	var onPrev: MutableState<(WizardActivity) -> Unit> = mutableStateOf({})
 	var onNext: MutableState<(WizardActivity) -> Unit> = mutableStateOf({})
 
-	var flashes: HashMap<String, Uri> = HashMap()
+	var flashes: HashMap<String, Pair<Uri, String?>> = HashMap()
 	var texts: HashMap<String, String> = HashMap()
 
 	fun navigate(next: String) {
@@ -211,15 +213,16 @@ class WizardActivityState(val codename: String) {
 	}
 
 	fun flashStream(flashType: String): InputStream {
+		// TODO check sha sum
 		return flashes[flashType]?.let {
-			when (it.scheme) {
+			when (it.first.scheme) {
 				"content" ->
-					activity.contentResolver.openInputStream(it)
+					activity.contentResolver.openInputStream(it.first)
 						?: throw IOException("in == null")
 				"file" ->
-					FileInputStream(it.toFile())
+					FileInputStream(it.first.toFile())
 				"http", "https" ->
-					URL(it.toString()).openStream()
+					URL(it.first.toString()).openStream()
 				else -> null
 			}
 		} ?: throw IllegalArgumentException()

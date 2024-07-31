@@ -19,11 +19,16 @@ class FixDroidBootWizardPageFactory(private val vm: WizardActivityState) {
 	fun get(): List<IWizardPage> {
 		return listOf(WizardPage("start",
 			NavButton(vm.activity.getString(R.string.cancel)) { it.finish() },
-			NavButton(vm.activity.getString(R.string.next)) { it.navigate("select") })
+			NavButton(vm.activity.getString(R.string.next)) { it.navigate(if (vm.deviceInfo!!.postInstallScript) "shSel" else "select") })
 		{
 			Start(vm)
-		}, WizardPage("select",
+		}, WizardPage("shSel",
 			NavButton(vm.activity.getString(R.string.prev)) { it.navigate("start") },
+			NavButton("") {}
+		) {
+			SelectInstallSh(vm)
+		},WizardPage("select",
+			NavButton(vm.activity.getString(R.string.prev)) { it.navigate(if (vm.deviceInfo!!.postInstallScript) "shSel" else "start") },
 			NavButton("") {}
 		) {
 			SelectDroidBoot(vm)
@@ -61,12 +66,16 @@ private fun Flash(vm: WizardActivityState) {
 			terminal.add(vm.activity.getString(R.string.term_bl_failed))
 			terminal.add(if (e.message != null) e.message!! else "(null)")
 			terminal.add(vm.activity.getString(R.string.term_consult_doc))
+			return@Terminal
 		}
 		if (vm.deviceInfo.postInstallScript) {
 			terminal.add(vm.activity.getString(R.string.term_device_setup))
+			val tmpFile = createTempFileSu("abm", ".sh", vm.logic.rootTmpDir)
+			vm.copyPriv(vm.flashStream("InstallShFlashType"), tmpFile)
+			tmpFile.setExecutable(true)
 			vm.logic.runShFileWithArgs(
-				"BOOTED=${vm.deviceInfo.isBooted(vm.logic)} SETUP=false " +
-						"${File(vm.logic.assetDir, "Scripts/install/${vm.deviceInfo.codename}.sh").absolutePath} real"
+				"BOOTED=${vm.deviceInfo.isBooted(vm.logic)} SETUP=true " +
+						"${tmpFile.absolutePath} real"
 			).to(terminal).exec()
 		}
 		terminal.add(vm.activity.getString(R.string.term_success))

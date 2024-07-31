@@ -13,7 +13,8 @@ class DeviceLogic(ctx: Context) {
 	private val toolkitDir = File(assetDir, "Toolkit")
 	val fileDir = File(rootDir, "files")
 	val cacheDir = File(rootDir, "cache")
-	val abmBootset = File("/data/local/tmp/.abm_bootset")
+	val rootTmpDir = File("/data/local/tmp")
+	val abmBootset = File(rootTmpDir, ".abm_bootset")
 	val abmDb = File(abmBootset, "db")
 	val abmEntries = File(abmDb, "entries")
 	var mounted = false

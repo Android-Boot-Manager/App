@@ -38,11 +38,17 @@ class DroidBootWizardPageFactory(private val vm: WizardActivityState) {
 			Start(vm)
 		}, WizardPage("input",
 			NavButton(vm.activity.getString(R.string.prev)) { it.navigate("start") },
-			NavButton(vm.activity.getString(R.string.next)) { it.navigate(if (!vm.deviceInfo!!.isBooted(vm.logic)) "select" else "flash") }
+			NavButton(vm.activity.getString(R.string.next)) { it.navigate(if (vm.deviceInfo!!.postInstallScript) "shSel" else
+				(if (!vm.deviceInfo.isBooted(vm.logic)) "select" else "flash")) }
 		) {
 			Input(vm)
-		}, WizardPage("select",
+		}, WizardPage("shSel",
 			NavButton(vm.activity.getString(R.string.prev)) { it.navigate("input") },
+			NavButton(vm.activity.getString(R.string.next)) {}
+		) {
+			SelectInstallSh(vm)
+		}, WizardPage("select",
+			NavButton(vm.activity.getString(R.string.prev)) { it.navigate(if (vm.deviceInfo!!.postInstallScript) "shSel" else "input") },
 			NavButton("") {}
 		) {
 			SelectDroidBoot(vm)
@@ -129,7 +135,7 @@ fun SelectDroidBoot(vm: WizardActivityState) {
 			Text(stringResource(R.string.choose_droidboot_online))
 			Button(onClick = {
 				vm.activity.chooseFile("*/*") {
-					vm.flashes[flashType] = it
+					vm.flashes[flashType] = Pair(it, null)
 					nextButtonAvailable.value = true
 				}
 			}) {
@@ -144,7 +150,57 @@ fun SelectDroidBoot(vm: WizardActivityState) {
 						val json = JSONTokener(jsonText).nextValue() as JSONObject
 						val bl = json.getJSONObject("bootloader")
 						val url = bl.getString("url")
-						vm.flashes[flashType] = Uri.parse(url)
+						val sha = bl.getString("sha256")
+						vm.flashes[flashType] = Pair(Uri.parse(url), sha)
+						nextButtonAvailable.value = true
+					} catch (e: Exception) {
+						Handler(Looper.getMainLooper()).post {
+							Toast.makeText(ctx, R.string.dl_error, Toast.LENGTH_LONG).show()
+						}
+						Log.e("ABM droidboot json", Log.getStackTraceString(e))
+					}
+				}.start()
+			}) {
+				Text(stringResource(id = R.string.download))
+			}
+		}
+	}
+}
+
+// shared across DroidBootFlow, UpdateDroidBootFlow, FixDroidBootFlow
+@Composable
+fun SelectInstallSh(vm: WizardActivityState) {
+	val nextButtonAvailable = remember { mutableStateOf(false) }
+	val flashType = "InstallShFlashType"
+
+	Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
+		modifier = Modifier.fillMaxSize()
+	) {
+		if (nextButtonAvailable.value) {
+			Text(stringResource(id = R.string.successfully_selected))
+			vm.nextText.value = stringResource(id = R.string.next)
+			vm.onNext.value = { it.navigate(if (!vm.deviceInfo!!.isBooted(vm.logic)) "select" else "flash") }
+		} else {
+			Text(stringResource(R.string.choose_droidboot_online))
+			Button(onClick = {
+				vm.activity.chooseFile("*/*") {
+					vm.flashes[flashType] = Pair(it, null)
+					nextButtonAvailable.value = true
+				}
+			}) {
+				Text(stringResource(id = R.string.choose_file))
+			}
+			val ctx = LocalContext.current
+			Button(onClick = {
+				Thread {
+					try {
+						val jsonText =
+							URL("https://raw.githubusercontent.com/Android-Boot-Manager/ABM-json/master/devices/" + vm.codename + ".json").readText()
+						val json = JSONTokener(jsonText).nextValue() as JSONObject
+						val bl = json.getJSONObject("installScript")
+						val url = bl.getString("url")
+						val sha = bl.getString("sha256")
+						vm.flashes[flashType] = Pair(Uri.parse(url), sha)
 						nextButtonAvailable.value = true
 					} catch (e: Exception) {
 						Handler(Looper.getMainLooper()).post {
@@ -277,13 +333,17 @@ private fun Flash(vm: WizardActivityState) {
 				terminal.add(vm.activity.getString(R.string.term_bl_failed))
 				terminal.add(if (e.message != null) e.message!! else "(null)")
 				terminal.add(vm.activity.getString(R.string.term_consult_doc))
+				return@Terminal
 			}
 		}
 		if (vm.deviceInfo.postInstallScript) {
 			terminal.add(vm.activity.getString(R.string.term_device_setup))
+			val tmpFile = createTempFileSu("abm", ".sh", vm.logic.rootTmpDir)
+			vm.copyPriv(vm.flashStream("InstallShFlashType"), tmpFile)
+			tmpFile.setExecutable(true)
 			vm.logic.runShFileWithArgs(
 				"BOOTED=${vm.deviceInfo.isBooted(vm.logic)} SETUP=true " +
-				"${File(vm.logic.assetDir, "Scripts/install/${vm.deviceInfo.codename}.sh").absolutePath} real"
+						"${tmpFile.absolutePath} real"
 			).to(terminal).exec()
 		}
 		terminal.add(vm.activity.getString(R.string.term_success))

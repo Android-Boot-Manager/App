@@ -1,7 +1,3 @@
-[submodule "app/src/main/assets/Scripts"]
-	path = app/src/main/assets/Scripts
-	url = https://github.com/Android-Boot-Manager/Scripts
-	branch = master
 [submodule "app/src/main/assets/Toolkit"]
 	path = app/src/main/assets/Toolkit
 	url = https://github.com/Android-Boot-Manager/Toolkit
