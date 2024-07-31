@@ -14,9 +14,7 @@ class Toolkit(private val ctx: Context) {
 	private val targetPath = File(ctx.filesDir.parentFile, "assets")
 
 	fun copyAssets(uinf: Runnable, callback: Consumer<Boolean>) {
-		if (!targetPath.exists()) fail = fail or !targetPath.mkdir()
-		if (!File(ctx.filesDir.parentFile, "files").exists()) fail = fail or !File(ctx.filesDir.parentFile, "files").mkdir()
-		if (!File(ctx.filesDir.parentFile, "cache").exists()) fail = fail or !File(ctx.filesDir.parentFile, "cache").mkdir()
+		val shell = Shell.Builder.create().setFlags(FLAG_NON_ROOT_SHELL).setTimeout(30).setContext(ctx).build()
 		var input: InputStream
 		var b: ByteArray
 		try {
@@ -40,12 +38,15 @@ class Toolkit(private val ctx: Context) {
 		val s2 = String(b).trim()
 		if (s != s2) {
 			uinf.run()
+			shell.newJob().add("rm -rf " + targetPath.absolutePath).exec()
+			if (!targetPath.exists()) fail = fail or !targetPath.mkdir()
+			if (!File(ctx.filesDir.parentFile, "files").exists()) fail = fail or !File(ctx.filesDir.parentFile, "files").mkdir()
+			if (!File(ctx.filesDir.parentFile, "cache").exists()) fail = fail or !File(ctx.filesDir.parentFile, "cache").mkdir()
 			copyAssets("Toolkit", "Toolkit")
 			copyAssets("Scripts", "Scripts")
 			copyAssets("cp", "")
 		}
-		Shell.Builder.create().setFlags(FLAG_NON_ROOT_SHELL).setTimeout(30).setContext(ctx).build().newJob()
-			.add("chmod -R +x " + targetPath.absolutePath).exec()
+		shell.newJob().add("chmod -R +x " + targetPath.absolutePath).exec()
 		callback.accept(fail)
 	}
 

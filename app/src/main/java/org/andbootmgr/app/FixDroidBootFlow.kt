@@ -77,6 +77,7 @@ private fun Flash(vm: WizardActivityState) {
 				"BOOTED=${vm.deviceInfo.isBooted(vm.logic)} SETUP=true " +
 						"${tmpFile.absolutePath} real"
 			).to(terminal).exec()
+			tmpFile.delete()
 		}
 		terminal.add(vm.activity.getString(R.string.term_success))
 		vm.activity.runOnUiThread {

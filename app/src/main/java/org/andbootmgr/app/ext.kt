@@ -19,7 +19,7 @@ class ActionAbortedCleanlyError(e: Exception?) : ActionAbortedError(e)
 
 @Throws(IOException::class)
 private fun generateFile(prefix: String, suffix: String, dir: File?): File {
-	var n = Math.random().toLong()
+	var n = (Math.random() * Long.MAX_VALUE).toLong()
 	n = if (n == Long.MIN_VALUE) {
 		0 // corner case
 	} else {
@@ -44,7 +44,7 @@ fun createTempFileSu(
 	var f: File
 	do {
 		f = generateFile(prefix, suffix ?: ".tmp", tmpdir)
-	} while (!f.exists())
+	} while (f.exists())
 	val ff = SuFile.open(f.toURI())
 
 	if (!ff.createNewFile()) throw IOException("Unable to create temporary file")

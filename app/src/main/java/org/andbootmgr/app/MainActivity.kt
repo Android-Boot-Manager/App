@@ -776,9 +776,11 @@ private fun PartTool(vm: MainActivityState) {
 						Button(onClick = {
 							processing = true
 							delete = false
+							val wasMounted = vm.logic!!.mounted
 							vm.logic!!.unmountBootset()
 							vm.logic!!.delete(p).submit {
 								vm.logic!!.mountBootset(vm.deviceInfo!!)
+								if (wasMounted != vm.logic!!.mounted) vm.activity!!.finish()
 								processing = false
 								editPartID = null
 								parts = SDUtils.generateMeta(vm.deviceInfo!!)

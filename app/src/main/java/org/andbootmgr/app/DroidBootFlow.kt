@@ -44,7 +44,7 @@ class DroidBootWizardPageFactory(private val vm: WizardActivityState) {
 			Input(vm)
 		}, WizardPage("shSel",
 			NavButton(vm.activity.getString(R.string.prev)) { it.navigate("input") },
-			NavButton(vm.activity.getString(R.string.next)) {}
+			NavButton("") {}
 		) {
 			SelectInstallSh(vm)
 		}, WizardPage("select",
@@ -150,7 +150,7 @@ fun SelectDroidBoot(vm: WizardActivityState) {
 						val json = JSONTokener(jsonText).nextValue() as JSONObject
 						val bl = json.getJSONObject("bootloader")
 						val url = bl.getString("url")
-						val sha = bl.getString("sha256")
+						val sha = if (bl.has("sha256")) bl.getString("sha256") else null
 						vm.flashes[flashType] = Pair(Uri.parse(url), sha)
 						nextButtonAvailable.value = true
 					} catch (e: Exception) {
@@ -181,7 +181,7 @@ fun SelectInstallSh(vm: WizardActivityState) {
 			vm.nextText.value = stringResource(id = R.string.next)
 			vm.onNext.value = { it.navigate(if (!vm.deviceInfo!!.isBooted(vm.logic)) "select" else "flash") }
 		} else {
-			Text(stringResource(R.string.choose_droidboot_online))
+			Text(stringResource(R.string.choose_install_s_online))
 			Button(onClick = {
 				vm.activity.chooseFile("*/*") {
 					vm.flashes[flashType] = Pair(it, null)
@@ -197,16 +197,16 @@ fun SelectInstallSh(vm: WizardActivityState) {
 						val jsonText =
 							URL("https://raw.githubusercontent.com/Android-Boot-Manager/ABM-json/master/devices/" + vm.codename + ".json").readText()
 						val json = JSONTokener(jsonText).nextValue() as JSONObject
-						val bl = json.getJSONObject("installScript")
-						val url = bl.getString("url")
-						val sha = bl.getString("sha256")
+						val i = json.getJSONObject("installScript")
+						val url = i.getString("url")
+						val sha = if (i.has("sha256")) i.getString("sha256") else null
 						vm.flashes[flashType] = Pair(Uri.parse(url), sha)
 						nextButtonAvailable.value = true
 					} catch (e: Exception) {
 						Handler(Looper.getMainLooper()).post {
 							Toast.makeText(ctx, R.string.dl_error, Toast.LENGTH_LONG).show()
 						}
-						Log.e("ABM droidboot json", Log.getStackTraceString(e))
+						Log.e("ABM install json", Log.getStackTraceString(e))
 					}
 				}.start()
 			}) {
@@ -345,6 +345,7 @@ private fun Flash(vm: WizardActivityState) {
 				"BOOTED=${vm.deviceInfo.isBooted(vm.logic)} SETUP=true " +
 						"${tmpFile.absolutePath} real"
 			).to(terminal).exec()
+			tmpFile.delete()
 		}
 		terminal.add(vm.activity.getString(R.string.term_success))
 		vm.logic.unmountBootset()
