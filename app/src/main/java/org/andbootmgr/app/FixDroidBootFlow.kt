@@ -62,6 +62,13 @@ private fun Flash(vm: WizardActivityState) {
 			terminal.add(if (e.message != null) e.message!! else "(null)")
 			terminal.add(vm.activity.getString(R.string.term_consult_doc))
 		}
+		if (vm.deviceInfo.postInstallScript) {
+			terminal.add(vm.activity.getString(R.string.term_device_setup))
+			vm.logic.runShFileWithArgs(
+				"BOOTED=${vm.deviceInfo.isBooted(vm.logic)} SETUP=false " +
+						"${File(vm.logic.assetDir, "Scripts/install/${vm.deviceInfo.codename}.sh").absolutePath} real"
+			).to(terminal).exec()
+		}
 		terminal.add(vm.activity.getString(R.string.term_success))
 		vm.activity.runOnUiThread {
 			vm.btnsOverride = true

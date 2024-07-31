@@ -282,7 +282,7 @@ private fun Flash(vm: WizardActivityState) {
 		if (vm.deviceInfo.postInstallScript) {
 			terminal.add(vm.activity.getString(R.string.term_device_setup))
 			vm.logic.runShFileWithArgs(
-				"BOOTED=${vm.deviceInfo.isBooted(vm.logic)} " +
+				"BOOTED=${vm.deviceInfo.isBooted(vm.logic)} SETUP=true " +
 				"${File(vm.logic.assetDir, "Scripts/install/${vm.deviceInfo.codename}.sh").absolutePath} real"
 			).to(terminal).exec()
 		}
