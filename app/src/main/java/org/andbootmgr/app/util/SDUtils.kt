@@ -2,77 +2,30 @@ package org.andbootmgr.app.util
 
 import android.util.Log
 import com.topjohnwu.superuser.Shell
+import org.andbootmgr.app.DeviceInfo
 import org.andbootmgr.app.join
 import java.util.*
 import java.util.stream.Collectors
 
 object SDUtils {
 
-	// Unmount partition
-	fun umsd(t: PartitionType?, major: Int, minor: Int): String {
-		return when (t) {
-			PartitionType.FREE -> "true"
-			PartitionType.PORTABLE -> "sm unmount public:$major,$minor"
-			PartitionType.ADOPTED -> "sm unmount private:$major,$minor"
-			PartitionType.RESERVED, PartitionType.UNKNOWN -> "echo 'Warning: Unsure on how to unmount this partition.'"
-			else -> "echo 'Warning: Unsure on how to unmount this partition.'"
-		}
-	}
-
-	// Unmount partition
-	fun umsd(t: Partition): String {
-		return umsd(t.type, t.major, t.minor)
-	}
-
-	// Unmount partition
-	fun msd(t: PartitionType?, major: Int, minor: Int): String {
-		return when (t) {
-			PartitionType.FREE -> "true"
-			PartitionType.PORTABLE -> "sm mount public:$major,$minor"
-			PartitionType.ADOPTED -> "sm mount private:$major,$minor"
-			PartitionType.RESERVED, PartitionType.UNKNOWN -> "echo 'Warning: Unsure on how to mount this partition.'"
-			else -> "echo 'Warning: Unsure on how to mount this partition.'"
-		}
-	}
-
-	// Unmount partition
-	fun msd(t: Partition): String {
-		return msd(t.type, t.major, t.minor)
-	}
-
-	// Delete partition
-	fun rmp(t: Partition): String {
-		if (t.type == PartitionType.FREE)
-			return "echo 'Tried to delete free space'"
-		return "sgdisk " + t.meta.path + " --delete " + t.id
-	}
-
-	// Rename partition
-	fun rep(t: Partition, newName: String): String {
-		if (t.type == PartitionType.FREE)
-			return "echo 'Tried to rename free space'"
-		return "sgdisk " + t.meta.path + " --change-name " + t.id + ":'" + newName.replace("'", "") + "'"
-	}
-
-
 	// Unmount drive
 	fun umsd(meta: SDPartitionMeta): String {
 		val s = StringBuilder()
-		for (p in meta.p) s.append(umsd(p)).append(" && ")
+		for (p in meta.p) s.append(p.unmount()).append(" && ")
 		val e = s.toString()
 		return if (e.isEmpty()) "true" else e.substring(0, e.length - 4)
 	}
 
-	// Generate meta
-	fun generateMeta(bdev: String, pbdev: String): SDPartitionMeta? {
+	fun generateMeta(deviceInfo: DeviceInfo): SDPartitionMeta? {
 		val meta: SDPartitionMeta
 		val r =
-			Shell.cmd("printf \"mm:%d:%d\\n\" `stat -c '0x%t 0x%T' $bdev` && sgdisk $bdev --print")
+			Shell.cmd("printf \"mm:%d:%d\\n\" `stat -c '0x%t 0x%T' ${deviceInfo.bdev}` && sgdisk ${deviceInfo.bdev} --print")
 				.exec()
 		meta = if (r.isSuccess) SDPartitionMeta() else return null
 		try {
-			meta.path = bdev
-			meta.ppath = pbdev
+			meta.path = deviceInfo.bdev
+			meta.ppath = deviceInfo.pbdev
 			meta.nid = 1
 			var temp: Long = -1
 			var o: String
@@ -140,6 +93,7 @@ object SDUtils {
 						meta,
 						type,
 						id,
+						meta.ppath + id,
 						ocut[1].toLong() /* startSector */,
 						ocut[2].toLong()/* endSector */,
 						meta.logicalSectorSizeBytes,
@@ -154,7 +108,7 @@ object SDUtils {
 				} else if (o=="Found invalid GPT and valid MBR; converting MBR to GPT format"){
 					meta.ismbr=true
 				} else if(o=="***************************************************************" || o=="in memory. ") {
-
+					assert(true)
 				} else {
 					Log.e("ABM SDUtils", "can't handle $o")
 					return null
@@ -206,6 +160,7 @@ object SDUtils {
 		var meta: SDPartitionMeta,
 		val type: PartitionType,
 		val id: Int,
+		open val path: String,
 		val startSector: Long,
 		val endSector: Long,
 		bytes: Int,
@@ -231,22 +186,51 @@ object SDUtils {
 		}
 
 		fun mount(): String {
-			return msd(this)
+			return when (this.type) {
+				PartitionType.FREE -> "echo 'Why are you trying to mount free space?!'"
+				PartitionType.PORTABLE -> "sm mount public:${this.major},${this.minor}"
+				PartitionType.ADOPTED -> "sm mount private:${this.major},${this.minor}"
+				else -> "echo 'Warning: Unsure on how to mount this partition.'"
+			}
 		}
 		fun unmount(): String {
-			return umsd(this)
+			return when (type) {
+				PartitionType.FREE -> "true"
+				PartitionType.PORTABLE -> "sm unmount public:${this.major},${this.minor}"
+				PartitionType.ADOPTED -> "sm unmount private:${this.major},${this.minor}"
+				PartitionType.RESERVED -> {
+					if (name == "abm_settings") {
+						// TODO unmount bootset
+						"true"
+					} else {
+						"echo 'Warning: Unsure on how to unmount this partition.'"
+					}
+				}
+				PartitionType.SYSTEM, PartitionType.DATA -> {
+					// TODO rework this when dual android is supported by looking at current os' xpart
+					"true"
+				}
+				else -> "echo 'Warning: Unsure on how to unmount this partition.'"
+			}
 		}
 
 		fun delete(): String {
-			return rmp(this)
+			if (type == PartitionType.FREE)
+				return "echo 'Tried to delete free space'"
+			return "sgdisk " + meta.path + " --delete " + id
 		}
 		fun rename(newName: String): String {
-			return rep(this, newName)
+			if (type == PartitionType.FREE)
+				return "echo 'Tried to rename free space'; exit 1"
+			return "sgdisk " + meta.path + " --change-name " + id + ":'" + newName.replace("'", "") + "'"
 		}
 
 		class FreeSpace(meta: SDPartitionMeta, start: Long, end: Long, bytes: Int) :
 			Partition(meta,
-				PartitionType.FREE, 0, (start / 2048 + 1) * 2048, end, bytes, "", "", 0, 0) {
+				PartitionType.FREE, 0, "", (start / 2048 + 1) * 2048, end, bytes, "", "", 0, 0) {
+
+			override val path
+				get() = throw IllegalArgumentException()
 
 			override fun toString(): String {
 				return "FreeSpace{" +
@@ -320,34 +304,9 @@ object SDUtils {
 					'}'
 		}
 
-		// Count actual partitions
-		fun countPartitions(): Int {
-			return p.size
-		}
-
-		// Get partition
-		fun dumpPartition(id: Int): Partition {
-			return p[id]
-		}
-
 		// Get partition by kernel id
 		fun dumpKernelPartition(id: Int): Partition {
 			return p.stream().filter { it.id == id }.findFirst().get()
-		}
-
-		// Count entries for partition wizard
-		fun count(): Int {
-			return u.size
-		}
-
-		// Get entry for partition wizard
-		fun dump(id: Int): Partition {
-			return u[id]
-		}
-
-		// Get entry for partition wizard from sorted list
-		fun dumpS(id: Int): Partition {
-			return s[id]
 		}
 	}
 }

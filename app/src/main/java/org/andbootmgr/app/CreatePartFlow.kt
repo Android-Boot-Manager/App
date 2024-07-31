@@ -186,7 +186,7 @@ private class CreatePartDataHolder(val vm: WizardActivityState): ProgressListene
 	@Composable
 	fun lateInit() {
 		noobMode = LocalContext.current.getSharedPreferences("abm", 0).getBoolean("noob_mode", BuildConfig.DEFAULT_NOOB_MODE)
-		meta = SDUtils.generateMeta(vm.deviceInfo!!.bdev, vm.deviceInfo.pbdev)
+		meta = SDUtils.generateMeta(vm.deviceInfo!!)
 		(meta?.s?.find { vm.activity.intent.getLongExtra("part_sid", -1L) == it.startSector } as SDUtils.Partition.FreeSpace?)?.also { p = it }
 	}
 
@@ -904,6 +904,11 @@ private fun Flash(c: CreatePartDataHolder) {
 
 			// After creating partitions:
 			fun installMore() {
+				val meta = SDUtils.generateMeta(vm.deviceInfo!!)
+				if (meta == null) {
+					terminal.add(vm.activity.getString(R.string.term_cant_get_meta))
+					return
+				}
 				terminal.add(vm.activity.getString(R.string.term_building_cfg))
 
 				val entry = ConfigFile()
@@ -911,7 +916,7 @@ private fun Flash(c: CreatePartDataHolder) {
 				entry["linux"] = "$fn/zImage"
 				entry["initrd"] = "$fn/initrd.cpio.gz"
 				entry["dtb"] = "$fn/dtb.dtb"
-				if (vm.deviceInfo!!.havedtbo)
+				if (vm.deviceInfo.havedtbo)
 					entry["dtbo"] = "$fn/dtbo.dtbo"
 				entry["options"] = c.cmdline
 				entry["xtype"] = c.rtype
@@ -930,7 +935,7 @@ private fun Flash(c: CreatePartDataHolder) {
 					val j = c.idVals.indexOf(i)
 					terminal.add(vm.activity.getString(R.string.term_flashing_s, i))
 					val f = c.chosen[i]!!
-					val tp = File(c.vm.deviceInfo!!.pbdev + parts[j])
+					val tp = File(meta.dumpKernelPartition(j).path)
 					if (c.sparseVals[j]) {
 						val f2 = f.toFile(c.vm)
 						val result2 = Shell.cmd(
@@ -994,13 +999,13 @@ private fun Flash(c: CreatePartDataHolder) {
 				}
 
 				vm.logic.unmountBootset()
-				val r = Shell.cmd(SDUtils.umsd(c.meta!!) + " && " + c.p.create(offset, offset + k, code, "")).to(terminal).exec()
+				val r = vm.logic.create(c.p, offset, offset + k, code, "").to(terminal).exec()
 				try {
 					if (r.out.join("\n").contains("kpartx")) {
 						terminal.add(vm.activity.getString(R.string.term_reboot_asap))
 					}
 					parts[it] = c.meta!!.nid.toString()
-					c.meta = SDUtils.generateMeta(c.vm.deviceInfo!!.bdev, c.vm.deviceInfo.pbdev)
+					c.meta = SDUtils.generateMeta(c.vm.deviceInfo!!)
 					if (it + 1 < c.count.intValue) {
 						c.p = c.meta!!.s.find { it1 -> it1.type == SDUtils.PartitionType.FREE && (offset + k) < it1.startSector } as SDUtils.Partition.FreeSpace
 					}
@@ -1011,7 +1016,7 @@ private fun Flash(c: CreatePartDataHolder) {
 							makeOne(it + 1)
 						} else {
 							terminal.add(vm.activity.getString(R.string.term_created_pt))
-							vm.logic.mountBootset(vm.deviceInfo)
+							vm.logic.mountBootset(vm.deviceInfo!!)
 							installMore()
 						}
 					} else {
@@ -1025,14 +1030,12 @@ private fun Flash(c: CreatePartDataHolder) {
 			makeOne(0)
 		} else { // Portable partition
 			terminal.add(vm.activity.getString(R.string.term_create_part))
-			val r = Shell.cmd(
-				SDUtils.umsd(c.meta!!) + " && " + c.p.create(
+			val r = vm.logic.create(c.p,
 					c.l.toLong(),
 					c.u.toLong(),
 					"0700",
 					c.t!!
-				)
-			).to(terminal).exec()
+				).to(terminal).exec()
 			if (r.out.join("\n").contains("kpartx")) {
 				terminal.add(vm.activity.getString(R.string.term_reboot_asap))
 			}

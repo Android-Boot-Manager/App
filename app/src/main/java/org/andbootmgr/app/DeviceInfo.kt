@@ -42,9 +42,8 @@ abstract class MetaOnSdDeviceInfo : DeviceInfo {
 	override val metaonsd: Boolean = true
 	override fun isInstalled(logic: DeviceLogic): Boolean {
 		return SuFile.open(bdev).exists() && run {
-			val meta: SDUtils.SDPartitionMeta? =
-				SDUtils.generateMeta(bdev, pbdev)
-			meta?.let { (meta.countPartitions() > 0) && (meta.dumpPartition(0).type == SDUtils.PartitionType.RESERVED) } == true
+			val meta = SDUtils.generateMeta(this)
+			meta?.let { (meta.p.isNotEmpty()) && (meta.dumpKernelPartition(0).type == SDUtils.PartitionType.RESERVED) } == true
 		}
 	}
 	override fun isCorrupt(logic: DeviceLogic): Boolean {
@@ -52,11 +51,11 @@ abstract class MetaOnSdDeviceInfo : DeviceInfo {
 	}
 	override fun getAbmSettings(logic: DeviceLogic): String? {
 		if (SuFile.open(bdev).exists())
-			SDUtils.generateMeta(bdev, pbdev)?.let { meta ->
-				if (meta.countPartitions() > 0) {
-					val part = meta.dumpPartition(0)
+			SDUtils.generateMeta(this)?.let { meta ->
+				if (meta.p.isNotEmpty()) {
+					val part = meta.dumpKernelPartition(0)
 					if (part.type == SDUtils.PartitionType.RESERVED)
-						return pbdev + part.id
+						return part.path
 				}
 			}
 		return null

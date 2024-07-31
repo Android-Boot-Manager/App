@@ -52,7 +52,7 @@ private class CreateBackupDataHolder(val vm: WizardActivityState){
 
 @Composable
 private fun ChooseAction(c: CreateBackupDataHolder) {
-    c.meta = remember { SDUtils.generateMeta(c.vm.deviceInfo!!.bdev, c.vm.deviceInfo.pbdev) }
+    c.meta = remember { SDUtils.generateMeta(c.vm.deviceInfo!!) }
     c.pi = remember { c.vm.activity.intent.getIntExtra("partitionid", -1) }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
@@ -125,23 +125,18 @@ private fun Flash(c: CreateBackupDataHolder) {
     Terminal(c.vm, logFile = "flash_${System.currentTimeMillis()}.txt") { terminal ->
         terminal.add(c.vm.activity.getString(R.string.term_starting))
         try {
-            if (!Shell.cmd(SDUtils.umsd(c.meta!!.dumpKernelPartition(c.pi))).to(terminal).exec().isSuccess)
+            val p = c.meta!!.dumpKernelPartition(c.pi)
+            if (!c.vm.logic.unmount(p).to(terminal).exec().isSuccess)
                 throw IOException(c.vm.activity.getString(R.string.term_cant_umount))
             if (c.action == 1) {
                 c.vm.copy(
-                    SuFileInputStream.open(
-                        File(
-                            c.vm.deviceInfo!!.pbdev + (c.pi)
-                        )
-                    ),
+                    SuFileInputStream.open(File(p.path)),
                     c.vm.activity.contentResolver.openOutputStream(c.path!!)!!
                 )
             } else if (c.action == 2) {
                 c.vm.copyPriv(
                     c.vm.activity.contentResolver.openInputStream(c.path!!)!!,
-                    File(
-                        c.vm.deviceInfo!!.pbdev + (c.pi)
-                    )
+                    File(p.path)
                 )
             } else if (c.action == 3) {
                 val f = File(c.vm.logic.cacheDir, System.currentTimeMillis().toString())
@@ -150,9 +145,7 @@ private fun Flash(c: CreateBackupDataHolder) {
                     File(
                         c.vm.logic.assetDir,
                         "Toolkit/simg2img"
-                    ).absolutePath + " ${f.absolutePath} ${
-                        c.vm.deviceInfo!!.pbdev + (c.pi)
-                    }"
+                    ).absolutePath + " ${f.absolutePath} ${p.path}"
                 ).to(terminal).exec()
                 if (!result2.isSuccess) {
                     terminal.add(c.vm.activity.getString(R.string.term_failure))

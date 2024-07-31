@@ -129,8 +129,7 @@ private fun Start(u: UpdateFlowDataHolder) {
                                     val sp = u.e!!["xpart"]!!.split(":")
                                     val p = j.getJSONObject("parts")
                                     for (k in p.keys()) {
-                                        val v = p.getString(k)
-                                        partMapping[sp[k.toInt()].toInt()] = v
+                                        partMapping[sp[k.toInt()].toInt()] = p.getString(k)
                                     }
                                 }
                                 updateJson = j.optString("updateJson")
@@ -243,6 +242,8 @@ private fun dlFile(u: UpdateFlowDataHolder, l: String): File? {
 private fun Flash(u: UpdateFlowDataHolder) {
     Terminal(u.vm, logFile = "update_${System.currentTimeMillis()}.txt") { terminal ->
         val sp = u.e!!["xpart"]!!.split(":")
+        val meta = SDUtils.generateMeta(u.vm.deviceInfo!!)!!
+        Shell.cmd(SDUtils.umsd(SDUtils.generateMeta(u.vm.deviceInfo)!!)).exec()
 
         if (u.hasUpdate) { // online
             u.vm.btnsOverride = true
@@ -287,9 +288,8 @@ private fun Flash(u: UpdateFlowDataHolder) {
                 for (p in u.partMapping.entries) {
                     val v = sp.find { p.key.toString() == it }
                     terminal.add(u.vm.activity.getString(R.string.term_flashing_p, v))
-                    val k = u.vm.deviceInfo!!.pbdev + p.key
                     val f2 = pmap[p.key]!!
-                    val tp = File(k)
+                    val tp = File(meta.dumpKernelPartition(p.key).path)
                     if (u.sparse.contains(p.key)) {
                         val result2 = Shell.cmd(
                             File(
@@ -317,7 +317,7 @@ private fun Flash(u: UpdateFlowDataHolder) {
                     for (i in sp) {
                         cmd += " $i"
                     }
-                    val r = Shell.cmd(SDUtils.umsd(SDUtils.generateMeta(u.vm.deviceInfo.bdev, u.vm.deviceInfo.pbdev)!!) + " && " + cmd).to(terminal).exec()
+                    val r = Shell.cmd(cmd).to(terminal).exec()
                     bootfile.forEach { it.delete() }
                     if (!r.isSuccess) {
                         throw IllegalStateException(u.vm.activity.getString(R.string.term_script_fail))
@@ -350,7 +350,7 @@ private fun Flash(u: UpdateFlowDataHolder) {
             for (i in sp) {
                 cmd += " $i"
             }
-            val r = Shell.cmd(SDUtils.umsd(SDUtils.generateMeta(u.vm.deviceInfo.bdev, u.vm.deviceInfo.pbdev)!!) + " && " + cmd).to(terminal).exec()
+            val r = Shell.cmd(cmd).to(terminal).exec()
             bootfile.forEach { it.delete() }
             if (!r.isSuccess) {
                 throw IllegalStateException(u.vm.activity.getString(R.string.term_script_fail))

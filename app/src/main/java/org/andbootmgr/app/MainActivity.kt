@@ -465,14 +465,7 @@ private fun PartTool(vm: MainActivityState) {
 			)
 		}
 
-	var parts by remember {
-		mutableStateOf(
-			SDUtils.generateMeta(
-				vm.deviceInfo!!.bdev,
-				vm.deviceInfo!!.pbdev
-			)
-		)
-	}
+	var parts by remember { mutableStateOf(SDUtils.generateMeta(vm.deviceInfo!!)) }
 	if (parts == null) {
 		Text(stringResource(R.string.part_wizard_err))
 		return
@@ -740,12 +733,9 @@ private fun PartTool(vm: MainActivityState) {
 							if (!e) {
 								processing = true
 								rename = false
-								Shell.cmd(SDUtils.umsd(parts!!) + " && " + p.rename(t)).submit { r ->
+								vm.logic!!.rename(p, t).submit { r ->
 									result = r.out.join("\n") + r.err.join("\n")
-									parts = SDUtils.generateMeta(
-										vm.deviceInfo!!.bdev,
-										vm.deviceInfo!!.pbdev
-									)
+									parts = SDUtils.generateMeta(vm.deviceInfo!!)
 									editPartID = parts?.s!!.findLast { it.id == p.id }
 									processing = false
 								}
@@ -780,8 +770,7 @@ private fun PartTool(vm: MainActivityState) {
 								vm.logic!!.mountBootset(vm.deviceInfo!!)
 								processing = false
 								editPartID = null
-								parts =
-									SDUtils.generateMeta(vm.deviceInfo!!.bdev, vm.deviceInfo!!.pbdev)
+								parts = SDUtils.generateMeta(vm.deviceInfo!!)
 								result = it.out.join("\n") + it.err.join("\n")
 							}
 						}) {
@@ -1004,18 +993,12 @@ private fun PartTool(vm: MainActivityState) {
 							Thread {
 								var tresult = ""
 								if (e.has("xpart") && !e["xpart"].isNullOrBlank()) {
-									val allp = e["xpart"]!!.split(":").stream()
+									val allp = e["xpart"]!!.split(":")
 										.map { parts!!.dumpKernelPartition(Integer.valueOf(it)) }
-										.map { it.delete() }.collect(
-											Collectors.toList()
-										)
 									vm.logic!!.unmountBootset()
-									for (s in allp) { // Do not chain, but regenerate meta and unmount every time. Thanks void
-										val r = Shell.cmd(
-											SDUtils.umsd(parts!!) + " && " + s
-										).exec()
-										parts =
-											SDUtils.generateMeta(vm.deviceInfo!!.bdev, vm.deviceInfo!!.pbdev)
+									for (p in allp) { // Do not chain, but regenerate meta and unmount every time. Thanks void
+										val r = vm.logic!!.delete(p).exec()
+										parts = SDUtils.generateMeta(vm.deviceInfo!!)
 										tresult += r.out.join("\n") + r.err.join("\n") + "\n"
 									}
 									vm.logic!!.mountBootset(vm.deviceInfo!!)
@@ -1029,8 +1012,7 @@ private fun PartTool(vm: MainActivityState) {
 									tresult += vm.activity!!.getString(R.string.cannot_delete, f.absolutePath)
 								editEntryID = null
 								processing = false
-								parts =
-									SDUtils.generateMeta(vm.deviceInfo!!.bdev, vm.deviceInfo!!.pbdev)
+								parts = SDUtils.generateMeta(vm.deviceInfo!!)
 								result = tresult
 							}.start()
 						}) {

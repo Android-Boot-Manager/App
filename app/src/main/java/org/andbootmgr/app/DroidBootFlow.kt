@@ -165,15 +165,9 @@ private fun Flash(vm: WizardActivityState) {
 	val flashType = "DroidBootFlashType"
 	Terminal(vm, logFile = "blflash_${System.currentTimeMillis()}.txt") { terminal ->
 		terminal.add(vm.activity.getString(R.string.term_preparing_fs))
-		if (vm.logic.mounted) {
+		if (vm.logic.checkMounted()) {
 			terminal.add(vm.activity.getString(R.string.term_mount_state_bad))
 			return@Terminal
-		}
-		if (!SuFile.open(vm.logic.abmDir.toURI()).exists()) {
-			if (!SuFile.open(vm.logic.abmDir.toURI()).mkdir()) {
-				terminal.add(vm.activity.getString(R.string.term_cant_create_abm_dir))
-				return@Terminal
-			}
 		}
 		if (!SuFile.open(vm.logic.abmBootset.toURI()).exists()) {
 			if (!SuFile.open(vm.logic.abmBootset.toURI()).mkdir()) {
@@ -181,7 +175,6 @@ private fun Flash(vm: WizardActivityState) {
 				return@Terminal
 			}
 		}
-
 		if (!SuFile.open(File(vm.logic.abmBootset, ".NOT_MOUNTED").toURI()).exists()) {
 			if (!SuFile.open(File(vm.logic.abmBootset, ".NOT_MOUNTED").toURI()).createNewFile()) {
 				terminal.add(vm.activity.getString(R.string.term_cant_create_placeholder))
@@ -190,7 +183,7 @@ private fun Flash(vm: WizardActivityState) {
 		}
 
 		if (vm.deviceInfo!!.metaonsd) {
-			var meta = SDUtils.generateMeta(vm.deviceInfo.bdev, vm.deviceInfo.pbdev)
+			var meta = SDUtils.generateMeta(vm.deviceInfo)
 			if (meta == null) {
 				terminal.add(vm.activity.getString(R.string.term_cant_get_meta))
 				return@Terminal
@@ -204,16 +197,17 @@ private fun Flash(vm: WizardActivityState) {
 				terminal.add(vm.activity.getString(R.string.term_failed_create_pt))
 				return@Terminal
 			}
-			meta = SDUtils.generateMeta(vm.deviceInfo.bdev, vm.deviceInfo.pbdev)
-			val r = Shell.cmd(
-				SDUtils.umsd(meta!!) + " && " + (meta.dump(0) as SDUtils.Partition.FreeSpace)
-					.create(
+			meta = SDUtils.generateMeta(vm.deviceInfo)
+			if (meta == null) {
+				terminal.add(vm.activity.getString(R.string.term_cant_get_meta))
+				return@Terminal
+			}
+			val r = vm.logic.create(meta.s[0] as SDUtils.Partition.FreeSpace,
 						0,
 						(meta.sectors - 2048) / 41 + 2048,
 						"8301",
 						"abm_settings"
-					)
-			).to(terminal).exec()
+					).to(terminal).exec()
 			if (r.out.join("\n").contains("old")) {
 				terminal.add(vm.activity.getString(R.string.term_reboot_asap))
 			}
@@ -275,7 +269,7 @@ private fun Flash(vm: WizardActivityState) {
 				terminal.add(vm.activity.getString(R.string.term_cant_write_bl))
 			vm.copyPriv(
 				SuFileInputStream.open(vm.deviceInfo.blBlock),
-				File(vm.logic.abmDir, "backup_lk1.img")
+				File(vm.logic.fileDir, "backup_lk1.img")
 			)
 			try {
 				vm.copyPriv(vm.flashStream(flashType), File(vm.deviceInfo.blBlock))
