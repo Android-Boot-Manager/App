@@ -3,7 +3,6 @@ package org.andbootmgr.app
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -67,6 +66,7 @@ class WizardActivity : ComponentActivity() {
 		super.onCreate(savedInstanceState)
 		vm = WizardActivityState(intent.getStringExtra("codename")!!)
 		vm.activity = this
+		vm.deviceInfo = JsonDeviceInfoFactory(this).get(vm.codename)!!
 		vm.logic = DeviceLogic(this)
 		chooseFile = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
 			if (uri == null) {
@@ -182,8 +182,8 @@ class WizardActivityState(val codename: String) {
 	lateinit var navController: NavHostController
 	lateinit var activity: WizardActivity
 	lateinit var logic: DeviceLogic
-	val deviceInfo = HardcodedDeviceInfoFactory.get(codename)
-	var current = mutableStateOf("start")
+	lateinit var deviceInfo: DeviceInfo
+	private var current = mutableStateOf("start")
 	var prevText = mutableStateOf("")
 	var nextText = mutableStateOf("")
 	var onPrev: MutableState<(WizardActivity) -> Unit> = mutableStateOf({})

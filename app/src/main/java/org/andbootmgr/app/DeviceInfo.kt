@@ -1,10 +1,17 @@
 package org.andbootmgr.app
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.util.Log
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
 import org.andbootmgr.app.util.SDUtils
+import org.json.JSONObject
+import org.json.JSONTokener
+import java.io.File
+import java.io.FileNotFoundException
 import java.lang.reflect.Method
+import java.net.URL
 
 interface DeviceInfo {
 	val codename: String
@@ -41,7 +48,7 @@ abstract class MetaOnSdDeviceInfo : DeviceInfo {
 	override val metaonsd = true
 	override fun isInstalled(logic: DeviceLogic): Boolean {
 		return SuFile.open(bdev).exists() && SDUtils.generateMeta(this)?.let { meta ->
-			meta.p.isNotEmpty() && meta.dumpKernelPartition(1).type == SDUtils.PartitionType.RESERVED
+			meta.p.find { it.id == 1 && it.type == SDUtils.PartitionType.RESERVED } != null
 		} == true
 	}
 	override fun isCorrupt(logic: DeviceLogic): Boolean {
@@ -60,70 +67,52 @@ abstract class MetaOnSdDeviceInfo : DeviceInfo {
 	}
 }
 
-object HardcodedDeviceInfoFactory {
-	private fun getYggdrasil(): DeviceInfo {
-		return object : MetaOnSdDeviceInfo() {
-			override val codename = "yggdrasil"
-			override val blBlock = "/dev/block/by-name/lk"
-			override val bdev = "/dev/block/mmcblk1"
-			override val pbdev = bdev + "p"
-			override val postInstallScript = false
-			override val havedtbo = false
-		}
-	}
+class JsonDeviceInfo(
+	override val codename: String,
+	override val blBlock: String,
+	override val bdev: String,
+	override val pbdev: String,
+	override val postInstallScript: Boolean,
+	override val havedtbo: Boolean
+) : MetaOnSdDeviceInfo()
 
-	private fun getMimameid(): DeviceInfo {
-		return object : MetaOnSdDeviceInfo() {
-			override val codename = "mimameid"
-			override val blBlock = "/dev/block/by-name/lk"
-			override val bdev = "/dev/block/mmcblk1"
-			override val pbdev = bdev + "p"
-			override val postInstallScript = true
-			override val havedtbo = false
-		}
-	}
-
-	private fun getYggdrasilx(): DeviceInfo {
-		return object : MetaOnSdDeviceInfo() {
-			override val codename = "yggdrasilx"
-			override val blBlock = "/dev/block/by-name/lk"
-			override val bdev = "/dev/block/mmcblk1"
-			override val pbdev = bdev + "p"
-			override val postInstallScript = true
-			override val havedtbo = false
-		}
-	}
-
-	private fun getVidofnir(): DeviceInfo {
-		return object : MetaOnSdDeviceInfo() {
-			override val codename = "vidofnir"
-			override val blBlock = "/dev/block/by-name/lk"
-			override val bdev = "/dev/block/mmcblk0"
-			override val pbdev = bdev + "p"
-			override val postInstallScript = false
-			override val havedtbo = false
-		}
-	}
-
-	private fun getVayu(): DeviceInfo {
-		return object : MetaOnSdDeviceInfo() {
-			override val codename = "vayu"
-			override val blBlock = "/dev/block/by-name/boot"
-			override val bdev = "/dev/block/mmcblk0"
-			override val pbdev = bdev + "p"
-			override val postInstallScript = true
-			override val havedtbo = true
-		}
-	}
-
+class JsonDeviceInfoFactory(private val ctx: Context) {
 	fun get(codename: String): DeviceInfo? {
-		return when (codename) {
-			"yggdrasil" -> getYggdrasil()
-			"yggdrasilx" -> getYggdrasilx()
-			"mimameid" -> getMimameid()
-			"vidofnir" -> getVidofnir()
-			"vayu" -> getVayu()
-			else -> null
+		return try {
+			var fromNet = true
+			val jsonText = try {
+				try {
+					ctx.assets.open("abm.json").readBytes().toString(Charsets.UTF_8)
+				} catch (e: FileNotFoundException) {
+					URL("https://raw.githubusercontent.com/Android-Boot-Manager/ABM-json/master/devices/$codename.json").readText()
+				}
+			} catch (e: Exception) {
+				fromNet = false
+				Log.e("ABM device info", Log.getStackTraceString(e))
+				val f = File(ctx.filesDir, "abm_dd_cache.json")
+				if (f.exists()) f.readText() else
+					ctx.assets.open("abm_fallback/$codename.json").readBytes().toString(Charsets.UTF_8)
+			}
+			val jsonRoot = JSONTokener(jsonText).nextValue() as JSONObject? ?: return null
+			val json = jsonRoot.getJSONObject("deviceInfo")
+			if (fromNet) {
+				val newRoot = JSONObject()
+				newRoot.put("deviceInfo", json)
+				File(ctx.filesDir, "abm_dd_cache.json").writeText(newRoot.toString())
+			}
+			if (!json.getBoolean("metaOnSd"))
+				throw IllegalArgumentException("sd less currently not implemented")
+			JsonDeviceInfo(
+				json.getString("codename"),
+				json.getString("blBlock"),
+				json.getString("sdBlock"),
+				json.getString("sdBlockP"),
+				json.getBoolean("postInstallScript"),
+				json.getBoolean("haveDtbo")
+			)
+		} catch (e: Exception) {
+			Log.e("ABM device info", Log.getStackTraceString(e))
+			null
 		}
 	}
 }

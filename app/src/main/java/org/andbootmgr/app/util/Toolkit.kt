@@ -43,7 +43,6 @@ class Toolkit(private val ctx: Context) {
 			if (!File(ctx.filesDir.parentFile, "files").exists()) fail = fail or !File(ctx.filesDir.parentFile, "files").mkdir()
 			if (!File(ctx.filesDir.parentFile, "cache").exists()) fail = fail or !File(ctx.filesDir.parentFile, "cache").mkdir()
 			copyAssets("Toolkit", "Toolkit")
-			copyAssets("Scripts", "Scripts")
 			copyAssets("cp", "")
 		}
 		shell.newJob().add("chmod -R +x " + targetPath.absolutePath).exec()

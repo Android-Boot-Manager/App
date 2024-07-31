@@ -144,42 +144,46 @@ class MainActivity : ComponentActivity() {
 				}
 				if (!fail) {
 					Shell.getShell { shell ->
-						vm.root = shell.isRoot
-						vm.deviceInfo = HardcodedDeviceInfoFactory.get(Build.DEVICE)
-						// == temp migration code start ==
-						if (Shell.cmd("mountpoint -q /data/abm/bootset").exec().isSuccess) {
-							Shell.cmd("umount /data/abm/bootset").exec()
-						}
-						SuFile.open("/data/abm").let {
-							if (it.exists())
-								Shell.cmd("rm -rf /data/abm").exec()
-						}
-						// == temp migration code end ==
-						if (vm.deviceInfo != null && vm.deviceInfo!!.isInstalled(vm.logic!!)) {
-							vm.logic!!.mountBootset(vm.deviceInfo!!)
-						} else {
-							Log.i("ABM", "not installed, not trying to mount")
-						}
-						if (vm.deviceInfo != null) {
-							vm.isOk = ((vm.deviceInfo!!.isInstalled(vm.logic!!)) &&
-							 vm.deviceInfo!!.isBooted(vm.logic!!) &&
-							 !(!vm.logic!!.mounted || vm.deviceInfo!!.isCorrupt(vm.logic!!)))
-						}
-						runOnUiThread {
-							setContent {
-								val navController = rememberNavController()
-								val drawerState = rememberDrawerState(DrawerValue.Closed)
-								val scope = rememberCoroutineScope()
-								vm.navController = navController
-								vm.drawerState = drawerState
-								vm.scope = scope
-								vm.noobMode = LocalContext.current.getSharedPreferences("abm", 0).getBoolean("noob_mode", BuildConfig.DEFAULT_NOOB_MODE)
-								AppContent(vm) {
-									NavGraph(vm, it)
-								}
+						Thread {
+							vm.root = shell.isRoot
+							vm.deviceInfo = JsonDeviceInfoFactory(vm.activity!!).get(Build.DEVICE)
+							// == temp migration code start ==
+							if (Shell.cmd("mountpoint -q /data/abm/bootset").exec().isSuccess) {
+								Shell.cmd("umount /data/abm/bootset").exec()
 							}
-							vm.isReady = true
-						}
+							SuFile.open("/data/abm").let {
+								if (it.exists())
+									Shell.cmd("rm -rf /data/abm").exec()
+							}
+							// == temp migration code end ==
+							if (vm.deviceInfo != null && vm.deviceInfo!!.isInstalled(vm.logic!!)) {
+								vm.logic!!.mountBootset(vm.deviceInfo!!)
+							} else {
+								Log.i("ABM", "not installed, not trying to mount")
+							}
+							if (vm.deviceInfo != null) {
+								vm.isOk = ((vm.deviceInfo!!.isInstalled(vm.logic!!)) &&
+										vm.deviceInfo!!.isBooted(vm.logic!!) &&
+										!(!vm.logic!!.mounted || vm.deviceInfo!!.isCorrupt(vm.logic!!)))
+							}
+							runOnUiThread {
+								setContent {
+									val navController = rememberNavController()
+									val drawerState = rememberDrawerState(DrawerValue.Closed)
+									val scope = rememberCoroutineScope()
+									vm.navController = navController
+									vm.drawerState = drawerState
+									vm.scope = scope
+									vm.noobMode =
+										LocalContext.current.getSharedPreferences("abm", 0)
+											.getBoolean("noob_mode", BuildConfig.DEFAULT_NOOB_MODE)
+									AppContent(vm) {
+										NavGraph(vm, it)
+									}
+								}
+								vm.isReady = true
+							}
+						}.start()
 					}
 				} else {
 					setContent {
