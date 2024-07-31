@@ -1142,6 +1142,12 @@ private fun Settings(vm: MainActivityState) {
 		}) {
 			Text(stringResource(R.string.update_droidboot))
 		}
+		Button(onClick = {
+			vm.logic!!.unmountBootset()
+			vm.activity!!.finish()
+		}) {
+			Text(stringResource(R.string.umount))
+		}
 		Row(horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 			Text(stringResource(R.string.noob_mode))
 			Switch(checked = vm.noobMode, onCheckedChange = {

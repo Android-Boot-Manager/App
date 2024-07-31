@@ -3,6 +3,7 @@ package org.andbootmgr.app
 import android.content.Context
 import android.util.Log
 import com.topjohnwu.superuser.Shell
+import com.topjohnwu.superuser.io.SuFile
 import org.andbootmgr.app.util.SDUtils
 import java.io.File
 
@@ -12,14 +13,15 @@ class DeviceLogic(ctx: Context) {
 	private val toolkitDir = File(assetDir, "Toolkit")
 	val fileDir = File(rootDir, "files")
 	val cacheDir = File(rootDir, "cache")
-	val abmBootset = File(fileDir, "bootset")
+	val abmBootset = File("/data/local/tmp/.abm_bootset")
 	val abmDb = File(abmBootset, "db")
 	val abmEntries = File(abmDb, "entries")
 	var mounted = false
 	fun mountBootset(d: DeviceInfo): Boolean {
 		if (checkMounted()) return true
 		val ast = d.getAbmSettings(this) ?: return false
-		if (!abmBootset.exists()) abmBootset.mkdir()
+		val bootsetSu = SuFile.open(abmBootset.toURI())
+		if (!bootsetSu.exists()) bootsetSu.mkdir()
 		val result = Shell
 			.cmd("mount $ast ${abmBootset.absolutePath}")
 			.exec()
