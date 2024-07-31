@@ -6,6 +6,7 @@ import org.andbootmgr.app.DeviceInfo
 import org.andbootmgr.app.join
 import java.util.*
 import java.util.stream.Collectors
+import kotlin.jvm.optionals.getOrElse
 
 object SDUtils {
 
@@ -306,7 +307,8 @@ object SDUtils {
 
 		// Get partition by kernel id
 		fun dumpKernelPartition(id: Int): Partition {
-			return p.stream().filter { it.id == id }.findFirst().get()
+			return p.stream().filter { it.id == id }.findFirst().getOrElse {
+				throw IllegalArgumentException("no such partition with id $id, have: ${this.p}") }
 		}
 	}
 }

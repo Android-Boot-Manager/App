@@ -895,7 +895,7 @@ private fun Flash(c: CreatePartDataHolder) {
 	val vm = c.vm
 	Terminal(vm, logFile = "install_${System.currentTimeMillis()}.txt") { terminal ->
 		if (c.t == null) { // OS install
-			val parts = ArrayMap<Int, String>()
+			val parts = ArrayMap<Int, Int>()
 			val fn = c.t2.value
 			val gn = c.t3.value
 			terminal.add(vm.activity.getString(R.string.term_f_name, fn))
@@ -920,7 +920,7 @@ private fun Flash(c: CreatePartDataHolder) {
 					entry["dtbo"] = "$fn/dtbo.dtbo"
 				entry["options"] = c.cmdline
 				entry["xtype"] = c.rtype
-				entry["xpart"] = parts.values.join(":")
+				entry["xpart"] = parts.values.joinToString(":")
 				if (c.dmaMeta.contains("updateJson") && c.dmaMeta["updateJson"] != null)
 					entry["xupdate"] = c.dmaMeta["updateJson"]!!
 				entry.exportToFile(File(vm.logic.abmEntries, "$fn.conf"))
@@ -935,7 +935,7 @@ private fun Flash(c: CreatePartDataHolder) {
 					val j = c.idVals.indexOf(i)
 					terminal.add(vm.activity.getString(R.string.term_flashing_s, i))
 					val f = c.chosen[i]!!
-					val tp = File(meta.dumpKernelPartition(j).path)
+					val tp = File(meta.dumpKernelPartition(parts[j]!!).path)
 					if (c.sparseVals[j]) {
 						val f2 = f.toFile(c.vm)
 						val result2 = Shell.cmd(
@@ -1004,7 +1004,7 @@ private fun Flash(c: CreatePartDataHolder) {
 					if (r.out.join("\n").contains("kpartx")) {
 						terminal.add(vm.activity.getString(R.string.term_reboot_asap))
 					}
-					parts[it] = c.meta!!.nid.toString()
+					parts[it] = c.meta!!.nid
 					c.meta = SDUtils.generateMeta(c.vm.deviceInfo!!)
 					if (it + 1 < c.count.intValue) {
 						c.p = c.meta!!.s.find { it1 -> it1.type == SDUtils.PartitionType.FREE && (offset + k) < it1.startSector } as SDUtils.Partition.FreeSpace

@@ -146,8 +146,19 @@ class MainActivity : ComponentActivity() {
 					Shell.getShell { shell ->
 						vm.root = shell.isRoot
 						vm.deviceInfo = HardcodedDeviceInfoFactory.get(Build.DEVICE)
+						// == temp migration code start ==
+						if (Shell.cmd("mountpoint -q /data/abm/bootset").exec().isSuccess) {
+							Shell.cmd("umount /data/abm/bootset").exec()
+						}
+						SuFile.open("/data/abm").let {
+							if (it.exists())
+								Shell.cmd("rm -rf /data/abm").exec()
+						}
+						// == temp migration code end ==
 						if (vm.deviceInfo != null && vm.deviceInfo!!.isInstalled(vm.logic!!)) {
 							vm.logic!!.mountBootset(vm.deviceInfo!!)
+						} else {
+							Log.i("ABM", "not installed, not trying to mount")
 						}
 						if (vm.deviceInfo != null) {
 							vm.isOk = ((vm.deviceInfo!!.isInstalled(vm.logic!!)) &&

@@ -19,6 +19,7 @@ class DeviceLogic(ctx: Context) {
 	fun mountBootset(d: DeviceInfo): Boolean {
 		if (checkMounted()) return true
 		val ast = d.getAbmSettings(this) ?: return false
+		if (!abmBootset.exists()) abmBootset.mkdir()
 		val result = Shell
 			.cmd("mount $ast ${abmBootset.absolutePath}")
 			.exec()
