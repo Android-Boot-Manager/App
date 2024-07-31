@@ -464,7 +464,7 @@ private fun Os(c: CreatePartDataHolder) {
 	}
 
 	LaunchedEffect(Unit) {
-		val a = SuFile.open("/data/abm/bootset/db/entries/").list()!!.toMutableList()
+		val a = SuFile.open(c.vm.logic.abmEntries.absolutePath).list()!!.toMutableList()
 		a.removeIf { c -> !(c.startsWith("rom") && c.endsWith(".conf") && c.substring(3, c.length - 5).matches(Regex("\\d+"))) }
 		a.sortWith(Comparator.comparingInt { c -> c.substring(3, c.length - 5).toInt() })
 		val b = if (a.size > 0) a.last().substring(3, a.last().length - 5).toInt() + 1 else 0

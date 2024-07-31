@@ -54,7 +54,7 @@ private fun Flash(vm: WizardActivityState) {
 		val f = SuFile.open(vm.deviceInfo!!.blBlock)
 		if (!f.canWrite())
 			terminal.add(vm.activity.getString(R.string.term_cant_write_bl))
-		vm.copyPriv(SuFileInputStream.open(vm.deviceInfo.blBlock), File(vm.logic.abmDir, "backup_lk.img"))
+		vm.copyPriv(SuFileInputStream.open(vm.deviceInfo.blBlock), File(vm.logic.fileDir, "backup_lk.img"))
 		try {
 			vm.copyPriv(vm.flashStream(flashType), File(vm.deviceInfo.blBlock))
 		} catch (e: IOException) {

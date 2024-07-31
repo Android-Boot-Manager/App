@@ -191,7 +191,6 @@
     <string name="term_cant_write_bl">Info: kann wahrscheinlich nicht den Bootloader überschreiben</string>
     <string name="term_consult_doc">-- Bitte schlage diese Fehler in der Dokumentation nach, um die Installation zu beenden.</string>
     <string name="term_preparing_fs">Bereite Dateisystem vor…</string>
-    <string name="term_cant_create_abm_dir">-- konnte /data/abm nicht erstellen, breche ab</string>
     <string name="term_cant_create_mount_point">-- konnte Einhängepunkt nicht erstellen, breche ab</string>
     <string name="term_cant_create_placeholder">-- konnte Platzhalter nicht erstellen, breche ab</string>
     <string name="term_cant_get_meta">-- konnte Meta nicht bekommen, breche ab</string>

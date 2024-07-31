@@ -74,17 +74,6 @@ object HardcodedDeviceInfoFactory {
 		}
 	}
 
-	private fun getCedric(): DeviceInfo {
-		return object : MetaOnSdDeviceInfo() {
-			override val codename: String = "cedric"
-			override val blBlock: String = "/dev/block/bootdevice/by-name/boot"
-			override val bdev: String = "/dev/block/mmcblk1"
-			override val pbdev: String = bdev + "p"
-			override val postInstallScript: Boolean = true
-			override val havedtbo: Boolean = false
-		}
-	}
-
 	private fun getMimameid(): DeviceInfo {
 		return object : MetaOnSdDeviceInfo() {
 			override val codename: String = "mimameid"
@@ -133,7 +122,6 @@ object HardcodedDeviceInfoFactory {
 		return when (codename) {
 			"yggdrasil" -> getYggdrasil()
 			"yggdrasilx" -> getYggdrasilx()
-			"cedric" -> getCedric()
 			"mimameid" -> getMimameid()
 			"vidofnir" -> getVidofnir()
 			"vayu" -> getVayu()

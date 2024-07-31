@@ -191,7 +191,6 @@
     <string name="term_mount_state_bad">-- status muat tidak konsisten, membatalkan</string>
     <string name="term_failed_umount_drive">-- peringatan: gagal melepas penyimpanan</string>
     <string name="term_preparing_fs">Menyiapkan berkas sistem…</string>
-    <string name="term_cant_create_abm_dir">-- gagal membuat direktori /data/abm, membatalkan</string>
     <string name="term_cant_get_meta">-- gagal mendapatkan meta, membatalkan</string>
     <string name="term_invalid_action">Tindakan tidak valid, tidak ada yang diubah</string>
     <string name="term_contact_support">-- Mohon hubungi pusat dukungan</string>

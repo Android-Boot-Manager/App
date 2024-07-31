@@ -156,7 +156,6 @@
     <string name="term_bl_failed">-- Falha ao instalar bootloader pois:</string>
     <string name="term_consult_doc">-- Consulte a documentação para finalizar a instalação.</string>
     <string name="term_preparing_fs">Preparando o sistema de arquivos…</string>
-    <string name="term_cant_create_abm_dir">-- falha ao criar /data/ABM. Abortando</string>
     <string name="term_cant_create_mount_point">-- falha ao criar ponto de montagem. Abortando</string>
     <string name="term_cant_create_placeholder">-- falha ao criar espaço reservado. Abortando</string>
     <string name="term_cant_get_meta">-- falha ao carregar meta. Abortando</string>

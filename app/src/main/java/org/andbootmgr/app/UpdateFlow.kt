@@ -243,7 +243,7 @@ private fun Flash(u: UpdateFlowDataHolder) {
     Terminal(u.vm, logFile = "update_${System.currentTimeMillis()}.txt") { terminal ->
         val sp = u.e!!["xpart"]!!.split(":")
         val meta = SDUtils.generateMeta(u.vm.deviceInfo!!)!!
-        Shell.cmd(SDUtils.umsd(SDUtils.generateMeta(u.vm.deviceInfo)!!)).exec()
+        Shell.cmd(SDUtils.umsd(meta)).exec()
 
         if (u.hasUpdate) { // online
             u.vm.btnsOverride = true
@@ -309,7 +309,7 @@ private fun Flash(u: UpdateFlowDataHolder) {
                     terminal.add(u.vm.activity.getString(R.string.term_patch_update))
                     var cmd = "FORMATDATA=false " + File(
                         u.vm.logic.assetDir,
-                        "Scripts/add_os/${u.vm.deviceInfo!!.codename}/${u.script}"
+                        "Scripts/add_os/${u.vm.deviceInfo.codename}/${u.script}"
                     ).absolutePath + " ${u.ef!!.nameWithoutExtension}"
                     for (i in bootfile) {
                         cmd += " " + i.absolutePath

@@ -180,7 +180,6 @@
     <string name="term_bl_failed">-- Önyükleyiciyi yüklerken hata, sebep:</string>
     <string name="term_consult_doc">-- Lütfen yüklemeyi bitirene kadar dokümanlara uyunuz.</string>
     <string name="term_preparing_fs">Dosya sistemi hazırlanıyor…</string>
-    <string name="term_cant_create_abm_dir">-- /data/abm oluşturulamadı, iptal ediliyor</string>
     <string name="term_cant_create_placeholder">-- yer tutucu oluşturulamadı, iptal ediliyor</string>
     <string name="term_mount_state_bad">-- geçersiz bağlama durumu, iptal ediliyor</string>
     <string name="term_failed_create_pt">-- bölüm tablosu oluşturulamadı, iptal ediliyor</string>

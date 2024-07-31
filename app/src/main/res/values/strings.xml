@@ -194,7 +194,6 @@
 	<string name="term_consult_doc">-- Please consult documentation to finish the install.</string>
 	<string name="term_preparing_fs">Preparing file system…</string>
 	<string name="term_mount_state_bad">-- inconsistent mount state, aborting</string>
-	<string name="term_cant_create_abm_dir">-- failed to create /data/abm, aborting</string>
 	<string name="term_cant_create_mount_point">-- failed to create mount point, aborting</string>
 	<string name="term_cant_create_placeholder">-- failed to create placeholder, aborting</string>
 	<string name="term_cant_get_meta">-- failed to get meta, aborting</string>

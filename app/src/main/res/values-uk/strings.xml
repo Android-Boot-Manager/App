@@ -55,7 +55,6 @@
     <string name="term_cant_umount">Неможливо розмонтувати. Нічого не було змінено</string>
     <string name="term_backup_restore_fail">-- Не вдалося зарезервувати/відновити, причина:</string>
     <string name="term_consult_doc">-- Просимо проконсультуватись з документацією для завершення інсталяції.</string>
-    <string name="term_cant_create_abm_dir">-- не вдалося створити /data/abm, процес зупинено</string>
     <string name="term_cant_get_meta">-- не вдалося отримати meta, процес перервано</string>
     <string name="term_failed_create_pt">-- не вдалося створити partition table, процес зупинено</string>
     <string name="term_mount_failure_inconsist">-- помилка монтування, процес зупинено</string>

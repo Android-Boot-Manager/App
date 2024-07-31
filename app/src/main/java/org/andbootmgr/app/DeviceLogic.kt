@@ -9,6 +9,7 @@ import java.io.File
 class DeviceLogic(ctx: Context) {
 	private val rootDir = ctx.filesDir.parentFile!!
 	val assetDir = File(rootDir, "assets")
+	private val toolkitDir = File(assetDir, "Toolkit")
 	val fileDir = File(rootDir, "files")
 	val cacheDir = File(rootDir, "cache")
 	val abmBootset = File(fileDir, "bootset")
@@ -74,5 +75,10 @@ class DeviceLogic(ctx: Context) {
 	}
 	fun create(p: SDUtils.Partition.FreeSpace, start: Long, end: Long, typeCode: String, name: String): Shell.Job {
 		return Shell.cmd(SDUtils.umsd(p.meta) + " && " + p.create(start, end, typeCode, name))
+	}
+	fun runShFileWithArgs(cmd: String): Shell.Job {
+		return Shell.cmd("export PATH=\"${toolkitDir.absolutePath}:\$PATH\" " +
+				"TMPDIR=\"${cacheDir.absolutePath}\" BOOTSET=\"${abmBootset.absolutePath}\" " +
+				"TK=\"${toolkitDir.absolutePath}\" && cd \"\$TK\" && $cmd")
 	}
 }

@@ -201,7 +201,6 @@
     <string name="term_bl_failed">-- Не удалось прошить загрузчик, причина:</string>
     <string name="term_preparing_fs">Подготовка файловой системы…</string>
     <string name="term_mount_state_bad">-- несоответсвующее состояние монтирования, прерывание</string>
-    <string name="term_cant_create_abm_dir">-- не удалось создать /data/abm, прерывание</string>
     <string name="term_cant_create_placeholder">-- не удалось создать placeholder, прерывание</string>
     <string name="term_cant_get_meta">-- не удалось получить мета, прерывание</string>
     <string name="term_failed_create_pt">-- не удалось создать таблицу разделов, прерывание</string>
