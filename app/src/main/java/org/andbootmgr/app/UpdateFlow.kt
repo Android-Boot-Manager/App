@@ -317,7 +317,7 @@ private fun Flash(u: UpdateFlowDataHolder) {
                     for (i in sp) {
                         cmd += " $i"
                     }
-                    val r = Shell.cmd(cmd).to(terminal).exec()
+                    val r = u.vm.logic.runShFileWithArgs(cmd).to(terminal).exec()
                     bootfile.forEach { it.delete() }
                     if (!r.isSuccess) {
                         throw IllegalStateException(u.vm.activity.getString(R.string.term_script_fail))
@@ -350,7 +350,7 @@ private fun Flash(u: UpdateFlowDataHolder) {
             for (i in sp) {
                 cmd += " $i"
             }
-            val r = Shell.cmd(cmd).to(terminal).exec()
+            val r = u.vm.logic.runShFileWithArgs(cmd).to(terminal).exec()
             bootfile.forEach { it.delete() }
             if (!r.isSuccess) {
                 throw IllegalStateException(u.vm.activity.getString(R.string.term_script_fail))

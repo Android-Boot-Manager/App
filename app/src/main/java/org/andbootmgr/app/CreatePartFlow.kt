@@ -967,7 +967,7 @@ private fun Flash(c: CreatePartDataHolder) {
 				for (i in parts) {
 					cmd += " " + i.value
 				}
-				val result = Shell.cmd(cmd).to(terminal).exec()
+				val result = vm.logic.runShFileWithArgs(cmd).to(terminal).exec()
 				if (!result.isSuccess) {
 					terminal.add(vm.activity.getString(R.string.term_failure))
 					return
