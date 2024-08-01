@@ -30,6 +30,9 @@ class Simulator : AppCompatActivity() {
 		})
 		Thread {
 			start(bitmap, w, h)
-		}.start()
+		}.run {
+			name = "droidboot0"
+			start()
+		}
 	}
 }
