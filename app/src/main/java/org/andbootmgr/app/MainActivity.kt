@@ -44,7 +44,6 @@ import org.andbootmgr.app.util.ConfigFile
 import org.andbootmgr.app.util.SDUtils
 import org.andbootmgr.app.util.Toolkit
 import java.io.File
-import java.util.stream.Collectors
 
 class MainActivityState {
 	fun startFlow(flow: String) {
@@ -243,6 +242,17 @@ private fun AppContent(vm: MainActivityState, view: @Composable (PaddingValues) 
 					)
 					if (vm.isOk) {
 						NavigationDrawerItem(
+							label = { Text(stringResource(R.string.themes)) },
+							selected = vm.currentNav == "themes",
+							onClick = {
+								scope.launch {
+									vm.navController!!.navigate("themes")
+									drawerState.close()
+								}
+							},
+							modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp)
+						)
+						NavigationDrawerItem(
 							label = { Text(stringResource(R.string.settings)) },
 							selected = vm.currentNav == "settings",
 							onClick = {
@@ -293,6 +303,10 @@ private fun NavGraph(vm: MainActivityState, it: PaddingValues) {
 		composable("start") {
 			vm.currentNav = "start"
 			Start(vm)
+		}
+		composable("themes") {
+			vm.currentNav = "themes"
+			Themes(vm)
 		}
 		composable("settings") {
 			vm.currentNav = "settings"

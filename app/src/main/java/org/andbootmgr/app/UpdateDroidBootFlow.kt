@@ -55,8 +55,14 @@ private fun Start(vm: WizardActivityState) {
 private fun Flash(vm: WizardActivityState) {
 	val flashType = "DroidBootFlashType"
 	Terminal(vm, logFile = "blup_${System.currentTimeMillis()}.txt") { terminal ->
+		val tmpFile = if (vm.deviceInfo.postInstallScript) {
+			val tmpFile = createTempFileSu("abm", ".sh", vm.logic.rootTmpDir)
+			vm.copyPriv(vm.flashStream("InstallShFlashType"), tmpFile)
+			tmpFile.setExecutable(true)
+			tmpFile
+		} else null
 		terminal.add(vm.activity.getString(R.string.term_flashing_droidboot))
-		val f = SuFile.open(vm.deviceInfo!!.blBlock)
+		val f = SuFile.open(vm.deviceInfo.blBlock)
 		if (!f.canWrite())
 			terminal.add(vm.activity.getString(R.string.term_cant_write_bl))
 		vm.copyPriv(SuFileInputStream.open(vm.deviceInfo.blBlock), File(vm.logic.fileDir, "backup2_lk.img"))
@@ -70,12 +76,9 @@ private fun Flash(vm: WizardActivityState) {
 		}
 		if (vm.deviceInfo.postInstallScript) {
 			terminal.add(vm.activity.getString(R.string.term_device_setup))
-			val tmpFile = createTempFileSu("abm", ".sh", vm.logic.rootTmpDir)
-			vm.copyPriv(vm.flashStream("InstallShFlashType"), tmpFile)
-			tmpFile.setExecutable(true)
 			vm.logic.runShFileWithArgs(
 				"BOOTED=${vm.deviceInfo.isBooted(vm.logic)} SETUP=false " +
-						"${tmpFile.absolutePath} real"
+						"${tmpFile!!.absolutePath} real"
 			).to(terminal).exec()
 			tmpFile.delete()
 		}

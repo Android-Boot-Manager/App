@@ -304,10 +304,15 @@ private fun Flash(vm: WizardActivityState) {
 				return@Terminal
 			}
 		}
+		val tmpFile = if (vm.deviceInfo.postInstallScript) {
+			val tmpFile = createTempFileSu("abm", ".sh", vm.logic.rootTmpDir)
+			vm.copyPriv(vm.flashStream("InstallShFlashType"), tmpFile)
+			tmpFile.setExecutable(true)
+			tmpFile
+		} else null
 
 		terminal.add(vm.activity.getString(R.string.term_building_cfg))
 		val db = ConfigFile()
-		// TODO was this ever used? is it used by vbm maybe?
 		db["default"] = "Entry 01"
 		db["timeout"] = "5"
 		db.exportToFile(File(vm.logic.abmDb, "db.conf"))
@@ -342,12 +347,9 @@ private fun Flash(vm: WizardActivityState) {
 		}
 		if (vm.deviceInfo.postInstallScript) {
 			terminal.add(vm.activity.getString(R.string.term_device_setup))
-			val tmpFile = createTempFileSu("abm", ".sh", vm.logic.rootTmpDir)
-			vm.copyPriv(vm.flashStream("InstallShFlashType"), tmpFile)
-			tmpFile.setExecutable(true)
 			vm.logic.runShFileWithArgs(
 				"BOOTED=${vm.deviceInfo.isBooted(vm.logic)} SETUP=true " +
-						"${tmpFile.absolutePath} real"
+						"${tmpFile!!.absolutePath} real"
 			).to(terminal).exec()
 			tmpFile.delete()
 		}
