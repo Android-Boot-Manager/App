@@ -187,7 +187,7 @@ private class CreatePartDataHolder(val vm: WizardActivityState): ProgressListene
 	@Composable
 	fun lateInit() {
 		noobMode = LocalContext.current.getSharedPreferences("abm", 0).getBoolean("noob_mode", BuildConfig.DEFAULT_NOOB_MODE)
-		meta = SDUtils.generateMeta(vm.deviceInfo!!)
+		meta = SDUtils.generateMeta(vm.deviceInfo)
 		(meta?.s?.find { vm.activity.intent.getLongExtra("part_sid", -1L) == it.startSector } as SDUtils.Partition.FreeSpace?)?.also { p = it }
 	}
 
@@ -800,41 +800,7 @@ private fun Download(c: CreatePartDataHolder) {
 					}
 				})
 		}
-		Row(
-			verticalAlignment = Alignment.CenterVertically,
-			horizontalArrangement = Arrangement.SpaceBetween,
-			modifier = Modifier.fillMaxWidth()
-		) {
-			Column {
-				Text(stringResource(id = R.string.installer_sh))
-			}
-			Column {
-				if (c.vm.flashes.containsKey("InstallShFlashType")) {
-					Button(onClick = {
-						c.vm.flashes.remove("InstallShFlashType")
-					}) {
-						Text(stringResource(R.string.undo))
-					}
-				} else {
-					if (c.scriptInet != null) {
-						Button(onClick = {
-							c.vm.flashes["InstallShFlashType"] = Pair(Uri.parse(c.scriptInet!!), c.scriptShaInet)
-						}) {
-							Text(stringResource(R.string.download))
-						}
-					}
-					Button(onClick = {
-						c.vm.activity.chooseFile("*/*") {
-							c.vm.flashes["InstallShFlashType"] = Pair(it, null)
-						}
-					}) {
-						Text(stringResource(R.string.choose))
-					}
-				}
-			}
-		}
-		for (i in c.idNeeded) {
-			val inet = c.inetAvailable.containsKey(i)
+		for (i in (c.idNeeded + listOf("_install.sh_"))) {
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
 				horizontalArrangement = Arrangement.SpaceBetween,
@@ -843,7 +809,8 @@ private fun Download(c: CreatePartDataHolder) {
 				Column {
 					Text(i)
 					Text(
-						if (c.inetDesc.containsKey(i)) c.inetDesc[i]!! else stringResource(R.string.user_selected),
+						if (c.inetDesc.containsKey(i)) c.inetDesc[i]!! else stringResource(
+							if (i == "_install.sh_") R.string.installer_sh else R.string.user_selected),
 						color = MaterialTheme.colorScheme.onSurfaceVariant
 					)
 				}
@@ -856,7 +823,7 @@ private fun Download(c: CreatePartDataHolder) {
 							Text(stringResource(R.string.undo))
 						}
 					} else {
-						if (inet) {
+						if (c.inetAvailable.containsKey(i) || i == "_install.sh_") {
 							Button(onClick = {
 								downloading = true
 								progressText = c.vm.activity.getString(R.string.connecting_text)
@@ -874,7 +841,8 @@ private fun Download(c: CreatePartDataHolder) {
 									try {
 										val downloadedFile = File(c.vm.logic.cacheDir, i)
 										val request =
-											Request.Builder().url(c.inetAvailable[i]!!).build()
+											Request.Builder().url(if (i == "_install.sh_")
+												c.scriptInet!! else c.inetAvailable[i]!!).build()
 										val call = c.client.newCall(request)
 										val response = call.execute()
 
@@ -919,7 +887,7 @@ private fun Download(c: CreatePartDataHolder) {
 			}
 		}
 		c.vm.btnsOverride = true
-		if (c.idNeeded.find { !c.chosen.containsKey(it) } == null) {
+		if (c.idNeeded.find { !c.chosen.containsKey(it) } == null && c.chosen.containsKey("_install.sh_")) {
 			c.vm.onNext.value = { it.navigate("flash") }
 			c.vm.nextText.value = stringResource(id = R.string.install)
 		} else {
@@ -939,14 +907,13 @@ private fun Flash(c: CreatePartDataHolder) {
 			val gn = c.t3.value
 			terminal.add(vm.activity.getString(R.string.term_f_name, fn))
 			terminal.add(vm.activity.getString(R.string.term_g_name, gn))
-			val tmpFile = createTempFileSu("abm", ".sh", vm.logic.rootTmpDir)
-			vm.copyPriv(vm.flashStream("InstallShFlashType"), tmpFile)
+			val tmpFile = c.chosen["_install.sh_"]!!.toFile(vm)
 			tmpFile.setExecutable(true)
 			terminal.add(vm.activity.getString(R.string.term_creating_pt))
 
 			// After creating partitions:
 			fun installMore() {
-				val meta = SDUtils.generateMeta(vm.deviceInfo!!)
+				val meta = SDUtils.generateMeta(vm.deviceInfo)
 				if (meta == null) {
 					terminal.add(vm.activity.getString(R.string.term_cant_get_meta))
 					return
@@ -1007,7 +974,6 @@ private fun Flash(c: CreatePartDataHolder) {
 					cmd += " " + i.value
 				}
 				val result = vm.logic.runShFileWithArgs(cmd).to(terminal).exec()
-				tmpFile.delete()
 				if (!result.isSuccess) {
 					terminal.add(vm.activity.getString(R.string.term_failure))
 					return
@@ -1045,7 +1011,7 @@ private fun Flash(c: CreatePartDataHolder) {
 						terminal.add(vm.activity.getString(R.string.term_reboot_asap))
 					}
 					parts[it] = c.meta!!.nid
-					c.meta = SDUtils.generateMeta(c.vm.deviceInfo!!)
+					c.meta = SDUtils.generateMeta(c.vm.deviceInfo)
 					if (it + 1 < c.count.intValue) {
 						c.p = c.meta!!.s.find { it1 -> it1.type == SDUtils.PartitionType.FREE && (offset + k) < it1.startSector } as SDUtils.Partition.FreeSpace
 					}
@@ -1056,7 +1022,7 @@ private fun Flash(c: CreatePartDataHolder) {
 							makeOne(it + 1)
 						} else {
 							terminal.add(vm.activity.getString(R.string.term_created_pt))
-							vm.logic.mountBootset(vm.deviceInfo!!)
+							vm.logic.mountBootset(vm.deviceInfo)
 							installMore()
 						}
 					} else {

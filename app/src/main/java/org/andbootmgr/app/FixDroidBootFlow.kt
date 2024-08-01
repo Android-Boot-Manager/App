@@ -19,7 +19,7 @@ class FixDroidBootWizardPageFactory(private val vm: WizardActivityState) {
 	fun get(): List<IWizardPage> {
 		return listOf(WizardPage("start",
 			NavButton(vm.activity.getString(R.string.cancel)) { it.finish() },
-			NavButton(vm.activity.getString(R.string.next)) { it.navigate(if (vm.deviceInfo!!.postInstallScript) "shSel" else "select") })
+			NavButton(vm.activity.getString(R.string.next)) { it.navigate(if (vm.deviceInfo.postInstallScript) "shSel" else "select") })
 		{
 			Start(vm)
 		}, WizardPage("shSel",
@@ -28,7 +28,7 @@ class FixDroidBootWizardPageFactory(private val vm: WizardActivityState) {
 		) {
 			SelectInstallSh(vm)
 		},WizardPage("select",
-			NavButton(vm.activity.getString(R.string.prev)) { it.navigate(if (vm.deviceInfo!!.postInstallScript) "shSel" else "start") },
+			NavButton(vm.activity.getString(R.string.prev)) { it.navigate(if (vm.deviceInfo.postInstallScript) "shSel" else "start") },
 			NavButton("") {}
 		) {
 			SelectDroidBoot(vm)

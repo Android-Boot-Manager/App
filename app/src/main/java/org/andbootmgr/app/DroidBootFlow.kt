@@ -38,7 +38,7 @@ class DroidBootWizardPageFactory(private val vm: WizardActivityState) {
 			Start(vm)
 		}, WizardPage("input",
 			NavButton(vm.activity.getString(R.string.prev)) { it.navigate("start") },
-			NavButton(vm.activity.getString(R.string.next)) { it.navigate(if (vm.deviceInfo!!.postInstallScript) "shSel" else
+			NavButton(vm.activity.getString(R.string.next)) { it.navigate(if (vm.deviceInfo.postInstallScript) "shSel" else
 				(if (!vm.deviceInfo.isBooted(vm.logic)) "select" else "flash")) }
 		) {
 			Input(vm)
@@ -48,7 +48,7 @@ class DroidBootWizardPageFactory(private val vm: WizardActivityState) {
 		) {
 			SelectInstallSh(vm)
 		}, WizardPage("select",
-			NavButton(vm.activity.getString(R.string.prev)) { it.navigate(if (vm.deviceInfo!!.postInstallScript) "shSel" else "input") },
+			NavButton(vm.activity.getString(R.string.prev)) { it.navigate(if (vm.deviceInfo.postInstallScript) "shSel" else "input") },
 			NavButton("") {}
 		) {
 			SelectDroidBoot(vm)
@@ -68,7 +68,7 @@ private fun Start(vm: WizardActivityState) {
 	) {
 		Text(stringResource(R.string.welcome_text))
 		Text(
-			if (vm.deviceInfo!!.isBooted(vm.logic)) {
+			if (vm.deviceInfo.isBooted(vm.logic)) {
 				stringResource(R.string.install_abm)
 			} else {
 				stringResource(R.string.install_abm_dboot)
@@ -171,7 +171,7 @@ fun SelectDroidBoot(vm: WizardActivityState) {
 
 // shared across DroidBootFlow, UpdateDroidBootFlow, FixDroidBootFlow
 @Composable
-fun SelectInstallSh(vm: WizardActivityState) {
+fun SelectInstallSh(vm: WizardActivityState, update: Boolean = false) {
 	val nextButtonAvailable = remember { mutableStateOf(false) }
 	val flashType = "InstallShFlashType"
 
@@ -181,7 +181,7 @@ fun SelectInstallSh(vm: WizardActivityState) {
 		if (nextButtonAvailable.value) {
 			Text(stringResource(id = R.string.successfully_selected))
 			vm.nextText.value = stringResource(id = R.string.next)
-			vm.onNext.value = { it.navigate(if (!vm.deviceInfo!!.isBooted(vm.logic)) "select" else "flash") }
+			vm.onNext.value = { it.navigate(if (!vm.deviceInfo.isBooted(vm.logic) || update) "select" else "flash") }
 		} else {
 			Text(stringResource(R.string.choose_install_s_online))
 			Button(onClick = {
@@ -242,7 +242,7 @@ private fun Flash(vm: WizardActivityState) {
 			}
 		}
 
-		if (vm.deviceInfo!!.metaonsd) {
+		if (vm.deviceInfo.metaonsd) {
 			var meta = SDUtils.generateMeta(vm.deviceInfo)
 			if (meta == null) {
 				terminal.add(vm.activity.getString(R.string.term_cant_get_meta))

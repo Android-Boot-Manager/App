@@ -26,7 +26,7 @@ class UpdateDroidBootWizardPageFactory(private val vm: WizardActivityState) {
 			NavButton(vm.activity.getString(R.string.prev)) { it.navigate("start") },
 			NavButton("") {}
 		) {
-			SelectInstallSh(vm)
+			SelectInstallSh(vm, update = true)
 		},WizardPage("select",
 			NavButton(vm.activity.getString(R.string.prev)) { it.navigate(if (vm.deviceInfo!!.postInstallScript) "shSel" else "start") },
 			NavButton("") {}

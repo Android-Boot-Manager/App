@@ -95,11 +95,12 @@ class JsonDeviceInfoFactory(private val ctx: Context) {
 			}
 			val jsonRoot = JSONTokener(jsonText).nextValue() as JSONObject? ?: return null
 			val json = jsonRoot.getJSONObject("deviceInfo")
-			if (BuildConfig.VERSION_CODE < json.getInt("minAppVersion"))
+			if (BuildConfig.VERSION_CODE < jsonRoot.getInt("minAppVersion"))
 				throw IllegalStateException("please upgrade app")
 			if (fromNet) {
 				val newRoot = JSONObject()
 				newRoot.put("deviceInfo", json)
+				newRoot.put("minAppVersion", jsonRoot.getInt("minAppVersion"))
 				File(ctx.filesDir, "abm_dd_cache.json").writeText(newRoot.toString())
 			}
 			if (!json.getBoolean("metaOnSd"))
