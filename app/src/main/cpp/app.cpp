@@ -4,7 +4,7 @@
 
 #include <jni.h>
 
-extern "C" void simulator_start(JNIEnv* env, jobject bitmap, jint w, jint h);
+extern "C" void simulator_start(JNIEnv* env, jobject thiz, jobject bitmap, jint w, jint h);
 extern "C" void simulator_stop(JNIEnv* env);
 extern "C" void simulator_key(jint key);
 
@@ -17,5 +17,5 @@ extern "C" JNIEXPORT void JNICALL Java_org_andbootmgr_app_Simulator_stop(JNIEnv*
 }
 
 extern "C" JNIEXPORT void JNICALL Java_org_andbootmgr_app_Simulator_start(JNIEnv* env, jobject thiz, jobject bitmap, jint w, jint h) {
-	simulator_start(env, bitmap, w, h);
+	simulator_start(env, thiz, bitmap, w, h);
 }
