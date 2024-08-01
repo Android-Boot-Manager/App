@@ -7,6 +7,9 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 
 class Simulator : AppCompatActivity() {
+	init {
+		System.loadLibrary("app")
+	}
 	external fun start(bitmap: Bitmap, w: Int, h: Int)
 	external fun stop()
 	external fun key(key: Int)
@@ -25,6 +28,8 @@ class Simulator : AppCompatActivity() {
 				canvas.drawBitmap(this@Simulator.bitmap, 0f, 0f, null)
 			}
 		})
-		start(bitmap, w, h)
+		Thread {
+			start(bitmap, w, h)
+		}.start()
 	}
 }
