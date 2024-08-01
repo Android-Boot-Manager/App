@@ -33,6 +33,11 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        externalNativeBuild {
+            cmake {
+                cppFlags += ""
+            }
+        }
     }
     signingConfigs {
         register("release") {
@@ -93,6 +98,12 @@ android {
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.1.1"
+    }
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.22.1"
+        }
     }
     applicationVariants.configureEach {
         tasks["merge${name.replaceFirstChar(Char::titlecase)}Assets"].dependsOn(tasks["setAssetTs"])

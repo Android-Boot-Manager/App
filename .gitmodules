@@ -2,3 +2,6 @@
 	path = app/src/main/assets/Toolkit
 	url = https://github.com/Android-Boot-Manager/Toolkit
 	branch = master
+[submodule "app/src/main/cpp/droidboot_gui"]
+	path = app/src/main/cpp/droidboot_gui
+	url = https://github.com/Android-Boot-Manager/droidboot_gui
