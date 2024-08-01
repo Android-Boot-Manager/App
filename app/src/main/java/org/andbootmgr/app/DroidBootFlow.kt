@@ -148,6 +148,8 @@ fun SelectDroidBoot(vm: WizardActivityState) {
 						val jsonText =
 							URL("https://raw.githubusercontent.com/Android-Boot-Manager/ABM-json/master/devices/" + vm.codename + ".json").readText()
 						val json = JSONTokener(jsonText).nextValue() as JSONObject
+						if (BuildConfig.VERSION_CODE < json.getInt("minAppVersion"))
+							throw IllegalStateException("please upgrade app")
 						val bl = json.getJSONObject("bootloader")
 						val url = bl.getString("url")
 						val sha = if (bl.has("sha256")) bl.getString("sha256") else null
@@ -197,6 +199,8 @@ fun SelectInstallSh(vm: WizardActivityState) {
 						val jsonText =
 							URL("https://raw.githubusercontent.com/Android-Boot-Manager/ABM-json/master/devices/" + vm.codename + ".json").readText()
 						val json = JSONTokener(jsonText).nextValue() as JSONObject
+						if (BuildConfig.VERSION_CODE < json.getInt("minAppVersion"))
+							throw IllegalStateException("please upgrade app")
 						val i = json.getJSONObject("installScript")
 						val url = i.getString("url")
 						val sha = if (i.has("sha256")) i.getString("sha256") else null

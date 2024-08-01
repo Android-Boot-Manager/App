@@ -95,6 +95,8 @@ class JsonDeviceInfoFactory(private val ctx: Context) {
 			}
 			val jsonRoot = JSONTokener(jsonText).nextValue() as JSONObject? ?: return null
 			val json = jsonRoot.getJSONObject("deviceInfo")
+			if (BuildConfig.VERSION_CODE < json.getInt("minAppVersion"))
+				throw IllegalStateException("please upgrade app")
 			if (fromNet) {
 				val newRoot = JSONObject()
 				newRoot.put("deviceInfo", json)

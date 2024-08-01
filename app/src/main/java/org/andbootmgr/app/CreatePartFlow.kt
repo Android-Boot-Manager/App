@@ -357,7 +357,10 @@ private fun Shop(c: CreatePartDataHolder) {
 					} catch (e: FileNotFoundException) {
 						URL("https://raw.githubusercontent.com/Android-Boot-Manager/ABM-json/master/devices/" + c.vm.codename + ".json").readText()
 					}
-					json = JSONTokener(jsonText).nextValue() as JSONObject
+					val jjson = JSONTokener(jsonText).nextValue() as JSONObject
+					if (BuildConfig.VERSION_CODE < jjson.getInt("minAppVersion"))
+						throw IllegalStateException("please upgrade app")
+					json = jjson
 					//Log.i("ABM shop:", jsonText)
 				} catch (e: Exception) {
 					Log.e("ABM shop", Log.getStackTraceString(e))
