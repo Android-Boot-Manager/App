@@ -1,6 +1,10 @@
 package org.andbootmgr.app
 
+import android.content.Intent
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 
 /*
     uint32_t win_bg_color;
@@ -24,5 +28,11 @@ import androidx.compose.runtime.Composable
  */
 @Composable
 fun Themes(vm: MainActivityState) {
-
+	Button(onClick = {
+		vm.activity!!.startActivity(Intent(vm.activity!!, Simulator::class.java).apply {
+			putExtra("sdCardBlock", vm.deviceInfo!!.bdev)
+		})
+	}) {
+		Text(text = stringResource(id = R.string.simulator))
+	}
 }

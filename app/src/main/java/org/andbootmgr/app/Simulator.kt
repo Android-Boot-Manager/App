@@ -12,6 +12,8 @@ import android.view.View
 import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ipc.RootService
 import com.topjohnwu.superuser.nio.FileSystemManager
@@ -20,6 +22,7 @@ import java.io.File
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 import kotlin.math.min
+import kotlin.system.exitProcess
 
 class Simulator : AppCompatActivity() {
 	init {
@@ -49,29 +52,9 @@ class Simulator : AppCompatActivity() {
 		w = 1080 //TODO make size fullscreen and hide sysui
 		h = 1920
 		bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-		f = File("/dev/block/mmcblk1") // TODO
+		f = File(intent.getStringExtra("sdCardBlock")!!)
 		// TODO make keys work
 		val intent = Intent(this, RootFsService::class.java)
-		RootService.bind(intent, object : ServiceConnection {
-			override fun onServiceConnected(componentName: ComponentName?, service: IBinder?) {
-				this@Simulator.fs = FileSystemManager.getRemote(service!!)
-				fi = fs!!.openChannel(f, FileSystemManager.MODE_READ_ONLY)
-				if (firstTime) {
-					Thread {
-						Log.i("Simulator","going to call start()")
-						start(bitmap, w, h)
-					}.run {
-						name = "droidboot0"
-						start()
-					}
-					firstTime = false
-				}
-			}
-
-			override fun onServiceDisconnected(componentName: ComponentName?) {
-				this@Simulator.fs = null
-			}
-		})
 		val l = LinearLayout(this)
 		v = object : View(this) {
 			override fun onDraw(canvas: Canvas) {
@@ -94,6 +77,30 @@ class Simulator : AppCompatActivity() {
 		l.addView(v, LinearLayout.LayoutParams(
 			LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT))
 		setContentView(l)
+		WindowInsetsControllerCompat(window, l).apply {
+			systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+			hide(WindowInsetsCompat.Type.systemBars())
+		}
+		RootService.bind(intent, object : ServiceConnection {
+			override fun onServiceConnected(componentName: ComponentName?, service: IBinder?) {
+				this@Simulator.fs = FileSystemManager.getRemote(service!!)
+				fi = fs!!.openChannel(f, FileSystemManager.MODE_READ_ONLY)
+				if (firstTime) {
+					Thread {
+						Log.i("Simulator","going to call start()")
+						start(bitmap, w, h)
+					}.run {
+						name = "droidboot0"
+						start()
+					}
+					firstTime = false
+				}
+			}
+
+			override fun onServiceDisconnected(componentName: ComponentName?) {
+				this@Simulator.fs = null
+			}
+		})
 	}
 
 	private fun blockCount(): Long {
@@ -123,5 +130,7 @@ class Simulator : AppCompatActivity() {
 	override fun onStop() {
 		Log.i("Simulator", "goodbye")
 		super.onStop()
+		// droidboot cannot cope with starting twice in same process due to static variables
+		exitProcess(0)
 	}
 }

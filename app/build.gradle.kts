@@ -134,7 +134,6 @@ dependencies {
     // Foundation (Border, Background, Box, Image, Scroll, shapes, animations, etc.)
     implementation("androidx.compose.foundation:foundation:1.6.8")
     // Material Design
-    implementation("androidx.compose.material:material:1.6.8")
     implementation("androidx.compose.material3:material3:1.2.1")
     // Material design icons
     implementation("androidx.compose.material:material-icons-core:1.6.8")

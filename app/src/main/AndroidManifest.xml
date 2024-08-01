@@ -38,8 +38,11 @@
 			android:process=":simulator"
 			android:taskAffinity=""
 			android:noHistory="true"
+			android:screenOrientation="nosensor"
 			android:excludeFromRecents="true"
-			android:theme="@style/AppTheme" />
+			android:configChanges="keyboard|keyboardHidden|uiMode"
+			android:theme="@style/Simulator"
+			tools:ignore="DiscouragedApi" />
 	</application>
 
 </manifest>

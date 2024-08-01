@@ -231,4 +231,5 @@
 	<string name="shop_error">Failed loading list of ROMs from Open ROM Project</string>
 	<string name="installer_sh">Installer shell script</string>
 	<string name="themes">Themes</string>
+	<string name="simulator">Start simulator</string>
 </resources>
