@@ -39,6 +39,7 @@ import org.json.JSONObject
 import org.json.JSONTokener
 import java.io.FileNotFoundException
 import java.net.URL
+import java.nio.charset.Charset
 
 class CreatePartWizardPageFactory(private val vm: WizardActivityState) {
 	fun get(): List<IWizardPage> {
@@ -851,10 +852,17 @@ private fun Download(c: CreatePartDataHolder) {
 											downloadedFile.delete()
 											downloading = false
 										}
+										val desiredHash = if (i == "_install.sh_") c.scriptShaInet!! else null
 
-										val sink = downloadedFile.sink().buffer()
-										sink.writeAll(response.body!!.source())
-										sink.close()
+										val rawSink = downloadedFile.sink()
+										val sink = if (desiredHash != null) HashingSink.sha256(rawSink) else rawSink
+										val buffer = sink.buffer()
+										buffer.writeAll(response.body!!.source())
+										buffer.close()
+										val realHash = if (desiredHash != null)
+												(sink as HashingSink).hash.hex() else null
+										if (desiredHash != null && realHash != desiredHash)
+											throw IllegalStateException("hash $realHash does not match expected hash $desiredHash")
 
 										if (!call.isCanceled())
 											c.chosen[i] = DledFile(null, downloadedFile)

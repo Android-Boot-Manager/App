@@ -41,6 +41,8 @@ import java.io.OutputStream
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
+import java.security.DigestInputStream
+import java.security.MessageDigest
 
 class WizardPageFactory(private val vm: WizardActivityState) {
 	fun get(flow: String): List<IWizardPage> {
@@ -177,6 +179,18 @@ class WizardActivity : ComponentActivity() {
 	}
 }
 
+private class ExpectedDigestInputStream(stream: InputStream?,
+                                        digest: MessageDigest?,
+                                        private val expectedDigest: String
+) : DigestInputStream(stream, digest) {
+	@OptIn(ExperimentalStdlibApi::class)
+	fun doAssert() {
+		val hash = digest.digest().toHexString()
+		if (hash != expectedDigest)
+			throw IllegalArgumentException("digest $hash does not match expected hash $expectedDigest")
+	}
+}
+
 class WizardActivityState(val codename: String) {
 	var btnsOverride = false
 	lateinit var navController: NavHostController
@@ -209,13 +223,14 @@ class WizardActivityState(val codename: String) {
 		inputStream.close()
 		outputStream.flush()
 		outputStream.close()
+		if (inputStream is ExpectedDigestInputStream)
+			inputStream.doAssert()
 		return nread
 	}
 
 	fun flashStream(flashType: String): InputStream {
-		// TODO check sha sum
 		return flashes[flashType]?.let {
-			when (it.first.scheme) {
+			val i = when (it.first.scheme) {
 				"content" ->
 					activity.contentResolver.openInputStream(it.first)
 						?: throw IOException("in == null")
@@ -225,6 +240,9 @@ class WizardActivityState(val codename: String) {
 					URL(it.first.toString()).openStream()
 				else -> null
 			}
+			if (it.second != null)
+				ExpectedDigestInputStream(i, MessageDigest.getInstance("SHA-256"), it.second!!)
+			else i
 		} ?: throw IllegalArgumentException()
 	}
 
