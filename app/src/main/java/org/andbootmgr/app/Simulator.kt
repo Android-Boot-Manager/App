@@ -1,24 +1,25 @@
 package org.andbootmgr.app
 
+import android.content.ComponentName
+import android.content.Intent
+import android.content.ServiceConnection
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.os.Bundle
+import android.os.IBinder
 import android.util.Log
 import android.view.View
-import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.topjohnwu.superuser.Shell
-import com.topjohnwu.superuser.io.SuFile
-import com.topjohnwu.superuser.io.SuFileInputStream
-import com.topjohnwu.superuser.nio.ExtendedFile
-import java.io.EOFException
+import com.topjohnwu.superuser.ipc.RootService
+import com.topjohnwu.superuser.nio.FileSystemManager
+import org.andbootmgr.app.util.RootFsService
 import java.io.File
-import java.io.IOException
-import java.io.InputStream
-import java.util.Arrays
+import java.nio.ByteBuffer
+import java.nio.channels.FileChannel
 import kotlin.math.min
-
 
 class Simulator : AppCompatActivity() {
 	init {
@@ -28,23 +29,54 @@ class Simulator : AppCompatActivity() {
 	external fun start(bitmap: Bitmap, w: Int, h: Int)
 	external fun stop()
 	external fun key(key: Int)
+	private lateinit var v: View
 	private lateinit var bitmap: Bitmap
+	private var firstTime = true
 	private var w: Int = 0
 	private var h: Int = 0
 	private lateinit var f: File
+	private var fs: FileSystemManager? = null
+	private var fi: FileChannel? = null
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		w = 1080
+		Log.i("Simulator", "welcome")
+		onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+			override fun handleOnBackPressed() {
+				stop()
+			}
+		})
+		w = 1080 //TODO make size fullscreen and hide sysui
 		h = 1920
 		bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-		f = File("/dev/block/mmcblk1")
+		f = File("/dev/block/mmcblk1") // TODO
+		// TODO make keys work
+		val intent = Intent(this, RootFsService::class.java)
+		RootService.bind(intent, object : ServiceConnection {
+			override fun onServiceConnected(componentName: ComponentName?, service: IBinder?) {
+				this@Simulator.fs = FileSystemManager.getRemote(service!!)
+				fi = fs!!.openChannel(f, FileSystemManager.MODE_READ_ONLY)
+				if (firstTime) {
+					Thread {
+						Log.i("Simulator","going to call start()")
+						start(bitmap, w, h)
+					}.run {
+						name = "droidboot0"
+						start()
+					}
+					firstTime = false
+				}
+			}
+
+			override fun onServiceDisconnected(componentName: ComponentName?) {
+				this@Simulator.fs = null
+			}
+		})
 		val l = LinearLayout(this)
-		l.addView(object : View(this) {
+		v = object : View(this) {
 			override fun onDraw(canvas: Canvas) {
 				super.onDraw(canvas)
 				canvas.drawBitmap(this@Simulator.bitmap, 0f, 0f, null)
-				invalidate() //TODO
 			}
 
 			override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -58,15 +90,10 @@ class Simulator : AppCompatActivity() {
 					else -> Int.MAX_VALUE
 				})
 			}
-		}, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
-		setContentView(l)
-		Thread {
-			Log.i("Simulator","going to call start()")
-			start(bitmap, w, h)
-		}.run {
-			name = "droidboot0"
-			start()
 		}
+		l.addView(v, LinearLayout.LayoutParams(
+			LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT))
+		setContentView(l)
 	}
 
 	private fun blockCount(): Long {
@@ -76,98 +103,25 @@ class Simulator : AppCompatActivity() {
 	}
 
 	private fun readBlocks(offset: Long, count: Int): ByteArray {
-		val fo = SuFileInputStream.open(f)
-		fo.skipNBytesSupport(offset)
-		val b = fo.readNBytesSupport(count)!!
-		fo.close()
-		return b
+		Log.i("Simulator", "read $count bytes at $offset")
+		val bb = ByteBuffer.allocate(count)
+		fi!!.read(bb, offset)
+		fi!!.position(0)
+		return bb.array()
 	}
 
-	@Throws(IOException::class)
-	private fun InputStream.skipNBytesSupport(nn: Long) {
-		var n = nn
-		while (n > 0) {
-			val ns: Long = skip(n)
-			if (ns in 1..n) {
-				// adjust number to skip
-				n -= ns
-			} else if (ns == 0L) { // no bytes skipped
-				// read one byte to check for EOS
-				if (read() == -1) {
-					throw EOFException()
-				}
-				// one byte read so decrement number to skip
-				n--
-			} else { // skipped negative or too many bytes
-				throw IOException("Unable to skip exactly")
-			}
-		}
+	private fun redraw() {
+		Log.i("Simulator", "redrawing")
+		v.invalidate()
 	}
 
-	@Throws(IOException::class)
-	fun InputStream.readNBytesSupport(len: Int): ByteArray? {
-		require(len >= 0) { "len < 0" }
+	override fun onPause() {
+		stop()
+		super.onPause()
+	}
 
-		var bufs: MutableList<ByteArray>? = null
-		var result: ByteArray? = null
-		var total = 0
-		var remaining = len
-		var n: Int
-		do {
-			var buf = ByteArray(
-				min(remaining, 8192)
-			)
-			var nread = 0
-
-			// read to EOF which may read more or less than buffer size
-			while ((read(
-					buf, nread,
-					min((buf.size - nread), remaining)
-				).also { n = it }) > 0
-			) {
-				nread += n
-				remaining -= n
-			}
-
-			if (nread > 0) {
-				if (8192 - total < nread) {
-					throw OutOfMemoryError("Required array size too large")
-				}
-				if (nread < buf.size) {
-					buf = Arrays.copyOfRange(buf, 0, nread)
-				}
-				total += nread
-				if (result == null) {
-					result = buf
-				} else {
-					if (bufs == null) {
-						bufs = ArrayList()
-						bufs.add(result)
-					}
-					bufs.add(buf)
-				}
-			}
-			// if the last call to read returned -1 or the number of bytes
-			// requested have been read then break
-		} while (n >= 0 && remaining > 0)
-
-		if (bufs == null) {
-			if (result == null) {
-				return ByteArray(0)
-			}
-			return if (result.size == total) result else result.copyOf(total)
-		}
-
-		result = ByteArray(total)
-		var offset = 0
-		remaining = total
-		for (b in bufs) {
-			val count = min(b.size.toDouble(), remaining.toDouble()).toInt()
-			System.arraycopy(b, 0, result, offset, count)
-			offset += count
-			remaining -= count
-		}
-
-		return result
+	override fun onStop() {
+		Log.i("Simulator", "goodbye")
+		super.onStop()
 	}
 }

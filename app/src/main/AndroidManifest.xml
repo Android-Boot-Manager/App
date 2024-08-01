@@ -29,20 +29,17 @@
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 
-				<!--<category android:name="android.intent.category.LAUNCHER" />-->
+				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
 		<activity
 			android:name=".Simulator"
-			android:exported="true"
-			android:configChanges="keyboard|keyboardHidden|orientation"
-			android:theme="@style/AppTheme">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
-
-				<category android:name="android.intent.category.LAUNCHER" />
-			</intent-filter>
-		</activity>
+			android:exported="false"
+			android:process=":simulator"
+			android:taskAffinity=""
+			android:noHistory="true"
+			android:excludeFromRecents="true"
+			android:theme="@style/AppTheme" />
 	</application>
 
 </manifest>
