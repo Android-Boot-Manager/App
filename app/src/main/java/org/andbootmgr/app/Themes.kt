@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.DrawerValue
@@ -27,17 +28,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
-import com.github.skydoves.colorpicker.compose.AlphaSlider
 import com.github.skydoves.colorpicker.compose.BrightnessSlider
-import com.github.skydoves.colorpicker.compose.ColorPickerController
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
+import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 import org.andbootmgr.app.util.ConfigFile
 import java.io.File
 
@@ -164,31 +169,56 @@ fun Themes(vm: MainActivityState) {
 		}
 		for (cfg in configs) {
 			if (cfg is ColorConfig) {
-				var value by remember(key1 = cfg.configKey, key2 = resetCounter) {
+				var value by remember(resetCounter) {
 					if (!c.has(cfg.configKey)) c[cfg.configKey] = cfg.default
 					mutableStateOf(c[cfg.configKey] ?: cfg.default)
 				}
-				val controller = remember(key1 = cfg.configKey, key2 = resetCounter) { ColorPickerController() }
-				Text(cfg.text+value)
-				HsvColorPicker(
-					modifier = Modifier
-						.height(200.dp)
-						.width(200.dp)
-						.padding(10.dp),
-					controller = controller,
-					onColorChanged = {
-						value = "0x" + (it.color.toArgb() and (0xff shl 24).inv()).toHexString().substring(2, 8)
-						c[cfg.configKey] = value
-						e[cfg.configKey] = cfg.validate(value)
+				var edit by remember(resetCounter) { mutableStateOf(false) }
+				Row(verticalAlignment = Alignment.CenterVertically) {
+					Text(cfg.text, modifier = Modifier.padding(end = 8.dp))
+					Box(
+						modifier = Modifier
+							.drawWithContent {
+								drawRect(
+									Color(
+										(value
+											.substring(2)
+											.toIntOrNull(16) ?: 0) or (0xff shl 24)
+									)
+								)
+							}
+							.width(16.dp)
+							.height(16.dp)
+					)
+					Button(onClick = { edit = true }, modifier = Modifier.padding(start = 8.dp)) {
+						Text(stringResource(id = R.string.edit))
 					}
-				)
-				BrightnessSlider(
-					modifier = Modifier
-						.fillMaxWidth()
-						.padding(10.dp)
-						.height(35.dp),
-					controller = controller,
-				)
+				}
+				if (edit) {
+					val color = rememberColorPickerController()
+					AlertDialog(onDismissRequest = { edit = false }, confirmButton = {
+						Button(onClick = {
+							value = "0x" + (color.selectedColor.value.toArgb() and (0xff shl 24).inv()).toHexString().substring(2, 8)
+							c[cfg.configKey] = value
+							e[cfg.configKey] = cfg.validate(value)
+							edit = false
+						}) {
+							Text(stringResource(id = R.string.ok))
+						}
+					}, dismissButton = {
+						Button(onClick = { edit = false }) {
+							Text(stringResource(id = R.string.cancel))
+						}
+					}, title = { Text(cfg.text) }, text = {
+						Column {
+							HsvColorPicker(modifier = Modifier.height(200.dp), controller = color, initialColor = Color(
+								(value.substring(2).toIntOrNull(16) ?: 0) or (0xff shl 24)
+							))
+							BrightnessSlider(modifier = Modifier.height(35.dp), controller = color)
+						}
+					})
+				}
+
 			} else {
 				var value by remember(key1 = cfg.configKey, key2 = resetCounter) {
 					if (!c.has(cfg.configKey)) c[cfg.configKey] = cfg.default

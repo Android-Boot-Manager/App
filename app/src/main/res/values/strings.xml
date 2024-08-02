@@ -255,4 +255,5 @@
 	<string name="list_border_color">List border color</string>
 	<string name="simulator_info">Simulator is an accurate preview of the boot menu. You can use volume keys to navigate. Instead of pressing the power button, simply tap anywhere on the display.</string>
 	<string name="reset">Reset</string>
+	<string name="edit">Edit</string>
 </resources>
