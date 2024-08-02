@@ -14,8 +14,7 @@ elif [ "$os_version" -eq "28" ]; then
 else
   cmd="$cmd -XjdwpProvider:adbconnection -XjdwpOptions:suspend=n,server=y $@"
 fi
-#export ASAN_OPTIONS=log_to_syslog=true,allow_user_segv_handler=1,detect_stack_use_after_return=true,check_initialization_order=true,halt_on_error=false
-export ASAN_OPTIONS=log_to_syslog=true
+export ASAN_OPTIONS=log_to_syslog=true,allow_user_segv_handler=1,detect_stack_use_after_return=true,check_initialization_order=true
 ASAN_LIB=$(ls "$HERE"/libclang_rt.asan-*-android.so)
 if [ -f "$HERE/libc++_shared.so" ]; then
     # Workaround for https://github.com/android-ndk/ndk/issues/988.
