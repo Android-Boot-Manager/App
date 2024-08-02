@@ -290,7 +290,7 @@ fun AppContent(vm: MainActivityState, view: @Composable (PaddingValues) -> Unit)
 								scope.launch { drawerState.open() }
 							})
 						})
-					}, content = view, floatingActionButton = fab)
+					}, content = view, floatingActionButton = fab, modifier = Modifier.fillMaxWidth())
 				}
 			)
 		}
@@ -299,7 +299,7 @@ fun AppContent(vm: MainActivityState, view: @Composable (PaddingValues) -> Unit)
 
 @Composable
 private fun NavGraph(vm: MainActivityState, it: PaddingValues) {
-	NavHost(navController = vm.navController!!, startDestination = "start", modifier = Modifier.padding(it)) {
+	NavHost(navController = vm.navController!!, startDestination = "start", modifier = Modifier.padding(it).fillMaxSize()) {
 		composable("start") {
 			vm.currentNav = "start"
 			Start(vm)

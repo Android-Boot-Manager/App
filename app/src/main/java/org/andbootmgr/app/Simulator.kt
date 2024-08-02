@@ -2,6 +2,7 @@ package org.andbootmgr.app
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -65,6 +66,7 @@ class Simulator : AppCompatActivity() {
 					}
 					firstTime = false
 				}
+				canvas.drawColor(Color.BLACK)
 				canvas.drawBitmap(this@Simulator.bitmap, 0f, 0f, null)
 			}
 
@@ -82,12 +84,12 @@ class Simulator : AppCompatActivity() {
 		}
 		l.addView(v, LinearLayout.LayoutParams(
 			LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT))
-		WindowCompat.setDecorFitsSystemWindows(window, false)
+		setContentView(l)
+		WindowCompat.setDecorFitsSystemWindows(window, true)
 		WindowInsetsControllerCompat(window, l).apply {
 			systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 			hide(WindowInsetsCompat.Type.systemBars())
 		}
-		setContentView(l)
 	}
 
 	private fun blockCount(): Long {

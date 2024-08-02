@@ -242,9 +242,8 @@
 	<string name="button_unselected_text_color">Button text color (unselected)</string>
 	<string name="button_selected_color">Button color (selected)</string>
 	<string name="button_selected_text_color">Button text color (selected)</string>
-	<string name="button_unselected_size">Button size (unselected)</string>
-	<string name="button_selected_size">Button size (selected)</string>
-	<string name="button_radius">Button radius</string>
+	<string name="button_unselected_radius">Button radius (unselected)</string>
+	<string name="button_selected_radius">Button radius (selected)</string>
 	<string name="button_grow_default">Grow buttons when selected</string>
 	<string name="button_border_unselected_color">Button border color (unselected)</string>
 	<string name="button_border_unselected_size">Button border size (unselected)</string>
@@ -254,4 +253,6 @@
 	<string name="list_radius">List radius</string>
 	<string name="list_border_size">List border size</string>
 	<string name="list_border_color">List border color</string>
+	<string name="simulator_info">Simulator is an accurate preview of the boot menu. You can use volume keys to navigate. Instead of pressing the power button, simply tap anywhere on the display.</string>
+	<string name="reset">Reset</string>
 </resources>
