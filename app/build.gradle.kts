@@ -17,7 +17,7 @@ android {
             useLegacyPackaging = false
         }
         jniLibs {
-            useLegacyPackaging = false
+            useLegacyPackaging = true
         }
         resources {
             excludes += "META-INF/*.version"
@@ -35,7 +35,7 @@ android {
         }
         externalNativeBuild {
             cmake {
-                cppFlags += ""
+                arguments += "-DANDROID_STL=c++_shared"
             }
         }
     }
