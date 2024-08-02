@@ -213,7 +213,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AppContent(vm: MainActivityState, view: @Composable (PaddingValues) -> Unit) {
+fun AppContent(vm: MainActivityState, view: @Composable (PaddingValues) -> Unit) {
 	val drawerState = vm.drawerState!!
 	val scope = vm.scope!!
 	var fabhint by remember { mutableStateOf(false) }
