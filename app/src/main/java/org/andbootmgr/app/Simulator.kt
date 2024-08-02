@@ -6,10 +6,13 @@ import android.content.ServiceConnection
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.os.Bundle
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsCompat
@@ -40,6 +43,7 @@ class Simulator : AppCompatActivity() {
 	private lateinit var f: File
 	private var fs: FileSystemManager? = null
 	private var fi: FileChannel? = null
+	private val handler = Handler(Looper.getMainLooper())
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -120,6 +124,12 @@ class Simulator : AppCompatActivity() {
 	private fun redraw() {
 		Log.i("Simulator", "redrawing")
 		v.invalidate()
+	}
+
+	private fun screenPrint(str: String) {
+		handler.post {
+			Toast.makeText(this, str.trim(), Toast.LENGTH_SHORT).show()
+		}
 	}
 
 	override fun onPause() {
