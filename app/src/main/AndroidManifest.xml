@@ -29,12 +29,12 @@
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 
-				<category android:name="android.intent.category.LAUNCHER" />
+				<!--<category android:name="android.intent.category.LAUNCHER" />-->
 			</intent-filter>
 		</activity>
 		<activity
 			android:name=".Simulator"
-			android:exported="false"
+			android:exported="true"
 			android:process=":simulator"
 			android:taskAffinity=""
 			android:noHistory="true"
@@ -42,7 +42,13 @@
 			android:excludeFromRecents="true"
 			android:configChanges="keyboard|keyboardHidden|uiMode"
 			android:theme="@style/Simulator"
-			tools:ignore="DiscouragedApi" />
+			tools:ignore="DiscouragedApi">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+		</activity>
 	</application>
 
 </manifest>

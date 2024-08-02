@@ -10,6 +10,8 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.util.Log
+import android.view.KeyEvent
+import android.view.MotionEvent
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -18,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.topjohnwu.superuser.Shell
+import com.topjohnwu.superuser.io.SuRandomAccessFile
 import com.topjohnwu.superuser.ipc.RootService
 import com.topjohnwu.superuser.nio.FileSystemManager
 import org.andbootmgr.app.util.RootFsService
@@ -26,6 +29,7 @@ import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 import kotlin.math.min
 import kotlin.system.exitProcess
+
 
 class Simulator : AppCompatActivity() {
 	init {
@@ -56,8 +60,8 @@ class Simulator : AppCompatActivity() {
 		w = 1080 //TODO make size fullscreen and hide sysui
 		h = 1920
 		bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-		f = File(intent.getStringExtra("sdCardBlock")!!)
-		// TODO make keys work
+		//f = File(intent.getStringExtra("sdCardBlock")!!)
+		f = File("/dev/block/mmcblk1")
 		val intent = Intent(this, RootFsService::class.java)
 		val l = LinearLayout(this)
 		v = object : View(this) {
@@ -142,5 +146,34 @@ class Simulator : AppCompatActivity() {
 		super.onStop()
 		// droidboot cannot cope with starting twice in same process due to static variables
 		exitProcess(0)
+	}
+
+	override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+		return if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+			Log.i("Simulator", "key down: $keyCode")
+			key(if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) 1 else 2)
+			true
+		} else {
+			super.onKeyDown(keyCode, event)
+		}
+	}
+
+	override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
+		return if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+			Log.i("Simulator", "key up: $keyCode")
+			key(if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) 8 else 16)
+			true
+		} else {
+			super.onKeyUp(keyCode, event)
+		}
+	}
+
+	override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+		when (ev?.action) {
+			MotionEvent.ACTION_UP -> key(32)
+			MotionEvent.ACTION_DOWN -> key(4)
+			else -> return false
+		}
+		return true
 	}
 }
