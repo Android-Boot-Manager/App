@@ -13,6 +13,7 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.topjohnwu.superuser.Shell
@@ -81,11 +82,12 @@ class Simulator : AppCompatActivity() {
 		}
 		l.addView(v, LinearLayout.LayoutParams(
 			LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT))
-		setContentView(l)
+		WindowCompat.setDecorFitsSystemWindows(window, false)
 		WindowInsetsControllerCompat(window, l).apply {
 			systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 			hide(WindowInsetsCompat.Type.systemBars())
 		}
+		setContentView(l)
 	}
 
 	private fun blockCount(): Long {

@@ -232,4 +232,26 @@
 	<string name="installer_sh">Installer shell script</string>
 	<string name="themes">Themes</string>
 	<string name="simulator">Start simulator</string>
+	<string name="win_bg_color">Window background color</string>
+	<string name="win_radius">Window corner radius</string>
+	<string name="win_border_size">Window border size</string>
+	<string name="win_border_color">Window border color</string>
+	<string name="global_font_size">Global font size</string>
+	<string name="global_font_name">Global font name</string>
+	<string name="button_unselected_color">Button color (unselected)</string>
+	<string name="button_unselected_text_color">Button text color (unselected)</string>
+	<string name="button_selected_color">Button color (selected)</string>
+	<string name="button_selected_text_color">Button text color (selected)</string>
+	<string name="button_unselected_size">Button size (unselected)</string>
+	<string name="button_selected_size">Button size (selected)</string>
+	<string name="button_radius">Button radius</string>
+	<string name="button_grow_default">Grow buttons when selected</string>
+	<string name="button_border_unselected_color">Button border color (unselected)</string>
+	<string name="button_border_unselected_size">Button border size (unselected)</string>
+	<string name="button_border_selected_color">Button border color (selected)</string>
+	<string name="button_border_selected_size">Button border size (selected)</string>
+	<string name="list_bg_color">List background color</string>
+	<string name="list_radius">List radius</string>
+	<string name="list_border_size">List border size</string>
+	<string name="list_border_color">List border color</string>
 </resources>
