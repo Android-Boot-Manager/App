@@ -45,15 +45,25 @@ class Simulator : AppCompatActivity() {
 				stop()
 			}
 		})
-		w = 1080 //TODO make size fullscreen and hide sysui
-		h = 1920
-		bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-		//f = File(intent.getStringExtra("sdCardBlock")!!)
-		f = File("/dev/block/mmcblk1")
+		f = File(intent.getStringExtra("sdCardBlock")!!)
 		val l = LinearLayout(this)
 		v = object : View(this) {
+			private var firstTime = true
 			override fun onDraw(canvas: Canvas) {
 				super.onDraw(canvas)
+				if (firstTime) {
+					w = width
+					h = height
+					bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+					Thread {
+						Log.i("Simulator","going to call start()")
+						start(bitmap, w, h)
+					}.run {
+						name = "droidboot0"
+						start()
+					}
+					firstTime = false
+				}
 				canvas.drawBitmap(this@Simulator.bitmap, 0f, 0f, null)
 			}
 
@@ -75,14 +85,6 @@ class Simulator : AppCompatActivity() {
 		WindowInsetsControllerCompat(window, l).apply {
 			systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 			hide(WindowInsetsCompat.Type.systemBars())
-		}
-
-		Thread {
-			Log.i("Simulator","going to call start()")
-			start(bitmap, w, h)
-		}.run {
-			name = "droidboot0"
-			start()
 		}
 	}
 
