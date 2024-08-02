@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -18,8 +20,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -27,14 +27,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
 import androidx.navigation.compose.rememberNavController
+import com.github.skydoves.colorpicker.compose.AlphaSlider
+import com.github.skydoves.colorpicker.compose.BrightnessSlider
+import com.github.skydoves.colorpicker.compose.ColorPickerController
+import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import org.andbootmgr.app.util.ConfigFile
 import java.io.File
 
@@ -61,6 +64,7 @@ import java.io.File
 	uint8_t button_border_selected_size;
 	uint32_t button_border_selected_color;
  */
+@OptIn(ExperimentalStdlibApi::class)
 @Composable
 fun Themes(vm: MainActivityState) {
 	val c = remember {
@@ -79,28 +83,27 @@ fun Themes(vm: MainActivityState) {
 	}
 	val e = remember { mutableStateMapOf<String, Boolean>() }
 	var resetCounter by remember { mutableIntStateOf(0) }
-	val col = { it: String -> it.startsWith("0x") && it.length == 8 && (it.substring(2).toIntOrNull(16) ?: -1) in 0..0xffffff }
 	val configs = listOf(
-		Config(stringResource(id = R.string.win_bg_color), "win_bg_color", "0x000000", col),
+		ColorConfig(stringResource(id = R.string.win_bg_color), "win_bg_color", "0x000000"),
 		Config(stringResource(id = R.string.win_radius), "win_radius", "0") { it.toShortOrNull() != null },
 		Config(stringResource(id = R.string.win_border_size), "win_border_size", "0") { it.toShortOrNull() != null },
-		Config(stringResource(id = R.string.win_border_color), "win_border_color", "0xffffff", col),
-		Config(stringResource(id = R.string.list_bg_color), "list_bg_color", "0x000000", col),
+		ColorConfig(stringResource(id = R.string.win_border_color), "win_border_color", "0xffffff"),
+		ColorConfig(stringResource(id = R.string.list_bg_color), "list_bg_color", "0x000000"),
 		Config(stringResource(id = R.string.list_radius), "list_radius", "0") { it.toShortOrNull() != null },
 		Config(stringResource(id = R.string.list_border_size), "list_border_size", "0") { it.toShortOrNull() != null },
-		Config(stringResource(id = R.string.list_border_color), "list_border_color", "0xffffff", col),
+		ColorConfig(stringResource(id = R.string.list_border_color), "list_border_color", "0xffffff"),
 		Config(stringResource(id = R.string.global_font_size), "global_font_size", "0") { it.toIntOrNull() != null },
 		Config(stringResource(id = R.string.global_font_name), "global_font_name", "") { true /* should check if exists later */ },
-		Config(stringResource(id = R.string.button_unselected_color), "button_unselected_color", "0x000000", col),
-		Config(stringResource(id = R.string.button_unselected_text_color), "button_unselected_text_color","0xffffff", col),
+		ColorConfig(stringResource(id = R.string.button_unselected_color), "button_unselected_color", "0x000000"),
+		ColorConfig(stringResource(id = R.string.button_unselected_text_color), "button_unselected_text_color","0xffffff"),
 		Config(stringResource(id = R.string.button_unselected_radius), "button_unselected_radius", "0") { it.toShortOrNull() != null },
-		Config(stringResource(id = R.string.button_selected_color), "button_selected_color", "0xff9800", col),
-		Config(stringResource(id = R.string.button_selected_text_color), "button_selected_text_color", "0x000000", col),
+		ColorConfig(stringResource(id = R.string.button_selected_color), "button_selected_color", "0xff9800"),
+		ColorConfig(stringResource(id = R.string.button_selected_text_color), "button_selected_text_color", "0x000000"),
 		Config(stringResource(id = R.string.button_selected_radius), "button_selected_radius", "0") { it.toShortOrNull() != null },
 		Config(stringResource(id = R.string.button_grow_default), "button_grow_default", "true") { it.toBooleanStrictOrNull() != null }, // TODO checkbox
-		Config(stringResource(id = R.string.button_border_unselected_color), "button_border_unselected_color", "0xffffff", col),
+		ColorConfig(stringResource(id = R.string.button_border_unselected_color), "button_border_unselected_color", "0xffffff"),
 		Config(stringResource(id = R.string.button_border_unselected_size), "button_border_unselected_size", "1") { it.toIntOrNull() != null },
-		Config(stringResource(id = R.string.button_border_selected_color), "button_border_selected_color", "0xffffff", col),
+		ColorConfig(stringResource(id = R.string.button_border_selected_color), "button_border_selected_color", "0xffffff"),
 		Config(stringResource(id = R.string.button_border_selected_size), "button_border_selected_size", "1") { it.toIntOrNull() != null }
 	)
 	val state = rememberScrollState()
@@ -160,36 +163,65 @@ fun Themes(vm: MainActivityState) {
 			}
 		}
 		for (cfg in configs) {
-			ConfigTextField(c, e, resetCounter, cfg.text, cfg.configKey, cfg.default, cfg.validate)
+			if (cfg is ColorConfig) {
+				var value by remember(key1 = cfg.configKey, key2 = resetCounter) {
+					if (!c.has(cfg.configKey)) c[cfg.configKey] = cfg.default
+					mutableStateOf(c[cfg.configKey] ?: cfg.default)
+				}
+				val controller = remember(key1 = cfg.configKey, key2 = resetCounter) { ColorPickerController() }
+				Text(cfg.text+value)
+				HsvColorPicker(
+					modifier = Modifier
+						.height(200.dp)
+						.width(200.dp)
+						.padding(10.dp),
+					controller = controller,
+					onColorChanged = {
+						value = "0x" + (it.color.toArgb() and (0xff shl 24).inv()).toHexString().substring(2, 8)
+						c[cfg.configKey] = value
+						e[cfg.configKey] = cfg.validate(value)
+					}
+				)
+				BrightnessSlider(
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(10.dp)
+						.height(35.dp),
+					controller = controller,
+				)
+			} else {
+				var value by remember(key1 = cfg.configKey, key2 = resetCounter) {
+					if (!c.has(cfg.configKey)) c[cfg.configKey] = cfg.default
+					mutableStateOf(c[cfg.configKey] ?: cfg.default)
+				}
+				TextField(
+					value = value,
+					onValueChange = {
+						value = it
+						c[cfg.configKey] = it.trim()
+						e[cfg.configKey] = cfg.validate(it)
+					},
+					label = { Text(cfg.text) },
+					isError = !(e[cfg.configKey] ?: true)
+				)
+				if (e[cfg.configKey] == false) {
+					Text(
+						stringResource(id = R.string.invalid_in),
+						color = MaterialTheme.colorScheme.error
+					)
+				} else {
+					Text("") // Budget spacer
+				}
+			}
 		}
 	}
 }
 
-@Composable
-private fun ConfigTextField(c: ConfigFile, e: SnapshotStateMap<String, Boolean>, resetCounter: Int, text: String, configKey: String, default: String, validate: (String) -> Boolean) {
-	var value by remember(key1 = configKey, key2 = resetCounter) {
-		if (!c.has(configKey)) c[configKey] = default
-		mutableStateOf(c[configKey] ?: default)
-	}
-	TextField(
-		value = value,
-		onValueChange = {
-			value = it
-			c[configKey] = it.trim()
-			e[configKey] = validate(it)
-		},
-		label = { Text(text) },
-		isError = !(e[configKey] ?: true)
-	)
-	if (e[configKey] == false) {
-		Text(stringResource(id = R.string.invalid_in), color = MaterialTheme.colorScheme.error)
-	} else {
-		Text("") // Budget spacer
-	}
-}
-
-private data class Config(val text: String, val configKey: String, val default: String,
+private open class Config(val text: String, val configKey: String, val default: String,
                           val validate: (String) -> Boolean)
+private class ColorConfig(text: String, configKey: String, default: String) : Config(text, configKey,
+	default, { it.startsWith("0x") && it.length == 8 &&
+			(it.substring(2).toIntOrNull(16) ?: -1) in 0..0xffffff })
 
 @Preview
 @Composable
