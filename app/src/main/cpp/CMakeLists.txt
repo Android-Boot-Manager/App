@@ -32,3 +32,5 @@ add_library(${CMAKE_PROJECT_NAME} SHARED app.cpp)
 # can link libraries from various origins, such as libraries defined in this
 # build script, prebuilt third-party libraries, or Android system libraries.
 target_link_libraries(${CMAKE_PROJECT_NAME}	droidboot_gui)
+target_compile_options(${CMAKE_PROJECT_NAME} PUBLIC -fsanitize=address -fsanitize-recover=address -fno-omit-frame-pointer)
+target_link_options(${CMAKE_PROJECT_NAME} PUBLIC -fsanitize=address -fsanitize-recover=address)
