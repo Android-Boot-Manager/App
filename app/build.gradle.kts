@@ -17,7 +17,7 @@ android {
             useLegacyPackaging = false
         }
         jniLibs {
-            useLegacyPackaging = true
+            useLegacyPackaging = false
         }
         resources {
             excludes += "META-INF/*.version"
