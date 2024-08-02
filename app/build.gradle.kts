@@ -155,7 +155,6 @@ dependencies {
 
 	val libsuVersion = "5.0.1"
     implementation("com.github.topjohnwu.libsu:core:${libsuVersion}")
-    implementation("com.github.topjohnwu.libsu:service:${libsuVersion}")
     implementation("com.github.topjohnwu.libsu:io:${libsuVersion}")
     implementation("com.mikepenz:aboutlibraries:11.2.2")
 
