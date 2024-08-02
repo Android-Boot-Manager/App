@@ -1,13 +1,9 @@
 package org.andbootmgr.app
 
-import android.content.ComponentName
-import android.content.Intent
-import android.content.ServiceConnection
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.os.Bundle
 import android.os.Handler
-import android.os.IBinder
 import android.os.Looper
 import android.util.Log
 import android.view.KeyEvent
@@ -21,12 +17,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuRandomAccessFile
-import com.topjohnwu.superuser.ipc.RootService
-import com.topjohnwu.superuser.nio.FileSystemManager
-import org.andbootmgr.app.util.RootFsService
 import java.io.File
-import java.nio.ByteBuffer
-import java.nio.channels.FileChannel
 import kotlin.math.min
 import kotlin.system.exitProcess
 
@@ -41,12 +32,9 @@ class Simulator : AppCompatActivity() {
 	external fun key(key: Int)
 	private lateinit var v: View
 	private lateinit var bitmap: Bitmap
-	private var firstTime = true
 	private var w: Int = 0
 	private var h: Int = 0
 	private lateinit var f: File
-	private var fs: FileSystemManager? = null
-	private var fi: FileChannel? = null
 	private val handler = Handler(Looper.getMainLooper())
 
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,7 +50,6 @@ class Simulator : AppCompatActivity() {
 		bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
 		//f = File(intent.getStringExtra("sdCardBlock")!!)
 		f = File("/dev/block/mmcblk1")
-		val intent = Intent(this, RootFsService::class.java)
 		val l = LinearLayout(this)
 		v = object : View(this) {
 			override fun onDraw(canvas: Canvas) {
@@ -89,26 +76,14 @@ class Simulator : AppCompatActivity() {
 			systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 			hide(WindowInsetsCompat.Type.systemBars())
 		}
-		RootService.bind(intent, object : ServiceConnection {
-			override fun onServiceConnected(componentName: ComponentName?, service: IBinder?) {
-				this@Simulator.fs = FileSystemManager.getRemote(service!!)
-				fi = fs!!.openChannel(f, FileSystemManager.MODE_READ_ONLY)
-				if (firstTime) {
-					Thread {
-						Log.i("Simulator","going to call start()")
-						start(bitmap, w, h)
-					}.run {
-						name = "droidboot0"
-						start()
-					}
-					firstTime = false
-				}
-			}
 
-			override fun onServiceDisconnected(componentName: ComponentName?) {
-				this@Simulator.fs = null
-			}
-		})
+		Thread {
+			Log.i("Simulator","going to call start()")
+			start(bitmap, w, h)
+		}.run {
+			name = "droidboot0"
+			start()
+		}
 	}
 
 	private fun blockCount(): Long {
@@ -119,10 +94,12 @@ class Simulator : AppCompatActivity() {
 
 	private fun readBlocks(offset: Long, count: Int): ByteArray {
 		Log.i("Simulator", "read $count bytes at $offset")
-		val bb = ByteBuffer.allocate(count)
-		fi!!.read(bb, offset)
-		fi!!.position(0)
-		return bb.array()
+		val fo = SuRandomAccessFile.open(f, "r")
+		fo.seek(offset)
+		val b = ByteArray(count)
+		fo.read(b)
+		fo.close()
+		return b
 	}
 
 	private fun redraw() {
