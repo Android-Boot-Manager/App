@@ -34,7 +34,7 @@
 			</intent-filter>
 		</activity>
 		<activity
-			android:name=".Simulator"
+			android:name=".themes.Simulator"
 			android:exported="false"
 			android:process=":simulator"
 			android:taskAffinity=""

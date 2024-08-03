@@ -1,4 +1,4 @@
-package org.andbootmgr.app
+package org.andbootmgr.app.themes
 
 import android.content.Intent
 import android.widget.Toast
@@ -30,10 +30,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
@@ -43,6 +40,11 @@ import androidx.navigation.compose.rememberNavController
 import com.github.skydoves.colorpicker.compose.BrightnessSlider
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
+import org.andbootmgr.app.ActionAbortedCleanlyError
+import org.andbootmgr.app.ActionAbortedError
+import org.andbootmgr.app.AppContent
+import org.andbootmgr.app.MainActivityState
+import org.andbootmgr.app.R
 import org.andbootmgr.app.util.ConfigFile
 import java.io.File
 

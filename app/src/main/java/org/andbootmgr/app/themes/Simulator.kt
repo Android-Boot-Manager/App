@@ -1,4 +1,4 @@
-package org.andbootmgr.app
+package org.andbootmgr.app.themes
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -19,6 +19,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuRandomAccessFile
+import org.andbootmgr.app.join
 import java.io.File
 import kotlin.math.min
 import kotlin.system.exitProcess
@@ -92,12 +93,14 @@ class Simulator : AppCompatActivity() {
 		}
 	}
 
+	@Suppress("unused") // jni
 	private fun blockCount(): Long {
 		return Shell.cmd("blockdev --getsz ${f.absolutePath}").exec().out.join("\n").toLong().also {
 			Log.i("Simulator", "block count: $it")
 		}
 	}
 
+	@Suppress("unused") // jni
 	private fun readBlocks(offset: Long, count: Int): ByteArray {
 		Log.i("Simulator", "read $count bytes at $offset")
 		val fo = SuRandomAccessFile.open(f, "r")
@@ -108,11 +111,13 @@ class Simulator : AppCompatActivity() {
 		return b
 	}
 
+	@Suppress("unused") // jni
 	private fun redraw() {
 		Log.i("Simulator", "redrawing")
 		v.invalidate()
 	}
 
+	@Suppress("unused") // jni
 	private fun screenPrint(str: String) {
 		handler.post {
 			Toast.makeText(this, str.trim(), Toast.LENGTH_SHORT).show()
