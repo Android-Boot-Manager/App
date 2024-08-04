@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -38,6 +39,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PlatformImeOptions
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,6 +51,9 @@ import androidx.navigation.compose.rememberNavController
 import com.github.skydoves.colorpicker.compose.BrightnessSlider
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.andbootmgr.app.AppContent
 import org.andbootmgr.app.MainActivityState
 import org.andbootmgr.app.R
@@ -92,16 +100,16 @@ fun Themes(vm: ThemeViewModel) {
 		.fillMaxSize()
 		.padding(horizontal = 5.dp)) {
 		val saveChanges = remember { {
-			if (errors.find { it.value } == null)
+			if (errors.find { it.value } != null)
 				Toast.makeText(
 					vm.mvm.activity!!,
 					vm.mvm.activity!!.getString(R.string.invalid_in),
 					Toast.LENGTH_LONG
 				).show()
-			else {
+			else CoroutineScope(Dispatchers.Main).launch {
 				vm.mvm.editDefaultCfg(changes)
 				changes.clear()
-			}
+			}; Unit
 		} }
 		Card(modifier = Modifier
 			.fillMaxWidth()
@@ -109,14 +117,27 @@ fun Themes(vm: ThemeViewModel) {
 			Column(modifier = Modifier.padding(10.dp)) {
 				Text(stringResource(id = R.string.simulator_info))
 				Button(onClick = {
-					saveChanges()
-					// sync does not work :/
-					vm.mvm.unmountBootset()
-					vm.mvm.mountBootset()
-					vm.mvm.activity!!.startActivity(Intent(vm.mvm.activity!!, Simulator::class.java).apply {
-						putExtra("sdCardBlock", vm.mvm.deviceInfo!!.bdev)
-					})
-				}, modifier = Modifier.align(Alignment.End).padding(top = 5.dp)) {
+					if (errors.find { it.value } != null)
+						Toast.makeText(
+							vm.mvm.activity!!,
+							vm.mvm.activity!!.getString(R.string.invalid_in),
+							Toast.LENGTH_LONG
+						).show()
+					else CoroutineScope(Dispatchers.Main).launch {
+						vm.mvm.editDefaultCfg(changes)
+						changes.clear()
+						// sync does not work :/
+						vm.mvm.remountBootset()
+						vm.mvm.activity!!.startActivity(
+							Intent(
+								vm.mvm.activity!!,
+								Simulator::class.java
+							).apply {
+								putExtra("sdCardBlock", vm.mvm.deviceInfo!!.bdev)
+							}
+						)
+					}
+				}, modifier = Modifier.align(Alignment.End).padding(top = 5.dp), enabled = errors.find { it.value } == null) {
 					Text(text = stringResource(id = R.string.simulator))
 				}
 			}
@@ -214,7 +235,14 @@ fun Themes(vm: ThemeViewModel) {
 						changes[cfg.configKey] = it.trim()
 					},
 					label = { Text(stringResource(id = cfg.text)) },
-					isError = error
+					isError = error,
+					keyboardOptions = KeyboardOptions(
+						keyboardType = if (cfg is NumberConfig)
+							KeyboardType.Decimal else KeyboardType.Text,
+						capitalization = KeyboardCapitalization.None,
+						imeAction = ImeAction.Next,
+						autoCorrect = false
+					)
 				)
 			}
 		}
@@ -228,18 +256,20 @@ class ColorConfig(text: Int, configKey: String, default: String) : Config(text, 
 			(it.substring(2).toIntOrNull(16) ?: -1) in 0..0xffffff })
 class BoolConfig(text: Int, configKey: String, default: String) : Config(text, configKey,
 	default, { it.toBooleanStrictOrNull() != null})
+class NumberConfig(text: Int, configKey: String, default: String, validate: (String) -> Boolean)
+	: Config(text, configKey, default, validate)
 
 class ThemeViewModel(val mvm: MainActivityState) : ViewModel() {
 	val configs = listOf(
 		ColorConfig(R.string.win_bg_color, "win_bg_color", "0x000000"),
-		Config(R.string.win_radius, "win_radius", "0") { it.toShortOrNull() != null },
-		Config(R.string.win_border_size, "win_border_size", "0") { it.toShortOrNull() != null },
+		NumberConfig(R.string.win_radius, "win_radius", "0") { it.toShortOrNull() != null },
+		NumberConfig(R.string.win_border_size, "win_border_size", "0") { it.toShortOrNull() != null },
 		ColorConfig(R.string.win_border_color, "win_border_color", "0xffffff"),
 		ColorConfig(R.string.list_bg_color, "list_bg_color", "0x000000"),
-		Config(R.string.list_radius, "list_radius", "0") { it.toShortOrNull() != null },
-		Config(R.string.list_border_size, "list_border_size", "0") { it.toShortOrNull() != null },
+		NumberConfig(R.string.list_radius, "list_radius", "0") { it.toShortOrNull() != null },
+		NumberConfig(R.string.list_border_size, "list_border_size", "0") { it.toShortOrNull() != null },
 		ColorConfig(R.string.list_border_color, "list_border_color", "0xffffff"),
-		Config(R.string.global_font_size, "global_font_size", "0") { it.toIntOrNull() != null },
+		NumberConfig(R.string.global_font_size, "global_font_size", "0") { it.toIntOrNull() != null },
 		Config(
 			R.string.global_font_name,
 			"global_font_name",
@@ -251,14 +281,14 @@ class ThemeViewModel(val mvm: MainActivityState) : ViewModel() {
 			"button_unselected_text_color",
 			"0xffffff"
 		),
-		Config(
+		NumberConfig(
 			R.string.button_unselected_radius,
 			"button_unselected_radius",
 			"0"
 		) { it.toShortOrNull() != null },
 		ColorConfig(R.string.button_selected_color, "button_selected_color", "0xff9800"),
 		ColorConfig(R.string.button_selected_text_color, "button_selected_text_color", "0x000000"),
-		Config(
+		NumberConfig(
 			R.string.button_selected_radius,
 			"button_selected_radius",
 			"0"
@@ -273,7 +303,7 @@ class ThemeViewModel(val mvm: MainActivityState) : ViewModel() {
 			"button_border_unselected_color",
 			"0xffffff"
 		),
-		Config(
+		NumberConfig(
 			R.string.button_border_unselected_size,
 			"button_border_unselected_size",
 			"1"
@@ -283,7 +313,7 @@ class ThemeViewModel(val mvm: MainActivityState) : ViewModel() {
 			"button_border_selected_color",
 			"0xffffff"
 		),
-		Config(
+		NumberConfig(
 			R.string.button_border_selected_size,
 			"button_border_selected_size",
 			"1"

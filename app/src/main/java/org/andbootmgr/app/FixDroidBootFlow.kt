@@ -11,6 +11,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.topjohnwu.superuser.io.SuFile
 import com.topjohnwu.superuser.io.SuFileInputStream
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.andbootmgr.app.util.AbmTheme
 import java.io.File
 import java.io.IOException
@@ -21,7 +25,7 @@ class FixDroidBootWizardPageFactory(private val vm: WizardActivityState) {
 			NavButton(vm.activity.getString(R.string.cancel)) { it.finish() },
 			NavButton(vm.activity.getString(R.string.next)) { it.navigate(if (vm.deviceInfo.postInstallScript) "shSel" else "select") })
 		{
-			Start(vm)
+			Start()
 		}, WizardPage("shSel",
 			NavButton(vm.activity.getString(R.string.prev)) { it.navigate("start") },
 			NavButton("") {}
@@ -42,7 +46,7 @@ class FixDroidBootWizardPageFactory(private val vm: WizardActivityState) {
 }
 
 @Composable
-private fun Start(vm: WizardActivityState) {
+private fun Start() {
 	Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
 		modifier = Modifier.fillMaxSize()
 	) {
@@ -53,7 +57,6 @@ private fun Start(vm: WizardActivityState) {
 
 @Composable
 private fun Flash(vm: WizardActivityState) {
-	val flashType = "DroidBootFlashType"
 	Terminal(vm, logFile = "blfix_${System.currentTimeMillis()}.txt") { terminal ->
 		val tmpFile = if (vm.deviceInfo.postInstallScript) {
 			val tmpFile = createTempFileSu("abm", ".sh", vm.logic.rootTmpDir)
@@ -67,7 +70,7 @@ private fun Flash(vm: WizardActivityState) {
 			terminal.add(vm.activity.getString(R.string.term_cant_write_bl))
 		vm.copyPriv(SuFileInputStream.open(vm.deviceInfo.blBlock), File(vm.logic.fileDir, "backup_lk.img"))
 		try {
-			vm.copyPriv(vm.flashStream(flashType), File(vm.deviceInfo.blBlock))
+			vm.copyPriv(vm.flashStream("DroidBootFlashType"), File(vm.deviceInfo.blBlock))
 		} catch (e: IOException) {
 			terminal.add(vm.activity.getString(R.string.term_bl_failed))
 			terminal.add(if (e.message != null) e.message!! else "(null)")
@@ -83,7 +86,7 @@ private fun Flash(vm: WizardActivityState) {
 			tmpFile.delete()
 		}
 		terminal.add(vm.activity.getString(R.string.term_success))
-		vm.activity.runOnUiThread {
+		withContext(Dispatchers.Main) {
 			vm.btnsOverride = true
 			vm.nextText.value = vm.activity.getString(R.string.finish)
 			vm.onNext.value = {

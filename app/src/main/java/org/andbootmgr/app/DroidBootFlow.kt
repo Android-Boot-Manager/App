@@ -68,7 +68,7 @@ private fun Start(vm: WizardActivityState) {
 	) {
 		Text(stringResource(R.string.welcome_text))
 		Text(
-			if (vm.deviceInfo.isBooted(vm.logic)) {
+			if (remember { vm.deviceInfo.isBooted(vm.logic) }) {
 				stringResource(R.string.install_abm)
 			} else {
 				stringResource(R.string.install_abm_dboot)
@@ -116,7 +116,6 @@ private fun Input(vm: WizardActivityState) {
 @Composable
 fun SelectDroidBoot(vm: WizardActivityState) {
 	val nextButtonAvailable = remember { mutableStateOf(false) }
-	val flashType = "DroidBootFlashType"
 
 	Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
 		modifier = Modifier.fillMaxSize()
@@ -135,7 +134,7 @@ fun SelectDroidBoot(vm: WizardActivityState) {
 			Text(stringResource(R.string.choose_droidboot_online))
 			Button(onClick = {
 				vm.activity.chooseFile("*/*") {
-					vm.flashes[flashType] = Pair(it, null)
+					vm.flashes["DroidBootFlashType"] = Pair(it, null)
 					nextButtonAvailable.value = true
 				}
 			}) {
@@ -153,7 +152,7 @@ fun SelectDroidBoot(vm: WizardActivityState) {
 						val bl = json.getJSONObject("bootloader")
 						val url = bl.getString("url")
 						val sha = if (bl.has("sha256")) bl.getString("sha256") else null
-						vm.flashes[flashType] = Pair(Uri.parse(url), sha)
+						vm.flashes["DroidBootFlashType"] = Pair(Uri.parse(url), sha)
 						nextButtonAvailable.value = true
 					} catch (e: Exception) {
 						Handler(Looper.getMainLooper()).post {

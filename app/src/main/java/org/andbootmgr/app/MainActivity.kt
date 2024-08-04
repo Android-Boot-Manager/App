@@ -100,7 +100,7 @@ class MainActivityState {
 	var isOk = false
 	var logic: DeviceLogic? = null
 
-	fun loadDefaultCfg() {
+	private fun loadDefaultCfg() {
 		CoroutineScope(Dispatchers.IO).launch {
 			val cfg = ConfigFile.importFromFile(logic!!.abmDbConf).toMap()
 			withContext(Dispatchers.Main) {
@@ -110,10 +110,10 @@ class MainActivityState {
 		}
 	}
 
-	fun editDefaultCfg(changes: Map<String, String?>) {
+	suspend fun editDefaultCfg(changes: Map<String, String?>) {
 		val changesSafe = changes.toMutableMap() // multi threading may mean parameter is edited
 		if (!logic!!.mounted) throw IllegalStateException("bootset not mounted")
-		CoroutineScope(Dispatchers.Main).launch {
+		withContext(Dispatchers.Main) {
 			changesSafe.forEach { (t, u) ->
 				if (u != null) defaultCfg[t] = u else defaultCfg.remove(t)
 			}
@@ -140,6 +140,11 @@ class MainActivityState {
 	fun unmountBootset() {
 		defaultCfg.clear()
 		logic!!.unmountBootset()
+	}
+
+	fun remountBootset() {
+		logic!!.unmountBootset()
+		logic!!.mountBootset(deviceInfo!!)
 	}
 }
 
@@ -266,7 +271,7 @@ fun AppContent(vm: MainActivityState, view: @Composable (PaddingValues) -> Unit)
 	val scope = vm.scope!!
 	var fabhint by remember { mutableStateOf(false) }
 	val fab = @Composable {
-		if (vm.noobMode && vm.currentNav == "start") {
+		if (vm.noobMode && vm.isOk && vm.currentNav == "start") {
 			FloatingActionButton(onClick = { fabhint = true }) {
 				Icon(Icons.Default.Add, stringResource(R.string.add_icon_content_desc))
 			}
@@ -1139,70 +1144,6 @@ private fun PartTool(vm: MainActivityState) {
 					}
 				}
 			)
-		}
-	}
-}
-
-@Composable
-private fun Settings(vm: MainActivityState) {
-	val ctx = LocalContext.current
-	val changes = remember { mutableStateMapOf<String, String>() }
-	val defaultText = changes["default"] ?: vm.defaultCfg["default"] ?: "Entry 01"
-	val defaultErr by remember { derivedStateOf { defaultText.isBlank() || !defaultText.matches(Regex("[\\dA-Za-z ]+")) } }
-	val timeoutText = changes["timeout"] ?: vm.defaultCfg["timeout"] ?: "20"
-	val timeoutErr by remember { derivedStateOf {  timeoutText.isBlank() || !timeoutText.matches(Regex("\\d+")) } }
-	Column {
-		TextField(
-			value = defaultText,
-			onValueChange = {
-				changes["default"] = it
-			},
-			label = { Text(stringResource(R.string.default_entry)) },
-			isError = defaultErr
-		)
-		if (defaultErr) {
-			Text(stringResource(id = R.string.invalid_in), color = MaterialTheme.colorScheme.error)
-		} else {
-			Text("") // Budget spacer
-		}
-		TextField(
-			value = timeoutText,
-			onValueChange = {
-				changes["timeout"] = it
-			},
-			label = { Text(stringResource(R.string.timeout_secs)) },
-			isError = timeoutErr
-		)
-		if (timeoutErr) {
-			Text(stringResource(id = R.string.invalid_in), color = MaterialTheme.colorScheme.error)
-		} else {
-			Text("") // Budget spacer
-		}
-		Button(onClick = {
-			if (defaultErr || timeoutErr)
-				Toast.makeText(vm.activity!!, vm.activity!!.getString(R.string.invalid_in), Toast.LENGTH_LONG).show()
-			else
-				vm.editDefaultCfg(changes)
-		}, enabled = !(defaultErr || timeoutErr)) {
-			Text(stringResource(R.string.save_changes))
-		}
-		Button(onClick = {
-			vm.startFlow("update_droidboot")
-		}) {
-			Text(stringResource(R.string.update_droidboot))
-		}
-		Button(onClick = {
-			vm.unmountBootset()
-			vm.activity!!.finish()
-		}) {
-			Text(stringResource(R.string.umount))
-		}
-		Row(horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-			Text(stringResource(R.string.noob_mode))
-			Switch(checked = vm.noobMode, onCheckedChange = {
-				vm.noobMode = it
-				ctx.getSharedPreferences("abm", 0).edit().putBoolean("noob_mode", it).apply()
-			})
 		}
 	}
 }

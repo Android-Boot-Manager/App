@@ -29,6 +29,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.topjohnwu.superuser.io.SuFileOutputStream
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.andbootmgr.app.util.AbmTheme
@@ -312,7 +314,7 @@ private fun Preview() {
 
 /* Monospace auto-scrolling text view, fed using MutableList<String>, catching exceptions and running logic on a different thread */
 @Composable
-fun Terminal(vm: WizardActivityState, logFile: String? = null, r: (MutableList<String>) -> Unit) {
+fun Terminal(vm: WizardActivityState, logFile: String? = null, action: suspend (MutableList<String>) -> Unit) {
 	val scrollH = rememberScrollState()
 	val scrollV = rememberScrollState()
 	val scope = rememberCoroutineScope()
@@ -427,15 +429,15 @@ fun Terminal(vm: WizardActivityState, logFile: String? = null, r: (MutableList<S
 			}
 
 		}
-		Thread {
+		CoroutineScope(Dispatchers.Default).launch {
 			try {
-				r(s)
+				action(s)
 			} catch (e: Throwable) {
 				s.add(vm.activity.getString(R.string.term_failure))
 				s.add(vm.activity.getString(R.string.dev_details))
 				s.add(Log.getStackTraceString(e))
 			}
-		}.start()
+		}
 		onDispose {
 			log?.close()
 		}

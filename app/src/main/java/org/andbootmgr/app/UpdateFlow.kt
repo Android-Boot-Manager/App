@@ -15,6 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import okhttp3.Call
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -28,6 +31,7 @@ import org.json.JSONTokener
 import java.io.File
 import java.net.URL
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.CoroutineContext
 
 class UpdateFlowWizardPageFactory(private val vm: WizardActivityState) {
     fun get(): List<IWizardPage> {
@@ -89,7 +93,7 @@ private fun Start(u: UpdateFlowDataHolder) {
         val toFind = u.vm.activity.intent.getStringExtra("entryFilename") ?: "null"
         u.e = entries.entries.find { it.value.absolutePath == toFind }!!.also { u.ef = it.value }.key
 
-        Thread {
+        CoroutineScope(Dispatchers.IO).launch {
             try {
                 val jsonText =
                     URL(u.e!!["xupdate"]).readText()
@@ -101,7 +105,7 @@ private fun Start(u: UpdateFlowDataHolder) {
                 u.hasUpdate = u.json!!.optBoolean("hasUpdate", false)
             }
             u.hasChecked = true
-        }.start()
+        }
     }
     Column {
         if (u.hasChecked) {

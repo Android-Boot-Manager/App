@@ -158,8 +158,14 @@ class Simulator : AppCompatActivity() {
 
 	override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
 		when (ev?.action) {
-			MotionEvent.ACTION_UP -> key(32)
-			MotionEvent.ACTION_DOWN -> key(4)
+			MotionEvent.ACTION_UP -> {
+				Log.i("Simulator", "key up: power")
+				key(32)
+			}
+			MotionEvent.ACTION_DOWN -> {
+				Log.i("Simulator", "key down: power")
+				key(4)
+			}
 			else -> return false
 		}
 		return true
