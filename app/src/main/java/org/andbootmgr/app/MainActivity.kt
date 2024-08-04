@@ -1146,30 +1146,16 @@ private fun PartTool(vm: MainActivityState) {
 @Composable
 private fun Settings(vm: MainActivityState) {
 	val ctx = LocalContext.current
-	val c = remember {
-		try {
-			if (vm.logic == null)
-				throw ActionAbortedCleanlyError(Exception("Compose preview special-casing"))
-			ConfigFile.importFromFile(File(vm.logic!!.abmDb, "db.conf"))
-		} catch (e: ActionAbortedCleanlyError) {
-			if (vm.activity != null) // Compose preview special-casing
-				Toast.makeText(vm.activity, vm.activity!!.getString(R.string.malformed_dbcfg), Toast.LENGTH_LONG).show()
-			ConfigFile().also {
-				it["default"] = "Entry 01"
-				it["timeout"] = "5"
-			}
-		}
-	}
-	var defaultText by remember { mutableStateOf(c["default"]!!) }
-	val defaultErr = defaultText.isBlank() || !defaultText.matches(Regex("[\\dA-Za-z ]+"))
-	var timeoutText by remember { mutableStateOf(c["timeout"]!!) }
-	val timeoutErr = timeoutText.isBlank() || !timeoutText.matches(Regex("\\d+"))
+	val changes = remember { mutableStateMapOf<String, String>() }
+	val defaultText = changes["default"] ?: vm.defaultCfg["default"] ?: "Entry 01"
+	val defaultErr by remember { derivedStateOf { defaultText.isBlank() || !defaultText.matches(Regex("[\\dA-Za-z ]+")) } }
+	val timeoutText = changes["timeout"] ?: vm.defaultCfg["timeout"] ?: "20"
+	val timeoutErr by remember { derivedStateOf {  timeoutText.isBlank() || !timeoutText.matches(Regex("\\d+")) } }
 	Column {
 		TextField(
 			value = defaultText,
 			onValueChange = {
-				defaultText = it
-				c["default"] = it.trim()
+				changes["default"] = it
 			},
 			label = { Text(stringResource(R.string.default_entry)) },
 			isError = defaultErr
@@ -1182,8 +1168,7 @@ private fun Settings(vm: MainActivityState) {
 		TextField(
 			value = timeoutText,
 			onValueChange = {
-				timeoutText = it
-				c["timeout"] = it.trim()
+				changes["timeout"] = it
 			},
 			label = { Text(stringResource(R.string.timeout_secs)) },
 			isError = timeoutErr
@@ -1196,14 +1181,8 @@ private fun Settings(vm: MainActivityState) {
 		Button(onClick = {
 			if (defaultErr || timeoutErr)
 				Toast.makeText(vm.activity!!, vm.activity!!.getString(R.string.invalid_in), Toast.LENGTH_LONG).show()
-			else {
-				try {
-					c.exportToFile(File(vm.logic!!.abmDb, "db.conf"))
-				} catch (e: ActionAbortedError) {
-					Toast.makeText(vm.activity!!, vm.activity!!.getString(R.string.failed2save), Toast.LENGTH_LONG)
-						.show()
-				}
-			}
+			else
+				vm.editDefaultCfg(changes)
 		}, enabled = !(defaultErr || timeoutErr)) {
 			Text(stringResource(R.string.save_changes))
 		}

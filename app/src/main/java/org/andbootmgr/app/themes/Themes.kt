@@ -2,6 +2,7 @@ package org.andbootmgr.app.themes
 
 import android.content.Intent
 import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,12 +16,16 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -71,36 +76,22 @@ import org.andbootmgr.app.R
 @Composable
 fun Themes(vm: ThemeViewModel) {
 	val changes = remember { mutableStateMapOf<String, String>() }
-	val e = remember { mutableStateMapOf<String, Boolean>() }
-	val configs = listOf(
-		ColorConfig(stringResource(id = R.string.win_bg_color), "win_bg_color", "0x000000"),
-		Config(stringResource(id = R.string.win_radius), "win_radius", "0") { it.toShortOrNull() != null },
-		Config(stringResource(id = R.string.win_border_size), "win_border_size", "0") { it.toShortOrNull() != null },
-		ColorConfig(stringResource(id = R.string.win_border_color), "win_border_color", "0xffffff"),
-		ColorConfig(stringResource(id = R.string.list_bg_color), "list_bg_color", "0x000000"),
-		Config(stringResource(id = R.string.list_radius), "list_radius", "0") { it.toShortOrNull() != null },
-		Config(stringResource(id = R.string.list_border_size), "list_border_size", "0") { it.toShortOrNull() != null },
-		ColorConfig(stringResource(id = R.string.list_border_color), "list_border_color", "0xffffff"),
-		Config(stringResource(id = R.string.global_font_size), "global_font_size", "0") { it.toIntOrNull() != null },
-		Config(stringResource(id = R.string.global_font_name), "global_font_name", "") { true /* should check if exists later */ },
-		ColorConfig(stringResource(id = R.string.button_unselected_color), "button_unselected_color", "0x000000"),
-		ColorConfig(stringResource(id = R.string.button_unselected_text_color), "button_unselected_text_color","0xffffff"),
-		Config(stringResource(id = R.string.button_unselected_radius), "button_unselected_radius", "0") { it.toShortOrNull() != null },
-		ColorConfig(stringResource(id = R.string.button_selected_color), "button_selected_color", "0xff9800"),
-		ColorConfig(stringResource(id = R.string.button_selected_text_color), "button_selected_text_color", "0x000000"),
-		Config(stringResource(id = R.string.button_selected_radius), "button_selected_radius", "0") { it.toShortOrNull() != null },
-		Config(stringResource(id = R.string.button_grow_default), "button_grow_default", "true") { it.toBooleanStrictOrNull() != null }, // TODO checkbox
-		ColorConfig(stringResource(id = R.string.button_border_unselected_color), "button_border_unselected_color", "0xffffff"),
-		Config(stringResource(id = R.string.button_border_unselected_size), "button_border_unselected_size", "1") { it.toIntOrNull() != null },
-		ColorConfig(stringResource(id = R.string.button_border_selected_color), "button_border_selected_color", "0xffffff"),
-		Config(stringResource(id = R.string.button_border_selected_size), "button_border_selected_size", "1") { it.toIntOrNull() != null }
-	)
 	val state = rememberScrollState()
+	val errors = remember {
+		vm.configs.map { cfg ->
+			derivedStateOf {
+				val value =
+					changes[cfg.configKey] ?: vm.mvm.defaultCfg[cfg.configKey] ?: cfg.default
+				!cfg.validate(value)
+			}
+		}
+	}
 	Column(modifier = Modifier
 		.verticalScroll(state)
-		.fillMaxSize()) {
-		val saveChanges = {
-			if (e.containsValue(false))
+		.fillMaxSize()
+		.padding(horizontal = 5.dp)) {
+		val saveChanges = remember { {
+			if (errors.find { it.value } == null)
 				Toast.makeText(
 					vm.mvm.activity!!,
 					vm.mvm.activity!!.getString(R.string.invalid_in),
@@ -110,10 +101,10 @@ fun Themes(vm: ThemeViewModel) {
 				vm.mvm.editDefaultCfg(changes)
 				changes.clear()
 			}
-		}
+		} }
 		Card(modifier = Modifier
 			.fillMaxWidth()
-			.padding(10.dp)) {
+			.padding(5.dp)) {
 			Column(modifier = Modifier.padding(10.dp)) {
 				Text(stringResource(id = R.string.simulator_info))
 				Button(onClick = {
@@ -129,24 +120,25 @@ fun Themes(vm: ThemeViewModel) {
 				}
 			}
 		}
-		Row {
-			Button(onClick = saveChanges, enabled = !e.containsValue(false)) {
+		Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+			Button(onClick = saveChanges, enabled = errors.find { it.value } == null) {
 				Text(stringResource(R.string.save_changes))
 			}
 			Button(onClick = {
-				for (cfg in configs) {
+				for (cfg in vm.configs) {
 					changes[cfg.configKey] = cfg.default
 				}
 			}) {
 				Text(stringResource(R.string.reset))
 			}
 		}
-		for (cfg in configs) {
+		vm.configs.forEachIndexed { i, cfg ->
 			val value = changes[cfg.configKey] ?: vm.mvm.defaultCfg[cfg.configKey] ?: cfg.default
+			val error = errors[i].value
 			if (cfg is ColorConfig) {
 				var edit by remember { mutableStateOf(false) }
+				Text(stringResource(cfg.text))
 				Row(verticalAlignment = Alignment.CenterVertically) {
-					Text(cfg.text, modifier = Modifier.padding(end = 8.dp))
 					Box(
 						modifier = Modifier
 							.drawWithContent {
@@ -161,7 +153,10 @@ fun Themes(vm: ThemeViewModel) {
 							.width(16.dp)
 							.height(16.dp)
 					)
-					Button(onClick = { edit = true }, modifier = Modifier.padding(start = 8.dp)) {
+					OutlinedButton(
+						onClick = { edit = true },
+						modifier = Modifier.padding(start = 8.dp)
+					) {
 						Text(stringResource(id = R.string.edit))
 					}
 				}
@@ -169,9 +164,9 @@ fun Themes(vm: ThemeViewModel) {
 					val color = rememberColorPickerController()
 					AlertDialog(onDismissRequest = { edit = false }, confirmButton = {
 						Button(onClick = {
-							val nv = "0x" + (color.selectedColor.value.toArgb() and (0xff shl 24).inv()).toHexString().substring(2, 8)
-							changes[cfg.configKey] = nv
-							e[cfg.configKey] = cfg.validate(nv)
+							changes[cfg.configKey] =
+								"0x" + (color.selectedColor.value.toArgb() and (0xff shl 24).inv())
+									.toHexString().substring(2, 8)
 							edit = false
 						}) {
 							Text(stringResource(id = R.string.ok))
@@ -180,28 +175,34 @@ fun Themes(vm: ThemeViewModel) {
 						Button(onClick = { edit = false }) {
 							Text(stringResource(id = R.string.cancel))
 						}
-					}, title = { Text(cfg.text) }, text = {
+					}, title = { Text(stringResource(id = cfg.text)) }, text = {
 						Column {
-							HsvColorPicker(modifier = Modifier.height(200.dp), controller = color, initialColor = Color(
-								(value.substring(2).toIntOrNull(16) ?: 0) or (0xff shl 24)
-							))
+							HsvColorPicker(
+								modifier = Modifier.height(200.dp).padding(bottom = 10.dp),
+								controller = color,
+								initialColor = Color(
+									(value.substring(2).toIntOrNull(16) ?: 0) or (0xff shl 24)
+								)
+							)
 							BrightnessSlider(modifier = Modifier.height(35.dp), controller = color)
 						}
 					})
 				}
-
+			} else if (cfg is BoolConfig) {
+				Text(stringResource(id = cfg.text))
+				Checkbox(checked = value.toBooleanStrictOrNull() == true, onCheckedChange = {
+					changes[cfg.configKey] = it.toString()
+				})
 			} else {
-				TextField(
+				Text(stringResource(id = cfg.text))
+				OutlinedTextField(
 					value = value,
 					onValueChange = {
-						val nv = it.trim()
-						changes[cfg.configKey] = nv
-						e[cfg.configKey] = cfg.validate(nv)
+						changes[cfg.configKey] = it.trim()
 					},
-					label = { Text(cfg.text) },
-					isError = !(e[cfg.configKey] ?: true)
+					isError = error
 				)
-				if (e[cfg.configKey] == false) {
+				if (error) {
 					Text(
 						stringResource(id = R.string.invalid_in),
 						color = MaterialTheme.colorScheme.error
@@ -214,12 +215,75 @@ fun Themes(vm: ThemeViewModel) {
 	}
 }
 
-private open class Config(val text: String, val configKey: String, val default: String,
+open class Config(val text: Int, val configKey: String, val default: String,
                           val validate: (String) -> Boolean)
-private class ColorConfig(text: String, configKey: String, default: String) : Config(text, configKey,
+class ColorConfig(text: Int, configKey: String, default: String) : Config(text, configKey,
 	default, { it.startsWith("0x") && it.length == 8 &&
 			(it.substring(2).toIntOrNull(16) ?: -1) in 0..0xffffff })
-class ThemeViewModel(val mvm: MainActivityState) : ViewModel()
+class BoolConfig(text: Int, configKey: String, default: String) : Config(text, configKey,
+	default, { it.toBooleanStrictOrNull() != null})
+
+class ThemeViewModel(val mvm: MainActivityState) : ViewModel() {
+	val configs = listOf(
+		ColorConfig(R.string.win_bg_color, "win_bg_color", "0x000000"),
+		Config(R.string.win_radius, "win_radius", "0") { it.toShortOrNull() != null },
+		Config(R.string.win_border_size, "win_border_size", "0") { it.toShortOrNull() != null },
+		ColorConfig(R.string.win_border_color, "win_border_color", "0xffffff"),
+		ColorConfig(R.string.list_bg_color, "list_bg_color", "0x000000"),
+		Config(R.string.list_radius, "list_radius", "0") { it.toShortOrNull() != null },
+		Config(R.string.list_border_size, "list_border_size", "0") { it.toShortOrNull() != null },
+		ColorConfig(R.string.list_border_color, "list_border_color", "0xffffff"),
+		Config(R.string.global_font_size, "global_font_size", "0") { it.toIntOrNull() != null },
+		Config(
+			R.string.global_font_name,
+			"global_font_name",
+			""
+		) { true /* should check if exists later */ },
+		ColorConfig(R.string.button_unselected_color, "button_unselected_color", "0x000000"),
+		ColorConfig(
+			R.string.button_unselected_text_color,
+			"button_unselected_text_color",
+			"0xffffff"
+		),
+		Config(
+			R.string.button_unselected_radius,
+			"button_unselected_radius",
+			"0"
+		) { it.toShortOrNull() != null },
+		ColorConfig(R.string.button_selected_color, "button_selected_color", "0xff9800"),
+		ColorConfig(R.string.button_selected_text_color, "button_selected_text_color", "0x000000"),
+		Config(
+			R.string.button_selected_radius,
+			"button_selected_radius",
+			"0"
+		) { it.toShortOrNull() != null },
+		BoolConfig(
+			R.string.button_grow_default,
+			"button_grow_default",
+			"true"
+		),
+		ColorConfig(
+			R.string.button_border_unselected_color,
+			"button_border_unselected_color",
+			"0xffffff"
+		),
+		Config(
+			R.string.button_border_unselected_size,
+			"button_border_unselected_size",
+			"1"
+		) { it.toIntOrNull() != null },
+		ColorConfig(
+			R.string.button_border_selected_color,
+			"button_border_selected_color",
+			"0xffffff"
+		),
+		Config(
+			R.string.button_border_selected_size,
+			"button_border_selected_size",
+			"1"
+		) { it.toIntOrNull() != null }
+	)
+}
 
 @Preview
 @Composable
