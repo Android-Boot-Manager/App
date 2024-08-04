@@ -6,8 +6,8 @@ import org.andbootmgr.app.ActionAbortedCleanlyError
 import org.andbootmgr.app.ActionAbortedError
 import java.io.*
 
-class ConfigFile {
-	val data: MutableMap<String, String> = HashMap()
+
+class ConfigFile(private val data: MutableMap<String, String> = HashMap()) {
 	operator fun get(name: String): String? {
 		return data[name]
 	}
@@ -16,7 +16,11 @@ class ConfigFile {
 		data[name] = value
 	}
 
-	fun exportToString(): String {
+	fun toMap(): Map<String, String> {
+		return data
+	}
+
+	private fun exportToString(): String {
 		val out = StringBuilder()
 		for (key in data.keys) {
 			out.append(key).append(" ").append(get(key)).append("\n")
@@ -40,7 +44,7 @@ class ConfigFile {
 	}
 
 	companion object {
-		fun importFromString(s: String): ConfigFile {
+		private fun importFromString(s: String): ConfigFile {
 			val out = ConfigFile()
 			var line: String
 			for (lline in s.split("\n").toTypedArray()) {
@@ -72,11 +76,6 @@ class ConfigFile {
 				}
 			}
 			return importFromString(s.toString())
-		}
-
-		@Throws(ActionAbortedCleanlyError::class)
-		fun importFromFile(s: String): ConfigFile {
-			return importFromFile(File(s))
 		}
 	}
 }

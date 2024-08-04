@@ -22,7 +22,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,17 +35,14 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
 import androidx.navigation.compose.rememberNavController
 import com.github.skydoves.colorpicker.compose.BrightnessSlider
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
-import org.andbootmgr.app.ActionAbortedCleanlyError
-import org.andbootmgr.app.ActionAbortedError
 import org.andbootmgr.app.AppContent
 import org.andbootmgr.app.MainActivityState
 import org.andbootmgr.app.R
-import org.andbootmgr.app.util.ConfigFile
-import java.io.File
 
 /*
 	uint32_t win_bg_color;
@@ -73,23 +69,9 @@ import java.io.File
  */
 @OptIn(ExperimentalStdlibApi::class)
 @Composable
-fun Themes(vm: MainActivityState) {
-	val c = remember {
-		try {
-			if (vm.logic == null)
-				throw ActionAbortedCleanlyError(Exception("Compose preview special-casing"))
-			ConfigFile.importFromFile(File(vm.logic!!.abmDb, "db.conf"))
-		} catch (e: ActionAbortedCleanlyError) {
-			if (vm.activity != null) // Compose preview special-casing
-				Toast.makeText(vm.activity, vm.activity!!.getString(R.string.malformed_dbcfg), Toast.LENGTH_LONG).show()
-			ConfigFile().also {
-				it["default"] = "Entry 01"
-				it["timeout"] = "5"
-			}
-		}
-	}
+fun Themes(vm: ThemeViewModel) {
+	val changes = remember { mutableStateMapOf<String, String>() }
 	val e = remember { mutableStateMapOf<String, Boolean>() }
-	var resetCounter by remember { mutableIntStateOf(0) }
 	val configs = listOf(
 		ColorConfig(stringResource(id = R.string.win_bg_color), "win_bg_color", "0x000000"),
 		Config(stringResource(id = R.string.win_radius), "win_radius", "0") { it.toShortOrNull() != null },
@@ -120,21 +102,13 @@ fun Themes(vm: MainActivityState) {
 		val saveChanges = {
 			if (e.containsValue(false))
 				Toast.makeText(
-					vm.activity!!,
-					vm.activity!!.getString(R.string.invalid_in),
+					vm.mvm.activity!!,
+					vm.mvm.activity!!.getString(R.string.invalid_in),
 					Toast.LENGTH_LONG
 				).show()
 			else {
-				try {
-					c.exportToFile(File(vm.logic!!.abmDb, "db.conf"))
-				} catch (e: ActionAbortedError) {
-					Toast.makeText(
-						vm.activity!!,
-						vm.activity!!.getString(R.string.failed2save),
-						Toast.LENGTH_LONG
-					)
-						.show()
-				}
+				vm.mvm.editDefaultCfg(changes)
+				changes.clear()
 			}
 		}
 		Card(modifier = Modifier
@@ -145,10 +119,10 @@ fun Themes(vm: MainActivityState) {
 				Button(onClick = {
 					saveChanges()
 					// sync does not work :/
-					vm.logic!!.unmountBootset()
-					vm.logic!!.mountBootset(vm.deviceInfo!!)
-					vm.activity!!.startActivity(Intent(vm.activity!!, Simulator::class.java).apply {
-						putExtra("sdCardBlock", vm.deviceInfo!!.bdev)
+					vm.mvm.unmountBootset()
+					vm.mvm.mountBootset()
+					vm.mvm.activity!!.startActivity(Intent(vm.mvm.activity!!, Simulator::class.java).apply {
+						putExtra("sdCardBlock", vm.mvm.deviceInfo!!.bdev)
 					})
 				}) {
 					Text(text = stringResource(id = R.string.simulator))
@@ -161,21 +135,16 @@ fun Themes(vm: MainActivityState) {
 			}
 			Button(onClick = {
 				for (cfg in configs) {
-					c[cfg.configKey] = cfg.default
+					changes[cfg.configKey] = cfg.default
 				}
-				resetCounter++
-				saveChanges()
 			}) {
 				Text(stringResource(R.string.reset))
 			}
 		}
 		for (cfg in configs) {
+			val value = changes[cfg.configKey] ?: vm.mvm.defaultCfg[cfg.configKey] ?: cfg.default
 			if (cfg is ColorConfig) {
-				var value by remember(resetCounter) {
-					if (!c.has(cfg.configKey)) c[cfg.configKey] = cfg.default
-					mutableStateOf(c[cfg.configKey] ?: cfg.default)
-				}
-				var edit by remember(resetCounter) { mutableStateOf(false) }
+				var edit by remember { mutableStateOf(false) }
 				Row(verticalAlignment = Alignment.CenterVertically) {
 					Text(cfg.text, modifier = Modifier.padding(end = 8.dp))
 					Box(
@@ -200,9 +169,9 @@ fun Themes(vm: MainActivityState) {
 					val color = rememberColorPickerController()
 					AlertDialog(onDismissRequest = { edit = false }, confirmButton = {
 						Button(onClick = {
-							value = "0x" + (color.selectedColor.value.toArgb() and (0xff shl 24).inv()).toHexString().substring(2, 8)
-							c[cfg.configKey] = value
-							e[cfg.configKey] = cfg.validate(value)
+							val nv = "0x" + (color.selectedColor.value.toArgb() and (0xff shl 24).inv()).toHexString().substring(2, 8)
+							changes[cfg.configKey] = nv
+							e[cfg.configKey] = cfg.validate(nv)
 							edit = false
 						}) {
 							Text(stringResource(id = R.string.ok))
@@ -222,16 +191,12 @@ fun Themes(vm: MainActivityState) {
 				}
 
 			} else {
-				var value by remember(key1 = cfg.configKey, key2 = resetCounter) {
-					if (!c.has(cfg.configKey)) c[cfg.configKey] = cfg.default
-					mutableStateOf(c[cfg.configKey] ?: cfg.default)
-				}
 				TextField(
 					value = value,
 					onValueChange = {
-						value = it
-						c[cfg.configKey] = it.trim()
-						e[cfg.configKey] = cfg.validate(it)
+						val nv = it.trim()
+						changes[cfg.configKey] = nv
+						e[cfg.configKey] = cfg.validate(nv)
 					},
 					label = { Text(cfg.text) },
 					isError = !(e[cfg.configKey] ?: true)
@@ -254,6 +219,7 @@ private open class Config(val text: String, val configKey: String, val default: 
 private class ColorConfig(text: String, configKey: String, default: String) : Config(text, configKey,
 	default, { it.startsWith("0x") && it.length == 8 &&
 			(it.substring(2).toIntOrNull(16) ?: -1) in 0..0xffffff })
+class ThemeViewModel(val mvm: MainActivityState) : ViewModel()
 
 @Preview
 @Composable
@@ -267,7 +233,7 @@ fun ThemePreview() {
 	vm.scope = scope
 	AppContent(vm) {
 		Box(modifier = Modifier.padding(it)) {
-			Themes(vm)
+			Themes(vm.theme)
 		}
 	}
 }

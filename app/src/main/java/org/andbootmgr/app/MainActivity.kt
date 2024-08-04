@@ -38,7 +38,10 @@ import com.topjohnwu.superuser.Shell.FLAG_MOUNT_MASTER
 import com.topjohnwu.superuser.Shell.FLAG_REDIRECT_STDERR
 import com.topjohnwu.superuser.io.SuFile
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.andbootmgr.app.themes.ThemeViewModel
 import org.andbootmgr.app.themes.Themes
 import org.andbootmgr.app.util.AbmTheme
 import org.andbootmgr.app.util.ConfigFile
@@ -86,6 +89,8 @@ class MainActivityState {
 	var activity: MainActivity? = null
 	var deviceInfo: DeviceInfo? = null
 	var currentNav by mutableStateOf("start")
+	val theme = ThemeViewModel(this)
+	var defaultCfg = mutableStateMapOf<String, String>()
 	var isReady = false
 	var name by mutableStateOf("") /* default value moved to onCreate() */
 	var navController: NavHostController? = null
@@ -94,6 +99,48 @@ class MainActivityState {
 	var root = false
 	var isOk = false
 	var logic: DeviceLogic? = null
+
+	fun loadDefaultCfg() {
+		CoroutineScope(Dispatchers.IO).launch {
+			val cfg = ConfigFile.importFromFile(logic!!.abmDbConf).toMap()
+			withContext(Dispatchers.Main) {
+				defaultCfg.clear()
+				defaultCfg.putAll(cfg)
+			}
+		}
+	}
+
+	fun editDefaultCfg(changes: Map<String, String?>) {
+		val changesSafe = changes.toMutableMap() // multi threading may mean parameter is edited
+		if (!logic!!.mounted) throw IllegalStateException("bootset not mounted")
+		CoroutineScope(Dispatchers.Main).launch {
+			changesSafe.forEach { (t, u) ->
+				if (u != null) defaultCfg[t] = u else defaultCfg.remove(t)
+			}
+			try {
+				val cfg = defaultCfg.toMutableMap()
+				withContext(Dispatchers.IO) {
+					ConfigFile(cfg).exportToFile(logic!!.abmDbConf)
+				}
+			} catch (e: ActionAbortedError) {
+				Log.e("ABM", Log.getStackTraceString(e))
+				Toast.makeText(
+					activity!!,
+					activity!!.getString(R.string.failed2save), Toast.LENGTH_LONG
+				).show()
+			}
+		}
+	}
+
+	fun mountBootset() {
+		logic!!.mountBootset(deviceInfo!!)
+		loadDefaultCfg()
+	}
+
+	fun unmountBootset() {
+		defaultCfg.clear()
+		logic!!.unmountBootset()
+	}
 }
 
 
@@ -157,7 +204,7 @@ class MainActivity : ComponentActivity() {
 							}
 							// == temp migration code end ==
 							if (vm.deviceInfo != null && vm.deviceInfo!!.isInstalled(vm.logic!!)) {
-								vm.logic!!.mountBootset(vm.deviceInfo!!)
+								vm.mountBootset()
 							} else {
 								Log.i("ABM", "not installed, not trying to mount")
 							}
@@ -307,7 +354,7 @@ private fun NavGraph(vm: MainActivityState, it: PaddingValues) {
 		}
 		composable("themes") {
 			vm.currentNav = "themes"
-			Themes(vm)
+			Themes(vm.theme)
 		}
 		composable("settings") {
 			vm.currentNav = "settings"
@@ -796,14 +843,16 @@ private fun PartTool(vm: MainActivityState) {
 							processing = true
 							delete = false
 							val wasMounted = vm.logic!!.mounted
-							vm.logic!!.unmountBootset()
+							vm.unmountBootset()
 							vm.logic!!.delete(p).submit {
-								vm.logic!!.mountBootset(vm.deviceInfo!!)
+								vm.mountBootset()
 								if (wasMounted != vm.logic!!.mounted) vm.activity!!.finish()
-								processing = false
-								editPartID = null
-								parts = SDUtils.generateMeta(vm.deviceInfo!!)
-								result = it.out.join("\n") + it.err.join("\n")
+								else {
+									processing = false
+									editPartID = null
+									parts = SDUtils.generateMeta(vm.deviceInfo!!)
+									result = it.out.join("\n") + it.err.join("\n")
+								}
 							}
 						}) {
 							Text(stringResource(R.string.delete))
@@ -1027,13 +1076,13 @@ private fun PartTool(vm: MainActivityState) {
 								if (e.has("xpart") && !e["xpart"].isNullOrBlank()) {
 									val allp = e["xpart"]!!.split(":")
 										.map { parts!!.dumpKernelPartition(Integer.valueOf(it)) }
-									vm.logic!!.unmountBootset()
+									vm.unmountBootset()
 									for (p in allp) { // Do not chain, but regenerate meta and unmount every time. Thanks void
 										val r = vm.logic!!.delete(p).exec()
 										parts = SDUtils.generateMeta(vm.deviceInfo!!)
 										tresult += r.out.join("\n") + r.err.join("\n") + "\n"
 									}
-									vm.logic!!.mountBootset(vm.deviceInfo!!)
+									vm.mountBootset()
 								}
 								val f = entries[e]!!
 								val f2 = SuFile(vm.logic!!.abmBootset, f.nameWithoutExtension)
@@ -1164,7 +1213,7 @@ private fun Settings(vm: MainActivityState) {
 			Text(stringResource(R.string.update_droidboot))
 		}
 		Button(onClick = {
-			vm.logic!!.unmountBootset()
+			vm.unmountBootset()
 			vm.activity!!.finish()
 		}) {
 			Text(stringResource(R.string.umount))

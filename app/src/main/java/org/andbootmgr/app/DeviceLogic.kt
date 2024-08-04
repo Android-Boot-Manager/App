@@ -17,6 +17,7 @@ class DeviceLogic(ctx: Context) {
 	val abmBootset = File(rootTmpDir, ".abm_bootset")
 	val abmDb = File(abmBootset, "db")
 	val abmEntries = File(abmDb, "entries")
+	val abmDbConf = File(abmDb, "db.conf")
 	var mounted = false
 	fun mountBootset(d: DeviceInfo): Boolean {
 		if (checkMounted()) return true
