@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,11 +19,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -37,9 +36,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.navigation.compose.rememberNavController
 import com.github.skydoves.colorpicker.compose.BrightnessSlider
@@ -104,7 +105,7 @@ fun Themes(vm: ThemeViewModel) {
 		} }
 		Card(modifier = Modifier
 			.fillMaxWidth()
-			.padding(5.dp)) {
+			.padding(horizontal = 5.dp, vertical = with(LocalDensity.current) { 8.sp.toDp() })) {
 			Column(modifier = Modifier.padding(10.dp)) {
 				Text(stringResource(id = R.string.simulator_info))
 				Button(onClick = {
@@ -115,12 +116,13 @@ fun Themes(vm: ThemeViewModel) {
 					vm.mvm.activity!!.startActivity(Intent(vm.mvm.activity!!, Simulator::class.java).apply {
 						putExtra("sdCardBlock", vm.mvm.deviceInfo!!.bdev)
 					})
-				}) {
+				}, modifier = Modifier.align(Alignment.End).padding(top = 5.dp)) {
 					Text(text = stringResource(id = R.string.simulator))
 				}
 			}
 		}
-		Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+		Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
+			.padding(vertical = with(LocalDensity.current) { 8.sp.toDp() })) {
 			Button(onClick = saveChanges, enabled = errors.find { it.value } == null) {
 				Text(stringResource(R.string.save_changes))
 			}
@@ -137,8 +139,10 @@ fun Themes(vm: ThemeViewModel) {
 			val error = errors[i].value
 			if (cfg is ColorConfig) {
 				var edit by remember { mutableStateOf(false) }
-				Text(stringResource(cfg.text))
-				Row(verticalAlignment = Alignment.CenterVertically) {
+				Row(modifier = Modifier.fillMaxWidth().padding(vertical = with(LocalDensity.current) { 8.sp.toDp() }),
+					verticalAlignment = Alignment.CenterVertically) {
+					Text(stringResource(cfg.text))
+					Spacer(modifier = Modifier.weight(1f))
 					Box(
 						modifier = Modifier
 							.drawWithContent {
@@ -155,7 +159,7 @@ fun Themes(vm: ThemeViewModel) {
 					)
 					OutlinedButton(
 						onClick = { edit = true },
-						modifier = Modifier.padding(start = 8.dp)
+						modifier = Modifier.padding(start = 12.5.dp)
 					) {
 						Text(stringResource(id = R.string.edit))
 					}
@@ -189,27 +193,29 @@ fun Themes(vm: ThemeViewModel) {
 					})
 				}
 			} else if (cfg is BoolConfig) {
-				Text(stringResource(id = cfg.text))
-				Checkbox(checked = value.toBooleanStrictOrNull() == true, onCheckedChange = {
-					changes[cfg.configKey] = it.toString()
-				})
+				Row(verticalAlignment = Alignment.CenterVertically) {
+					Text(stringResource(id = cfg.text))
+					Spacer(modifier = Modifier.weight(1f))
+					Checkbox(checked = value.toBooleanStrictOrNull() == true, onCheckedChange = {
+						changes[cfg.configKey] = it.toString()
+					})
+				}
 			} else {
-				Text(stringResource(id = cfg.text))
 				OutlinedTextField(
 					value = value,
+					modifier = Modifier.fillMaxWidth()
+						.let {
+							if (i > 0 && vm.configs[i - 1] is ColorConfig)
+								it.padding(top = with(LocalDensity.current) { 4.sp.toDp() } ,bottom = with(LocalDensity.current) { 8.sp.toDp() })
+							else
+								it.padding(vertical = with(LocalDensity.current) { 8.sp.toDp() })
+						},
 					onValueChange = {
 						changes[cfg.configKey] = it.trim()
 					},
+					label = { Text(stringResource(id = cfg.text)) },
 					isError = error
 				)
-				if (error) {
-					Text(
-						stringResource(id = R.string.invalid_in),
-						color = MaterialTheme.colorScheme.error
-					)
-				} else {
-					Text("") // Budget spacer
-				}
 			}
 		}
 	}
