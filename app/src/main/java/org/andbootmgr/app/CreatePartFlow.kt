@@ -24,6 +24,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.*
 import okio.*
 import org.andbootmgr.app.util.AbmTheme
@@ -351,7 +355,7 @@ private fun Shop(c: CreatePartDataHolder) {
 	val ctx = LocalContext.current
 	LaunchedEffect(Unit) {
 		c.run {
-			Thread {
+			CoroutineScope(Dispatchers.IO).launch {
 				try {
 					val jsonText = try {
 						ctx.assets.open("abm.json").readBytes().toString(Charsets.UTF_8)
@@ -838,7 +842,7 @@ private fun Download(c: CreatePartDataHolder) {
 											SOUtils.humanReadableByteCountBin(bytesRead), SOUtils.humanReadableByteCountBin(contentLength))
 									}
 								}
-								Thread {
+								CoroutineScope(Dispatchers.IO).launch {
 									try {
 										val downloadedFile = File(c.vm.logic.cacheDir, i)
 										val request =
@@ -868,7 +872,7 @@ private fun Download(c: CreatePartDataHolder) {
 											c.chosen[i] = DledFile(null, downloadedFile)
 									} catch (e: Exception) {
 										Log.e("ABM", Log.getStackTraceString(e))
-										c.vm.activity.runOnUiThread {
+										withContext(Dispatchers.Main) {
 											Toast.makeText(
 												c.vm.activity,
 												c.vm.activity.getString(R.string.dl_error),
@@ -878,7 +882,7 @@ private fun Download(c: CreatePartDataHolder) {
 									}
 									c.pl = null
 									downloading = false
-								}.start()
+								}
 							}) {
 								Text(stringResource(R.string.download))
 							}

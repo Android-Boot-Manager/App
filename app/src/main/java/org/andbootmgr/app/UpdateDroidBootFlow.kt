@@ -11,6 +11,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.topjohnwu.superuser.io.SuFile
 import com.topjohnwu.superuser.io.SuFileInputStream
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.andbootmgr.app.util.AbmTheme
 import java.io.File
 import java.io.IOException
@@ -82,7 +84,7 @@ private fun Flash(vm: WizardActivityState) {
 			tmpFile.delete()
 		}
 		terminal.add(vm.activity.getString(R.string.term_success))
-		vm.activity.runOnUiThread {
+		withContext(Dispatchers.Main) {
 			vm.btnsOverride = true
 			vm.nextText.value = vm.activity.getString(R.string.finish)
 			vm.onNext.value = {

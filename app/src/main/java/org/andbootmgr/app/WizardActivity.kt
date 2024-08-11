@@ -33,6 +33,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.andbootmgr.app.util.AbmTheme
 import java.io.File
 import java.io.FileInputStream
@@ -320,7 +321,7 @@ fun Terminal(vm: WizardActivityState, logFile: String? = null, action: suspend (
 	val scope = rememberCoroutineScope()
 	val text = remember { mutableStateOf("") }
 	val ctx = LocalContext.current
-	DisposableEffect(Unit) {
+	DisposableEffect(Unit) { // TODO don't run again on UI recreation
 		val log = logFile?.let { FileOutputStream(File(ctx.externalCacheDir, it)) }
 		// Budget CallbackList
 		val s = object : MutableList<String> {
@@ -417,21 +418,21 @@ fun Terminal(vm: WizardActivityState, logFile: String? = null, action: suspend (
 			}
 
 			fun onAdd(element: String) {
-				vm.activity.runOnUiThread {
+				scope.launch {
 					text.value += element + "\n"
-					scope.launch {
-						delay(200) // Give it time to re-measure
-						scrollV.animateScrollTo(scrollV.maxValue)
-						scrollH.animateScrollTo(0)
-					}
+					delay(200) // Give it time to re-measure
+					scrollV.animateScrollTo(scrollV.maxValue)
+					scrollH.animateScrollTo(0)
 				}
 				log?.write((element + "\n").encodeToByteArray())
 			}
 
 		}
-		CoroutineScope(Dispatchers.Default).launch {
+		CoroutineScope(Dispatchers.Default).launch { // do not bind to composable, we must never die
 			try {
-				action(s)
+				withContext(Dispatchers.Default) {
+					action(s)
+				}
 			} catch (e: Throwable) {
 				s.add(vm.activity.getString(R.string.term_failure))
 				s.add(vm.activity.getString(R.string.dev_details))

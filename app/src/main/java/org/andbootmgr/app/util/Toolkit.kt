@@ -5,35 +5,34 @@ import android.content.res.AssetManager
 import android.util.Log
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.Shell.FLAG_NON_ROOT_SHELL
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.*
-import java.util.function.Consumer
 
 // Manage & extract Toolkit
 class Toolkit(private val ctx: Context) {
 	private var fail = false
 	private val targetPath = File(ctx.filesDir.parentFile, "assets")
 
-	fun copyAssets(uinf: Runnable, callback: Consumer<Boolean>) {
+	suspend fun copyAssets(uinf: suspend () -> Unit, callback: suspend (Boolean) -> Unit) {
 		val shell = Shell.Builder.create().setFlags(FLAG_NON_ROOT_SHELL).setTimeout(30).setContext(ctx).build()
-		var input: InputStream
-		var b: ByteArray
-		try {
-			input = ctx.assets.open("cp/_ts")
-			b = input.readBytes()
-			input.close()
+		var b = try {
+			withContext(Dispatchers.IO) {
+				ctx.assets.open("cp/_ts").use { it.readBytes() }
+			}
 		} catch (e: IOException) {
 			e.printStackTrace()
 			fail = true
-			callback.accept(true)
+			callback(true)
 			return
 		}
 		val s = String(b).trim()
-		try {
-			input = FileInputStream(File(targetPath, "_ts"))
-			b = input.readBytes()
-			input.close()
+		b = try {
+			withContext(Dispatchers.IO) {
+				FileInputStream(File(targetPath, "_ts")).use { it.readBytes() }
+			}
 		} catch (e: IOException) {
-			b = ByteArray(0)
+			ByteArray(0)
 		}
 		val s2 = String(b).trim()
 		if (s != s2) {
@@ -46,7 +45,7 @@ class Toolkit(private val ctx: Context) {
 			copyAssets("cp", "")
 		}
 		shell.newJob().add("chmod -R +x " + targetPath.absolutePath).exec()
-		callback.accept(fail)
+		callback(fail)
 	}
 
 	private fun copyAssets(src: String, outp: String) {

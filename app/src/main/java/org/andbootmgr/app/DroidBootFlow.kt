@@ -20,6 +20,10 @@ import androidx.compose.ui.unit.dp
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
 import com.topjohnwu.superuser.io.SuFileInputStream
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.andbootmgr.app.util.AbmTheme
 import org.andbootmgr.app.util.ConfigFile
 import org.andbootmgr.app.util.SDUtils
@@ -142,7 +146,7 @@ fun SelectDroidBoot(vm: WizardActivityState) {
 			}
 			val ctx = LocalContext.current
 			Button(onClick = {
-				Thread {
+				CoroutineScope(Dispatchers.Default).launch {
 					try {
 						val jsonText =
 							URL("https://raw.githubusercontent.com/Android-Boot-Manager/ABM-json/master/devices/" + vm.codename + ".json").readText()
@@ -160,7 +164,7 @@ fun SelectDroidBoot(vm: WizardActivityState) {
 						}
 						Log.e("ABM droidboot json", Log.getStackTraceString(e))
 					}
-				}.start()
+				}
 			}) {
 				Text(stringResource(id = R.string.download))
 			}
@@ -193,7 +197,7 @@ fun SelectInstallSh(vm: WizardActivityState, update: Boolean = false) {
 			}
 			val ctx = LocalContext.current
 			Button(onClick = {
-				Thread {
+				CoroutineScope(Dispatchers.IO).launch {
 					try {
 						val jsonText =
 							URL("https://raw.githubusercontent.com/Android-Boot-Manager/ABM-json/master/devices/" + vm.codename + ".json").readText()
@@ -211,7 +215,7 @@ fun SelectInstallSh(vm: WizardActivityState, update: Boolean = false) {
 						}
 						Log.e("ABM install json", Log.getStackTraceString(e))
 					}
-				}.start()
+				}
 			}) {
 				Text(stringResource(id = R.string.download))
 			}
@@ -354,7 +358,7 @@ private fun Flash(vm: WizardActivityState) {
 		}
 		terminal.add(vm.activity.getString(R.string.term_success))
 		vm.logic.unmountBootset()
-		vm.activity.runOnUiThread {
+		withContext(Dispatchers.Main) {
 			vm.btnsOverride = true
 			vm.nextText.value = vm.activity.getString(R.string.finish)
 			vm.onNext.value = {

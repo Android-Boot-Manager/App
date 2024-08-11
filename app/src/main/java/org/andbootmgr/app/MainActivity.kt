@@ -177,7 +177,7 @@ class MainActivity : ComponentActivity() {
 
 		val toast =
 			Toast.makeText(this, getString(R.string.toolkit_extracting), Toast.LENGTH_LONG)
-		Thread {
+		CoroutineScope(Dispatchers.IO).launch {
 			if (Shell.getCachedShell() == null) {
 				Shell.enableVerboseLogging = BuildConfig.DEBUG
 				Shell.setDefaultBuilder(
@@ -186,17 +186,39 @@ class MainActivity : ComponentActivity() {
 						.setTimeout(30)
 				)
 			}
-			Toolkit(this).copyAssets({
-				runOnUiThread {
+			Toolkit(this@MainActivity).copyAssets({
+				withContext(Dispatchers.Main) {
 					toast.show()
 				}
 			}) { fail ->
-				runOnUiThread {
+				withContext(Dispatchers.Main) {
 					toast.cancel()
+					if (fail) {
+						setContent {
+							AlertDialog(
+								onDismissRequest = {},
+								title = {
+									Text(text = getString(R.string.error))
+								},
+								text = {
+									Text(getString(R.string.toolkit_error))
+								},
+								confirmButton = {
+									Button(
+										onClick = {
+											finish()
+										}) {
+										Text(getString(R.string.quit))
+									}
+								}
+							)
+						}
+						vm.isReady = true
+					}
 				}
 				if (!fail) {
 					Shell.getShell { shell ->
-						Thread {
+						CoroutineScope(Dispatchers.IO).launch {
 							vm.root = shell.isRoot
 							vm.deviceInfo = JsonDeviceInfoFactory(vm.activity!!).get(Build.DEVICE)
 							// == temp migration code start ==
@@ -218,7 +240,7 @@ class MainActivity : ComponentActivity() {
 										vm.deviceInfo!!.isBooted(vm.logic!!) &&
 										!(!vm.logic!!.mounted || vm.deviceInfo!!.isCorrupt(vm.logic!!)))
 							}
-							runOnUiThread {
+							withContext(Dispatchers.Main) {
 								setContent {
 									val navController = rememberNavController()
 									val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -235,32 +257,11 @@ class MainActivity : ComponentActivity() {
 								}
 								vm.isReady = true
 							}
-						}.start()
+						}
 					}
-				} else {
-					setContent {
-						AlertDialog(
-							onDismissRequest = {},
-							title = {
-								Text(text = getString(R.string.error))
-							},
-							text = {
-								Text(getString(R.string.toolkit_error))
-							},
-							confirmButton = {
-								Button(
-									onClick = {
-										finish()
-									}) {
-									Text(getString(R.string.quit))
-								}
-							}
-						)
-					}
-					vm.isReady = true
 				}
 			}
-		}.start()
+		}
 	}
 }
 
@@ -1076,7 +1077,7 @@ private fun PartTool(vm: MainActivityState) {
 						Button(onClick = {
 							processing = true
 							delete = false
-							Thread {
+							CoroutineScope(Dispatchers.Default).launch {
 								var tresult = ""
 								if (e.has("xpart") && !e["xpart"].isNullOrBlank()) {
 									val allp = e["xpart"]!!.split(":")
@@ -1100,7 +1101,7 @@ private fun PartTool(vm: MainActivityState) {
 								processing = false
 								parts = SDUtils.generateMeta(vm.deviceInfo!!)
 								result = tresult
-							}.start()
+							}
 						}) {
 							Text(stringResource(R.string.delete))
 						}

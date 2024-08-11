@@ -237,7 +237,7 @@ fun Themes(vm: ThemeViewModel) {
 					label = { Text(stringResource(id = cfg.text)) },
 					isError = error,
 					keyboardOptions = KeyboardOptions(
-						keyboardType = if (cfg is NumberConfig)
+						keyboardType = if (cfg is IntConfig || cfg is ShortConfig)
 							KeyboardType.Decimal else KeyboardType.Text,
 						capitalization = KeyboardCapitalization.None,
 						imeAction = ImeAction.Next,
@@ -256,20 +256,22 @@ class ColorConfig(text: Int, configKey: String, default: String) : Config(text, 
 			(it.substring(2).toIntOrNull(16) ?: -1) in 0..0xffffff })
 class BoolConfig(text: Int, configKey: String, default: String) : Config(text, configKey,
 	default, { it.toBooleanStrictOrNull() != null})
-class NumberConfig(text: Int, configKey: String, default: String, validate: (String) -> Boolean)
-	: Config(text, configKey, default, validate)
+class IntConfig(text: Int, configKey: String, default: String)
+	: Config(text, configKey, default, { it.toIntOrNull() != null })
+class ShortConfig(text: Int, configKey: String, default: String)
+	: Config(text, configKey, default, { it.toShortOrNull() != null })
 
 class ThemeViewModel(val mvm: MainActivityState) : ViewModel() {
 	val configs = listOf(
 		ColorConfig(R.string.win_bg_color, "win_bg_color", "0x000000"),
-		NumberConfig(R.string.win_radius, "win_radius", "0") { it.toShortOrNull() != null },
-		NumberConfig(R.string.win_border_size, "win_border_size", "0") { it.toShortOrNull() != null },
+		ShortConfig(R.string.win_radius, "win_radius", "0"),
+		ShortConfig(R.string.win_border_size, "win_border_size", "0"),
 		ColorConfig(R.string.win_border_color, "win_border_color", "0xffffff"),
 		ColorConfig(R.string.list_bg_color, "list_bg_color", "0x000000"),
-		NumberConfig(R.string.list_radius, "list_radius", "0") { it.toShortOrNull() != null },
-		NumberConfig(R.string.list_border_size, "list_border_size", "0") { it.toShortOrNull() != null },
+		ShortConfig(R.string.list_radius, "list_radius", "0"),
+		ShortConfig(R.string.list_border_size, "list_border_size", "0"),
 		ColorConfig(R.string.list_border_color, "list_border_color", "0xffffff"),
-		NumberConfig(R.string.global_font_size, "global_font_size", "0") { it.toIntOrNull() != null },
+		IntConfig(R.string.global_font_size, "global_font_size", "0"),
 		Config(
 			R.string.global_font_name,
 			"global_font_name",
@@ -281,18 +283,18 @@ class ThemeViewModel(val mvm: MainActivityState) : ViewModel() {
 			"button_unselected_text_color",
 			"0xffffff"
 		),
-		NumberConfig(
+		ShortConfig(
 			R.string.button_unselected_radius,
 			"button_unselected_radius",
 			"0"
-		) { it.toShortOrNull() != null },
+		),
 		ColorConfig(R.string.button_selected_color, "button_selected_color", "0xff9800"),
 		ColorConfig(R.string.button_selected_text_color, "button_selected_text_color", "0x000000"),
-		NumberConfig(
+		ShortConfig(
 			R.string.button_selected_radius,
 			"button_selected_radius",
 			"0"
-		) { it.toShortOrNull() != null },
+		),
 		BoolConfig(
 			R.string.button_grow_default,
 			"button_grow_default",
@@ -303,21 +305,21 @@ class ThemeViewModel(val mvm: MainActivityState) : ViewModel() {
 			"button_border_unselected_color",
 			"0xffffff"
 		),
-		NumberConfig(
+		IntConfig(
 			R.string.button_border_unselected_size,
 			"button_border_unselected_size",
 			"1"
-		) { it.toIntOrNull() != null },
+		),
 		ColorConfig(
 			R.string.button_border_selected_color,
 			"button_border_selected_color",
 			"0xffffff"
 		),
-		NumberConfig(
+		IntConfig(
 			R.string.button_border_selected_size,
 			"button_border_selected_size",
 			"1"
-		) { it.toIntOrNull() != null }
+		)
 	)
 }
 
