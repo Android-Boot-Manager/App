@@ -34,6 +34,7 @@ import org.andbootmgr.app.util.AbmTheme
 import org.andbootmgr.app.util.ConfigFile
 import org.andbootmgr.app.util.SDUtils
 import org.andbootmgr.app.util.SOUtils
+import org.andbootmgr.app.util.Terminal
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
@@ -912,7 +913,7 @@ private fun Download(c: CreatePartDataHolder) {
 @Composable
 private fun Flash(c: CreatePartDataHolder) {
 	val vm = c.vm
-	Terminal(vm, logFile = "install_${System.currentTimeMillis()}.txt") { terminal ->
+	Terminal(logFile = "install_${System.currentTimeMillis()}.txt") { terminal ->
 		if (c.t == null) { // OS install
 			val parts = ArrayMap<Int, Int>()
 			val fn = c.t2.value
@@ -1019,7 +1020,7 @@ private fun Flash(c: CreatePartDataHolder) {
 				vm.logic.unmountBootset()
 				val r = vm.logic.create(c.p, offset, offset + k, code, "").to(terminal).exec()
 				try {
-					if (r.out.join("\n").contains("kpartx")) {
+					if (r.out.joinToString("\n").contains("kpartx")) {
 						terminal.add(vm.activity.getString(R.string.term_reboot_asap))
 					}
 					parts[it] = c.meta!!.nid
@@ -1054,7 +1055,7 @@ private fun Flash(c: CreatePartDataHolder) {
 					"0700",
 					c.t!!
 				).to(terminal).exec()
-			if (r.out.join("\n").contains("kpartx")) {
+			if (r.out.joinToString("\n").contains("kpartx")) {
 				terminal.add(vm.activity.getString(R.string.term_reboot_asap))
 			}
 			if (r.isSuccess) {

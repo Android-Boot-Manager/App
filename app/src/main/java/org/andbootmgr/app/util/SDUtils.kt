@@ -3,7 +3,6 @@ package org.andbootmgr.app.util
 import android.util.Log
 import com.topjohnwu.superuser.Shell
 import org.andbootmgr.app.DeviceInfo
-import org.andbootmgr.app.join
 import java.util.*
 import java.util.stream.Collectors
 import kotlin.jvm.optionals.getOrElse
@@ -99,7 +98,7 @@ object SDUtils {
 						ocut[2].toLong()/* endSector */,
 						meta.logicalSectorSizeBytes,
 						code,
-						String.join(" ", ocut.copyOfRange(6, ocut.size).toList()) /* label/name */,
+						ocut.copyOfRange(6, ocut.size).toList().joinToString(" ") /* label/name */,
 						meta.major,
 						meta.minor + id
 					)

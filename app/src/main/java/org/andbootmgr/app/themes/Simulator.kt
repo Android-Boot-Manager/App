@@ -19,7 +19,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuRandomAccessFile
-import org.andbootmgr.app.join
 import java.io.File
 import kotlin.math.min
 import kotlin.system.exitProcess
@@ -95,7 +94,7 @@ class Simulator : AppCompatActivity() {
 
 	@Suppress("unused") // jni
 	private fun blockCount(): Long {
-		return Shell.cmd("blockdev --getsz ${f.absolutePath}").exec().out.join("\n").toLong().also {
+		return Shell.cmd("blockdev --getsz ${f.absolutePath}").exec().out.joinToString("\n").toLong().also {
 			Log.i("Simulator", "block count: $it")
 		}
 	}

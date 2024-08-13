@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFileInputStream
 import org.andbootmgr.app.util.SDUtils
+import org.andbootmgr.app.util.Terminal
 import java.io.File
 import java.io.IOException
 
@@ -121,7 +122,7 @@ private fun SelectDroidBoot(c: CreateBackupDataHolder) {
 
 @Composable
 private fun Flash(c: CreateBackupDataHolder) {
-    Terminal(c.vm, logFile = "flash_${System.currentTimeMillis()}.txt") { terminal ->
+    Terminal(logFile = "flash_${System.currentTimeMillis()}.txt") { terminal ->
         terminal.add(c.vm.activity.getString(R.string.term_starting))
         try {
             val p = c.meta!!.dumpKernelPartition(c.pi)

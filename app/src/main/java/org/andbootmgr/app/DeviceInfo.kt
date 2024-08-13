@@ -5,6 +5,8 @@ import android.content.Context
 import android.util.Log
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.andbootmgr.app.util.SDUtils
 import org.json.JSONObject
 import org.json.JSONTokener
@@ -38,7 +40,7 @@ interface DeviceInfo {
 			e.printStackTrace()
 		}
 		val result = Shell.cmd("grep ABM.bootloader=1 /proc/cmdline").exec()
-		return result.isSuccess && result.out.join("\n").contains("ABM.bootloader=1")
+		return result.isSuccess && result.out.joinToString("\n").contains("ABM.bootloader=1")
 	}
 	fun isCorrupt(logic: DeviceLogic): Boolean
 	fun getAbmSettings(logic: DeviceLogic): String?
@@ -77,42 +79,45 @@ class JsonDeviceInfo(
 ) : MetaOnSdDeviceInfo()
 
 class JsonDeviceInfoFactory(private val ctx: Context) {
-	fun get(codename: String): DeviceInfo? {
+	suspend fun get(codename: String): DeviceInfo? {
 		return try {
-			var fromNet = true
-			val jsonText = try {
-				try {
-					ctx.assets.open("abm.json").readBytes().toString(Charsets.UTF_8)
-				} catch (e: FileNotFoundException) {
-					URL("https://raw.githubusercontent.com/Android-Boot-Manager/ABM-json/master/devices/$codename.json").readText()
+			withContext(Dispatchers.IO) {
+				var fromNet = true
+				val jsonText = try {
+					try {
+						ctx.assets.open("abm.json").readBytes().toString(Charsets.UTF_8)
+					} catch (e: FileNotFoundException) {
+						URL("https://raw.githubusercontent.com/Android-Boot-Manager/ABM-json/master/devices/$codename.json").readText()
+					}
+				} catch (e: Exception) {
+					fromNet = false
+					Log.e("ABM device info", Log.getStackTraceString(e))
+					val f = File(ctx.filesDir, "abm_dd_cache.json")
+					if (f.exists()) f.readText() else
+						ctx.assets.open("abm_fallback/$codename.json").readBytes()
+							.toString(Charsets.UTF_8)
 				}
-			} catch (e: Exception) {
-				fromNet = false
-				Log.e("ABM device info", Log.getStackTraceString(e))
-				val f = File(ctx.filesDir, "abm_dd_cache.json")
-				if (f.exists()) f.readText() else
-					ctx.assets.open("abm_fallback/$codename.json").readBytes().toString(Charsets.UTF_8)
+				val jsonRoot = JSONTokener(jsonText).nextValue() as JSONObject? ?: return@withContext null
+				val json = jsonRoot.getJSONObject("deviceInfo")
+				if (BuildConfig.VERSION_CODE < jsonRoot.getInt("minAppVersion"))
+					throw IllegalStateException("please upgrade app")
+				if (fromNet) {
+					val newRoot = JSONObject()
+					newRoot.put("deviceInfo", json)
+					newRoot.put("minAppVersion", jsonRoot.getInt("minAppVersion"))
+					File(ctx.filesDir, "abm_dd_cache.json").writeText(newRoot.toString())
+				}
+				if (!json.getBoolean("metaOnSd"))
+					throw IllegalArgumentException("sd less currently not implemented")
+				JsonDeviceInfo(
+					json.getString("codename"),
+					json.getString("blBlock"),
+					json.getString("sdBlock"),
+					json.getString("sdBlockP"),
+					json.getBoolean("postInstallScript"),
+					json.getBoolean("haveDtbo")
+				)
 			}
-			val jsonRoot = JSONTokener(jsonText).nextValue() as JSONObject? ?: return null
-			val json = jsonRoot.getJSONObject("deviceInfo")
-			if (BuildConfig.VERSION_CODE < jsonRoot.getInt("minAppVersion"))
-				throw IllegalStateException("please upgrade app")
-			if (fromNet) {
-				val newRoot = JSONObject()
-				newRoot.put("deviceInfo", json)
-				newRoot.put("minAppVersion", jsonRoot.getInt("minAppVersion"))
-				File(ctx.filesDir, "abm_dd_cache.json").writeText(newRoot.toString())
-			}
-			if (!json.getBoolean("metaOnSd"))
-				throw IllegalArgumentException("sd less currently not implemented")
-			JsonDeviceInfo(
-				json.getString("codename"),
-				json.getString("blBlock"),
-				json.getString("sdBlock"),
-				json.getString("sdBlockP"),
-				json.getBoolean("postInstallScript"),
-				json.getBoolean("haveDtbo")
-			)
 		} catch (e: Exception) {
 			Log.e("ABM device info", Log.getStackTraceString(e))
 			null

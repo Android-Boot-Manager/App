@@ -220,6 +220,9 @@ class MainActivity : ComponentActivity() {
 					Shell.getShell { shell ->
 						CoroutineScope(Dispatchers.IO).launch {
 							vm.root = shell.isRoot
+							if (vm.root && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+								Shell.cmd("pm grant $packageName ${android.Manifest.permission.POST_NOTIFICATIONS}")
+							}
 							vm.deviceInfo = JsonDeviceInfoFactory(vm.activity!!).get(Build.DEVICE)
 							// == temp migration code start ==
 							if (Shell.cmd("mountpoint -q /data/abm/bootset").exec().isSuccess) {
@@ -242,6 +245,7 @@ class MainActivity : ComponentActivity() {
 							}
 							withContext(Dispatchers.Main) {
 								setContent {
+									// TODO support work resumption by instantly opening Terminal with null action if work is going on
 									val navController = rememberNavController()
 									val drawerState = rememberDrawerState(DrawerValue.Closed)
 									val scope = rememberCoroutineScope()
@@ -753,7 +757,7 @@ private fun PartTool(vm: MainActivityState) {
 											processing = true
 											vm.logic!!.mount(p).submit {
 												processing = false
-												result = it.out.join("\n") + it.err.join("\n")
+												result = it.out.joinToString("\n") + it.err.joinToString("\n")
 											}
 										}, Modifier.padding(end = 5.dp)) {
 											Text(stringResource(R.string.mount))
@@ -762,7 +766,7 @@ private fun PartTool(vm: MainActivityState) {
 											processing = true
 											vm.logic!!.unmount(p).submit {
 												processing = false
-												result = it.out.join("\n") + it.err.join("\n")
+												result = it.out.joinToString("\n") + it.err.joinToString("\n")
 											}
 										}) {
 											Text(stringResource(R.string.umount))
@@ -817,7 +821,7 @@ private fun PartTool(vm: MainActivityState) {
 								processing = true
 								rename = false
 								vm.logic!!.rename(p, t).submit { r ->
-									result = r.out.join("\n") + r.err.join("\n")
+									result = r.out.joinToString("\n") + r.err.joinToString("\n")
 									parts = SDUtils.generateMeta(vm.deviceInfo!!)
 									editPartID = parts?.s!!.findLast { it.id == p.id }
 									processing = false
@@ -857,7 +861,7 @@ private fun PartTool(vm: MainActivityState) {
 									processing = false
 									editPartID = null
 									parts = SDUtils.generateMeta(vm.deviceInfo!!)
-									result = it.out.join("\n") + it.err.join("\n")
+									result = it.out.joinToString("\n") + it.err.joinToString("\n")
 								}
 							}
 						}) {
@@ -1086,7 +1090,7 @@ private fun PartTool(vm: MainActivityState) {
 									for (p in allp) { // Do not chain, but regenerate meta and unmount every time. Thanks void
 										val r = vm.logic!!.delete(p).exec()
 										parts = SDUtils.generateMeta(vm.deviceInfo!!)
-										tresult += r.out.join("\n") + r.err.join("\n") + "\n"
+										tresult += r.out.joinToString("\n") + r.err.joinToString("\n") + "\n"
 									}
 									vm.mountBootset()
 								}

@@ -3,26 +3,26 @@ package org.andbootmgr.app
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.core.net.toFile
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -31,14 +31,10 @@ import androidx.navigation.compose.rememberNavController
 import com.topjohnwu.superuser.io.SuFileOutputStream
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.andbootmgr.app.util.AbmTheme
-import org.andbootmgr.app.util.StayAliveService
 import java.io.File
 import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -72,75 +68,88 @@ class WizardActivity : ComponentActivity() {
 		super.onCreate(savedInstanceState)
 		vm = WizardActivityState(intent.getStringExtra("codename")!!)
 		vm.activity = this
-		vm.deviceInfo = JsonDeviceInfoFactory(this).get(vm.codename)!!
-		vm.logic = DeviceLogic(this)
-		chooseFile = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-			if (uri == null) {
-				Toast.makeText(this, getString(R.string.file_unavailable), Toast.LENGTH_LONG).show()
-				onFileChosen = null
-				return@registerForActivityResult
+		chooseFile =
+			registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+				if (uri == null) {
+					Toast.makeText(
+						this,
+						getString(R.string.file_unavailable),
+						Toast.LENGTH_LONG
+					).show()
+					onFileChosen = null
+					return@registerForActivityResult
+				}
+				if (onFileChosen != null) {
+					onFileChosen!!(uri)
+					onFileChosen = null
+				} else {
+					Toast.makeText(
+						this@WizardActivity,
+						getString(R.string.internal_file_error1),
+						Toast.LENGTH_LONG
+					).show()
+				}
 			}
-			if (onFileChosen != null) {
-				onFileChosen!!(uri)
-				onFileChosen = null
-			} else {
-				Toast.makeText(
-					this@WizardActivity,
-					getString(R.string.internal_file_error1),
-					Toast.LENGTH_LONG
-				).show()
+		newFile =
+			registerForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream")) { uri: Uri? ->
+				if (uri == null) {
+					Toast.makeText(
+						this,
+						getString(R.string.file_unavailable),
+						Toast.LENGTH_LONG
+					).show()
+					onFileCreated = null
+					return@registerForActivityResult
+				}
+				if (onFileCreated != null) {
+					onFileCreated!!(uri)
+					onFileCreated = null
+				} else {
+					Toast.makeText(
+						this@WizardActivity,
+						getString(R.string.internal_file_error1),
+						Toast.LENGTH_LONG
+					).show()
+				}
 			}
-		}
-		newFile = registerForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream")) { uri: Uri? ->
-			if (uri == null) {
-				Toast.makeText(this, getString(R.string.file_unavailable), Toast.LENGTH_LONG).show()
-				onFileCreated = null
-				return@registerForActivityResult
-			}
-			if (onFileCreated != null) {
-				onFileCreated!!(uri)
-				onFileCreated = null
-			} else {
-				Toast.makeText(
-					this@WizardActivity,
-					getString(R.string.internal_file_error1),
-					Toast.LENGTH_LONG
-				).show()
-			}
-		}
-		val wizardPages = WizardPageFactory(vm).get(intent.getStringExtra("flow")!!)
-		setContent {
-			vm.navController = rememberNavController()
-			AbmTheme {
-				// A surface container using the 'background' color from the theme
-				Surface(
-					modifier = Modifier.fillMaxSize(),
-					color = MaterialTheme.colorScheme.background
-				) {
-					Column(verticalArrangement = Arrangement.SpaceBetween,
-						modifier = Modifier.fillMaxWidth()
+		CoroutineScope(Dispatchers.Main).launch {
+			vm.deviceInfo = JsonDeviceInfoFactory(vm.activity).get(vm.codename)!!
+			vm.logic = DeviceLogic(vm.activity)
+			val wizardPages = WizardPageFactory(vm).get(intent.getStringExtra("flow")!!)
+			setContent {
+				vm.navController = rememberNavController()
+				AbmTheme {
+					// A surface container using the 'background' color from the theme
+					Surface(
+						modifier = Modifier.fillMaxSize(),
+						color = MaterialTheme.colorScheme.background
 					) {
-						NavHost(
-							navController = vm.navController,
-							startDestination = "start",
-							modifier = Modifier
-								.fillMaxWidth()
-								.weight(1.0f)
+						Column(
+							verticalArrangement = Arrangement.SpaceBetween,
+							modifier = Modifier.fillMaxWidth()
 						) {
-							for (i in wizardPages) {
-								composable(i.name) {
-									if (!vm.btnsOverride) {
-										vm.prevText.value = i.prev.text
-										vm.nextText.value = i.next.text
-										vm.onPrev.value = i.prev.onClick
-										vm.onNext.value = i.next.onClick
+							NavHost(
+								navController = vm.navController,
+								startDestination = "start",
+								modifier = Modifier
+									.fillMaxWidth()
+									.weight(1.0f)
+							) {
+								for (i in wizardPages) {
+									composable(i.name) {
+										if (!vm.btnsOverride) {
+											vm.prevText.value = i.prev.text
+											vm.nextText.value = i.next.text
+											vm.onPrev.value = i.prev.onClick
+											vm.onNext.value = i.next.onClick
+										}
+										i.run()
 									}
-									i.run()
 								}
 							}
-						}
-						Box(Modifier.fillMaxWidth()) {
-							BtnsRow(vm)
+							Box(Modifier.fillMaxWidth()) {
+								BtnsRow(vm)
+							}
 						}
 					}
 				}
@@ -191,9 +200,10 @@ private class ExpectedDigestInputStream(stream: InputStream?,
 	fun doAssert() {
 		val hash = digest.digest().toHexString()
 		if (hash != expectedDigest)
-			throw IllegalArgumentException("digest $hash does not match expected hash $expectedDigest")
+			throw HashMismatchException("digest $hash does not match expected hash $expectedDigest")
 	}
 }
+class HashMismatchException(message: String) : Exception(message)
 
 class WizardActivityState(val codename: String) {
 	var btnsOverride = false
@@ -216,6 +226,7 @@ class WizardActivityState(val codename: String) {
 		navController.navigate(current.value)
 	}
 
+	// TODO have callers handle HashMismatchException when appropriate
 	fun copy(inputStream: InputStream, outputStream: OutputStream): Long {
 		var nread = 0L
 		val buf = ByteArray(8192)

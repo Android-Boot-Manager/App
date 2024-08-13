@@ -14,6 +14,7 @@ import com.topjohnwu.superuser.io.SuFileInputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.andbootmgr.app.util.AbmTheme
+import org.andbootmgr.app.util.Terminal
 import java.io.File
 import java.io.IOException
 
@@ -55,7 +56,7 @@ private fun Start() {
 
 @Composable
 private fun Flash(vm: WizardActivityState) {
-	Terminal(vm, logFile = "blup_${System.currentTimeMillis()}.txt") { terminal ->
+	Terminal(logFile = "blup_${System.currentTimeMillis()}.txt") { terminal ->
 		val tmpFile = if (vm.deviceInfo.postInstallScript) {
 			val tmpFile = createTempFileSu("abm", ".sh", vm.logic.rootTmpDir)
 			vm.copyPriv(vm.flashStream("InstallShFlashType"), tmpFile)

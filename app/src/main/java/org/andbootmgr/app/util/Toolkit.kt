@@ -11,6 +11,11 @@ import java.io.*
 
 // Manage & extract Toolkit
 class Toolkit(private val ctx: Context) {
+	companion object {
+		private const val TAG = "ABM_AssetCopy"
+		private const val DEBUG = false
+	}
+
 	private var fail = false
 	private val targetPath = File(ctx.filesDir.parentFile, "assets")
 
@@ -36,7 +41,7 @@ class Toolkit(private val ctx: Context) {
 		}
 		val s2 = String(b).trim()
 		if (s != s2) {
-			uinf.run()
+			uinf.invoke()
 			shell.newJob().add("rm -rf " + targetPath.absolutePath).exec()
 			if (!targetPath.exists()) fail = fail or !targetPath.mkdir()
 			if (!File(ctx.filesDir.parentFile, "files").exists()) fail = fail or !File(ctx.filesDir.parentFile, "files").mkdir()
@@ -54,7 +59,7 @@ class Toolkit(private val ctx: Context) {
 		try {
 			files = assetManager.list(src)
 		} catch (e: IOException) {
-			Log.e("ABM_AssetCopy", "Failed to get asset file list.", e)
+			Log.e(TAG, "Failed to get asset file list.", e)
 			fail = true
 		}
 		assert(files != null)
@@ -80,27 +85,23 @@ class Toolkit(private val ctx: Context) {
 			out.flush()
 			out.close()
 		} catch (e: FileNotFoundException) {
-			Log.d(
-				"ABM_AssetCopy",
-				"Result of mkdir #1: " + File(targetPath, outp).mkdir()
-			)
-			Log.d("ABM_AssetCopy", Log.getStackTraceString(e))
+			val r = File(targetPath, outp).mkdir()
+			if (DEBUG) Log.d(TAG, "Result of mkdir #1: $r")
+			if (DEBUG) Log.d(TAG, Log.getStackTraceString(e))
 			try {
 				assetManager.open(src + File.separator + filename).close()
 				copyAssets(src, outp, assetManager, filename)
 			} catch (e2: FileNotFoundException) {
-				Log.d(
-					"ABM_AssetCopy",
-					"Result of mkdir #2: " + File(File(targetPath, outp), filename).mkdir()
-				)
-				Log.d("ABM_AssetCopy", Log.getStackTraceString(e2))
+				val r2 = File(File(targetPath, outp), filename).mkdir()
+				if (DEBUG) Log.d(TAG, "Result of mkdir #2: $r2")
+				if (DEBUG) Log.d(TAG, Log.getStackTraceString(e2))
 				copyAssets(src + File.separator + filename, outp + File.separator + filename)
 			} catch (ex: IOException) {
-				Log.e("ABM_AssetCopy", "Failed to copy asset file: $filename", ex)
+				Log.e(TAG, "Failed to copy asset file: $filename", ex)
 				fail = true
 			}
 		} catch (e: IOException) {
-			Log.e("ABM_AssetCopy", "Failed to copy asset file: $filename", e)
+			Log.e(TAG, "Failed to copy asset file: $filename", e)
 			fail = true
 		}
 	}

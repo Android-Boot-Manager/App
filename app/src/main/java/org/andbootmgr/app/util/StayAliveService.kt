@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Binder
 import android.os.IBinder
+import android.util.Log
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -18,14 +19,12 @@ import org.andbootmgr.app.R
 
 interface IStayAlive {
 	fun startWork(work: suspend (Context) -> Unit, extra: Any)
-	val isWorkDone: Boolean
 	val workExtra: Any
-	fun finish()
 }
 
 class StayAliveService : LifecycleService(), IStayAlive {
 	private var work: (suspend (Context) -> Unit)? = null
-	override var isWorkDone = false
+	var isWorkDone = false
 		get() {
 			if (destroyed) {
 				throw IllegalStateException("This StayAliveService was leaked. It is already destroyed.")
@@ -52,6 +51,8 @@ class StayAliveService : LifecycleService(), IStayAlive {
 		if (this.work != null) {
 			throw IllegalStateException("Work already set on this StayAliveService.")
 		}
+		// make sure we get promoted to started service
+		startService(Intent(this, this::class.java))
 		this.work = work
 		this.extra = extra
 		lifecycleScope.launch {
@@ -60,7 +61,10 @@ class StayAliveService : LifecycleService(), IStayAlive {
 			onDone!!.invoke()
 		}
 	}
-	override fun finish() {
+	fun finish() {
+		if (!isWorkDone) {
+			Log.e(TAG, "Warning: finishing StayAliveService before work is done.")
+		}
 		destroyed = true
 		stopSelf()
 	}
@@ -104,13 +108,16 @@ class StayAliveService : LifecycleService(), IStayAlive {
 		if (work != null) {
 			throw IllegalStateException("Work was already set on this StayAliveService.")
 		}
-		// make sure we get promoted to started service
-		startService(Intent(this, this::class.java))
 		return object : Binder(), Provider {
 			override var service = this@StayAliveService
 			override var onDone
-				get() = this@StayAliveService.onDone!!
+				get() = this@StayAliveService.onDone
 				set(value) { this@StayAliveService.onDone = value }
+			override val isWorkDone: Boolean
+				get() = this@StayAliveService.isWorkDone
+			override fun finish() {
+				this@StayAliveService.finish()
+			}
 		}
 	}
 
@@ -119,46 +126,58 @@ class StayAliveService : LifecycleService(), IStayAlive {
 		destroyed = true
 	}
 
-	private interface Provider {
-		val service: IStayAlive
-		var onDone: () -> Unit
-	}
-
 	companion object {
+		private const val TAG = "ABM_StayAlive"
 		private const val SERVICE_CHANNEL = "service"
 		private const val FG_SERVICE_ID = 1001
+	}
+}
+
+private interface Provider {
+	val service: IStayAlive
+	var onDone: (() -> Unit)?
+	val isWorkDone: Boolean
+	fun finish()
+}
+
+class StayAliveConnection(inContext: Context,
+                          private val onConnected: (IStayAlive) -> Unit) : ServiceConnection {
+	companion object {
 		@SuppressLint("StaticFieldLeak") // application context
 		private var currentConn: StayAliveConnection? = null
 	}
+	private val context = inContext.applicationContext
 
-	class StayAliveConnection(inContext: Context,
-	                          private val onConnected: (IStayAlive) -> Unit) : ServiceConnection {
-		private val context = inContext.applicationContext
-		private var service: IStayAlive? = null
-
-		init {
-			if (currentConn != null) {
-				throw IllegalStateException("There should only be one StayAliveConnection at a time.")
-			}
-			currentConn = this
-			context.bindService(
-				Intent(context, StayAliveService::class.java),
-				this,
-				Context.BIND_IMPORTANT or Context.BIND_AUTO_CREATE
-			)
+	init {
+		if (currentConn != null) {
+			throw IllegalStateException("There should only be one StayAliveConnection at a time.")
 		}
+		currentConn = this
+		context.bindService(
+			Intent(context, StayAliveService::class.java),
+			this,
+			Context.BIND_IMPORTANT or Context.BIND_AUTO_CREATE
+		)
+	}
 
-		override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-			val provider = service as Provider
-			provider.onDone = {
-				context.unbindService(this)
-				currentConn = null
-			}
-			onConnected(provider.service)
+	override fun onServiceConnected(name: ComponentName?, inService: IBinder?) {
+		val provider = inService as Provider
+		val service = provider.service
+		val onDone = {
+			provider.finish()
+			provider.onDone = null
+			context.unbindService(this)
+			currentConn = null
 		}
+		if (provider.isWorkDone) {
+			onDone()
+		} else {
+			provider.onDone = onDone
+		}
+		onConnected(service)
+	}
 
-		override fun onServiceDisconnected(name: ComponentName?) {
-			this.service = null
-		}
+	override fun onServiceDisconnected(name: ComponentName?) {
+		// Do nothing
 	}
 }

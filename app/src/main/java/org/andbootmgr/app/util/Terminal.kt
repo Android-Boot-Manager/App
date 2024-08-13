@@ -16,13 +16,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.andbootmgr.app.R
-import org.andbootmgr.app.WizardActivityState
 import java.io.File
 import java.io.FileOutputStream
 
@@ -126,41 +124,54 @@ private class BudgetCallbackList(private val log: FileOutputStream?) : MutableLi
 	}
 }
 
-
 /* Monospace auto-scrolling text view, fed using MutableList<String>, catching exceptions and running logic on a different thread */
 @Composable
-fun Terminal(vm: WizardActivityState, logFile: String? = null, action: suspend (MutableList<String>) -> Unit) {
+fun Terminal(logFile: String? = null, action: (suspend (MutableList<String>) -> Unit)?) {
 	val scrollH = rememberScrollState()
 	val scrollV = rememberScrollState()
 	val scope = rememberCoroutineScope()
 	val text = remember { mutableStateOf("") }
 	val ctx = LocalContext.current.applicationContext
 	LaunchedEffect(Unit) {
-		// TODO support resumption
-		StayAliveService.StayAliveConnection(ctx) { service ->
-			val log = logFile?.let { FileOutputStream(File(ctx.externalCacheDir, it)) }
-			// Budget CallbackList
-			val s = BudgetCallbackList(log)
-			service.startWork({
-				withContext(Dispatchers.Default) {
-					try {
-						action(s)
-					} catch (e: Throwable) {
-						s.add(ctx.getString(R.string.term_failure))
-						s.add(ctx.getString(R.string.dev_details))
-						s.add(Log.getStackTraceString(e))
-					}
-					withContext(Dispatchers.IO) {
-						log?.close()
+		if (action == null && logFile != null) {
+			throw IllegalArgumentException("logFile must be null if action is null")
+		}
+		StayAliveConnection(ctx) { service ->
+			if (action != null) {
+				val log = logFile?.let { FileOutputStream(File(ctx.externalCacheDir, it)) }
+				val s = BudgetCallbackList(log)
+				s.cb = { element ->
+					scope.launch {
+						text.value += element + "\n"
+						delay(200) // Give it time to re-measure
+						scrollV.animateScrollTo(scrollV.maxValue)
+						scrollH.animateScrollTo(0)
 					}
 				}
-			}, s)
-			(service.workExtra as BudgetCallbackList).cb = { element ->
-				scope.launch {
-					text.value += element + "\n"
-					delay(200) // Give it time to re-measure
-					scrollV.animateScrollTo(scrollV.maxValue)
-					scrollH.animateScrollTo(0)
+				service.startWork({
+					withContext(Dispatchers.Default) {
+						try {
+							action(s)
+						} catch (e: Throwable) {
+							s.add(ctx.getString(R.string.term_failure))
+							s.add(ctx.getString(R.string.dev_details))
+							s.add(Log.getStackTraceString(e))
+						}
+						withContext(Dispatchers.IO) {
+							log?.close()
+						}
+					}
+				}, s)
+			} else {
+				val s = service.workExtra as BudgetCallbackList
+				text.value = s.joinToString("\n")
+				s.cb = { element ->
+					scope.launch {
+						text.value += element + "\n"
+						delay(200) // Give it time to re-measure
+						scrollV.animateScrollTo(scrollV.maxValue)
+						scrollH.animateScrollTo(0)
+					}
 				}
 			}
 		}

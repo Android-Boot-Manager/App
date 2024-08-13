@@ -28,7 +28,7 @@ class DeviceLogic(ctx: Context) {
 			.cmd("mount $ast ${abmBootset.absolutePath}")
 			.exec()
 		if (!result.isSuccess) {
-			val out = result.out.join("\n") + result.err.join("\n")
+			val out = result.out.joinToString("\n") + result.err.joinToString("\n")
 			if (out.contains("Device or resource busy")) {
 				mounted = false
 			}
@@ -45,7 +45,7 @@ class DeviceLogic(ctx: Context) {
 		if (!checkMounted()) return true
 		val result = Shell.cmd("umount ${abmBootset.absolutePath}").exec()
 		if (!result.isSuccess) {
-			val out = result.out.join("\n") + result.err.join("\n")
+			val out = result.out.joinToString("\n") + result.err.joinToString("\n")
 			if (out.contains("Device or resource busy")) {
 				mounted = true
 			}

@@ -22,11 +22,13 @@ import com.topjohnwu.superuser.io.SuFile
 import com.topjohnwu.superuser.io.SuFileInputStream
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.andbootmgr.app.util.AbmTheme
 import org.andbootmgr.app.util.ConfigFile
 import org.andbootmgr.app.util.SDUtils
+import org.andbootmgr.app.util.Terminal
 import org.json.JSONObject
 import org.json.JSONTokener
 import java.io.File
@@ -226,7 +228,7 @@ fun SelectInstallSh(vm: WizardActivityState, update: Boolean = false) {
 @Composable
 private fun Flash(vm: WizardActivityState) {
 	val flashType = "DroidBootFlashType"
-	Terminal(vm, logFile = "blflash_${System.currentTimeMillis()}.txt") { terminal ->
+	Terminal(logFile = "blflash_${System.currentTimeMillis()}.txt") { terminal ->
 		terminal.add(vm.activity.getString(R.string.term_preparing_fs))
 		if (vm.logic.checkMounted()) {
 			terminal.add(vm.activity.getString(R.string.term_mount_state_bad))
@@ -271,7 +273,7 @@ private fun Flash(vm: WizardActivityState) {
 						"8301",
 						"abm_settings"
 					).to(terminal).exec()
-			if (r.out.join("\n").contains("old")) {
+			if (r.out.joinToString("\n").contains("old")) {
 				terminal.add(vm.activity.getString(R.string.term_reboot_asap))
 			}
 			if (r.isSuccess) {

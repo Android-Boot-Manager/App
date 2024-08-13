@@ -6,12 +6,9 @@ import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
@@ -26,12 +23,12 @@ import okio.buffer
 import okio.sink
 import org.andbootmgr.app.util.ConfigFile
 import org.andbootmgr.app.util.SDUtils
+import org.andbootmgr.app.util.Terminal
 import org.json.JSONObject
 import org.json.JSONTokener
 import java.io.File
 import java.net.URL
 import java.util.concurrent.TimeUnit
-import kotlin.coroutines.CoroutineContext
 
 class UpdateFlowWizardPageFactory(private val vm: WizardActivityState) {
     fun get(): List<IWizardPage> {
@@ -250,9 +247,9 @@ private fun dlFile(u: UpdateFlowDataHolder, l: String): File? {
 
 @Composable
 private fun Flash(u: UpdateFlowDataHolder) {
-    Terminal(u.vm, logFile = "update_${System.currentTimeMillis()}.txt") { terminal ->
+    Terminal(logFile = "update_${System.currentTimeMillis()}.txt") { terminal ->
         val sp = u.e!!["xpart"]!!.split(":")
-        val meta = SDUtils.generateMeta(u.vm.deviceInfo!!)!!
+        val meta = SDUtils.generateMeta(u.vm.deviceInfo)!!
         Shell.cmd(SDUtils.umsd(meta)).exec()
 
         if (u.hasUpdate) { // online
