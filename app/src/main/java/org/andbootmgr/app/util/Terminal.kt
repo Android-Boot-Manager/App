@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -24,7 +25,8 @@ import org.andbootmgr.app.R
 import java.io.File
 import java.io.FileOutputStream
 
-private class BudgetCallbackList(private val log: FileOutputStream?) : MutableList<String> {
+private class BudgetCallbackList(private val scope: CoroutineScope,
+                                 private val log: FileOutputStream?) : MutableList<String> {
 	val internalList = ArrayList<String>()
 	var cb: ((String) -> Unit)? = null
 	override val size: Int
@@ -119,7 +121,9 @@ private class BudgetCallbackList(private val log: FileOutputStream?) : MutableLi
 	}
 
 	fun onAdd(element: String) {
-		log?.write((element + "\n").encodeToByteArray())
+		scope.launch {
+			log?.write((element + "\n").encodeToByteArray())
+		}
 		cb?.invoke(element)
 	}
 }
@@ -139,7 +143,7 @@ fun Terminal(logFile: String? = null, action: (suspend (MutableList<String>) -> 
 		StayAliveConnection(ctx) { service ->
 			if (action != null) {
 				val log = logFile?.let { FileOutputStream(File(ctx.externalCacheDir, it)) }
-				val s = BudgetCallbackList(log)
+				val s = BudgetCallbackList(CoroutineScope(Dispatchers.IO), log)
 				s.cb = { element ->
 					scope.launch {
 						text.value += element + "\n"

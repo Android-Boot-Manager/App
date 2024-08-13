@@ -7,6 +7,8 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Binder
 import android.os.IBinder
+import android.os.PowerManager
+import android.os.PowerManager.WakeLock
 import android.util.Log
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
@@ -23,6 +25,7 @@ interface IStayAlive {
 }
 
 class StayAliveService : LifecycleService(), IStayAlive {
+	private lateinit var wakeLock: WakeLock
 	private var work: (suspend (Context) -> Unit)? = null
 	var isWorkDone = false
 		get() {
@@ -44,6 +47,7 @@ class StayAliveService : LifecycleService(), IStayAlive {
 		}
 	private var destroyed = false
 	private var onDone: (() -> Unit)? = null
+	@SuppressLint("WakelockTimeout")
 	override fun startWork(work: suspend (Context) -> Unit, extra: Any) {
 		if (destroyed) {
 			throw IllegalStateException("This StayAliveService was leaked. It is already destroyed.")
@@ -56,9 +60,14 @@ class StayAliveService : LifecycleService(), IStayAlive {
 		this.work = work
 		this.extra = extra
 		lifecycleScope.launch {
-			this@StayAliveService.work!!.invoke(this@StayAliveService)
-			isWorkDone = true
-			onDone!!.invoke()
+			wakeLock.acquire()
+			try {
+				this@StayAliveService.work!!.invoke(this@StayAliveService)
+				isWorkDone = true
+				onDone!!.invoke()
+			} finally {
+				wakeLock.release()
+			}
 		}
 	}
 	fun finish() {
@@ -89,6 +98,8 @@ class StayAliveService : LifecycleService(), IStayAlive {
 			.setOnlyAlertOnce(true)
 			.setLocalOnly(true)
 			.build())
+		wakeLock = getSystemService(PowerManager::class.java)
+			.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "ABM::StayAlive(user_task)")
 		lifecycleScope.launch {
 			delay(10000)
 			// If there was nothing started after 10 seconds, there's a bug.

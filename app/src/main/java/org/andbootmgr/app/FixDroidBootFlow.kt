@@ -66,15 +66,22 @@ private fun Flash(vm: WizardActivityState) {
 			tmpFile
 		} else null
 		terminal.add(vm.activity.getString(R.string.term_flashing_droidboot))
+		val backupLk = File(vm.logic.fileDir, "backup_lk.img")
 		val f = SuFile.open(vm.deviceInfo.blBlock)
 		if (!f.canWrite())
 			terminal.add(vm.activity.getString(R.string.term_cant_write_bl))
-		vm.copyPriv(SuFileInputStream.open(vm.deviceInfo.blBlock), File(vm.logic.fileDir, "backup_lk.img"))
+		vm.copyPriv(SuFileInputStream.open(vm.deviceInfo.blBlock), backupLk)
 		try {
 			vm.copyPriv(vm.flashStream("DroidBootFlashType"), File(vm.deviceInfo.blBlock))
 		} catch (e: IOException) {
 			terminal.add(vm.activity.getString(R.string.term_bl_failed))
-			terminal.add(if (e.message != null) e.message!! else "(null)")
+			terminal.add(e.message ?: "(null)")
+			terminal.add(vm.activity.getString(R.string.term_consult_doc))
+			return@Terminal
+		} catch (e: HashMismatchException) {
+			terminal.add(e.message ?: "(null)")
+			terminal.add(vm.activity.getString(R.string.restoring_backup))
+			vm.copyPriv(SuFileInputStream.open(backupLk), File(vm.deviceInfo.blBlock))
 			terminal.add(vm.activity.getString(R.string.term_consult_doc))
 			return@Terminal
 		}

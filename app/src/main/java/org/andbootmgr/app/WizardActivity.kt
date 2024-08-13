@@ -226,7 +226,6 @@ class WizardActivityState(val codename: String) {
 		navController.navigate(current.value)
 	}
 
-	// TODO have callers handle HashMismatchException when appropriate
 	fun copy(inputStream: InputStream, outputStream: OutputStream): Long {
 		var nread = 0L
 		val buf = ByteArray(8192)

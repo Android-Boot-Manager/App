@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -92,7 +93,6 @@ class MainActivityState {
 	val theme = ThemeViewModel(this)
 	var defaultCfg = mutableStateMapOf<String, String>()
 	var isReady = false
-	var name by mutableStateOf("") /* default value moved to onCreate() */
 	var navController: NavHostController? = null
 	var drawerState: DrawerState? = null
 	var scope: CoroutineScope? = null
@@ -154,26 +154,9 @@ class MainActivity : ComponentActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		val vm = MainActivityState()
-		vm.name = getString(R.string.android)
+		installSplashScreen().setKeepOnScreenCondition { !vm.isReady }
 		vm.activity = this
 		vm.logic = DeviceLogic(this)
-
-		val content: View = findViewById(android.R.id.content)
-		content.viewTreeObserver.addOnPreDrawListener(
-			object : ViewTreeObserver.OnPreDrawListener {
-				override fun onPreDraw(): Boolean {
-					// Check if the initial data is ready.
-					return if (vm.isReady) {
-						// The content is ready; start drawing.
-						content.viewTreeObserver.removeOnPreDrawListener(this)
-						true
-					} else {
-						// The content is not ready; suspend.
-						false
-					}
-				}
-			}
-		)
 
 		val toast =
 			Toast.makeText(this, getString(R.string.toolkit_extracting), Toast.LENGTH_LONG)
