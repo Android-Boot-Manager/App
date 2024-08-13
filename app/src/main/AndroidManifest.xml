@@ -3,6 +3,8 @@
 	xmlns:tools="http://schemas.android.com/tools">
 
 	<uses-permission android:name="android.permission.INTERNET" />
+	<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+	<uses-permission android:name="android.permission.WAKE_LOCK" />
 
 	<application
 		android:gwpAsanMode="always"
@@ -17,6 +19,14 @@
 		android:theme="@style/AppTheme"
 		tools:ignore="DataExtractionRules"
 		tools:targetApi="s">
+		<service
+			android:name=".util.StayAliveService"
+			android:exported="false"
+			android:foregroundServiceType="specialUse">
+			<property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+				android:value="Update Android device bootloader / install OS to SD card"/>
+		</service>
+
 		<activity
 			android:name=".WizardActivity"
 			android:configChanges="density|fontScale|keyboard|keyboardHidden|layoutDirection|locale|mcc|mnc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|touchscreen|uiMode"

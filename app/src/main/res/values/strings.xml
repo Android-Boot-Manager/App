@@ -256,4 +256,7 @@
 	<string name="simulator_info">Simulator is an accurate preview of the boot menu. You can use volume keys to navigate. Instead of pressing the power button, simply tap anywhere on the display.</string>
 	<string name="reset">Reset</string>
 	<string name="edit">Edit</string>
+	<string name="service_notifications">Service notifications</string>
+	<string name="abm_processing_title">ABM is processing</string>
+	<string name="abm_processing_text">Please make sure you do not leave the app to avoid issues</string>
 </resources>
