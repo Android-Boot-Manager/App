@@ -108,8 +108,6 @@
     <string name="portable_part">Раздел переносимого хранилища</string>
     <string name="internal_id">Внутренный ID прошивки (не трогайте если не знаете что это)</string>
     <string name="os_userdata">Пользовательские данные ОС</string>
-    <string name="internal_file_error1">Внутренняя ошибка - не добавлен обработчик файла!! Пожалуйста, отмените установку</string>
-    <string name="internal_file_error2">Внутренняя ошибка - выбрано 2 файла!! Пожалуйста, отмените установку</string>
     <string name="android">Android</string>
     <string name="droidboot_icon_content_desc">Иконка DroidBoot</string>
     <string name="select_free_space">Выберите свободное место, чтобы начать добавление операционной системы или переносимого раздела в выбранной позиции.</string>

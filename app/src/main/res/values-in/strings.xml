@@ -59,7 +59,6 @@
     <string name="droidboot_icon_content_desc">Ikon DroidBoot</string>
     <string name="reinstall_dboot">Pasang ulang DroidBoot</string>
     <string name="file_unavailable">Berkas tidak tersedia, silahkan ulang kembali!</string>
-    <string name="internal_file_error1">Internal error - tidak ada berkas yang dipilih!! Batalkan pemasangan</string>
     <string name="local_update">Pembaruan Lokal</string>
     <string name="online_update">Pembaruan online</string>
     <string name="update_check_failed">Gagal memeriksa pembaruan! Coba lagi nanti.</string>
@@ -73,7 +72,6 @@
     <string name="remaining_sector">tersisa %d dari %d</string>
     <string name="provide_images">Harap sekarang berikan img untuk semua ID yang diperlukan. Anda dapat menggunakan yang direkomendasikan menggunakan tombol \"Unduh\"!</string>
     <string name="enter_name_for_current">Silahkan masukan nama sistem operasi yang sedang berjalan sekarang. Anda akan memilih sesuai keinginan.</string>
-    <string name="internal_file_error2">Internal error - berkas yang dipilih ganda!! Silahkan batalkan pemasangan</string>
     <string name="found_update">Pembaruan tersedia untuk dipasang.
 \n
 \n

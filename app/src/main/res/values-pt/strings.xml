@@ -55,7 +55,6 @@
     <string name="invalid_in">Entrada inválida</string>
     <string name="reinstall_dboot">Isso reinstalará o DroidBoot</string>
     <string name="file_unavailable">Arquivo indisponível. Tente novamente mais tarde!</string>
-    <string name="internal_file_error2">Erro interno - escolha de arquivo duplicada!! Por favor, cancele a instalação</string>
     <string name="local_update">Atualização local</string>
     <string name="online_update">Atualização online</string>
     <string name="update_check_failed">Falha ao verificar atualizações! Tente novamente mais tarde.</string>
@@ -190,7 +189,6 @@
     <string name="download">Baixar</string>
     <string name="install_abm">Isso instalará o ABM</string>
     <string name="droidboot_icon_content_desc">Ícone do DroidBoot</string>
-    <string name="internal_file_error1">Erro interno - nenhum manipulador de arquivo foi adicionado!! Por favor, cancele a instalação</string>
     <string name="found_update">Uma atualização está disponível para instalação.
 \n
 \n

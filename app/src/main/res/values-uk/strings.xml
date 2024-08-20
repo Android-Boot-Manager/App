@@ -101,8 +101,6 @@
     <string name="portable_part">Переносний розділ даних</string>
     <string name="sparse">Sparsed</string>
     <string name="file_unavailable">Файл наразі недоступний, спробуйте пізніше!</string>
-    <string name="internal_file_error1">Внутрішня помилка - не додано обробника файлу! Просимо припинити інсталяцію</string>
-    <string name="internal_file_error2">Внутрішня помилка - подвійне обрання файлу! Просимо припинити інсталяцію</string>
     <string name="local_update">Локальне оновлення</string>
     <string name="online_update">Онлайнове оновлення</string>
     <string name="install_update">Встановити оновлення</string>

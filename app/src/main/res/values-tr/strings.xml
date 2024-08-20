@@ -57,7 +57,6 @@
     <string name="invalid_in">Geçersiz giriş</string>
     <string name="droidboot_icon_content_desc">DroidBoot İkonu</string>
     <string name="file_unavailable">Dosya kullanılamıyor, lütfen daha sonra tekrar deneyin!</string>
-    <string name="internal_file_error1">Dahili hata - hiç bir dosya işleyici eklenmedi!! Lütfen yüklemeyi iptal edin</string>
     <string name="local_update">Yerel güncelleme</string>
     <string name="online_update">Online güncelleme</string>
     <string name="install_update">Güncellemeyi yükle</string>
@@ -97,7 +96,6 @@
     <string name="flash_sparse">Sparse imajını yükleyin</string>
     <string name="restore_backup_sparse">Bölüme yazmak için sparse dosyasını seçin</string>
     <string name="sparse">Sparselı</string>
-    <string name="internal_file_error2">Dahili hata - iki dosya seçildi!! Lütfen yüklemeyi iptal edin</string>
     <string name="ok">OK</string>
     <string name="installed">Yüklendi</string>
     <string name="installed_deactivated">Yüklendi ama aktif edilmedi</string>

@@ -62,7 +62,6 @@
     <string name="droidboot_icon_content_desc">DroidBoot-Icon</string>
     <string name="reinstall_dboot">Dies wird DroidBoot neu installieren</string>
     <string name="file_unavailable">Datei nicht verfügbar, bitte später nochmal probieren!</string>
-    <string name="internal_file_error1">Interner Fehler - kein Datei-Handler hinzugefügt! Bitte Installation abbrechen</string>
     <string name="local_update">Lokales Update</string>
     <string name="online_update">Online-Update</string>
     <string name="update_check_failed">Suche nach Updates ist fehlgeschlagen! Bitte später noch einmal versuchen.</string>
@@ -127,7 +126,6 @@
     <string name="provide_images">Bitte stelle nun Images für alle benötigten IDs bereit. Du kannst die empfohlenen mit dem Download-Knopf verwenden!</string>
     <string name="sd_erase2">Bitte stelle sicher, dass du ein Backup hast!</string>
     <string name="enter_name_for_current">Bitte gebe einen Namen für das aktive Betriebssystem ein. Du darfst eintragen, was dir gefällt.</string>
-    <string name="internal_file_error2">Interner Fehler - doppelte Dateiauswahl! Bitte Installation abbrechen</string>
     <string name="found_update">Ein Update ist zur Installation verfügbar.
 \n
 \n
