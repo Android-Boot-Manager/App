@@ -914,6 +914,7 @@ private fun Download(c: CreatePartDataHolder) {
 private fun Flash(c: CreatePartDataHolder) {
 	val vm = c.vm
 	Terminal(logFile = "install_${System.currentTimeMillis()}.txt") { terminal ->
+		c.vm.logic.extractToolkit(terminal)
 		if (c.t == null) { // OS install
 			val parts = ArrayMap<Int, Int>()
 			val fn = c.t2.value
@@ -962,8 +963,8 @@ private fun Flash(c: CreatePartDataHolder) {
 						val f2 = f.toFile(c.vm)
 						val result2 = Shell.cmd(
 							File(
-								c.vm.logic.assetDir,
-								"Toolkit/simg2img"
+								c.vm.logic.toolkitDir,
+								"simg2img"
 							).absolutePath + " ${f2.absolutePath} ${tp.absolutePath}"
 						).to(terminal).exec()
 						f.delete()

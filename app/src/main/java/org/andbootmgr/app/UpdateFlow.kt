@@ -248,6 +248,7 @@ private fun dlFile(u: UpdateFlowDataHolder, l: String): File? {
 @Composable
 private fun Flash(u: UpdateFlowDataHolder) {
     Terminal(logFile = "update_${System.currentTimeMillis()}.txt") { terminal ->
+        u.vm.logic.extractToolkit(terminal)
         val sp = u.e!!["xpart"]!!.split(":")
         val meta = SDUtils.generateMeta(u.vm.deviceInfo)!!
         Shell.cmd(SDUtils.umsd(meta)).exec()
@@ -303,8 +304,8 @@ private fun Flash(u: UpdateFlowDataHolder) {
                     if (u.sparse.contains(p.key)) {
                         val result2 = Shell.cmd(
                             File(
-                                u.vm.logic.assetDir,
-                                "Toolkit/simg2img"
+                                u.vm.logic.toolkitDir,
+                                "simg2img"
                             ).absolutePath + " ${f2.absolutePath} ${tp.absolutePath}"
                         ).to(terminal).exec()
                         if (!result2.isSuccess) {

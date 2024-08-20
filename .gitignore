@@ -2,6 +2,7 @@ build
 app/build
 app/.cxx
 .gradle/*
+.kotlin/*
 local.properties
 # User-specific stuff
 .idea

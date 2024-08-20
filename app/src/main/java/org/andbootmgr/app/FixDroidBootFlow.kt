@@ -59,6 +59,7 @@ private fun Start() {
 @Composable
 private fun Flash(vm: WizardActivityState) {
 	Terminal(logFile = "blfix_${System.currentTimeMillis()}.txt") { terminal ->
+		vm.logic.extractToolkit(terminal)
 		val tmpFile = if (vm.deviceInfo.postInstallScript) {
 			val tmpFile = createTempFileSu("abm", ".sh", vm.logic.rootTmpDir)
 			vm.copyPriv(vm.flashStream("InstallShFlashType"), tmpFile)

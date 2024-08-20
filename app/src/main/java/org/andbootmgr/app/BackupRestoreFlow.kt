@@ -123,6 +123,7 @@ private fun SelectDroidBoot(c: CreateBackupDataHolder) {
 @Composable
 private fun Flash(c: CreateBackupDataHolder) {
     Terminal(logFile = "flash_${System.currentTimeMillis()}.txt") { terminal ->
+        c.vm.logic.extractToolkit(terminal)
         terminal.add(c.vm.activity.getString(R.string.term_starting))
         try {
             val p = c.meta!!.dumpKernelPartition(c.pi)
@@ -143,8 +144,8 @@ private fun Flash(c: CreateBackupDataHolder) {
                 c.vm.copyUnpriv(c.vm.activity.contentResolver.openInputStream(c.path!!)!!, f)
                 val result2 = Shell.cmd(
                     File(
-                        c.vm.logic.assetDir,
-                        "Toolkit/simg2img"
+                        c.vm.logic.toolkitDir,
+                        "simg2img"
                     ).absolutePath + " ${f.absolutePath} ${p.path}"
                 ).to(terminal).exec()
                 if (!result2.isSuccess) {

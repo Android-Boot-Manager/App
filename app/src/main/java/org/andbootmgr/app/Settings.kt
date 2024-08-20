@@ -77,7 +77,7 @@ fun Settings(vm: MainActivityState) {
 		)
 		Button(onClick = {
 			if (defaultErr || timeoutErr)
-				Toast.makeText(vm.activity!!, vm.activity!!.getString(R.string.invalid_in), Toast.LENGTH_LONG).show()
+				Toast.makeText(vm.activity!!, vm.activity.getString(R.string.invalid_in), Toast.LENGTH_LONG).show()
 			else CoroutineScope(Dispatchers.Main).launch {
 				vm.editDefaultCfg(changes)
 				changes.clear()

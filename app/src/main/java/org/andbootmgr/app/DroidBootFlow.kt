@@ -229,6 +229,7 @@ fun SelectInstallSh(vm: WizardActivityState, update: Boolean = false) {
 private fun Flash(vm: WizardActivityState) {
 	val flashType = "DroidBootFlashType"
 	Terminal(logFile = "blflash_${System.currentTimeMillis()}.txt") { terminal ->
+		vm.logic.extractToolkit(terminal)
 		terminal.add(vm.activity.getString(R.string.term_preparing_fs))
 		if (vm.logic.checkMounted()) {
 			terminal.add(vm.activity.getString(R.string.term_mount_state_bad))

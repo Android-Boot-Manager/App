@@ -5,14 +5,15 @@ import android.util.Log
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
 import org.andbootmgr.app.util.SDUtils
+import org.andbootmgr.app.util.Toolkit
 import java.io.File
 
-class DeviceLogic(ctx: Context) {
+class DeviceLogic(private val ctx: Context) {
 	private val rootDir = ctx.filesDir.parentFile!!
-	val assetDir = File(rootDir, "assets")
-	private val toolkitDir = File(assetDir, "Toolkit")
+	private val toolkit = Toolkit(ctx)
 	val fileDir = File(rootDir, "files")
 	val cacheDir = File(rootDir, "cache")
+	val toolkitDir = File(toolkit.targetPath, "Toolkit") // will occasionally be pruned by OS, but it's fine
 	val rootTmpDir = File("/data/local/tmp")
 	val abmBootset = File(rootTmpDir, ".abm_bootset")
 	val abmDb = File(abmBootset, "db")
@@ -85,5 +86,15 @@ class DeviceLogic(ctx: Context) {
 		return Shell.cmd("export PATH=\"${toolkitDir.absolutePath}:\$PATH\" " +
 				"TMPDIR=\"${cacheDir.absolutePath}\" BOOTSET=\"${abmBootset.absolutePath}\" " +
 				"TK=\"${toolkitDir.absolutePath}\" && cd \"\$TK\" && $cmd")
+	}
+	suspend fun extractToolkit(terminal: MutableList<String>) {
+		try {
+			toolkit.copyAssets {
+				terminal.add(ctx.getString(R.string.toolkit_extracting))
+			}
+		} catch (e: Exception) {
+			terminal.add(ctx.getString(R.string.toolkit_error))
+			throw e
+		}
 	}
 }
