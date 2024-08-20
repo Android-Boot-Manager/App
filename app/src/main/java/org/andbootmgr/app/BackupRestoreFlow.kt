@@ -1,6 +1,5 @@
 package org.andbootmgr.app
 
-import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,7 +27,7 @@ class BackupRestoreWizardPageFactory(private val vm: WizardActivityState) {
     fun get(): List<IWizardPage> {
         val c = CreateBackupDataHolder(vm)
         return listOf(WizardPage("start",
-            NavButton(vm.activity.getString(R.string.cancel)) { it.startActivity(Intent(it, MainActivity::class.java)); it.finish() },
+            NavButton(vm.activity.getString(R.string.cancel)) { it.finish() },
             NavButton("") {})
         {
             ChooseAction(c)
@@ -46,19 +45,18 @@ class BackupRestoreWizardPageFactory(private val vm: WizardActivityState) {
     }
 }
 
-private class CreateBackupDataHolder(val vm: WizardActivityState){
+private class CreateBackupDataHolder(val vm: WizardActivityState) {
     var pi: Int = -1
     var action: Int = 0
     var path: Uri? = null
     var meta: SDUtils.SDPartitionMeta? = null
-
 }
 
 @Composable
 private fun ChooseAction(c: CreateBackupDataHolder) {
     LaunchedEffect(Unit) {
         c.meta = SDUtils.generateMeta(c.vm.deviceInfo)
-        c.pi = c.vm.activity.intent.getIntExtra("partitionid", -1)
+        c.pi = c.vm.mvm.wizardCompatPid!!
     }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
@@ -163,6 +161,6 @@ private fun Flash(c: CreateBackupDataHolder) {
         terminal.add(c.vm.activity.getString(R.string.term_success))
         c.vm.btnsOverride = true
         c.vm.nextText.value = c.vm.activity.getString(R.string.finish)
-        c.vm.onNext.value = { it.startActivity(Intent(it, MainActivity::class.java)); it.finish() }
+        c.vm.onNext.value = { it.finish() }
     }
 }

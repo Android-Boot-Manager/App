@@ -3,19 +3,15 @@ package org.andbootmgr.app
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.*
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import com.topjohnwu.superuser.io.SuFile
 import com.topjohnwu.superuser.io.SuFileInputStream
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.andbootmgr.app.util.AbmTheme
 import org.andbootmgr.app.util.Terminal
 import java.io.File
 import java.io.IOException
@@ -101,20 +97,6 @@ private fun Flash(vm: WizardActivityState) {
 			vm.onNext.value = {
 				it.finish()
 			}
-		}
-	}
-}
-
-@Composable
-@Preview
-private fun Preview() {
-	val vm = WizardActivityState("null")
-	AbmTheme {
-		Surface(
-			modifier = Modifier.fillMaxSize(),
-			color = MaterialTheme.colorScheme.background
-		) {
-			SelectDroidBoot(vm)
 		}
 	}
 }

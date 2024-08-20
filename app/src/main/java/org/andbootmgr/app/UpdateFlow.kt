@@ -1,6 +1,5 @@
 package org.andbootmgr.app
 
-import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
@@ -8,7 +7,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
@@ -36,17 +40,13 @@ class UpdateFlowWizardPageFactory(private val vm: WizardActivityState) {
         val noobMode = c.vm.activity.getSharedPreferences("abm", 0).getBoolean("noob_mode", BuildConfig.DEFAULT_NOOB_MODE)
         return listOf(WizardPage("start",
             NavButton(vm.activity.getString(R.string.cancel)) {
-                it.startActivity(Intent(it, MainActivity::class.java))
                 it.finish()
             },
             if (noobMode) NavButton("") {} else NavButton(vm.activity.getString(R.string.local_update)) { vm.navigate("local") }
         ) {
             Start(c)
         }, WizardPage("local",
-            NavButton(vm.activity.getString(R.string.cancel)) {
-                it.startActivity(Intent(it, MainActivity::class.java))
-                it.finish()
-            },
+            NavButton(vm.activity.getString(R.string.cancel)) { it.finish() },
             NavButton(vm.activity.getString(R.string.online_update)) { vm.navigate("start") }
         ) {
             Local(c)
@@ -372,7 +372,6 @@ private fun Flash(u: UpdateFlowDataHolder) {
         }
         u.vm.nextText.value = u.vm.activity.getString(R.string.finish)
         u.vm.onNext.value = {
-            it.startActivity(Intent(it, MainActivity::class.java))
             it.finish()
         }
     }

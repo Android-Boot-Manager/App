@@ -101,8 +101,8 @@ fun Settings(vm: MainActivityState) {
 			modifier = Modifier.fillMaxWidth().padding(horizontal = 5.dp)) {
 			Text(stringResource(R.string.noob_mode))
 			Switch(checked = vm.noobMode, onCheckedChange = {
-				vm.noobMode = it
 				ctx.getSharedPreferences("abm", 0).edit().putBoolean("noob_mode", it).apply()
+				vm.noobMode = it
 			})
 		}
 	}

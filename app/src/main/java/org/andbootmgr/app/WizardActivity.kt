@@ -1,26 +1,19 @@
 package org.andbootmgr.app
 
-import android.annotation.SuppressLint
 import android.net.Uri
-import android.os.Bundle
-import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Arrangement
+import android.view.WindowManager
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.core.net.toFile
 import androidx.navigation.NavHostController
@@ -28,10 +21,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.topjohnwu.superuser.io.SuFileOutputStream
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import org.andbootmgr.app.util.AbmTheme
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
@@ -57,137 +46,38 @@ class WizardPageFactory(private val vm: WizardActivityState) {
 	}
 }
 
-class WizardActivity : ComponentActivity() {
-	private lateinit var vm: WizardActivityState
-	private lateinit var newFile: ActivityResultLauncher<String>
-	private var onFileCreated: ((Uri) -> Unit)? = null
-	private lateinit var chooseFile: ActivityResultLauncher<String>
-	private var onFileChosen: ((Uri) -> Unit)? = null
-	override fun onCreate(savedInstanceState: Bundle?) {
-		super.onCreate(savedInstanceState)
-		vm = WizardActivityState(intent.getStringExtra("codename")!!)
-		vm.activity = this
-		chooseFile =
-			registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-				if (uri == null) {
-					Toast.makeText(
-						this,
-						getString(R.string.file_unavailable),
-						Toast.LENGTH_LONG
-					).show()
-					onFileChosen = null
-					return@registerForActivityResult
-				}
-				if (onFileChosen != null) {
-					onFileChosen!!(uri)
-					onFileChosen = null
-				} else {
-					Toast.makeText(
-						this@WizardActivity,
-						getString(R.string.internal_file_error1),
-						Toast.LENGTH_LONG
-					).show()
-				}
-			}
-		newFile =
-			registerForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream")) { uri: Uri? ->
-				if (uri == null) {
-					Toast.makeText(
-						this,
-						getString(R.string.file_unavailable),
-						Toast.LENGTH_LONG
-					).show()
-					onFileCreated = null
-					return@registerForActivityResult
-				}
-				if (onFileCreated != null) {
-					onFileCreated!!(uri)
-					onFileCreated = null
-				} else {
-					Toast.makeText(
-						this@WizardActivity,
-						getString(R.string.internal_file_error1),
-						Toast.LENGTH_LONG
-					).show()
-				}
-			}
-		CoroutineScope(Dispatchers.Main).launch {
-			vm.deviceInfo = JsonDeviceInfoFactory(vm.activity).get(vm.codename)!!
-			vm.logic = DeviceLogic(vm.activity)
-			val wizardPages = WizardPageFactory(vm).get(intent.getStringExtra("flow")!!)
-			setContent {
-				vm.navController = rememberNavController()
-				AbmTheme {
-					// A surface container using the 'background' color from the theme
-					Surface(
-						modifier = Modifier.fillMaxSize(),
-						color = MaterialTheme.colorScheme.background
-					) {
-						Column(
-							verticalArrangement = Arrangement.SpaceBetween,
-							modifier = Modifier.fillMaxWidth()
-						) {
-							NavHost(
-								navController = vm.navController,
-								startDestination = "start",
-								modifier = Modifier
-									.fillMaxWidth()
-									.weight(1.0f)
-							) {
-								for (i in wizardPages) {
-									composable(i.name) {
-										if (!vm.btnsOverride) {
-											vm.prevText.value = i.prev.text
-											vm.nextText.value = i.next.text
-											vm.onPrev.value = i.prev.onClick
-											vm.onNext.value = i.next.onClick
-										}
-										i.run()
-									}
-								}
-							}
-							Box(Modifier.fillMaxWidth()) {
-								BtnsRow(vm)
-							}
-						}
+@Composable
+fun WizardCompat(mvm: MainActivityState, flow: String) {
+	DisposableEffect(Unit) {
+		mvm.activity!!.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+		onDispose { mvm.activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) }
+	}
+	val vm = remember { WizardActivityState(mvm) }
+	vm.navController = rememberNavController()
+	val wizardPages = remember(flow) { WizardPageFactory(vm).get(flow) }
+	Column(modifier = Modifier.fillMaxSize()) {
+		NavHost(
+			navController = vm.navController,
+			startDestination = "start",
+			modifier = Modifier
+				.fillMaxWidth()
+				.weight(1.0f)
+		) {
+			for (i in wizardPages) {
+				composable(i.name) {
+					if (!vm.btnsOverride) {
+						vm.prevText.value = i.prev.text
+						vm.nextText.value = i.next.text
+						vm.onPrev.value = i.prev.onClick
+						vm.onNext.value = i.next.onClick
 					}
+					i.run()
 				}
 			}
 		}
-	}
-
-	@SuppressLint("MissingSuperCall")
-	@Deprecated("Deprecated in Java")
-	override fun onBackPressed() {
-		vm.onPrev.value(this)
-	}
-
-	fun navigate(next: String) {
-		vm.navigate(next)
-	}
-	fun chooseFile(mime: String, callback: (Uri) -> Unit) {
-		if (onFileChosen != null) {
-			Toast.makeText(
-				this,
-				getString(R.string.internal_file_error2),
-				Toast.LENGTH_LONG
-			).show()
-			return
+		Box(Modifier.fillMaxWidth()) {
+			BtnsRow(vm)
 		}
-		onFileChosen = callback
-		chooseFile.launch(mime)
-	}
-	fun createFile(name: String, callback: (Uri) -> Unit) {
-		if (onFileCreated != null) {
-			Toast.makeText(
-				this,
-				getString(R.string.internal_file_error2),
-				Toast.LENGTH_LONG
-			).show()
-			return
-		}
-		onFileCreated = callback
-		newFile.launch(name)
 	}
 }
 
@@ -204,25 +94,32 @@ private class ExpectedDigestInputStream(stream: InputStream?,
 }
 class HashMismatchException(message: String) : Exception(message)
 
-class WizardActivityState(val codename: String) {
+class WizardActivityState(val mvm: MainActivityState) {
+	val codename = mvm.deviceInfo!!.codename
 	var btnsOverride = false
+	val activity = mvm.activity!!
 	lateinit var navController: NavHostController
-	lateinit var activity: WizardActivity
-	lateinit var logic: DeviceLogic
-	lateinit var deviceInfo: DeviceInfo
-	private var current = mutableStateOf("start")
+	val logic = mvm.logic!!
+	val deviceInfo = mvm.deviceInfo!!
 	var prevText = mutableStateOf("")
 	var nextText = mutableStateOf("")
-	var onPrev: MutableState<(WizardActivity) -> Unit> = mutableStateOf({})
-	var onNext: MutableState<(WizardActivity) -> Unit> = mutableStateOf({})
+	var onPrev: MutableState<(WizardActivityState) -> Unit> = mutableStateOf({})
+	var onNext: MutableState<(WizardActivityState) -> Unit> = mutableStateOf({})
 
 	var flashes: HashMap<String, Pair<Uri, String?>> = HashMap()
 	var texts: HashMap<String, String> = HashMap()
 
 	fun navigate(next: String) {
 		btnsOverride = false
-		current.value = next
-		navController.navigate(current.value)
+		navController.navigate(next) {
+			launchSingleTop = true
+		}
+	}
+	fun finish() {
+		mvm.wizardCompat = null
+		mvm.wizardCompatE = null
+		mvm.wizardCompatPid = null
+		mvm.wizardCompatSid = null
 	}
 
 	fun copy(inputStream: InputStream, outputStream: OutputStream): Long {
@@ -270,7 +167,7 @@ class WizardActivityState(val codename: String) {
 	}
 }
 
-class NavButton(val text: String, val onClick: (WizardActivity) -> Unit)
+class NavButton(val text: String, val onClick: (WizardActivityState) -> Unit)
 class WizardPage(override val name: String, override val prev: NavButton,
                        override val next: NavButton, override val run: @Composable () -> Unit
 ) : IWizardPage
@@ -286,12 +183,12 @@ interface IWizardPage {
 private fun BtnsRow(vm: WizardActivityState) {
 	Row {
 		TextButton(onClick = {
-			vm.onPrev.value(vm.activity)
+			vm.onPrev.value(vm)
 		}, modifier = Modifier.weight(1f, true)) {
 			Text(vm.prevText.value)
 		}
 		TextButton(onClick = {
-			vm.onNext.value(vm.activity)
+			vm.onNext.value(vm)
 		}, modifier = Modifier.weight(1f, true)) {
 			Text(vm.nextText.value)
 		}

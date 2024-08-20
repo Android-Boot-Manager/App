@@ -2,7 +2,6 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
-    id("org.jetbrains.kotlinx.atomicfu")
     id("com.mikepenz.aboutlibraries.plugin")
 }
 
@@ -111,11 +110,6 @@ android {
     }
 }
 
-atomicfu {
-    dependenciesVersion = "0.25.0"
-    jvmVariant = "FU"
-}
-
 tasks.register("setAssetTs", Task::class) {
     doLast {
         File("$rootDir/app/src/main/assets/cp/_ts").writeText((System.currentTimeMillis() / 1000L).toString())
@@ -123,7 +117,6 @@ tasks.register("setAssetTs", Task::class) {
 }
 
 dependencies {
-    compileOnly("org.jetbrains.kotlinx:atomicfu:0.25.0")
     implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")

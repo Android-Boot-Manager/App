@@ -74,8 +74,6 @@
 	<string name="choose_install_s_online">Please choose an installer shell script, or use the download button to automatically download the latest version from the internet (recommended for most users).</string>
 	<string name="reinstall_dboot">This will reinstall DroidBoot</string>
 	<string name="file_unavailable">File not available, please try again later!</string>
-	<string name="internal_file_error1">Internal error - no file handler added!! Please cancel install</string>
-	<string name="internal_file_error2">Internal error - double file choose!! Please cancel install</string>
 	<string name="local_update">Local update</string>
 	<string name="online_update">Online update</string>
 	<string name="update_check_failed">Failed to check for updates! Please try again later.</string>

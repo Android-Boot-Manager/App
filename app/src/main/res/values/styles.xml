@@ -19,6 +19,9 @@
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:background">@color/red</item>
     </style>
+    <style name="SplashTheme" parent="@style/Theme.SplashScreen">
+        <item name="postSplashScreenTheme">@style/AppTheme</item>
+    </style>
 
     <color name="colorPrimary">#FE9200</color>
     <color name="colorSecondary">#FE9200</color>

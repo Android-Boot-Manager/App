@@ -1,7 +1,6 @@
 package org.andbootmgr.app
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
@@ -20,7 +19,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
@@ -30,30 +28,25 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.*
 import okio.*
-import org.andbootmgr.app.util.AbmTheme
 import org.andbootmgr.app.util.ConfigFile
 import org.andbootmgr.app.util.SDUtils
 import org.andbootmgr.app.util.SOUtils
 import org.andbootmgr.app.util.Terminal
-import java.io.File
-import java.io.FileInputStream
-import java.io.InputStream
-import java.math.BigDecimal
-import java.util.concurrent.TimeUnit
 import org.json.JSONObject
 import org.json.JSONTokener
+import java.io.File
+import java.io.FileInputStream
 import java.io.FileNotFoundException
+import java.io.InputStream
+import java.math.BigDecimal
 import java.net.URL
-import java.nio.charset.Charset
+import java.util.concurrent.TimeUnit
 
 class CreatePartWizardPageFactory(private val vm: WizardActivityState) {
 	fun get(): List<IWizardPage> {
 		val c = CreatePartDataHolder(vm)
 		return listOf(WizardPage("start",
-			NavButton(vm.activity.getString(R.string.cancel)) {
-				it.startActivity(Intent(it, MainActivity::class.java))
-				it.finish()
-			},
+			NavButton(vm.activity.getString(R.string.cancel)) { it.finish() },
 			NavButton("") {}
 		) {
 			Start(c)
@@ -68,10 +61,7 @@ class CreatePartWizardPageFactory(private val vm: WizardActivityState) {
 		) {
 			Os(c)
 		}, WizardPage("dload",
-			NavButton(vm.activity.getString(R.string.cancel)) {
-				it.startActivity(Intent(it, MainActivity::class.java))
-				it.finish()
-		},
+			NavButton(vm.activity.getString(R.string.cancel)) { it.finish() },
 			NavButton("") {}
 		) {
 			Download(c)
@@ -996,10 +986,7 @@ private fun Flash(c: CreatePartDataHolder) {
 				terminal.add(vm.activity.getString(R.string.term_success))
 				vm.btnsOverride = true
 				vm.nextText.value = vm.activity.getString(R.string.finish)
-				vm.onNext.value = {
-					it.startActivity(Intent(it, MainActivity::class.java))
-					it.finish()
-				}
+				vm.onNext.value = { it.finish() }
 			}
 
 			// Fucking complicated code to fairly and flexibly partition space based on preset percentage & bytes values
@@ -1063,28 +1050,12 @@ private fun Flash(c: CreatePartDataHolder) {
 				vm.btnsOverride = true
 				vm.nextText.value = c.vm.activity.getString(R.string.finish)
 				vm.onNext.value = {
-					it.startActivity(Intent(it, MainActivity::class.java))
 					it.finish()
 				}
 				terminal.add(vm.activity.getString(R.string.term_success))
 			} else {
 				terminal.add(vm.activity.getString(R.string.term_failure))
 			}
-		}
-	}
-}
-
-@Composable
-@Preview
-private fun Preview() {
-	val vm = WizardActivityState("null")
-	val c = CreatePartDataHolder(vm)
-	AbmTheme {
-		Surface(
-			modifier = Modifier.fillMaxSize(),
-			color = MaterialTheme.colorScheme.background
-		) {
-			Start(c)
 		}
 	}
 }
