@@ -184,7 +184,7 @@ private class CreatePartDataHolder(val vm: WizardActivityState): ProgressListene
 	fun lateInit() {
 		noobMode = LocalContext.current.getSharedPreferences("abm", 0).getBoolean("noob_mode", BuildConfig.DEFAULT_NOOB_MODE)
 		meta = SDUtils.generateMeta(vm.deviceInfo)
-		(meta?.s?.find { vm.activity.intent.getLongExtra("part_sid", -1L) == it.startSector } as SDUtils.Partition.FreeSpace?)?.also { p = it }
+		p = (meta?.s?.find { vm.mvm.wizardCompatSid == it.startSector } as SDUtils.Partition.FreeSpace?)!!
 	}
 
 	fun painterFromRtype(type: String): @Composable () -> Painter {

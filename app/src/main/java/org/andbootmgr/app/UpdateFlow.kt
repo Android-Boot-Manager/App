@@ -87,7 +87,7 @@ private fun Start(u: UpdateFlowDataHolder) {
                 Log.e("ABM", Log.getStackTraceString(e))
             }
         }
-        val toFind = u.vm.activity.intent.getStringExtra("entryFilename") ?: "null"
+        val toFind = u.vm.mvm.wizardCompatE!!
         u.e = entries.entries.find { it.value.absolutePath == toFind }!!.also { u.ef = it.value }.key
 
         CoroutineScope(Dispatchers.IO).launch {

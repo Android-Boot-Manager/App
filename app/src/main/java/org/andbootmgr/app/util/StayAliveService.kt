@@ -13,6 +13,10 @@ import android.util.Log
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
@@ -62,9 +66,11 @@ class StayAliveService : LifecycleService(), IStayAlive {
 		lifecycleScope.launch {
 			wakeLock.acquire()
 			try {
+				Log.i(TAG, "Starting work...")
 				this@StayAliveService.work!!.invoke(this@StayAliveService)
+				Log.i(TAG, "Done working!")
 				isWorkDone = true
-				onDone!!.invoke()
+				onDone?.invoke()
 			} finally {
 				wakeLock.release()
 			}
@@ -141,6 +147,7 @@ class StayAliveService : LifecycleService(), IStayAlive {
 	}
 
 	override fun onDestroy() {
+		Log.i(TAG, "Goodbye!")
 		super.onDestroy()
 		if (!destroyed) {
 			if (!isRunning) throw IllegalStateException("excepted isRunning to be true for non-destroyed service")
@@ -166,12 +173,16 @@ private interface Provider {
 }
 
 class StayAliveConnection(inContext: Context,
-                          private val onConnected: (IStayAlive) -> Unit) : ServiceConnection {
+                          lifecycleOwner: LifecycleOwner,
+                          private val doWhenDone: (() -> Unit)?,
+                          private val onConnected: (IStayAlive) -> Unit)
+	: ServiceConnection, DefaultLifecycleObserver {
 	companion object {
 		@SuppressLint("StaticFieldLeak") // application context
 		private var currentConn: StayAliveConnection? = null
 	}
 	private val context = inContext.applicationContext
+	private var provider: Provider? = null
 
 	init {
 		if (currentConn != null) {
@@ -183,26 +194,33 @@ class StayAliveConnection(inContext: Context,
 			this,
 			Context.BIND_IMPORTANT or Context.BIND_AUTO_CREATE
 		)
+		lifecycleOwner.lifecycle.addObserver(this)
 	}
 
 	override fun onServiceConnected(name: ComponentName?, inService: IBinder?) {
 		val provider = inService as Provider
+		this.provider = provider
 		val service = provider.service
 		val onDone = {
+			onServiceDisconnected(null)
 			provider.finish()
-			provider.onDone = null
-			context.unbindService(this)
-			currentConn = null
+			doWhenDone?.invoke(); Unit
 		}
+		onConnected(service)
 		if (provider.isWorkDone) {
 			onDone()
 		} else {
 			provider.onDone = onDone
 		}
-		onConnected(service)
 	}
 
 	override fun onServiceDisconnected(name: ComponentName?) {
-		// Do nothing
+		context.unbindService(this)
+		provider?.onDone = null
+		currentConn = null
+	}
+
+	override fun onDestroy(owner: LifecycleOwner) {
+		onServiceDisconnected(null)
 	}
 }

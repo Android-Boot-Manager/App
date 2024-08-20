@@ -53,6 +53,7 @@ import kotlinx.coroutines.launch
 import org.andbootmgr.app.AppContent
 import org.andbootmgr.app.MainActivityState
 import org.andbootmgr.app.R
+import org.andbootmgr.app.util.AbmTheme
 
 /*
 	uint32_t win_bg_color;
@@ -323,9 +324,11 @@ class ThemeViewModel(val mvm: MainActivityState) : ViewModel() {
 @Composable
 fun ThemePreview() {
 	val vm = MainActivityState(null)
-	AppContent(vm, rememberNavController()) {
-		Box(modifier = Modifier.padding(it)) {
-			Themes(vm.theme)
+	AbmTheme {
+		AppContent(vm, rememberNavController()) {
+			Box(modifier = Modifier.padding(it)) {
+				Themes(vm.theme)
+			}
 		}
 	}
 }

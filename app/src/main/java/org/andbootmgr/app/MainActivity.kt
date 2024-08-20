@@ -1,6 +1,5 @@
 package org.andbootmgr.app
 
-import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -12,7 +11,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -27,13 +28,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -76,25 +76,26 @@ class MainActivityState(val activity: MainActivity?) {
 	var wizardCompat by mutableStateOf<String?>(null)
 
 	fun startFlow(flow: String) {
+		unmountBootset()
 		wizardCompat = flow
 	}
 
 	var wizardCompatSid: Long? = null
 	fun startCreateFlow(freeSpace: SDUtils.Partition.FreeSpace) {
-		wizardCompat = "create_part"
 		wizardCompatSid = freeSpace.startSector
+		startFlow("create_part")
 	}
 
 	var wizardCompatE: String? = null
 	fun startUpdateFlow(e: String) {
-		wizardCompat = "update"
 		wizardCompatE = e
+		startFlow("update")
 	}
 
 	var wizardCompatPid: Int? = null
 	fun startBackupAndRestoreFlow(partition: SDUtils.Partition) {
-		wizardCompat = "backup_restore"
 		wizardCompatPid = partition.id
+		startFlow("backup_restore")
 	}
 
 	var noobMode by mutableStateOf(false)
@@ -132,6 +133,22 @@ class MainActivityState(val activity: MainActivity?) {
 					activity!!,
 					activity.getString(R.string.failed2save), Toast.LENGTH_LONG
 				).show()
+			}
+		}
+	}
+
+	// This will be called on startup, and after StayAlive work completes.
+	fun init() {
+		if (!StayAliveService.isRunning) {
+			val installed = deviceInfo?.isInstalled(logic!!)
+			if (installed == true) {
+				mountBootset()
+			} else {
+				Log.i("ABM", "not installed, not trying to mount")
+			}
+			if (deviceInfo != null) {
+				isOk = installed!! && deviceInfo!!.isBooted(logic!!) &&
+						!(!logic!!.mounted || deviceInfo!!.isCorrupt(logic!!))
 			}
 		}
 	}
@@ -202,14 +219,6 @@ class MainActivity : ComponentActivity() {
 		val vm = MainActivityState(this)
 		vm.logic = DeviceLogic(this)
 		CoroutineScope(Dispatchers.IO).launch {
-			if (Shell.getCachedShell() == null) {
-				Shell.enableVerboseLogging = BuildConfig.DEBUG
-				Shell.setDefaultBuilder(
-					Shell.Builder.create()
-						.setFlags(FLAG_MOUNT_MASTER or FLAG_REDIRECT_STDERR)
-						.setTimeout(30)
-				)
-			}
 			launch {
 				vm.noobMode =
 					this@MainActivity.getSharedPreferences("abm", 0)
@@ -217,48 +226,74 @@ class MainActivity : ComponentActivity() {
 			}
 			// TODO I/O on app startup is meh, but can we avoid it?
 			val di = async { JsonDeviceInfoFactory(vm.activity!!).get(Build.DEVICE) }
-			val shell = Shell.getShell() // blocking
-			if (shell.isRoot && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-				Shell.cmd("pm grant $packageName ${android.Manifest.permission.POST_NOTIFICATIONS}")
-					.submit()
-			}
-			// == temp migration code start ==
-			launch {
-				if (Shell.cmd("mountpoint -q /data/abm/bootset").exec().isSuccess) {
-					Shell.cmd("umount /data/abm/bootset").exec()
+			if (Shell.getCachedShell() == null) {
+				Shell.enableVerboseLogging = BuildConfig.DEBUG
+				Shell.setDefaultBuilder(
+					Shell.Builder.create()
+						.setFlags(FLAG_MOUNT_MASTER or FLAG_REDIRECT_STDERR)
+						.setTimeout(30)
+				)
+				val shell = Shell.getShell() // blocking
+				if (shell.isRoot && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+					Shell.cmd("pm grant $packageName ${android.Manifest.permission.POST_NOTIFICATIONS}")
+						.submit()
 				}
-				SuFile.open("/data/abm").let {
-					if (it.exists())
-						Shell.cmd("rm -rf /data/abm").exec()
+				// == temp migration code start ==
+				launch {
+					if (Shell.cmd("mountpoint -q /data/abm/bootset").exec().isSuccess) {
+						Shell.cmd("umount /data/abm/bootset").exec()
+					}
+					SuFile.open("/data/abm").let {
+						if (it.exists())
+							Shell.cmd("rm -rf /data/abm").exec()
+					}
+					SuFile.open(filesDir.parentFile!!, "assets").let {
+						if (it.exists())
+							Shell.cmd("rm -rf ${filesDir.parentFile!!.resolve("assets").absolutePath}")
+								.exec()
+					}
 				}
+				// == temp migration code end ==
 			}
-			// == temp migration code end ==
 			vm.deviceInfo = di.await() // blocking
-			val installed = vm.deviceInfo?.isInstalled(vm.logic!!)
-			if (installed == true) {
-				vm.mountBootset()
-			} else {
-				Log.i("ABM", "not installed, not trying to mount")
-			}
-			if (vm.deviceInfo != null) {
-				vm.isOk = installed!! && vm.deviceInfo!!.isBooted(vm.logic!!) &&
-						!(!vm.logic!!.mounted || vm.deviceInfo!!.isCorrupt(vm.logic!!))
-			}
+			vm.init()
 			withContext(Dispatchers.Main) {
 				setContent {
 					// TODO allow rotating device while viewing logs without loosing logs (will require rememberSavable)
-					if (remember { StayAliveService.isRunning }) {
-						DisposableEffect(Unit) {
-							window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-							onDispose { window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) }
-						}
-						Terminal(null, null)
-					} else if (vm.wizardCompat != null) {
-						WizardCompat(vm, vm.wizardCompat!!)
-					} else {
-						val navController = rememberNavController()
-						AppContent(vm, navController) {
-							NavGraph(vm, navController, it)
+					AbmTheme {
+						var showTerminal by remember { mutableStateOf(StayAliveService.isRunning) }
+						if (showTerminal) {
+							var canFinish by remember { mutableStateOf(false) }
+							DisposableEffect(Unit) {
+								window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+								onDispose { window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) }
+							}
+							Column(modifier = Modifier.fillMaxSize()) {
+								Terminal(null, { canFinish = true }, null)
+								Row(modifier = Modifier.fillMaxWidth()) {
+									TextButton(onClick = {
+									}, modifier = Modifier.weight(1f, true)) {
+										Text("") // This button is useless.
+									}
+									TextButton(onClick = {
+										if (canFinish) {
+											CoroutineScope(Dispatchers.IO).launch {
+												vm.init()
+												showTerminal = false
+											}
+										}
+									}, modifier = Modifier.weight(1f, true)) {
+										Text(if (canFinish) stringResource(R.string.finish) else "")
+									}
+								}
+							}
+						} else if (vm.wizardCompat != null) {
+							WizardCompat(vm, vm.wizardCompat!!)
+						} else {
+							val navController = rememberNavController()
+							AppContent(vm, navController) {
+								NavGraph(vm, navController, it)
+							}
 						}
 					}
 				}
@@ -292,104 +327,102 @@ fun AppContent(vm: MainActivityState, navController: NavHostController,
 	val scope = rememberCoroutineScope()
 	var fabhint by remember { mutableStateOf(false) }
 	val navBackStackEntry by navController.currentBackStackEntryAsState()
+	val currentRoute = navBackStackEntry?.destination?.route ?: "start"
 	val fab = @Composable {
-		if (vm.noobMode && vm.isOk && navBackStackEntry!!.destination.route == "start") {
+		if (vm.noobMode && vm.isOk && currentRoute == "start") {
 			FloatingActionButton(onClick = { fabhint = true }) {
 				Icon(Icons.Default.Add, stringResource(R.string.add_icon_content_desc))
 			}
 		}
 	}
-	AbmTheme {
-		// A surface container using the 'background' color from the theme
-		Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-			ModalNavigationDrawer(
-				drawerContent = {
-					ModalDrawerSheet {
-						NavigationDrawerItem(
-							label = { Text(stringResource(R.string.home)) },
-							selected = navBackStackEntry!!.destination.route == "start",
-							onClick = {
-								scope.launch {
-									navController.navigate("start") {
-										launchSingleTop = true
-									}
-									drawerState.close()
-								}
-							},
-							modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp)
-						)
-						if (vm.isOk) {
-							NavigationDrawerItem(
-								label = { Text(stringResource(R.string.themes)) },
-								selected = navBackStackEntry!!.destination.route == "themes",
-								onClick = {
-									scope.launch {
-										navController.navigate("themes") {
-											launchSingleTop = true
-										}
-										drawerState.close()
-									}
-								},
-								modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp)
-							)
-							NavigationDrawerItem(
-								label = { Text(stringResource(R.string.settings)) },
-								selected = navBackStackEntry!!.destination.route == "settings",
-								onClick = {
-									scope.launch {
-										navController.navigate("settings") {
-											launchSingleTop = true
-										}
-										drawerState.close()
-									}
-								},
-								modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp)
-							)
-						}
-					}
-				},
-				drawerState = drawerState,
-				content = {
-					if (fabhint) {
-						AlertDialog(onDismissRequest = { fabhint = false }, text = {
-							Text(stringResource(R.string.select_free_space))
-						}, confirmButton = {
-							Button(onClick = { fabhint = false }) {
-								Text(stringResource(R.string.ok))
+	ModalNavigationDrawer(
+		drawerContent = {
+			ModalDrawerSheet {
+				NavigationDrawerItem(
+					label = { Text(stringResource(R.string.home)) },
+					selected = currentRoute == "start",
+					onClick = {
+						scope.launch {
+							navController.navigate("start") {
+								launchSingleTop = true
 							}
-						})
-					}
-					Scaffold(
-						topBar = {
-							CenterAlignedTopAppBar(
-								title = {
-									Text(stringResource(R.string.app_name))
-								},
-								colors = TopAppBarDefaults.centerAlignedTopAppBarColors(),
-								navigationIcon = {
-									IconButton(content = {
-										Icon(
-											imageVector = Icons.Filled.Menu,
-											contentDescription = stringResource(R.string.menu)
-										)
-									}, onClick = {
-										scope.launch { drawerState.open() }
-									})
-								})
+							drawerState.close()
+						}
+					},
+					modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp)
+				)
+				if (vm.isOk) {
+					NavigationDrawerItem(
+						label = { Text(stringResource(R.string.themes)) },
+						selected = currentRoute == "themes",
+						onClick = {
+							scope.launch {
+								navController.navigate("themes") {
+									launchSingleTop = true
+								}
+								drawerState.close()
+							}
 						},
-						content = view,
-						floatingActionButton = fab,
-						modifier = Modifier.fillMaxWidth()
+						modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp)
+					)
+					NavigationDrawerItem(
+						label = { Text(stringResource(R.string.settings)) },
+						selected = currentRoute == "settings",
+						onClick = {
+							scope.launch {
+								navController.navigate("settings") {
+									launchSingleTop = true
+								}
+								drawerState.close()
+							}
+						},
+						modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp)
 					)
 				}
+			}
+		},
+		drawerState = drawerState,
+		content = {
+			if (fabhint) {
+				AlertDialog(onDismissRequest = { fabhint = false }, text = {
+					Text(stringResource(R.string.select_free_space))
+				}, confirmButton = {
+					Button(onClick = { fabhint = false }) {
+						Text(stringResource(R.string.ok))
+					}
+				})
+			}
+			Scaffold(
+				topBar = {
+					CenterAlignedTopAppBar(
+						title = {
+							Text(stringResource(R.string.app_name))
+						},
+						colors = TopAppBarDefaults.centerAlignedTopAppBarColors(),
+						navigationIcon = {
+							IconButton(content = {
+								Icon(
+									imageVector = Icons.Filled.Menu,
+									contentDescription = stringResource(R.string.menu)
+								)
+							}, onClick = {
+								scope.launch { drawerState.open() }
+							})
+						})
+				},
+				content = view,
+				floatingActionButton = fab,
+				modifier = Modifier.fillMaxWidth()
 			)
 		}
-	}
+	)
 }
 
 @Composable
 private fun NavGraph(vm: MainActivityState, navController: NavHostController, it: PaddingValues) {
-	NavHost(navController = navController, startDestination = "start", modifier = Modifier.padding(it).fillMaxSize()) {
+	NavHost(navController = navController, startDestination = "start", modifier = Modifier
+		.padding(it)
+		.fillMaxSize()) {
 		composable("start") {
 			Start(vm)
 		}
@@ -406,9 +439,11 @@ private fun NavGraph(vm: MainActivityState, navController: NavHostController, it
 @Composable
 private fun Preview() {
 	val vm = MainActivityState(null)
-	AppContent(vm, rememberNavController()) {
-		Box(modifier = Modifier.padding(it)) {
-			Start(vm)
+	AbmTheme {
+		AppContent(vm, rememberNavController()) {
+			Box(modifier = Modifier.padding(it)) {
+				Start(vm)
+			}
 		}
 	}
 }

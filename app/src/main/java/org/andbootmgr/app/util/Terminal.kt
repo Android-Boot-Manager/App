@@ -14,10 +14,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -129,21 +131,28 @@ private class BudgetCallbackList(private val scope: CoroutineScope,
 }
 
 /* Monospace auto-scrolling text view, fed using MutableList<String>, catching exceptions and running logic on a different thread */
+@OptIn(ExperimentalCoroutinesApi::class)
 @Composable
-fun Terminal(logFile: String? = null, action: (suspend (MutableList<String>) -> Unit)?) {
+fun Terminal(logFile: String? = null, doWhenDone: (() -> Unit)? = null,
+             action: (suspend (MutableList<String>) -> Unit)?) {
 	val scrollH = rememberScrollState()
 	val scrollV = rememberScrollState()
 	val scope = rememberCoroutineScope()
 	val text = remember { mutableStateOf("") }
 	val ctx = LocalContext.current.applicationContext
+	val lo = LocalLifecycleOwner.current
 	LaunchedEffect(Unit) {
 		if (action == null && logFile != null) {
 			throw IllegalArgumentException("logFile must be null if action is null")
 		}
-		StayAliveConnection(ctx) { service ->
+		if (action != null && doWhenDone != null) {
+			throw IllegalArgumentException("Don't use both action and doWhenDone")
+		}
+		StayAliveConnection(ctx, lo, doWhenDone) { service ->
 			if (action != null) {
+				val logDispatcher = Dispatchers.IO.limitedParallelism(1)
 				val log = logFile?.let { FileOutputStream(File(ctx.externalCacheDir, it)) }
-				val s = BudgetCallbackList(CoroutineScope(Dispatchers.IO), log)
+				val s = BudgetCallbackList(CoroutineScope(logDispatcher), log)
 				s.cb = { element ->
 					scope.launch {
 						text.value += element + "\n"
@@ -161,7 +170,7 @@ fun Terminal(logFile: String? = null, action: (suspend (MutableList<String>) -> 
 							s.add(ctx.getString(R.string.dev_details))
 							s.add(Log.getStackTraceString(e))
 						}
-						withContext(Dispatchers.IO) {
+						withContext(logDispatcher) {
 							log?.close()
 						}
 					}

@@ -2,6 +2,7 @@ package org.andbootmgr.app
 
 import android.net.Uri
 import android.view.WindowManager
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -55,6 +56,9 @@ fun WizardCompat(mvm: MainActivityState, flow: String) {
 	val vm = remember { WizardActivityState(mvm) }
 	vm.navController = rememberNavController()
 	val wizardPages = remember(flow) { WizardPageFactory(vm).get(flow) }
+	BackHandler {
+		vm.onPrev.value.invoke(vm)
+	}
 	Column(modifier = Modifier.fillMaxSize()) {
 		NavHost(
 			navController = vm.navController,
@@ -120,6 +124,7 @@ class WizardActivityState(val mvm: MainActivityState) {
 		mvm.wizardCompatE = null
 		mvm.wizardCompatPid = null
 		mvm.wizardCompatSid = null
+		mvm.mountBootset()
 	}
 
 	fun copy(inputStream: InputStream, outputStream: OutputStream): Long {
