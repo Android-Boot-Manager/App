@@ -22,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.net.toFile
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -295,31 +294,6 @@ private fun BtnsRow(vm: WizardActivityState) {
 			vm.onNext.value(vm.activity)
 		}, modifier = Modifier.weight(1f, true)) {
 			Text(vm.nextText.value)
-		}
-	}
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun Preview() {
-	val vm = WizardActivityState("null")
-	AbmTheme {
-		// A surface container using the 'background' color from the theme
-		Surface(
-			modifier = Modifier.fillMaxSize(),
-			color = MaterialTheme.colorScheme.background
-		) {
-			Column {
-				Box(
-					Modifier
-						.fillMaxWidth()
-						.weight(1.0f)) {
-					//Select(vm)
-				}
-				Box(Modifier.fillMaxWidth()) {
-					BtnsRow(vm)
-				}
-			}
 		}
 	}
 }

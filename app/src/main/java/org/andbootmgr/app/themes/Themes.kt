@@ -327,13 +327,7 @@ class ThemeViewModel(val mvm: MainActivityState) : ViewModel() {
 @Composable
 fun ThemePreview() {
 	val vm = MainActivityState()
-	val navController = rememberNavController()
-	val drawerState = rememberDrawerState(DrawerValue.Closed)
-	val scope = rememberCoroutineScope()
-	vm.navController = navController
-	vm.drawerState = drawerState
-	vm.scope = scope
-	AppContent(vm) {
+	AppContent(vm, rememberNavController()) {
 		Box(modifier = Modifier.padding(it)) {
 			Themes(vm.theme)
 		}

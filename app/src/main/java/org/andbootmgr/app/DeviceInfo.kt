@@ -6,6 +6,8 @@ import android.util.Log
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.andbootmgr.app.util.SDUtils
 import org.json.JSONObject
@@ -102,10 +104,12 @@ class JsonDeviceInfoFactory(private val ctx: Context) {
 				if (BuildConfig.VERSION_CODE < jsonRoot.getInt("minAppVersion"))
 					throw IllegalStateException("please upgrade app")
 				if (fromNet) {
-					val newRoot = JSONObject()
-					newRoot.put("deviceInfo", json)
-					newRoot.put("minAppVersion", jsonRoot.getInt("minAppVersion"))
-					File(ctx.filesDir, "abm_dd_cache.json").writeText(newRoot.toString())
+					launch {
+						val newRoot = JSONObject()
+						newRoot.put("deviceInfo", json)
+						newRoot.put("minAppVersion", jsonRoot.getInt("minAppVersion"))
+						File(ctx.filesDir, "abm_dd_cache.json").writeText(newRoot.toString())
+					}
 				}
 				if (!json.getBoolean("metaOnSd"))
 					throw IllegalArgumentException("sd less currently not implemented")

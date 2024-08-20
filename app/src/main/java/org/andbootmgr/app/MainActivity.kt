@@ -4,8 +4,6 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.View
-import android.view.ViewTreeObserver
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -40,6 +38,7 @@ import com.topjohnwu.superuser.Shell.FLAG_REDIRECT_STDERR
 import com.topjohnwu.superuser.io.SuFile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.andbootmgr.app.themes.ThemeViewModel
@@ -47,6 +46,8 @@ import org.andbootmgr.app.themes.Themes
 import org.andbootmgr.app.util.AbmTheme
 import org.andbootmgr.app.util.ConfigFile
 import org.andbootmgr.app.util.SDUtils
+import org.andbootmgr.app.util.StayAliveService
+import org.andbootmgr.app.util.Terminal
 import org.andbootmgr.app.util.Toolkit
 import java.io.File
 
@@ -93,10 +94,6 @@ class MainActivityState {
 	val theme = ThemeViewModel(this)
 	var defaultCfg = mutableStateMapOf<String, String>()
 	var isReady = false
-	var navController: NavHostController? = null
-	var drawerState: DrawerState? = null
-	var scope: CoroutineScope? = null
-	var root = false
 	var isOk = false
 	var logic: DeviceLogic? = null
 
@@ -200,14 +197,20 @@ class MainActivity : ComponentActivity() {
 					}
 				}
 				if (!fail) {
-					Shell.getShell { shell ->
-						CoroutineScope(Dispatchers.IO).launch {
-							vm.root = shell.isRoot
-							if (vm.root && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-								Shell.cmd("pm grant $packageName ${android.Manifest.permission.POST_NOTIFICATIONS}")
-							}
-							vm.deviceInfo = JsonDeviceInfoFactory(vm.activity!!).get(Build.DEVICE)
-							// == temp migration code start ==
+					CoroutineScope(Dispatchers.IO).launch {
+						launch {
+							vm.noobMode =
+								this@MainActivity.getSharedPreferences("abm", 0)
+									.getBoolean("noob_mode", BuildConfig.DEFAULT_NOOB_MODE)
+						}
+						// TODO I/O on app startup is meh, but can we avoid it?
+						val di = async { JsonDeviceInfoFactory(vm.activity!!).get(Build.DEVICE) }
+						val shell = Shell.getShell() // blocking
+						if (shell.isRoot && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+							Shell.cmd("pm grant $packageName ${android.Manifest.permission.POST_NOTIFICATIONS}").submit()
+						}
+						// == temp migration code start ==
+						launch {
 							if (Shell.cmd("mountpoint -q /data/abm/bootset").exec().isSuccess) {
 								Shell.cmd("umount /data/abm/bootset").exec()
 							}
@@ -215,35 +218,37 @@ class MainActivity : ComponentActivity() {
 								if (it.exists())
 									Shell.cmd("rm -rf /data/abm").exec()
 							}
-							// == temp migration code end ==
-							if (vm.deviceInfo != null && vm.deviceInfo!!.isInstalled(vm.logic!!)) {
-								vm.mountBootset()
-							} else {
-								Log.i("ABM", "not installed, not trying to mount")
-							}
-							if (vm.deviceInfo != null) {
-								vm.isOk = ((vm.deviceInfo!!.isInstalled(vm.logic!!)) &&
-										vm.deviceInfo!!.isBooted(vm.logic!!) &&
-										!(!vm.logic!!.mounted || vm.deviceInfo!!.isCorrupt(vm.logic!!)))
-							}
-							withContext(Dispatchers.Main) {
-								setContent {
-									// TODO support work resumption by instantly opening Terminal with null action if work is going on
+						}
+						// == temp migration code end ==
+						vm.deviceInfo = di.await() // blocking
+						val installed = vm.deviceInfo?.isInstalled(vm.logic!!)
+						if (installed == true) {
+							vm.mountBootset()
+						} else {
+							Log.i("ABM", "not installed, not trying to mount")
+						}
+						if (vm.deviceInfo != null) {
+							vm.isOk = installed!! && vm.deviceInfo!!.isBooted(vm.logic!!) &&
+									!(!vm.logic!!.mounted || vm.deviceInfo!!.isCorrupt(vm.logic!!))
+						}
+						withContext(Dispatchers.Main) {
+							setContent {
+								var terminalEnabled by remember { mutableStateOf(StayAliveService.isRunning) }
+								val newAction = remember { mutableStateOf<(suspend (MutableList<String>) -> Unit)?>(null) }
+								val action = if (newAction.value != null) {
+									terminalEnabled = true
+									newAction.value
+								} else null
+								if (terminalEnabled) {
+									Terminal(null, action)
+								} else {
 									val navController = rememberNavController()
-									val drawerState = rememberDrawerState(DrawerValue.Closed)
-									val scope = rememberCoroutineScope()
-									vm.navController = navController
-									vm.drawerState = drawerState
-									vm.scope = scope
-									vm.noobMode =
-										LocalContext.current.getSharedPreferences("abm", 0)
-											.getBoolean("noob_mode", BuildConfig.DEFAULT_NOOB_MODE)
-									AppContent(vm) {
-										NavGraph(vm, it)
+									AppContent(vm, navController) {
+										NavGraph(vm, navController, it)
 									}
 								}
-								vm.isReady = true
 							}
+							vm.isReady = true
 						}
 					}
 				}
@@ -254,9 +259,10 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppContent(vm: MainActivityState, view: @Composable (PaddingValues) -> Unit) {
-	val drawerState = vm.drawerState!!
-	val scope = vm.scope!!
+fun AppContent(vm: MainActivityState, navController: NavHostController,
+               view: @Composable (PaddingValues) -> Unit) {
+	val drawerState = rememberDrawerState(DrawerValue.Closed)
+	val scope = rememberCoroutineScope()
 	var fabhint by remember { mutableStateOf(false) }
 	val fab = @Composable {
 		if (vm.noobMode && vm.isOk && vm.currentNav == "start") {
@@ -275,7 +281,7 @@ fun AppContent(vm: MainActivityState, view: @Composable (PaddingValues) -> Unit)
 						selected = vm.currentNav == "start",
 						onClick = {
 							scope.launch {
-								vm.navController!!.navigate("start")
+								navController.navigate("start")
 								drawerState.close()
 							}
 						},
@@ -287,7 +293,7 @@ fun AppContent(vm: MainActivityState, view: @Composable (PaddingValues) -> Unit)
 							selected = vm.currentNav == "themes",
 							onClick = {
 								scope.launch {
-									vm.navController!!.navigate("themes")
+									navController.navigate("themes")
 									drawerState.close()
 								}
 							},
@@ -298,7 +304,7 @@ fun AppContent(vm: MainActivityState, view: @Composable (PaddingValues) -> Unit)
 							selected = vm.currentNav == "settings",
 							onClick = {
 								scope.launch {
-									vm.navController!!.navigate("settings")
+									navController.navigate("settings")
 									drawerState.close()
 								}
 							},
@@ -339,8 +345,8 @@ fun AppContent(vm: MainActivityState, view: @Composable (PaddingValues) -> Unit)
 }
 
 @Composable
-private fun NavGraph(vm: MainActivityState, it: PaddingValues) {
-	NavHost(navController = vm.navController!!, startDestination = "start", modifier = Modifier.padding(it).fillMaxSize()) {
+private fun NavGraph(vm: MainActivityState, navController: NavHostController, it: PaddingValues) {
+	NavHost(navController = navController, startDestination = "start", modifier = Modifier.padding(it).fillMaxSize()) {
 		composable("start") {
 			vm.currentNav = "start"
 			Start(vm)
@@ -1140,13 +1146,7 @@ private fun PartTool(vm: MainActivityState) {
 @Composable
 private fun Preview() {
 	val vm = MainActivityState()
-	val navController = rememberNavController()
-	val drawerState = rememberDrawerState(DrawerValue.Closed)
-	val scope = rememberCoroutineScope()
-	vm.navController = navController
-	vm.drawerState = drawerState
-	vm.scope = scope
-	AppContent(vm) {
+	AppContent(vm, rememberNavController()) {
 		Box(modifier = Modifier.padding(it)) {
 			Start(vm)
 		}

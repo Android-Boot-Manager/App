@@ -74,12 +74,20 @@ class StayAliveService : LifecycleService(), IStayAlive {
 		if (!isWorkDone) {
 			Log.e(TAG, "Warning: finishing StayAliveService before work is done.")
 		}
-		destroyed = true
+		if (!destroyed) {
+			if (!isRunning) throw IllegalStateException("excepted isRunning to be true for non-destroyed service")
+			isRunning = false
+			destroyed = true
+		}
 		stopSelf()
 	}
 
 	override fun onCreate() {
 		super.onCreate()
+		if (isRunning) {
+			throw IllegalStateException("expected isRunning=false for new service")
+		}
+		isRunning = true
 		NotificationManagerCompat.from(this).createNotificationChannel(
 			NotificationChannelCompat.Builder(SERVICE_CHANNEL,
 				NotificationManagerCompat.IMPORTANCE_HIGH)
@@ -134,13 +142,19 @@ class StayAliveService : LifecycleService(), IStayAlive {
 
 	override fun onDestroy() {
 		super.onDestroy()
-		destroyed = true
+		if (!destroyed) {
+			if (!isRunning) throw IllegalStateException("excepted isRunning to be true for non-destroyed service")
+			isRunning = false
+			destroyed = true
+		}
 	}
 
 	companion object {
 		private const val TAG = "ABM_StayAlive"
 		private const val SERVICE_CHANNEL = "service"
 		private const val FG_SERVICE_ID = 1001
+		var isRunning = false
+			private set
 	}
 }
 
