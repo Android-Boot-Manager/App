@@ -177,7 +177,7 @@ fun Terminal(logFile: String? = null, doWhenDone: (() -> Unit)? = null,
 				}, s)
 			} else {
 				val s = service.workExtra as BudgetCallbackList
-				text.value = s.joinToString("\n")
+				text.value = s.joinToString("\n").let { if (s.isNotEmpty()) it + "\n" else it }
 				s.cb = { element ->
 					scope.launch {
 						text.value += element + "\n"

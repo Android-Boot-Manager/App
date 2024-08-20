@@ -124,7 +124,6 @@ class WizardActivityState(val mvm: MainActivityState) {
 		mvm.wizardCompatE = null
 		mvm.wizardCompatPid = null
 		mvm.wizardCompatSid = null
-		mvm.mountBootset()
 	}
 
 	fun copy(inputStream: InputStream, outputStream: OutputStream): Long {

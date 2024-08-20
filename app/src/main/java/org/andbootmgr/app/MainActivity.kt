@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -76,7 +77,6 @@ class MainActivityState(val activity: MainActivity?) {
 	var wizardCompat by mutableStateOf<String?>(null)
 
 	fun startFlow(flow: String) {
-		unmountBootset()
 		wizardCompat = flow
 	}
 
@@ -268,20 +268,22 @@ class MainActivity : ComponentActivity() {
 								window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 								onDispose { window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) }
 							}
+							BackHandler {}
 							Column(modifier = Modifier.fillMaxSize()) {
-								Terminal(null, { canFinish = true }, null)
+								Row(modifier = Modifier.fillMaxWidth().weight(1.0f)) {
+									Terminal(null, { canFinish = true }, null)
+								}
 								Row(modifier = Modifier.fillMaxWidth()) {
 									TextButton(onClick = {
 									}, modifier = Modifier.weight(1f, true)) {
 										Text("") // This button is useless.
 									}
 									TextButton(onClick = {
-										if (canFinish) {
+										if (canFinish)
 											CoroutineScope(Dispatchers.IO).launch {
 												vm.init()
 												showTerminal = false
 											}
-										}
 									}, modifier = Modifier.weight(1f, true)) {
 										Text(if (canFinish) stringResource(R.string.finish) else "")
 									}

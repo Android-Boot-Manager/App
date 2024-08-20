@@ -1037,6 +1037,7 @@ private fun Flash(c: CreatePartDataHolder) {
 			makeOne(0)
 		} else { // Portable partition
 			terminal.add(vm.activity.getString(R.string.term_create_part))
+			vm.logic.unmountBootset()
 			val r = vm.logic.create(c.p,
 					c.l.toLong(),
 					c.u.toLong(),
