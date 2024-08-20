@@ -270,22 +270,17 @@ class MainActivity : ComponentActivity() {
 							}
 							BackHandler {}
 							Column(modifier = Modifier.fillMaxSize()) {
-								Row(modifier = Modifier.fillMaxWidth().weight(1.0f)) {
+								Box(modifier = Modifier.fillMaxWidth().weight(1.0f)) {
 									Terminal(null, { canFinish = true }, null)
 								}
-								Row(modifier = Modifier.fillMaxWidth()) {
-									TextButton(onClick = {
-									}, modifier = Modifier.weight(1f, true)) {
-										Text("") // This button is useless.
-									}
-									TextButton(onClick = {
+								Box(modifier = Modifier.fillMaxWidth()) {
+									BasicButtonRow("", {}, if (canFinish)
+										stringResource(R.string.finish) else "") {
 										if (canFinish)
 											CoroutineScope(Dispatchers.IO).launch {
 												vm.init()
 												showTerminal = false
 											}
-									}, modifier = Modifier.weight(1f, true)) {
-										Text(if (canFinish) stringResource(R.string.finish) else "")
 									}
 								}
 							}

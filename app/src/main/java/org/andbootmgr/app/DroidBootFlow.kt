@@ -16,6 +16,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -101,7 +102,7 @@ private fun Input(vm: WizardActivityState) {
 		modifier = Modifier.fillMaxSize()
 	) {
 		var text by remember { mutableStateOf(vm.activity.getString(R.string.android)) }
-		vm.texts["OsName"] = text.trim()
+		LaunchedEffect(text) { vm.texts["OsName"] = text.trim() }
 		val e = text.isBlank() || !text.matches(Regex("[\\dA-Za-z]+"))
 
 		Text(stringResource(R.string.enter_name_for_current), textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 5.dp))
@@ -115,13 +116,18 @@ private fun Input(vm: WizardActivityState) {
 			isError = e
 		)
 		if (e) {
-			vm.nextText.value = ""
-			vm.onNext.value = {}
 			Text(stringResource(R.string.invalid_in), color = MaterialTheme.colorScheme.error)
 		} else {
-			vm.nextText.value = stringResource(id = R.string.next)
-			vm.onNext.value = { it.navigate("select") }
 			Text("") // Budget spacer
+		}
+		LaunchedEffect(e) {
+			if (e) {
+				vm.nextText = ""
+				vm.onNext = {}
+			} else {
+				vm.nextText = vm.activity.getString(R.string.next)
+				vm.onNext = { it.navigate("select") }
+			}
 		}
 	}
 }
@@ -129,7 +135,7 @@ private fun Input(vm: WizardActivityState) {
 // shared across DroidBootFlow, UpdateDroidBootFlow, FixDroidBootFlow
 @Composable
 fun SelectDroidBoot(vm: WizardActivityState) {
-	val nextButtonAvailable = remember { mutableStateOf(false) }
+	var nextButtonAvailable by remember { mutableStateOf(false) }
 
 	Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
 		modifier = Modifier.fillMaxSize()
@@ -140,16 +146,16 @@ fun SelectDroidBoot(vm: WizardActivityState) {
 			Modifier.defaultMinSize(32.dp, 32.dp)
 		)
 
-		if (nextButtonAvailable.value) {
+		if (nextButtonAvailable) {
 			Text(stringResource(id = R.string.successfully_selected))
-			vm.nextText.value = stringResource(id = R.string.next)
-			vm.onNext.value = { it.navigate("flash") }
 		} else {
 			Text(stringResource(R.string.choose_droidboot_online))
 			Button(onClick = {
 				vm.activity.chooseFile("*/*") {
 					vm.flashes["DroidBootFlashType"] = Pair(it, null)
-					nextButtonAvailable.value = true
+					nextButtonAvailable = true
+					vm.nextText = vm.activity.getString(R.string.next)
+					vm.onNext = { n -> n.navigate("flash") }
 				}
 			}) {
 				Text(stringResource(id = R.string.choose_file))
@@ -167,7 +173,9 @@ fun SelectDroidBoot(vm: WizardActivityState) {
 						val url = bl.getString("url")
 						val sha = if (bl.has("sha256")) bl.getString("sha256") else null
 						vm.flashes["DroidBootFlashType"] = Pair(Uri.parse(url), sha)
-						nextButtonAvailable.value = true
+						nextButtonAvailable = true
+						vm.nextText = vm.activity.getString(R.string.next)
+						vm.onNext = { n -> n.navigate("flash") }
 					} catch (e: Exception) {
 						Handler(Looper.getMainLooper()).post {
 							Toast.makeText(ctx, R.string.dl_error, Toast.LENGTH_LONG).show()
@@ -185,22 +193,23 @@ fun SelectDroidBoot(vm: WizardActivityState) {
 // shared across DroidBootFlow, UpdateDroidBootFlow, FixDroidBootFlow
 @Composable
 fun SelectInstallSh(vm: WizardActivityState, update: Boolean = false) {
-	val nextButtonAvailable = remember { mutableStateOf(false) }
+	var nextButtonAvailable by remember { mutableStateOf(false) }
 	val flashType = "InstallShFlashType"
 
 	Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
 		modifier = Modifier.fillMaxSize()
 	) {
-		if (nextButtonAvailable.value) {
+		if (nextButtonAvailable) {
 			Text(stringResource(id = R.string.successfully_selected))
-			vm.nextText.value = stringResource(id = R.string.next)
-			vm.onNext.value = { it.navigate(if (!vm.deviceInfo.isBooted(vm.logic) || update) "select" else "flash") }
 		} else {
 			Text(stringResource(R.string.choose_install_s_online))
 			Button(onClick = {
 				vm.activity.chooseFile("*/*") {
 					vm.flashes[flashType] = Pair(it, null)
-					nextButtonAvailable.value = true
+					nextButtonAvailable = true
+					vm.nextText = vm.activity.getString(R.string.next)
+					vm.onNext = { n -> n.navigate(
+						if (!vm.deviceInfo.isBooted(vm.logic) || update) "select" else "flash") }
 				}
 			}) {
 				Text(stringResource(id = R.string.choose_file))
@@ -218,7 +227,10 @@ fun SelectInstallSh(vm: WizardActivityState, update: Boolean = false) {
 						val url = i.getString("url")
 						val sha = if (i.has("sha256")) i.getString("sha256") else null
 						vm.flashes[flashType] = Pair(Uri.parse(url), sha)
-						nextButtonAvailable.value = true
+						nextButtonAvailable = true
+						vm.nextText = vm.activity.getString(R.string.next)
+						vm.onNext = { n -> n.navigate(
+							if (!vm.deviceInfo.isBooted(vm.logic) || update) "select" else "flash") }
 					} catch (e: Exception) {
 						Handler(Looper.getMainLooper()).post {
 							Toast.makeText(ctx, R.string.dl_error, Toast.LENGTH_LONG).show()
@@ -374,9 +386,8 @@ private fun Flash(vm: WizardActivityState) {
 		terminal.add(vm.activity.getString(R.string.term_success))
 		vm.logic.unmountBootset()
 		withContext(Dispatchers.Main) {
-			vm.btnsOverride = true
-			vm.nextText.value = vm.activity.getString(R.string.finish)
-			vm.onNext.value = {
+			vm.nextText = vm.activity.getString(R.string.finish)
+			vm.onNext = {
 				if (vm.deviceInfo.isBooted(vm.logic)) {
 					it.finish()
 				} else {

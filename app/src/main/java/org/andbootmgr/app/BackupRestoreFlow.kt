@@ -100,15 +100,15 @@ private fun SelectDroidBoot(c: CreateBackupDataHolder) {
                     c.vm.activity.chooseFile("*/*") {
                         c.path = it
                         nextButtonAvailable = true
-                        c.vm.nextText.value = c.vm.activity.getString(R.string.next)
-                        c.vm.onNext.value = { i -> i.navigate("go") }
+                        c.vm.nextText = c.vm.activity.getString(R.string.next)
+                        c.vm.onNext = { i -> i.navigate("go") }
                     }
                 } else {
                     c.vm.activity.createFile("${c.meta!!.dumpKernelPartition(c.pi).name}.img") {
                         c.path = it
                         nextButtonAvailable = true
-                        c.vm.nextText.value = c.vm.activity.getString(R.string.next)
-                        c.vm.onNext.value = { i -> i.navigate("go") }
+                        c.vm.nextText = c.vm.activity.getString(R.string.next)
+                        c.vm.onNext = { i -> i.navigate("go") }
                     }
                 }
             }) {
@@ -159,8 +159,7 @@ private fun Flash(c: CreateBackupDataHolder) {
             terminal.add(c.vm.activity.getString(R.string.term_contact_support))
         }
         terminal.add(c.vm.activity.getString(R.string.term_success))
-        c.vm.btnsOverride = true
-        c.vm.nextText.value = c.vm.activity.getString(R.string.finish)
-        c.vm.onNext.value = { it.finish() }
+        c.vm.nextText = c.vm.activity.getString(R.string.finish)
+        c.vm.onNext = { it.finish() }
     }
 }

@@ -92,11 +92,8 @@ private fun Flash(vm: WizardActivityState) {
 		}
 		terminal.add(vm.activity.getString(R.string.term_success))
 		withContext(Dispatchers.Main) {
-			vm.btnsOverride = true
-			vm.nextText.value = vm.activity.getString(R.string.finish)
-			vm.onNext.value = {
-				it.finish()
-			}
+			vm.nextText = vm.activity.getString(R.string.finish)
+			vm.onNext = { it.finish() }
 		}
 	}
 }

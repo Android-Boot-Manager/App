@@ -12,9 +12,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.net.toFile
 import androidx.navigation.NavHostController
@@ -56,33 +57,31 @@ fun WizardCompat(mvm: MainActivityState, flow: String) {
 	val vm = remember { WizardActivityState(mvm) }
 	vm.navController = rememberNavController()
 	val wizardPages = remember(flow) { WizardPageFactory(vm).get(flow) }
-	BackHandler {
-		vm.onPrev.value.invoke(vm)
-	}
-	Column(modifier = Modifier.fillMaxSize()) {
 		NavHost(
 			navController = vm.navController,
 			startDestination = "start",
 			modifier = Modifier
 				.fillMaxWidth()
-				.weight(1.0f)
 		) {
 			for (i in wizardPages) {
 				composable(i.name) {
-					if (!vm.btnsOverride) {
-						vm.prevText.value = i.prev.text
-						vm.nextText.value = i.next.text
-						vm.onPrev.value = i.prev.onClick
-						vm.onNext.value = i.next.onClick
+					Column(modifier = Modifier.fillMaxSize()) {
+						BackHandler {
+							(vm.onPrev ?: i.prev.onClick)(vm)
+						}
+						Box(Modifier.fillMaxWidth().weight(1f)) {
+							i.run()
+						}
+						Box(Modifier.fillMaxWidth()) {
+							BasicButtonRow(vm.prevText ?: i.prev.text,
+								{ (vm.onPrev ?: i.prev.onClick)(vm) },
+								vm.nextText ?: i.next.text,
+								{ (vm.onNext ?: i.next.onClick)(vm) })
+						}
 					}
-					i.run()
 				}
 			}
 		}
-		Box(Modifier.fillMaxWidth()) {
-			BtnsRow(vm)
-		}
-	}
 }
 
 private class ExpectedDigestInputStream(stream: InputStream?,
@@ -100,26 +99,29 @@ class HashMismatchException(message: String) : Exception(message)
 
 class WizardActivityState(val mvm: MainActivityState) {
 	val codename = mvm.deviceInfo!!.codename
-	var btnsOverride = false
 	val activity = mvm.activity!!
 	lateinit var navController: NavHostController
 	val logic = mvm.logic!!
 	val deviceInfo = mvm.deviceInfo!!
-	var prevText = mutableStateOf("")
-	var nextText = mutableStateOf("")
-	var onPrev: MutableState<(WizardActivityState) -> Unit> = mutableStateOf({})
-	var onNext: MutableState<(WizardActivityState) -> Unit> = mutableStateOf({})
+	var prevText by mutableStateOf<String?>(null)
+	var nextText by mutableStateOf<String?>(null)
+	var onPrev by mutableStateOf<((WizardActivityState) -> Unit)?>(null)
+	var onNext by mutableStateOf<((WizardActivityState) -> Unit)?>(null)
 
 	var flashes: HashMap<String, Pair<Uri, String?>> = HashMap()
 	var texts: HashMap<String, String> = HashMap()
 
 	fun navigate(next: String) {
-		btnsOverride = false
+		prevText = null
+		nextText = null
+		onPrev = null
+		onNext = null
 		navController.navigate(next) {
 			launchSingleTop = true
 		}
 	}
 	fun finish() {
+		mvm.init()
 		mvm.wizardCompat = null
 		mvm.wizardCompatE = null
 		mvm.wizardCompatPid = null
@@ -184,17 +186,18 @@ interface IWizardPage {
 }
 
 @Composable
-private fun BtnsRow(vm: WizardActivityState) {
+fun BasicButtonRow(prev: String, onPrev: () -> Unit,
+                   next: String, onNext: () -> Unit) {
 	Row {
 		TextButton(onClick = {
-			vm.onPrev.value(vm)
+			onPrev()
 		}, modifier = Modifier.weight(1f, true)) {
-			Text(vm.prevText.value)
+			Text(prev)
 		}
 		TextButton(onClick = {
-			vm.onNext.value(vm)
+			onNext()
 		}, modifier = Modifier.weight(1f, true)) {
-			Text(vm.nextText.value)
+			Text(next)
 		}
 	}
 }

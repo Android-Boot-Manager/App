@@ -719,13 +719,14 @@ private fun Os(c: CreatePartDataHolder) {
 			}
 		}
 	}
-	c.vm.btnsOverride = true
-	if (e) {
-		c.vm.onNext.value = {}
-		c.vm.nextText.value = ""
-	} else {
-		c.vm.onNext.value = { it.navigate("dload") }
-		c.vm.nextText.value = stringResource(R.string.install)
+	LaunchedEffect(e) {
+		if (e) {
+			c.vm.onNext = {}
+			c.vm.nextText = ""
+		} else {
+			c.vm.onNext = { it.navigate("dload") }
+			c.vm.nextText = c.vm.activity.getString(R.string.install)
+		}
 	}
 }
 
@@ -889,13 +890,15 @@ private fun Download(c: CreatePartDataHolder) {
 				}
 			}
 		}
-		c.vm.btnsOverride = true
-		if (c.idNeeded.find { !c.chosen.containsKey(it) } == null && c.chosen.containsKey("_install.sh_")) {
-			c.vm.onNext.value = { it.navigate("flash") }
-			c.vm.nextText.value = stringResource(id = R.string.install)
-		} else {
-			c.vm.onNext.value = {}
-			c.vm.nextText.value = ""
+		val isOk = c.idNeeded.find { !c.chosen.containsKey(it) } == null && c.chosen.containsKey("_install.sh_")
+		LaunchedEffect(isOk) {
+			if (isOk) {
+				c.vm.onNext = { it.navigate("flash") }
+				c.vm.nextText = c.vm.activity.getString(R.string.install)
+			} else {
+				c.vm.onNext = {}
+				c.vm.nextText = ""
+			}
 		}
 	}
 }
@@ -984,9 +987,8 @@ private fun Flash(c: CreatePartDataHolder) {
 				}
 
 				terminal.add(vm.activity.getString(R.string.term_success))
-				vm.btnsOverride = true
-				vm.nextText.value = vm.activity.getString(R.string.finish)
-				vm.onNext.value = { it.finish() }
+				vm.nextText = vm.activity.getString(R.string.finish)
+				vm.onNext = { it.finish() }
 			}
 
 			// Fucking complicated code to fairly and flexibly partition space based on preset percentage & bytes values
@@ -1048,11 +1050,8 @@ private fun Flash(c: CreatePartDataHolder) {
 				terminal.add(vm.activity.getString(R.string.term_reboot_asap))
 			}
 			if (r.isSuccess) {
-				vm.btnsOverride = true
-				vm.nextText.value = c.vm.activity.getString(R.string.finish)
-				vm.onNext.value = {
-					it.finish()
-				}
+				vm.nextText = c.vm.activity.getString(R.string.finish)
+				vm.onNext = { it.finish() }
 				terminal.add(vm.activity.getString(R.string.term_success))
 			} else {
 				terminal.add(vm.activity.getString(R.string.term_failure))

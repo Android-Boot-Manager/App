@@ -254,9 +254,8 @@ private fun Flash(u: UpdateFlowDataHolder) {
         Shell.cmd(SDUtils.umsd(meta)).exec()
 
         if (u.hasUpdate) { // online
-            u.vm.btnsOverride = true
-            u.vm.nextText.value = u.vm.activity.getString(R.string.cancel)
-            u.vm.onNext.value = { u.currentDl?.cancel() }
+            u.vm.nextText = u.vm.activity.getString(R.string.cancel)
+            u.vm.onNext = { u.currentDl?.cancel() }
             try {
                 val bootfile = ArrayList<File>()
                 if (u.extraParts.isNotEmpty()) {
@@ -293,8 +292,8 @@ private fun Flash(u: UpdateFlowDataHolder) {
                 val tmpFile = createTempFileSu("abm", ".sh", u.vm.logic.rootTmpDir)
                 u.vm.copyPriv(u.vm.flashStream("InstallShFlashType"), tmpFile)
                 tmpFile.setExecutable(true)
-                u.vm.nextText.value = ""
-                u.vm.onNext.value = {}
+                u.vm.nextText = ""
+                u.vm.onNext = {}
 
                 for (p in u.partMapping.entries) {
                     val v = sp.find { p.key.toString() == it }
@@ -366,13 +365,10 @@ private fun Flash(u: UpdateFlowDataHolder) {
                 throw IllegalStateException(u.vm.activity.getString(R.string.term_script_fail))
             }
             terminal.add(u.vm.activity.getString(R.string.term_success))
-            u.vm.btnsOverride = true
         } else {
             terminal.add(u.vm.activity.getString(R.string.term_update_failed_prep))
         }
-        u.vm.nextText.value = u.vm.activity.getString(R.string.finish)
-        u.vm.onNext.value = {
-            it.finish()
-        }
+        u.vm.nextText = u.vm.activity.getString(R.string.finish)
+        u.vm.onNext = { it.finish() }
     }
 }
