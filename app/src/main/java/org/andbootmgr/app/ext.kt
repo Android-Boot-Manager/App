@@ -71,3 +71,7 @@ fun LoadingCircle(text: String, modifier: Modifier = Modifier, paddingBetween: D
 val safeFsRegex = Regex("\\A[A-Za-z0-9_-]+\\z")
 val asciiNonEmptyRegex = Regex("\\A\\p{ASCII}+\\z")
 val numberRegex = Regex("\\A\\d+\\z")
+val partitionTypeCodes = listOf(
+	Pair("0700", R.string.portable_part),
+	Pair("8302", R.string.os_userdata),
+	Pair("8305", R.string.os_system))

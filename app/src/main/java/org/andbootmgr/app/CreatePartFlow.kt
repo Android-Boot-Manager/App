@@ -543,22 +543,14 @@ private fun Os(c: CreatePartDataHolder) {
 				}
 			}
 		if (expanded == 2) {
-			Column(
-				Modifier
-					.fillMaxWidth()) {
-
-				for (i in 1..c.count) {
-					val selectedValue = remember { mutableIntStateOf(c.selVals.getOrElse(i-1) { 1 }) }
-					val intValue = remember { mutableLongStateOf(c.intVals.getOrElse(i-1) { 100L }) }
-					var codeValue by remember { mutableStateOf(c.codeVals.getOrElse(i-1) { "8305" }) }
-					var idValue by remember { mutableStateOf(c.idVals.getOrElse(i-1) { "" }) }
+			Column(Modifier.fillMaxWidth()) {
+				for (i in 0..<c.count) {
+					var selectedValue by remember { mutableIntStateOf(c.selVals.getOrElse(i) { 1 }) }
+					var intValue by remember { mutableLongStateOf(c.intVals.getOrElse(i) { 100L }) }
+					var codeValue by remember { mutableStateOf(c.codeVals.getOrElse(i) { "8305" }) }
+					var idValue by remember { mutableStateOf(c.idVals.getOrElse(i) { "" }) }
 					var d by remember { mutableStateOf(false) }
-					var sparse by remember { mutableStateOf(c.sparseVals.getOrElse(i-1) { false }) }
-					val items = listOf("bytes", "percent")
-					val items2 = listOf("0700", "8302", "8305")
-					val codes = listOf(stringResource(R.string.portable_part), stringResource(R.string.os_userdata), stringResource(R.string.os_system))
-					val isSelectedItem: (String) -> Boolean = { items[selectedValue.intValue] == it }
-					val onChangeState: (String) -> Unit = { selectedValue.intValue = items.indexOf(it) }
+					var sparse by remember { mutableStateOf(c.sparseVals.getOrElse(i) { false }) }
 
 					Card(
 						modifier = Modifier
@@ -570,79 +562,92 @@ private fun Os(c: CreatePartDataHolder) {
 								.fillMaxWidth()
 								.padding(10.dp)
 						) {
-							var sts: Long = -1
+							var sizeInSectors: Long = -1
 							var remaining = c.endSectorRelative - c.startSectorRelative
-							if (i-1 < c.selVals.size) {
-								c.selVals[i - 1] = selectedValue.intValue
+							if (i < c.selVals.size) {
+								c.selVals[i] = selectedValue
 							} else {
-								c.selVals.add(i - 1, selectedValue.intValue)
+								c.selVals.add(i, selectedValue)
 							}
-							if (i-1 < c.intVals.size) {
-								c.intVals[i - 1] = intValue.longValue
+							if (i < c.intVals.size) {
+								c.intVals[i] = intValue
 							} else {
-								c.intVals.add(i - 1, intValue.longValue)
+								c.intVals.add(i, intValue)
 							}
-							if (i-1 < c.codeVals.size) {
-								c.codeVals[i - 1] = codeValue
+							if (i < c.codeVals.size) {
+								c.codeVals[i] = codeValue
 							} else {
-								c.codeVals.add(i - 1, codeValue)
+								c.codeVals.add(i, codeValue)
 							}
-							if (i-1 < c.idVals.size) {
-								c.idVals[i - 1] = idValue
+							if (i < c.idVals.size) {
+								c.idVals[i] = idValue
 							} else {
-								c.idVals.add(i - 1, idValue)
+								c.idVals.add(i, idValue)
 							}
-							if (i-1 < c.sparseVals.size) {
-								c.sparseVals[i - 1] = sparse
+							if (i < c.sparseVals.size) {
+								c.sparseVals[i] = sparse
 							} else {
-								c.sparseVals.add(i - 1, sparse)
+								c.sparseVals.add(i, sparse)
 							}
-							for (j in 1 .. i) {
-								val k = c.intVals.getOrElse(j-1) { 0L }
-								val l = c.selVals.getOrElse(j-1) { 1 }
-								sts = if (l == 0 /*bytes*/) {
+							for (j in 0 .. i) {
+								val k = c.intVals.getOrElse(j) { 0L }
+								val l = c.selVals.getOrElse(j) { 1 }
+								sizeInSectors = if (l == 0 /*bytes*/) {
 									k / c.meta!!.logicalSectorSizeBytes
 								} else /*percent*/ {
 									(BigDecimal(remaining).multiply(BigDecimal(k).divide(BigDecimal(100)))).toLong()
 								}
-								remaining -= sts
+								remaining -= sizeInSectors
 							}
-							remaining += sts
+							remaining += sizeInSectors
 
-							Text(text = stringResource(R.string.sector_used, intValue.longValue, items[selectedValue.intValue], sts, remaining))
-							TextField(value = intValue.longValue.toString(), onValueChange = {
+							val selUnit = stringResource(if (selectedValue == 1) R.string.percent else R.string.bytes)
+							Text(text = stringResource(R.string.sector_used, intValue, selUnit, sizeInSectors, remaining))
+							TextField(value = intValue.toString(), onValueChange = {
 								if (it.matches(Regex("\\d+"))) {
-									intValue.longValue = it.toLong()
+									intValue = it.toLong()
 								}
 							}, label = {
 								Text(stringResource(R.string.size))
 							})
 							Row(Modifier.padding(8.dp)) {
-								items.forEach { item ->
-									Row(
-										verticalAlignment = Alignment.CenterVertically,
-										modifier = Modifier
-											.selectable(
-												selected = isSelectedItem(item),
-												onClick = { onChangeState(item) },
-												role = Role.RadioButton
-											)
-											.padding(8.dp)
-									) {
-										RadioButton(
-											selected = isSelectedItem(item),
-											onClick = null
+								Row(
+									verticalAlignment = Alignment.CenterVertically,
+									modifier = Modifier
+										.selectable(
+											selected = selectedValue == 0,
+											onClick = { selectedValue = 0 },
+											role = Role.RadioButton
 										)
-										Text(
-											text = item
+										.padding(8.dp)
+								) {
+									RadioButton(
+										selected = selectedValue == 0,
+										onClick = null
+									)
+									Text(text = stringResource(R.string.bytes))
+								}
+								Row(
+									verticalAlignment = Alignment.CenterVertically,
+									modifier = Modifier
+										.selectable(
+											selected = selectedValue == 1,
+											onClick = { selectedValue = 1 },
+											role = Role.RadioButton
 										)
-									}
+										.padding(8.dp)
+								) {
+									RadioButton(
+										selected = selectedValue == 1,
+										onClick = null
+									)
+									Text(text = stringResource(R.string.percent))
 								}
 							}
 							ExposedDropdownMenuBox(expanded = d, onExpandedChange = { d = it }) {
 								TextField(
 									readOnly = true,
-									value = codes[items2.indexOf(codeValue)],
+									value = stringResource(partitionTypeCodes.find { it.first == codeValue }!!.second),
 									onValueChange = { },
 									label = { Text(stringResource(R.string.type)) },
 									trailingIcon = {
@@ -658,14 +663,13 @@ private fun Os(c: CreatePartDataHolder) {
 										d = false
 									}
 								) {
-
-									for (g in codes) {
+									for (g in partitionTypeCodes) {
 										DropdownMenuItem(
 											onClick = {
-												codeValue = items2[codes.indexOf(g)]
+												codeValue = g.first
 												d = false
 											}, text = {
-												Text(text = g)
+												Text(text = stringResource(g.second))
 											}
 										)
 									}
@@ -805,7 +809,7 @@ private fun Download(c: CreatePartDataHolder) {
 							Text(stringResource(R.string.undo))
 						}
 					} else {
-						if (c.inetAvailable.containsKey(i) || i == "_install.sh_") {
+						if (i == "_install.sh_" || c.inetAvailable.containsKey(i)) {
 							Button(onClick = {
 								CoroutineScope(Dispatchers.IO).launch {
 									try {

@@ -259,4 +259,6 @@
 	<string name="abm_processing_title">ABM is processing</string>
 	<string name="abm_processing_text">Please make sure you do not leave the app to avoid issues</string>
 	<string name="restoring_backup">Restoring backup…</string>
+	<string name="bytes">bytes</string>
+	<string name="percent">percent</string>
 </resources>
