@@ -804,13 +804,7 @@ private fun PartTool(vm: MainActivityState) {
 					Text(stringResource(R.string.please_wait))
 				},
 				text = {
-					Row(
-						verticalAlignment = Alignment.CenterVertically,
-						horizontalArrangement = Arrangement.SpaceAround
-					) {
-						CircularProgressIndicator(Modifier.padding(end = 20.dp))
-						Text(stringResource(R.string.loading))
-					}
+					LoadingCircle(stringResource(R.string.loading), paddingBetween = 20.dp)
 				},
 				confirmButton = {}
 			)

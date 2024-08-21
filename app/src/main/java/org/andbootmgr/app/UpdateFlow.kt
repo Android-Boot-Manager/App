@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -21,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
 import kotlinx.coroutines.Dispatchers
@@ -158,12 +160,7 @@ private fun Start(u: UpdateFlowDataHolder) {
             }
         }
     } else {
-        Box(contentAlignment = Alignment.Center) {
-            Row {
-                CircularProgressIndicator()
-                Text(stringResource(R.string.checking_for_update))
-            }
-        }
+        LoadingCircle(stringResource(R.string.checking_for_update), modifier = Modifier.fillMaxSize())
     }
 
 }
