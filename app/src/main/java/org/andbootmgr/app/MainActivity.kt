@@ -14,7 +14,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -34,7 +33,6 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -68,36 +66,12 @@ import org.andbootmgr.app.themes.ThemeViewModel
 import org.andbootmgr.app.themes.Themes
 import org.andbootmgr.app.util.AbmTheme
 import org.andbootmgr.app.util.ConfigFile
-import org.andbootmgr.app.util.SDUtils
 import org.andbootmgr.app.util.StayAliveService
 import org.andbootmgr.app.util.Terminal
 import java.util.concurrent.atomic.AtomicBoolean
 
 class MainActivityState(val activity: MainActivity?) {
-	var wizardCompat by mutableStateOf<String?>(null)
-
-	fun startFlow(flow: String) {
-		wizardCompat = flow
-	}
-
-	var wizardCompatSid: Long? = null
-	fun startCreateFlow(freeSpace: SDUtils.Partition.FreeSpace) {
-		wizardCompatSid = freeSpace.startSector
-		startFlow("create_part")
-	}
-
-	var wizardCompatE: String? = null
-	fun startUpdateFlow(e: String) {
-		wizardCompatE = e
-		startFlow("update")
-	}
-
-	var wizardCompatPid: Int? = null
-	fun startBackupAndRestoreFlow(partition: SDUtils.Partition) {
-		wizardCompatPid = partition.id
-		startFlow("backup_restore")
-	}
-
+	var currentWizardFlow by mutableStateOf<WizardFlow?>(null)
 	var noobMode by mutableStateOf(false)
 	var deviceInfo: DeviceInfo? = null
 	val theme = ThemeViewModel(this)
@@ -284,8 +258,8 @@ class MainActivity : ComponentActivity() {
 									}
 								}
 							}
-						} else if (vm.wizardCompat != null) {
-							WizardCompat(vm, vm.wizardCompat!!)
+						} else if (vm.currentWizardFlow != null) {
+							WizardCompat(vm, vm.currentWizardFlow!!)
 						} else {
 							val navController = rememberNavController()
 							AppContent(vm, navController) {

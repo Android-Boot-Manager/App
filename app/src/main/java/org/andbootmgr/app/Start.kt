@@ -151,13 +151,15 @@ fun Start(vm: MainActivityState) {
 		} else if (metaOnSd && !sdPresent) {
 			Text(stringResource(R.string.need_sd), textAlign = TextAlign.Center)
 		} else if (!installed && !mounted) {
-			Button(onClick = { vm.startFlow("droidboot") }) {
+			Button(onClick = {
+				vm.currentWizardFlow = DroidBootFlow()
+			}) {
 				Text(stringResource(if (metaOnSd) R.string.setup_sd else R.string.install))
 			}
 		} else if (!booted && mounted) {
 			Text(stringResource(R.string.installed_not_booted), textAlign = TextAlign.Center)
 			Button(onClick = {
-				vm.startFlow("fix_droidboot")
+				vm.currentWizardFlow = FixDroidBootFlow()
 			}) {
 				Text(stringResource(R.string.repair_droidboot))
 			}
@@ -462,11 +464,15 @@ private fun PartTool(vm: MainActivityState) {
 									}
 								}
 							}
-							Button(onClick = { vm.startBackupAndRestoreFlow(p) }) {
+							Button(onClick = {
+								vm.currentWizardFlow = BackupRestoreFlow(p.id)
+							}) {
 								Text(stringResource(R.string.backupnrestore))
 							}
 						} else {
-							Button(onClick = { vm.startCreateFlow(p as SDUtils.Partition.FreeSpace) }) {
+							Button(onClick = {
+								vm.currentWizardFlow = CreatePartFlow(p.startSector)
+							}) {
 								Text(stringResource(R.string.create))
 							}
 						}
@@ -715,8 +721,9 @@ private fun PartTool(vm: MainActivityState) {
 					Column(Modifier.verticalScroll(rememberScrollState())) {
 						Button(
 							onClick = {
-								if (e.has("xupdate") && !e["xupdate"].isNullOrBlank())
-									vm.startUpdateFlow(entries!![e]!!.absolutePath)
+								if (e.has("xupdate") && !e["xupdate"].isNullOrBlank()) {
+									vm.currentWizardFlow = UpdateFlow(entries!![e]!!.name)
+								}
 							}, enabled = e.has("xupdate") && !e["xupdate"].isNullOrBlank()) {
 							Text(stringResource(R.string.update))
 						}

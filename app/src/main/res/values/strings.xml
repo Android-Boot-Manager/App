@@ -76,6 +76,7 @@
 	<string name="file_unavailable">File not available, please try again later!</string>
 	<string name="local_update">Local update</string>
 	<string name="online_update">Online update</string>
+	<string name="checking_for_update">Checking for updates…</string>
 	<string name="update_check_failed">Failed to check for updates! Please try again later.</string>
 	<string name="found_update">"An update is available for installation.\n\n
 

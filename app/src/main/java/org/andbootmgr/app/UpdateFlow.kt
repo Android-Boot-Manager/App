@@ -3,20 +3,26 @@ package org.andbootmgr.app
 import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.Call
@@ -34,15 +40,14 @@ import java.io.File
 import java.net.URL
 import java.util.concurrent.TimeUnit
 
-class UpdateFlowWizardPageFactory(private val vm: WizardActivityState) {
-    fun get(): List<IWizardPage> {
-        val c = UpdateFlowDataHolder(vm)
-        val noobMode = c.vm.activity.getSharedPreferences("abm", 0).getBoolean("noob_mode", BuildConfig.DEFAULT_NOOB_MODE)
+class UpdateFlow(private val entryName: String): WizardFlow() {
+    override fun get(vm: WizardActivityState): List<IWizardPage> {
+        val c = UpdateFlowDataHolder(vm, entryName)
         return listOf(WizardPage("start",
             NavButton(vm.activity.getString(R.string.cancel)) {
                 it.finish()
             },
-            if (noobMode) NavButton("") {} else NavButton(vm.activity.getString(R.string.local_update)) { vm.navigate("local") }
+            if (c.vm.mvm.noobMode) NavButton("") {} else NavButton(vm.activity.getString(R.string.local_update)) { vm.navigate("local") }
         ) {
             Start(c)
         }, WizardPage("local",
@@ -59,7 +64,7 @@ class UpdateFlowWizardPageFactory(private val vm: WizardActivityState) {
     }
 }
 
-private class UpdateFlowDataHolder(val vm: WizardActivityState) {
+private class UpdateFlowDataHolder(val vm: WizardActivityState, val entryFilename: String) {
     val client = OkHttpClient().newBuilder().readTimeout(1L, TimeUnit.HOURS).build()
     var json: JSONObject? = null
     var currentDl: Call? = null
@@ -68,7 +73,6 @@ private class UpdateFlowDataHolder(val vm: WizardActivityState) {
     var e: ConfigFile? = null
     var ef: File? = null
     var hasUpdate = false
-    var hasChecked by mutableStateOf(false)
     val partMapping = HashMap<Int, String>()
     var extraParts = ArrayList<String>()
     var updateJson: String? = null
@@ -77,20 +81,16 @@ private class UpdateFlowDataHolder(val vm: WizardActivityState) {
 
 @Composable
 private fun Start(u: UpdateFlowDataHolder) {
+    var hasChecked by remember { mutableStateOf(false) }
+    val ioDispatcher = rememberCoroutineScope { Dispatchers.IO }
     LaunchedEffect(Unit) {
-        val entries = mutableMapOf<ConfigFile, File>()
-        val list = SuFile.open(u.vm.logic.abmEntries.absolutePath).listFiles()
-        for (i in list!!) {
-            try {
-                entries[ConfigFile.importFromFile(i)] = i
-            } catch (e: ActionAbortedCleanlyError) {
-                Log.e("ABM", Log.getStackTraceString(e))
-            }
-        }
-        val toFind = u.vm.mvm.wizardCompatE!!
-        u.e = entries.entries.find { it.value.absolutePath == toFind }!!.also { u.ef = it.value }.key
-
-        CoroutineScope(Dispatchers.IO).launch {
+        ioDispatcher.launch {
+            u.e = ConfigFile.importFromFile(
+                SuFile.open(
+                    u.vm.logic.abmEntries.absolutePath,
+                    u.entryFilename
+                )
+            )
             try {
                 val jsonText =
                     URL(u.e!!["xupdate"]).readText()
@@ -101,11 +101,11 @@ private fun Start(u: UpdateFlowDataHolder) {
             if (u.json != null) {
                 u.hasUpdate = u.json!!.optBoolean("hasUpdate", false)
             }
-            u.hasChecked = true
+            hasChecked = true
         }
     }
-    Column {
-        if (u.hasChecked) {
+    if (hasChecked) {
+        Column(modifier = Modifier.fillMaxSize()) {
             if (u.json == null) {
                 Text(stringResource(R.string.update_check_failed))
             } else {
@@ -124,7 +124,8 @@ private fun Start(u: UpdateFlowDataHolder) {
                                     }
                                     vm.flashes["InstallShFlashType"] = Pair(
                                         Uri.parse(j.getString("script")),
-                                        if (j.has("scriptSha256")) j.getString("scriptSha256") else null)
+                                        if (j.has("scriptSha256")) j.getString("scriptSha256") else null
+                                    )
                                 }
                                 if (j.has("parts")) {
                                     val sp = u.e!!["xpart"]!!.split(":")
@@ -156,7 +157,15 @@ private fun Start(u: UpdateFlowDataHolder) {
                 }
             }
         }
+    } else {
+        Box(contentAlignment = Alignment.Center) {
+            Row {
+                CircularProgressIndicator()
+                Text(stringResource(R.string.checking_for_update))
+            }
+        }
     }
+
 }
 
 @Composable

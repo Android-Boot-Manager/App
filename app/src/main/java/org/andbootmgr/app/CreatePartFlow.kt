@@ -42,9 +42,9 @@ import java.math.BigDecimal
 import java.net.URL
 import java.util.concurrent.TimeUnit
 
-class CreatePartWizardPageFactory(private val vm: WizardActivityState) {
-	fun get(): List<IWizardPage> {
-		val c = CreatePartDataHolder(vm)
+class CreatePartFlow(private val desiredStartSector: Long): WizardFlow() {
+	override fun get(vm: WizardActivityState): List<IWizardPage> {
+		val c = CreatePartDataHolder(vm, desiredStartSector)
 		return listOf(WizardPage("start",
 			NavButton(vm.activity.getString(R.string.cancel)) { it.finish() },
 			NavButton("") {}
@@ -120,7 +120,7 @@ internal interface ProgressListener {
 	fun update(bytesRead: Long, contentLength: Long, done: Boolean)
 }
 
-private class CreatePartDataHolder(val vm: WizardActivityState): ProgressListener {
+private class CreatePartDataHolder(val vm: WizardActivityState, private val desiredStartSector: Long): ProgressListener {
 
 	var meta: SDUtils.SDPartitionMeta? = null
 	lateinit var p: SDUtils.Partition.FreeSpace
@@ -128,13 +128,12 @@ private class CreatePartDataHolder(val vm: WizardActivityState): ProgressListene
 	lateinit var u: String
 	var f = 0L
 	var t: String? = null
-	var noobMode: Boolean = false
 	var scriptInet: String? = null
 	var scriptShaInet: String? = null
 
 	var painter: @Composable (() -> Painter)? = null
-	var rtype by mutableStateOf("")
-	var cmdline by mutableStateOf("")
+	var rtype = ""
+	var cmdline = ""
 	val dmaMeta = ArrayMap<String, String>()
 	val count = mutableIntStateOf(0)
 	val intVals = mutableStateListOf<Long>()
@@ -156,8 +155,8 @@ private class CreatePartDataHolder(val vm: WizardActivityState): ProgressListene
 	}.build()
 	var pl: ProgressListener? = null
 	var cl: (() -> Unit)? = null
-	lateinit var t2: MutableState<String>
-	val t3 = mutableStateOf("")
+	var t2 by mutableStateOf("")
+	var t3 by mutableStateOf("")
 	var availableSize: Long = 0
 
 	override fun update(bytesRead: Long, contentLength: Long, done: Boolean) {
@@ -179,12 +178,9 @@ private class CreatePartDataHolder(val vm: WizardActivityState): ProgressListene
 		idNeeded.removeAll(idUnneeded)
 	}
 
-	@SuppressLint("ComposableNaming")
-	@Composable
 	fun lateInit() {
-		noobMode = LocalContext.current.getSharedPreferences("abm", 0).getBoolean("noob_mode", BuildConfig.DEFAULT_NOOB_MODE)
 		meta = SDUtils.generateMeta(vm.deviceInfo)
-		p = (meta?.s?.find { vm.mvm.wizardCompatSid == it.startSector } as SDUtils.Partition.FreeSpace?)!!
+		p = (meta?.s?.find { desiredStartSector == it.startSector } as SDUtils.Partition.FreeSpace?)!!
 	}
 
 	fun painterFromRtype(type: String): @Composable () -> Painter {
@@ -263,7 +259,7 @@ private fun Start(c: CreatePartDataHolder) {
 			}
 		}
 
-		if (remember { ctx.getSharedPreferences("abm", 0).getBoolean("noob_mode", BuildConfig.DEFAULT_NOOB_MODE) }) {
+		if (c.vm.mvm.noobMode) {
 			Card(
 				modifier = Modifier
 					.fillMaxWidth()
@@ -471,12 +467,14 @@ private fun Os(c: CreatePartDataHolder) {
 		a.sortWith(Comparator.comparingInt { c -> c.substring(3, c.length - 5).toInt() })
 		val b = if (a.size > 0) a.last().substring(3, a.last().length - 5).toInt() + 1 else 0
 		c.t2 = mutableStateOf("rom$b")
-		c.t3.value = c.dmaMeta["name"]!!
+		c.t3 = c.dmaMeta["name"]!!
 	}
 
 	val s = rememberScrollState()
 	var expanded by remember { mutableIntStateOf(0) }
-	var e by remember { mutableStateOf(false) }
+	val et2 by remember { derivedStateOf { !(c.t2.matches(Regex("\\A\\p{ASCII}*\\z"))) } }
+	val et3 by remember { derivedStateOf { !(c.t3.matches(Regex("\\A\\p{ASCII}*\\z"))) } }
+	val e = et2 || et3
 	Column(
 		Modifier
 			.fillMaxSize()
@@ -502,7 +500,7 @@ private fun Os(c: CreatePartDataHolder) {
 				}
 			}
 		}
-		if (!c.noobMode)
+		if (!c.vm.mvm.noobMode)
 			Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier
 				.fillMaxWidth()
 				.padding(5.dp)
@@ -516,32 +514,26 @@ private fun Os(c: CreatePartDataHolder) {
 					Icon(painterResource(id = R.drawable.ic_baseline_keyboard_arrow_down_24), stringResource(R.string.expand_content_desc))
 				}
 			}
-		if (expanded == 1 || c.noobMode) {
+		if (expanded == 1 || c.vm.mvm.noobMode) {
 			Column(
 				Modifier
 					.fillMaxWidth()
 					.padding(5.dp)
 			) {
-				var et2 by remember { mutableStateOf(false) }
-				var et3 by remember { mutableStateOf(false) }
-				if (!c.noobMode)
-					TextField(value = c.t2.value, onValueChange = {
-						c.t2.value = it
-						et2 = !(c.t2.value.matches(Regex("\\A\\p{ASCII}*\\z")))
-						e = et2 || et3
+				if (!c.vm.mvm.noobMode)
+					TextField(value = c.t2, onValueChange = {
+						c.t2 = it
 					}, isError = et2, label = {
 						Text(stringResource(R.string.internal_id))
 					})
-				TextField(value = c.t3.value, onValueChange = {
-					c.t3.value = it
-					et3 = !(c.t3.value.matches(Regex("\\A\\p{ASCII}*\\z")))
-					e = et2 || et3
+				TextField(value = c.t3, onValueChange = {
+					c.t3 = it
 				}, isError = et3, label = {
 					Text(stringResource(R.string.name_in_boot))
 				})
 			}
 		}
-		if (!c.noobMode)
+		if (!c.vm.mvm.noobMode)
 			Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier
 				.fillMaxWidth()
 				.padding(5.dp)
@@ -910,8 +902,8 @@ private fun Flash(c: CreatePartDataHolder) {
 		c.vm.logic.extractToolkit(terminal)
 		if (c.t == null) { // OS install
 			val parts = ArrayMap<Int, Int>()
-			val fn = c.t2.value
-			val gn = c.t3.value
+			val fn = c.t2
+			val gn = c.t3
 			terminal.add(vm.activity.getString(R.string.term_f_name, fn))
 			terminal.add(vm.activity.getString(R.string.term_g_name, gn))
 			val tmpFile = c.chosen["_install.sh_"]!!.toFile(vm)

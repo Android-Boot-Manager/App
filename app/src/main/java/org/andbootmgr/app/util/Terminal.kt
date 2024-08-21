@@ -9,9 +9,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -138,7 +141,8 @@ fun Terminal(logFile: String? = null, doWhenDone: (() -> Unit)? = null,
 	val scrollH = rememberScrollState()
 	val scrollV = rememberScrollState()
 	val scope = rememberCoroutineScope()
-	val text = remember { mutableStateOf("") }
+	var didConnectAndFinish by rememberSaveable { mutableStateOf(false) }
+	var text by rememberSaveable { mutableStateOf("") }
 	val ctx = LocalContext.current.applicationContext
 	val lo = LocalLifecycleOwner.current
 	LaunchedEffect(Unit) {
@@ -148,48 +152,53 @@ fun Terminal(logFile: String? = null, doWhenDone: (() -> Unit)? = null,
 		if (action != null && doWhenDone != null) {
 			throw IllegalArgumentException("Don't use both action and doWhenDone")
 		}
-		StayAliveConnection(ctx, lo, doWhenDone) { service ->
-			if (action != null) {
-				val logDispatcher = Dispatchers.IO.limitedParallelism(1)
-				val log = logFile?.let { FileOutputStream(File(ctx.externalCacheDir, it)) }
-				val s = BudgetCallbackList(CoroutineScope(logDispatcher), log)
-				s.cb = { element ->
-					scope.launch {
-						text.value += element + "\n"
-						delay(200) // Give it time to re-measure
-						scrollV.animateScrollTo(scrollV.maxValue)
-						scrollH.animateScrollTo(0)
-					}
-				}
-				service.startWork({
-					withContext(Dispatchers.Default) {
-						try {
-							action(s)
-						} catch (e: Throwable) {
-							s.add(ctx.getString(R.string.term_failure))
-							s.add(ctx.getString(R.string.dev_details))
-							s.add(Log.getStackTraceString(e))
-						}
-						withContext(logDispatcher) {
-							log?.close()
+		if (!didConnectAndFinish) {
+			StayAliveConnection(
+				ctx,
+				lo,
+				{ didConnectAndFinish = true; doWhenDone?.invoke() }) { service ->
+				if (action != null) {
+					val logDispatcher = Dispatchers.IO.limitedParallelism(1)
+					val log = logFile?.let { FileOutputStream(File(ctx.externalCacheDir, it)) }
+					val s = BudgetCallbackList(CoroutineScope(logDispatcher), log)
+					s.cb = { element ->
+						scope.launch {
+							text += element + "\n"
+							delay(200) // Give it time to re-measure
+							scrollV.animateScrollTo(scrollV.maxValue)
+							scrollH.animateScrollTo(0)
 						}
 					}
-				}, s)
-			} else {
-				val s = service.workExtra as BudgetCallbackList
-				text.value = s.joinToString("\n").let { if (s.isNotEmpty()) it + "\n" else it }
-				s.cb = { element ->
-					scope.launch {
-						text.value += element + "\n"
-						delay(200) // Give it time to re-measure
-						scrollV.animateScrollTo(scrollV.maxValue)
-						scrollH.animateScrollTo(0)
+					service.startWork({
+						withContext(Dispatchers.Default) {
+							try {
+								action(s)
+							} catch (e: Throwable) {
+								s.add(ctx.getString(R.string.term_failure))
+								s.add(ctx.getString(R.string.dev_details))
+								s.add(Log.getStackTraceString(e))
+							}
+							withContext(logDispatcher) {
+								log?.close()
+							}
+						}
+					}, s)
+				} else {
+					val s = service.workExtra as BudgetCallbackList
+					text = s.joinToString("\n").let { if (s.isNotEmpty()) it + "\n" else it }
+					s.cb = { element ->
+						scope.launch {
+							text += element + "\n"
+							delay(200) // Give it time to re-measure
+							scrollV.animateScrollTo(scrollV.maxValue)
+							scrollH.animateScrollTo(0)
+						}
 					}
 				}
 			}
 		}
 	}
-	Text(text.value, modifier = Modifier
+	Text(text, modifier = Modifier
 		.fillMaxSize()
 		.horizontalScroll(scrollH)
 		.verticalScroll(scrollV)

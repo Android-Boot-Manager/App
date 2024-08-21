@@ -44,8 +44,8 @@ import java.io.File
 import java.io.IOException
 import java.net.URL
 
-class DroidBootWizardPageFactory(private val vm: WizardActivityState) {
-	fun get(): List<IWizardPage> {
+class DroidBootFlow() : WizardFlow() {
+	override fun get(vm: WizardActivityState): List<IWizardPage> {
 		return listOf(WizardPage("start",
 			NavButton(vm.activity.getString(R.string.cancel)) { it.finish() },
 			NavButton(vm.activity.getString(R.string.next)) { it.navigate("input") })

@@ -23,9 +23,9 @@ import org.andbootmgr.app.util.Terminal
 import java.io.File
 import java.io.IOException
 
-class BackupRestoreWizardPageFactory(private val vm: WizardActivityState) {
-    fun get(): List<IWizardPage> {
-        val c = CreateBackupDataHolder(vm)
+class BackupRestoreFlow(private val partitionId: Int): WizardFlow() {
+    override fun get(vm: WizardActivityState): List<IWizardPage> {
+        val c = CreateBackupDataHolder(vm, partitionId)
         return listOf(WizardPage("start",
             NavButton(vm.activity.getString(R.string.cancel)) { it.finish() },
             NavButton("") {})
@@ -45,8 +45,7 @@ class BackupRestoreWizardPageFactory(private val vm: WizardActivityState) {
     }
 }
 
-private class CreateBackupDataHolder(val vm: WizardActivityState) {
-    var pi: Int = -1
+private class CreateBackupDataHolder(val vm: WizardActivityState, val pi: Int) {
     var action: Int = 0
     var path: Uri? = null
     var meta: SDUtils.SDPartitionMeta? = null
@@ -56,7 +55,6 @@ private class CreateBackupDataHolder(val vm: WizardActivityState) {
 private fun ChooseAction(c: CreateBackupDataHolder) {
     LaunchedEffect(Unit) {
         c.meta = SDUtils.generateMeta(c.vm.deviceInfo)
-        c.pi = c.vm.mvm.wizardCompatPid!!
     }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
@@ -95,21 +93,17 @@ private fun SelectDroidBoot(c: CreateBackupDataHolder) {
                     else -> ""
                 }
             )
+            val next = { it: Uri ->
+                c.path = it
+                nextButtonAvailable = true
+                c.vm.nextText = c.vm.activity.getString(R.string.next)
+                c.vm.onNext = { i -> i.navigate("go") }
+            }
             Button(onClick = {
                 if (c.action != 1) {
-                    c.vm.activity.chooseFile("*/*") {
-                        c.path = it
-                        nextButtonAvailable = true
-                        c.vm.nextText = c.vm.activity.getString(R.string.next)
-                        c.vm.onNext = { i -> i.navigate("go") }
-                    }
+                    c.vm.activity.chooseFile("*/*", next)
                 } else {
-                    c.vm.activity.createFile("${c.meta!!.dumpKernelPartition(c.pi).name}.img") {
-                        c.path = it
-                        nextButtonAvailable = true
-                        c.vm.nextText = c.vm.activity.getString(R.string.next)
-                        c.vm.onNext = { i -> i.navigate("go") }
-                    }
+                    c.vm.activity.createFile("${c.meta!!.dumpKernelPartition(c.pi).name}.img", next)
                 }
             }) {
                 Text(stringResource(if (c.action != 1) R.string.choose_file else R.string.create_file))

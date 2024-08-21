@@ -16,8 +16,8 @@ import org.andbootmgr.app.util.Terminal
 import java.io.File
 import java.io.IOException
 
-class FixDroidBootWizardPageFactory(private val vm: WizardActivityState) {
-	fun get(): List<IWizardPage> {
+class FixDroidBootFlow(): WizardFlow() {
+	override fun get(vm: WizardActivityState): List<IWizardPage> {
 		return listOf(WizardPage("start",
 			NavButton(vm.activity.getString(R.string.cancel)) { it.finish() },
 			NavButton(vm.activity.getString(R.string.next)) { it.navigate(if (vm.deviceInfo.postInstallScript) "shSel" else "select") })

@@ -34,29 +34,19 @@ import java.nio.file.StandardCopyOption
 import java.security.DigestInputStream
 import java.security.MessageDigest
 
-class WizardPageFactory(private val vm: WizardActivityState) {
-	fun get(flow: String): List<IWizardPage> {
-		return when (flow) {
-			"droidboot" -> DroidBootWizardPageFactory(vm).get()
-			"fix_droidboot" -> FixDroidBootWizardPageFactory(vm).get()
-			"update_droidboot" -> UpdateDroidBootWizardPageFactory(vm).get()
-			"create_part" -> CreatePartWizardPageFactory(vm).get()
-			"backup_restore" -> BackupRestoreWizardPageFactory(vm).get()
-			"update" -> UpdateFlowWizardPageFactory(vm).get()
-			else -> listOf()
-		}
-	}
+abstract class WizardFlow {
+	abstract fun get(vm: WizardActivityState): List<IWizardPage>
 }
 
 @Composable
-fun WizardCompat(mvm: MainActivityState, flow: String) {
+fun WizardCompat(mvm: MainActivityState, flow: WizardFlow) {
 	DisposableEffect(Unit) {
 		mvm.activity!!.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 		onDispose { mvm.activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) }
 	}
 	val vm = remember { WizardActivityState(mvm) }
 	vm.navController = rememberNavController()
-	val wizardPages = remember(flow) { WizardPageFactory(vm).get(flow) }
+	val wizardPages = remember(flow) { flow.get(vm) }
 		NavHost(
 			navController = vm.navController,
 			startDestination = "start",
@@ -122,10 +112,7 @@ class WizardActivityState(val mvm: MainActivityState) {
 	}
 	fun finish() {
 		mvm.init()
-		mvm.wizardCompat = null
-		mvm.wizardCompatE = null
-		mvm.wizardCompatPid = null
-		mvm.wizardCompatSid = null
+		mvm.currentWizardFlow = null
 	}
 
 	fun copy(inputStream: InputStream, outputStream: OutputStream): Long {

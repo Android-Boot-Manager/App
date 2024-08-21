@@ -86,7 +86,7 @@ fun Settings(vm: MainActivityState) {
 			Text(stringResource(R.string.save_changes))
 		}
 		Button(onClick = {
-			vm.startFlow("update_droidboot")
+			vm.currentWizardFlow = UpdateDroidBootFlow()
 		}) {
 			Text(stringResource(R.string.update_droidboot))
 		}
