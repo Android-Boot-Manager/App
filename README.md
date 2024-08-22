@@ -61,7 +61,6 @@ well.
       - [F(x)tec Pro1](https://github.com/Android-Boot-Manager/droidboot_device_fxtec_pro1) - not ported to 0.3 yet
 2. Second-stage bootloaders
     - [Project Renegade's EDKII for MSM](https://github.com/Android-Boot-Manager/droidboot_device_renegade-uefi)
-    - msmnilePkg - WIP?
     - [lk2nd](https://github.com/Android-Boot-Manager/droidboot_device_qcom_lk2nd)
 
 ## How do I install it?
@@ -80,5 +79,7 @@ Why not?
 - [M1cha](https://github.com/M1cha) for efidroid, arguably the best approach for multi-booting
 - [Mis012](https://github.com/Mis012) for re-boot2, which we borrowed some code from
 - [Renegade Project](https://github.com/edk2-porting) for edk2-msm
-- [WOA msmnile](https://github.com/woa-msmnile/msmnilePkg) for msmnilePkg
+- [U-Boot team](https://u-boot.org)
+- [Volla](https://volla.online)
+- [BigfootACA](https://github.com/BigfootACA) for SimpleInit
 - [calebccff](https://github.com/calebccff)
