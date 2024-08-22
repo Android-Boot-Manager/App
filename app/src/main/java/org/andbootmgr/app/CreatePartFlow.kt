@@ -27,6 +27,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.*
 import okio.*
+import org.andbootmgr.app.CreatePartDataHolder.Part
 import org.andbootmgr.app.util.ConfigFile
 import org.andbootmgr.app.util.SDUtils
 import org.andbootmgr.app.util.SOUtils
@@ -132,17 +133,16 @@ private class CreatePartDataHolder(val vm: WizardActivityState, val desiredStart
 	var rtype = ""
 	var cmdline = ""
 	val dmaMeta = ArrayMap<String, String>()
-	var count by mutableIntStateOf(0)
-	val intVals = mutableStateListOf<Long>()
-	val selVals = mutableStateListOf<Int>()
-	val codeVals = mutableStateListOf<String>()
-	val idVals = mutableStateListOf<String>()
-	val sparseVals = mutableStateListOf<Boolean>()
-	val inetAvailable = HashMap<String, String>()
-	val inetDesc = HashMap<String, String>()
+	class Part(size: Long, isPercent: Boolean, code: String, id: String, sparse: Boolean) {
+		var size by mutableLongStateOf(size)
+		var isPercent by mutableStateOf(isPercent)
+		var code by mutableStateOf(code)
+		var id by mutableStateOf(id)
+		var sparse by mutableStateOf(sparse)
+	}
+	val parts = mutableStateListOf<Part>()
+	val inetAvailable = HashMap<String, Pair<String, String>>()
 	val idNeeded = mutableStateListOf<String>()
-	val extraIdNeeded = mutableStateListOf<String>()
-	val idUnneeded = mutableStateListOf<String>()
 	val chosen = mutableStateMapOf<String, DledFile>()
 	val client by lazy { OkHttpClient().newBuilder().readTimeout(1L, TimeUnit.HOURS).addNetworkInterceptor {
 		val originalResponse: Response = it.proceed(it.request())
@@ -156,21 +156,6 @@ private class CreatePartDataHolder(val vm: WizardActivityState, val desiredStart
 
 	override fun update(bytesRead: Long, contentLength: Long, done: Boolean) {
 		pl?.update(bytesRead, contentLength, done)
-	}
-
-	fun addDefault(i: Long, sel: Int, code: String, id: String, needUnsparse: Boolean) {
-		if (idVals.contains(id)) return
-		count++
-		intVals.add(i)
-		selVals.add(sel)
-		codeVals.add(code)
-		idVals.add(id)
-		sparseVals.add(needUnsparse)
-	}
-
-	fun onStartDlPage() {
-		idNeeded.addAll(idVals)
-		idNeeded.removeAll(idUnneeded)
 	}
 
 	fun painterFromRtype(type: String): @Composable () -> Painter {
@@ -389,42 +374,47 @@ private fun Shop(c: CreatePartDataHolder) {
 								cmdline =
 									o.getString("cmdline")
 								i = 0
+								val idUnneeded = mutableListOf<String>()
+								val blockIdNeeded = o.getJSONArray("blockIdNeeded")
+								while (i < blockIdNeeded.length()) {
+									idUnneeded.add(blockIdNeeded.get(i) as String)
+									i++
+								}
+								i = 0
+								// The order in which stuff is added to idNeeded must not be changed
+								val extraIdNeeded = o.getJSONArray("extraIdNeeded")
+								while (i < extraIdNeeded.length()) {
+									val id = extraIdNeeded.get(i) as String
+									if (idUnneeded.contains(id))
+										throw IllegalStateException("id in both blockIdNeeded and extraIdNeeded")
+									idNeeded.add(id)
+									i++
+								}
+								i = 0
 								val partitionParams = o.getJSONArray("partitions")
 								while (i < partitionParams.length()) {
 									val l = partitionParams.getJSONObject(i)
-									addDefault(
-										l.getLong("size"),
-										if (l.getBoolean("isPercent")) {
-											1
-										} else {
-											0
-										},
+									val id = l.getString("id")
+									if (parts.find { it.id == id } != null)
+										throw IllegalStateException("duplicate $id in partitions?")
+									if (idNeeded.contains(id))
+										throw IllegalStateException("duplicate $id in idNeeded?")
+									parts.add(Part(l.getLong("size"),
+										l.getBoolean("isPercent"),
 										l.getString("type"),
-										l.getString("id"),
-										l.getBoolean("needUnsparse")
-									)
+										id, l.getBoolean("needUnsparse")))
+									if (!idUnneeded.remove(id))
+										idNeeded.add(id)
 									i++
 								}
+								if (idUnneeded.isNotEmpty())
+									throw IllegalStateException("useless blocked ids $idUnneeded")
 								i = 0
 								val inets = o.getJSONArray("inet")
 								while (i < inets.length()) {
 									val l = inets.getJSONObject(i)
-									val li = l.getString("id")
-									inetAvailable[li] = l.getString("url")
-									inetDesc[li] = l.getString("desc")
-									i++
-								}
-								i = 0
-								val extraIdNeeded = o.getJSONArray("extraIdNeeded")
-								while (i < extraIdNeeded.length()) {
-									this.extraIdNeeded.add(extraIdNeeded.get(i) as String)
-									i++
-								}
-								idNeeded.addAll(this.extraIdNeeded)
-								i = 0
-								val blockIdNeeded = o.getJSONArray("blockIdNeeded")
-								while (i < blockIdNeeded.length()) {
-									idUnneeded.add(blockIdNeeded.get(i) as String)
+									inetAvailable[l.getString("id")] =
+										Pair(l.getString("url"), l.getString("desc"))
 									i++
 								}
 
@@ -544,13 +534,8 @@ private fun Os(c: CreatePartDataHolder) {
 			}
 		if (expanded == 2) {
 			Column(Modifier.fillMaxWidth()) {
-				for (i in 0..<c.count) {
-					var selectedValue by remember { mutableIntStateOf(c.selVals.getOrElse(i) { 1 }) }
-					var intValue by remember { mutableLongStateOf(c.intVals.getOrElse(i) { 100L }) }
-					var codeValue by remember { mutableStateOf(c.codeVals.getOrElse(i) { "8305" }) }
-					var idValue by remember { mutableStateOf(c.idVals.getOrElse(i) { "" }) }
+				c.parts.forEachIndexed { i, part ->
 					var d by remember { mutableStateOf(false) }
-					var sparse by remember { mutableStateOf(c.sparseVals.getOrElse(i) { false }) }
 
 					Card(
 						modifier = Modifier
@@ -564,48 +549,21 @@ private fun Os(c: CreatePartDataHolder) {
 						) {
 							var sizeInSectors: Long = -1
 							var remaining = c.endSectorRelative - c.startSectorRelative
-							if (i < c.selVals.size) {
-								c.selVals[i] = selectedValue
-							} else {
-								c.selVals.add(i, selectedValue)
-							}
-							if (i < c.intVals.size) {
-								c.intVals[i] = intValue
-							} else {
-								c.intVals.add(i, intValue)
-							}
-							if (i < c.codeVals.size) {
-								c.codeVals[i] = codeValue
-							} else {
-								c.codeVals.add(i, codeValue)
-							}
-							if (i < c.idVals.size) {
-								c.idVals[i] = idValue
-							} else {
-								c.idVals.add(i, idValue)
-							}
-							if (i < c.sparseVals.size) {
-								c.sparseVals[i] = sparse
-							} else {
-								c.sparseVals.add(i, sparse)
-							}
-							for (j in 0 .. i) {
-								val k = c.intVals.getOrElse(j) { 0L }
-								val l = c.selVals.getOrElse(j) { 1 }
-								sizeInSectors = if (l == 0 /*bytes*/) {
-									k / c.meta!!.logicalSectorSizeBytes
+							for (iPart in c.parts.slice(0..i)) {
+								sizeInSectors = if (!iPart.isPercent /*bytes*/) {
+									iPart.size / c.meta!!.logicalSectorSizeBytes
 								} else /*percent*/ {
-									(BigDecimal(remaining).multiply(BigDecimal(k).divide(BigDecimal(100)))).toLong()
+									(BigDecimal(remaining).multiply(BigDecimal(iPart.size).divide(BigDecimal(100)))).toLong()
 								}
 								remaining -= sizeInSectors
 							}
 							remaining += sizeInSectors
 
-							val selUnit = stringResource(if (selectedValue == 1) R.string.percent else R.string.bytes)
-							Text(text = stringResource(R.string.sector_used, intValue, selUnit, sizeInSectors, remaining))
-							TextField(value = intValue.toString(), onValueChange = {
+							val selUnit = stringResource(if (part.isPercent) R.string.percent else R.string.bytes)
+							Text(text = stringResource(R.string.sector_used, part.size, selUnit, sizeInSectors, remaining))
+							TextField(value = part.size.toString(), onValueChange = {
 								if (it.matches(Regex("\\d+"))) {
-									intValue = it.toLong()
+									part.size = it.toLong()
 								}
 							}, label = {
 								Text(stringResource(R.string.size))
@@ -615,14 +573,14 @@ private fun Os(c: CreatePartDataHolder) {
 									verticalAlignment = Alignment.CenterVertically,
 									modifier = Modifier
 										.selectable(
-											selected = selectedValue == 0,
-											onClick = { selectedValue = 0 },
+											selected = !part.isPercent,
+											onClick = { part.isPercent = false },
 											role = Role.RadioButton
 										)
 										.padding(8.dp)
 								) {
 									RadioButton(
-										selected = selectedValue == 0,
+										selected = !part.isPercent,
 										onClick = null
 									)
 									Text(text = stringResource(R.string.bytes))
@@ -631,14 +589,14 @@ private fun Os(c: CreatePartDataHolder) {
 									verticalAlignment = Alignment.CenterVertically,
 									modifier = Modifier
 										.selectable(
-											selected = selectedValue == 1,
-											onClick = { selectedValue = 1 },
+											selected = part.isPercent,
+											onClick = { part.isPercent = true },
 											role = Role.RadioButton
 										)
 										.padding(8.dp)
 								) {
 									RadioButton(
-										selected = selectedValue == 1,
+										selected = part.isPercent,
 										onClick = null
 									)
 									Text(text = stringResource(R.string.percent))
@@ -647,7 +605,7 @@ private fun Os(c: CreatePartDataHolder) {
 							ExposedDropdownMenuBox(expanded = d, onExpandedChange = { d = it }) {
 								TextField(
 									readOnly = true,
-									value = stringResource(partitionTypeCodes.find { it.first == codeValue }!!.second),
+									value = stringResource(partitionTypeCodes.find { it.first == part.code }!!.second),
 									onValueChange = { },
 									label = { Text(stringResource(R.string.type)) },
 									trailingIcon = {
@@ -666,7 +624,7 @@ private fun Os(c: CreatePartDataHolder) {
 									for (g in partitionTypeCodes) {
 										DropdownMenuItem(
 											onClick = {
-												codeValue = g.first
+												part.code = g.first
 												d = false
 											}, text = {
 												Text(text = stringResource(g.second))
@@ -676,33 +634,40 @@ private fun Os(c: CreatePartDataHolder) {
 								}
 							}
 							TextField(
-								value = idValue,
-								onValueChange = { idValue = it },
+								value = part.id,
+								onValueChange = { part.id = it },
 								label = { Text(stringResource(R.string.id)) }
 							)
-							Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable { sparse = !sparse }) {
-								Checkbox(checked = sparse, onCheckedChange = { sparse = it })
+							Row(verticalAlignment = Alignment.CenterVertically,
+								modifier = Modifier.clickable { part.sparse = !part.sparse }) {
+								Checkbox(checked = part.sparse, onCheckedChange = { part.sparse = it })
 								Text(stringResource(R.string.sparse))
 							}
 						}
 					}
 				}
 				Row(verticalAlignment = Alignment.CenterVertically) {
-					Button(onClick = { c.count += 1 }) {
+					Button(onClick = { c.parts.add(
+						CreatePartDataHolder.Part(
+							100L,
+							true,
+							"8305",
+							"",
+							false
+						)
+					) }) {
 						Text("+")
 					}
-					Button(onClick = { c.count -= 1 }, enabled = (c.count > 1)) {
+					Button(onClick = { c.parts.removeLast() }, enabled = (c.parts.size > 1)) {
 						Text("-")
 					}
 					var remaining = c.endSectorRelative - c.startSectorRelative
-					for (j in 1 .. c.count) {
-						val inSize = c.intVals.getOrElse(j-1) { 0L }
-						val bytesOrPercent = c.selVals.getOrElse(j-1) { 1 }
-						val sizeInSectors = if (bytesOrPercent == 0 /*bytes*/) {
-							inSize / c.meta!!.logicalSectorSizeBytes
+					for (part in c.parts) {
+						val sizeInSectors = if (!part.isPercent /*bytes*/) {
+							part.size / c.meta!!.logicalSectorSizeBytes
 						} else /*percent*/ {
-							// remaining * (inSize/100) -> inSize percent of remaining
-							(BigDecimal(remaining).multiply(BigDecimal(inSize).divide(BigDecimal(100)))).toLong()
+							// remaining * (part.int/100) -> part.int percent of remaining
+							(BigDecimal(remaining).multiply(BigDecimal(part.size).divide(BigDecimal(100)))).toLong()
 						}
 						remaining -= sizeInSectors
 					}
@@ -757,9 +722,6 @@ private class DledFile(val safFile: Uri?, val netFile: File?) {
 
 @Composable
 private fun Download(c: CreatePartDataHolder) {
-	LaunchedEffect(Unit) {
-		c.onStartDlPage()
-	}
 	Column(Modifier.fillMaxSize()) {
 		Card {
 			Row(
@@ -795,7 +757,7 @@ private fun Download(c: CreatePartDataHolder) {
 				Column {
 					Text(i)
 					Text(
-						if (c.inetDesc.containsKey(i)) c.inetDesc[i]!! else stringResource(
+						c.inetAvailable[i]?.second ?: stringResource(
 							if (i == "_install.sh_") R.string.installer_sh else R.string.user_selected),
 						color = MaterialTheme.colorScheme.onSurfaceVariant
 					)
@@ -816,7 +778,7 @@ private fun Download(c: CreatePartDataHolder) {
 										val downloadedFile = File(c.vm.logic.cacheDir, i)
 										val request =
 											Request.Builder().url(if (i == "_install.sh_")
-												c.scriptInet!! else c.inetAvailable[i]!!).build()
+												c.scriptInet!! else c.inetAvailable[i]!!.first).build()
 										val call = c.client.newCall(request)
 										progressText = c.vm.activity.getString(R.string.connecting_text)
 										c.pl = object : ProgressListener {
@@ -896,133 +858,113 @@ private fun Flash(c: CreatePartDataHolder) {
 	Terminal(logFile = "install_${System.currentTimeMillis()}.txt") { terminal ->
 		c.vm.logic.extractToolkit(terminal)
 		if (c.partitionName == null) { // OS install
-			val parts = ArrayMap<Int, Int>()
+			val createdParts = ArrayMap<Part, Int>() // order is important
 			val fn = c.romFolderName
-			val gn = c.romDisplayName
 			terminal.add(vm.activity.getString(R.string.term_f_name, fn))
-			terminal.add(vm.activity.getString(R.string.term_g_name, gn))
+			terminal.add(vm.activity.getString(R.string.term_g_name, c.romDisplayName))
 			val tmpFile = c.chosen["_install.sh_"]!!.toFile(vm)
 			tmpFile.setExecutable(true)
 			terminal.add(vm.activity.getString(R.string.term_creating_pt))
 
-			// After creating partitions:
-			fun installMore() {
-				val meta = SDUtils.generateMeta(vm.deviceInfo)
-				if (meta == null) {
-					terminal.add(vm.activity.getString(R.string.term_cant_get_meta))
-					return
-				}
-				terminal.add(vm.activity.getString(R.string.term_building_cfg))
-
-				val entry = ConfigFile()
-				entry["title"] = gn
-				entry["linux"] = "$fn/zImage"
-				entry["initrd"] = "$fn/initrd.cpio.gz"
-				entry["dtb"] = "$fn/dtb.dtb"
-				if (vm.deviceInfo.havedtbo)
-					entry["dtbo"] = "$fn/dtbo.dtbo"
-				entry["options"] = c.cmdline
-				entry["xtype"] = c.rtype
-				entry["xpart"] = parts.values.joinToString(":")
-				if (c.dmaMeta.contains("updateJson") && c.dmaMeta["updateJson"] != null)
-					entry["xupdate"] = c.dmaMeta["updateJson"]!!
-				entry.exportToFile(File(vm.logic.abmEntries, "$fn.conf"))
-				if (!SuFile.open(File(vm.logic.abmBootset, fn).toURI()).mkdir()) {
-					terminal.add(vm.activity.getString(R.string.term_mkdir_failed))
-					return
-				}
-
-				terminal.add(vm.activity.getString(R.string.term_flashing_imgs))
-				for (i in c.idVals) {
-					if (c.idUnneeded.contains(i)) continue
-					val j = c.idVals.indexOf(i)
-					terminal.add(vm.activity.getString(R.string.term_flashing_s, i))
-					val f = c.chosen[i]!!
-					val tp = File(meta.dumpKernelPartition(parts[j]!!).path)
-					if (c.sparseVals[j]) {
-						val f2 = f.toFile(c.vm)
-						val result2 = Shell.cmd(
-							File(
-								c.vm.logic.toolkitDir,
-								"simg2img"
-							).absolutePath + " ${f2.absolutePath} ${tp.absolutePath}"
-						).to(terminal).exec()
-						f.delete()
-						if (!result2.isSuccess) {
-							terminal.add(vm.activity.getString(R.string.term_failure))
-							return
-						}
-					} else {
-						val f2 = f.openInputStream(c.vm)
-						c.vm.copyPriv(f2, tp)
-					}
-					terminal.add(vm.activity.getString(R.string.term_done))
-				}
-
-				terminal.add(vm.activity.getString(R.string.term_patching_os))
-				var cmd = "FORMATDATA=true " + tmpFile.absolutePath + " $fn"
-				for (i in c.extraIdNeeded) {
-					cmd += " " + c.chosen[i]!!.toFile(vm).absolutePath
-				}
-				for (i in parts) {
-					cmd += " " + i.value
-				}
-				val result = vm.logic.runShFileWithArgs(cmd).to(terminal).exec()
-				if (!result.isSuccess) {
-					terminal.add(vm.activity.getString(R.string.term_failure))
-					return
-				}
-
-				terminal.add(vm.activity.getString(R.string.term_success))
-				vm.nextText = vm.activity.getString(R.string.finish)
-				vm.onNext = { it.finish() }
-			}
-
-			var offset = c.startSectorRelative
-
-			var makeOne: (Int) -> Unit = {}
-			makeOne = {
+			vm.logic.unmountBootset()
+			c.parts.forEachIndexed { index, part ->
 				terminal.add(vm.activity.getString(R.string.term_create_part))
-
-				val b = c.intVals.getOrElse(it) { 0L }
-				val l = c.selVals.getOrElse(it) { 1 }
-				val code = c.codeVals.getOrElse(it) { "8305" }
-				val k = if (l == 0 /*bytes*/) {
-					b / c.meta!!.logicalSectorSizeBytes
+				val k = if (!part.isPercent /*bytes*/) {
+					part.size / c.meta!!.logicalSectorSizeBytes
 				} else /*percent*/ {
-					(BigDecimal(c.p.size - (offset + (c.p.size - c.endSectorRelative))).multiply(BigDecimal(b).divide(BigDecimal(100)))).toLong()
+					(BigDecimal(c.p.size - (c.startSectorRelative + (c.p.size - c.endSectorRelative))).multiply(BigDecimal(part.size).divide(BigDecimal(100)))).toLong()
 				}
 
-				vm.logic.unmountBootset()
-				val r = vm.logic.create(c.p, offset, offset + k, code, "").to(terminal).exec()
-				try {
-					if (r.out.joinToString("\n").contains("kpartx")) {
-						terminal.add(vm.activity.getString(R.string.term_reboot_asap))
-					}
-					parts[it] = c.meta!!.nid
-					c.meta = SDUtils.generateMeta(c.vm.deviceInfo)
-					if (it + 1 < c.count) {
-						c.p = c.meta!!.s.find { it1 -> it1.type == SDUtils.PartitionType.FREE && (offset + k) < it1.startSector } as SDUtils.Partition.FreeSpace
-					}
-					if (r.isSuccess) {
-						terminal.add(vm.activity.getString(R.string.term_created_part))
-						offset = 0L
-						if (it + 1 < c.count) {
-							makeOne(it + 1)
-						} else {
-							terminal.add(vm.activity.getString(R.string.term_created_pt))
-							vm.logic.mountBootset(vm.deviceInfo)
-							installMore()
-						}
-					} else {
-						terminal.add(vm.activity.getString(R.string.term_failure))
-					}
-				} catch (e: Exception) {
+				val r = vm.logic.create(c.p, c.startSectorRelative, c.startSectorRelative + k, part.code, "").to(terminal).exec()
+				if (r.out.joinToString("\n").contains("kpartx")) {
+					terminal.add(vm.activity.getString(R.string.term_reboot_asap))
+				}
+				createdParts[part] = c.meta!!.nid
+				c.meta = SDUtils.generateMeta(c.vm.deviceInfo)
+				// do not assert there is leftover space if we just created the last partition we want to create
+				if (index != c.parts.size - 1) {
+					c.p =
+						c.meta!!.s.find { it.type == SDUtils.PartitionType.FREE && (c.startSectorRelative + k) < it.startSector } as SDUtils.Partition.FreeSpace
+				}
+				if (r.isSuccess) {
+					terminal.add(vm.activity.getString(R.string.term_created_part))
+				} else {
 					terminal.add(vm.activity.getString(R.string.term_failure))
-					terminal.add(Log.getStackTraceString(e))
+					return@Terminal
 				}
 			}
-			makeOne(0)
+			terminal.add(vm.activity.getString(R.string.term_created_pt))
+			vm.logic.mountBootset(vm.deviceInfo)
+			val meta = SDUtils.generateMeta(vm.deviceInfo)
+			if (meta == null) {
+				terminal.add(vm.activity.getString(R.string.term_cant_get_meta))
+				return@Terminal
+			}
+			terminal.add(vm.activity.getString(R.string.term_building_cfg))
+
+			val entry = ConfigFile()
+			entry["title"] = c.romDisplayName
+			entry["linux"] = "$fn/zImage"
+			entry["initrd"] = "$fn/initrd.cpio.gz"
+			entry["dtb"] = "$fn/dtb.dtb"
+			if (vm.deviceInfo.havedtbo)
+				entry["dtbo"] = "$fn/dtbo.dtbo"
+			entry["options"] = c.cmdline
+			entry["xtype"] = c.rtype
+			entry["xpart"] = createdParts.values.joinToString(":")
+			if (c.dmaMeta.contains("updateJson") && c.dmaMeta["updateJson"] != null)
+				entry["xupdate"] = c.dmaMeta["updateJson"]!!
+			entry.exportToFile(File(vm.logic.abmEntries, "$fn.conf"))
+			if (!SuFile.open(File(vm.logic.abmBootset, fn).toURI()).mkdir()) {
+				terminal.add(vm.activity.getString(R.string.term_mkdir_failed))
+				return@Terminal
+			}
+
+			terminal.add(vm.activity.getString(R.string.term_flashing_imgs))
+			for (part in c.parts) {
+				if (!c.idNeeded.contains(part.id)) continue
+				terminal.add(vm.activity.getString(R.string.term_flashing_s, part.id))
+				val f = c.chosen[part.id]!!
+				val tp = File(meta.dumpKernelPartition(createdParts[part]!!).path)
+				if (part.sparse) {
+					val f2 = f.toFile(c.vm)
+					val result2 = Shell.cmd(
+						File(
+							c.vm.logic.toolkitDir,
+							"simg2img"
+						).absolutePath + " ${f2.absolutePath} ${tp.absolutePath}"
+					).to(terminal).exec()
+					f.delete()
+					if (!result2.isSuccess) {
+						terminal.add(vm.activity.getString(R.string.term_failure))
+						return@Terminal
+					}
+				} else {
+					val f2 = f.openInputStream(c.vm)
+					c.vm.copyPriv(f2, tp)
+				}
+				terminal.add(vm.activity.getString(R.string.term_done))
+			}
+
+			terminal.add(vm.activity.getString(R.string.term_patching_os))
+			var cmd = "FORMATDATA=true " + tmpFile.absolutePath + " $fn"
+			for (i in c.idNeeded) {
+				val j = c.parts.find { it.id == i }
+				if (j == null) {
+					cmd += " " + c.chosen[i]!!.toFile(vm).absolutePath
+				} else {
+					cmd += createdParts[j]
+				}
+			}
+			val result = vm.logic.runShFileWithArgs(cmd).to(terminal).exec()
+			if (!result.isSuccess) {
+				terminal.add(vm.activity.getString(R.string.term_failure))
+				return@Terminal
+			}
+
+			terminal.add(vm.activity.getString(R.string.term_success))
+			vm.nextText = vm.activity.getString(R.string.finish)
+			vm.onNext = { it.finish() }
 		} else { // Portable partition
 			terminal.add(vm.activity.getString(R.string.term_create_part))
 			vm.logic.unmountBootset()
