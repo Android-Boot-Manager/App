@@ -78,6 +78,7 @@ Why not?
 ## Credits
 - [M1cha](https://github.com/M1cha) for efidroid, arguably the best approach for multi-booting
 - [Mis012](https://github.com/Mis012) for re-boot2, which we borrowed some code from
+- [msm8916-mainline](https://github.com/msm8916-mainline) and [msm8953-mainline](https://github.com/msm8953-mainline) for lk2nd
 - [Renegade Project](https://github.com/edk2-porting) for edk2-msm
 - [U-Boot team](https://u-boot.org)
 - [Volla](https://volla.online)
