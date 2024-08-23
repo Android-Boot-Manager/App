@@ -36,7 +36,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.topjohnwu.superuser.io.SuFileOutputStream
-import kotlinx.coroutines.launch
 import org.andbootmgr.app.util.AbmOkHttp
 import org.andbootmgr.app.util.TerminalCancelException
 import org.andbootmgr.app.util.TerminalList
@@ -47,7 +46,6 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
-import java.util.concurrent.CancellationException
 
 abstract class WizardFlow {
 	abstract fun get(vm: WizardState): List<IWizardPage>

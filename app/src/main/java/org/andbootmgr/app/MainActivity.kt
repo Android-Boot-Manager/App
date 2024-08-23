@@ -38,6 +38,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -48,6 +49,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -167,9 +169,13 @@ class MainActivity : ComponentActivity() {
 					onFileChosen = null
 					return@registerForActivityResult
 				}
-				// need to persist, otherwise can't access from the background as StayAliveService
-				contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
 				if (onFileChosen != null) {
+					// need to persist, otherwise can't access from the background as StayAliveService
+					contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+					val prefs = getSharedPreferences("abm", 0)
+					val uris = prefs.getStringSet("persistable", setOf())!!.toMutableSet()
+					uris.add(uri.toString())
+					prefs.edit().putStringSet("persistable", uris).apply()
 					onFileChosen!!(uri)
 					onFileChosen = null
 				} else {
@@ -187,10 +193,14 @@ class MainActivity : ComponentActivity() {
 					onFileCreated = null
 					return@registerForActivityResult
 				}
-				// need to persist, otherwise can't access from the background as StayAliveService
-				contentResolver.takePersistableUriPermission(uri,
-					Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
 				if (onFileCreated != null) {
+					// need to persist, otherwise can't access from the background as StayAliveService
+					contentResolver.takePersistableUriPermission(uri,
+						Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+					val prefs = getSharedPreferences("abm", 0)
+					val uris = prefs.getStringSet("persistable", setOf())!!.toMutableSet()
+					uris.add(uri.toString())
+					prefs.edit().putStringSet("persistable", uris).apply()
 					onFileCreated!!(uri)
 					onFileCreated = null
 				} else {
@@ -269,6 +279,15 @@ class MainActivity : ComponentActivity() {
 							WizardCompat(vm, vm.currentWizardFlow!!)
 						} else {
 							val navController = rememberNavController()
+							LaunchedEffect(Unit) {
+								withContext(Dispatchers.IO) {
+									val prefs = getSharedPreferences("abm", 0)
+									val uris = prefs.getStringSet("persistable", setOf())!!.toMutableSet()
+									uris.forEach { contentResolver.releasePersistableUriPermission(it.toUri(),
+											Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION) }
+									prefs.edit().putStringSet("persistable", setOf()).apply()
+								}
+							}
 							AppContent(vm, navController) {
 								NavGraph(vm, navController, it)
 							}
