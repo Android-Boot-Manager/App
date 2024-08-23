@@ -226,5 +226,4 @@
     <string name="term_g_name">-- GUI-Name: %s</string>
     <string name="term_patching_os">-- Bessere Betriebssystem aus…</string>
     <string name="shop_error">Liste der ROMs aus dem Open ROM Projekt konnte nicht geladen werden</string>
-    <string name="choose_droidboot_online">Bitte wähle ein DroidBoot-Image, oder nutze den Download-Knopf, um die aktuellste Version automatisch aus dem Internet herunterzuladen (für die meisten Nutzer empfohlen).</string>
 </resources>

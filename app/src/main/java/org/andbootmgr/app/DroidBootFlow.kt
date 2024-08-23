@@ -44,8 +44,9 @@ import java.io.File
 import java.io.IOException
 import java.net.URL
 
-class DroidBootFlow() : WizardFlow() {
+class DroidBootFlow : WizardFlow() {
 	override fun get(vm: WizardActivityState): List<IWizardPage> {
+		val booted = vm.deviceInfo.isBooted(vm.logic)
 		return listOf(WizardPage("start",
 			NavButton(vm.activity.getString(R.string.cancel)) { it.finish() },
 			NavButton(vm.activity.getString(R.string.next)) { it.navigate("input") })
@@ -53,20 +54,15 @@ class DroidBootFlow() : WizardFlow() {
 			Start(vm)
 		}, WizardPage("input",
 			NavButton(vm.activity.getString(R.string.prev)) { it.navigate("start") },
-			NavButton(vm.activity.getString(R.string.next)) { it.navigate(if (vm.deviceInfo.postInstallScript) "shSel" else
-				(if (!vm.deviceInfo.isBooted(vm.logic)) "select" else "flash")) }
+			NavButton(vm.activity.getString(R.string.next)) { it.navigate(if (vm.deviceInfo.postInstallScript || !booted)
+				"dload" else "flash") }
 		) {
 			Input(vm)
-		}, WizardPage("shSel",
-			NavButton(vm.activity.getString(R.string.prev)) { it.navigate("input") },
+		}, WizardPage("dload",
+			NavButton(vm.activity.getString(R.string.cancel)) { it.finish() },
 			NavButton("") {}
 		) {
-			SelectInstallSh(vm)
-		}, WizardPage("select",
-			NavButton(vm.activity.getString(R.string.prev)) { it.navigate(if (vm.deviceInfo.postInstallScript) "shSel" else "input") },
-			NavButton("") {}
-		) {
-			SelectDroidBoot(vm)
+			WizardDownloader(vm)
 		}, WizardPage("flash",
 			NavButton("") {},
 			NavButton("") {}
@@ -98,19 +94,61 @@ private fun Start(vm: WizardActivityState) {
 
 @Composable
 private fun Input(vm: WizardActivityState) {
+	var loading by remember { mutableStateOf(!vm.deviceInfo.isBooted(vm.logic) || vm.deviceInfo.postInstallScript) }
+	LaunchedEffect(Unit) {
+		if (!loading) return@LaunchedEffect
+		CoroutineScope(Dispatchers.IO).launch {
+			try {
+				val jsonText =
+					URL("https://raw.githubusercontent.com/Android-Boot-Manager/ABM-json/master/devices/" + vm.codename + ".json").readText()
+				val json = JSONTokener(jsonText).nextValue() as JSONObject
+				if (BuildConfig.VERSION_CODE < json.getInt("minAppVersion"))
+					throw IllegalStateException("please upgrade app")
+				if (!vm.deviceInfo.isBooted(vm.logic)) {
+					val bl = json.getJSONObject("bootloader")
+					val url = bl.getString("url")
+					val sha = if (bl.has("sha256")) bl.getString("sha256") else null
+					vm.inetAvailable["droidboot"] = WizardActivityState.Downloadable(
+						url, sha, vm.activity.getString(R.string.droidboot_online)
+					)
+					vm.idNeeded.add("droidboot")
+				}
+				if (vm.deviceInfo.postInstallScript) {
+					val i = json.getJSONObject("installScript")
+					val url = i.getString("url")
+					val sha = if (i.has("sha256")) i.getString("sha256") else null
+					vm.inetAvailable["install"] = WizardActivityState.Downloadable(
+						url, sha, vm.activity.getString(R.string.installer_sh)
+					)
+					vm.idNeeded.add("install")
+				}
+				loading = false
+			} catch (e: Exception) {
+				Handler(Looper.getMainLooper()).post {
+					Toast.makeText(vm.activity, R.string.dl_error, Toast.LENGTH_LONG).show()
+				}
+				Log.e("ABM droidboot json", Log.getStackTraceString(e))
+			}
+		}
+	}
+	if (loading) {
+		LoadingCircle(stringResource(R.string.loading), modifier = Modifier.fillMaxSize())
+		return
+	}
 	Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
 		modifier = Modifier.fillMaxSize()
 	) {
-		var text by remember { mutableStateOf(vm.activity.getString(R.string.android)) }
-		LaunchedEffect(text) { vm.texts["OsName"] = text.trim() }
-		val e = text.isBlank() || !text.matches(Regex("[\\dA-Za-z]+"))
+		LaunchedEffect(Unit) { // TODO can't I do this better?
+			if (vm.texts.isBlank())
+				vm.texts = vm.activity.getString(R.string.android)
+		}
+		val e = vm.texts.isBlank() || !vm.texts.matches(Regex("[\\dA-Za-z]+"))
 
 		Text(stringResource(R.string.enter_name_for_current), textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 5.dp))
 		TextField(
-			value = text,
+			value = vm.texts,
 			onValueChange = {
-				text = it
-				vm.texts["OsName"] = it.trim()
+				vm.texts = it
 			},
 			label = { Text(stringResource(R.string.os_name)) },
 			isError = e
@@ -149,7 +187,7 @@ fun SelectDroidBoot(vm: WizardActivityState) {
 		if (nextButtonAvailable) {
 			Text(stringResource(id = R.string.successfully_selected))
 		} else {
-			Text(stringResource(R.string.choose_droidboot_online))
+			//Text(stringResource(R.string.choose_droidboot_online))
 			Button(onClick = {
 				vm.activity.chooseFile("*/*") {
 					vm.flashes["DroidBootFlashType"] = Pair(it, null)
@@ -162,7 +200,7 @@ fun SelectDroidBoot(vm: WizardActivityState) {
 			}
 			val ctx = LocalContext.current
 			Button(onClick = {
-				CoroutineScope(Dispatchers.Default).launch {
+				CoroutineScope(Dispatchers.IO).launch {
 					try {
 						val jsonText =
 							URL("https://raw.githubusercontent.com/Android-Boot-Manager/ABM-json/master/devices/" + vm.codename + ".json").readText()
@@ -202,7 +240,7 @@ fun SelectInstallSh(vm: WizardActivityState, update: Boolean = false) {
 		if (nextButtonAvailable) {
 			Text(stringResource(id = R.string.successfully_selected))
 		} else {
-			Text(stringResource(R.string.choose_install_s_online))
+			//Text(stringResource(R.string.choose_install_s_online))
 			Button(onClick = {
 				vm.activity.chooseFile("*/*") {
 					vm.flashes[flashType] = Pair(it, null)
@@ -290,11 +328,13 @@ private fun Flash(vm: WizardActivityState) {
 			}
 			val r = vm.logic.create(meta.s[0] as SDUtils.Partition.FreeSpace,
 						0,
-						(meta.sectors - 2048) / 41 + 2048,
+						((meta.sectors - 2048) / 41 + 2048) // create meta partition proportional to sd size
+							.coerceAtLeast((512L * 1024L * 1024L) / meta.logicalSectorSizeBytes) // but never less than 512mb
+							.coerceAtMost((4L * 1024L * 1024L * 1024L) / meta.logicalSectorSizeBytes), // and never more than 4gb
 						"8301",
 						"abm_settings"
 					).to(terminal).exec()
-			if (r.out.joinToString("\n").contains("old")) {
+			if (r.out.joinToString("\n").contains("kpartx")) {
 				terminal.add(vm.activity.getString(R.string.term_reboot_asap))
 			}
 			if (r.isSuccess) {
@@ -343,7 +383,7 @@ private fun Flash(vm: WizardActivityState) {
 		db["timeout"] = "5"
 		db.exportToFile(File(vm.logic.abmDb, "db.conf"))
 		val entry = ConfigFile()
-		entry["title"] = vm.texts["OsName"]!!
+		entry["title"] = vm.texts.trim()
 		entry["linux"] = "null"
 		entry["initrd"] = "null"
 		entry["dtb"] = "null"

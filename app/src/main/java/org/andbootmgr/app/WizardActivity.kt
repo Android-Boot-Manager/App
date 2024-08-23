@@ -1,28 +1,50 @@
 package org.andbootmgr.app
 
 import android.net.Uri
+import android.util.Log
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.net.toFile
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.topjohnwu.superuser.io.SuFileOutputStream
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.andbootmgr.app.util.AbmOkHttp
+import org.andbootmgr.app.util.SOUtils
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
@@ -98,8 +120,13 @@ class WizardActivityState(val mvm: MainActivityState) {
 	var onPrev by mutableStateOf<((WizardActivityState) -> Unit)?>(null)
 	var onNext by mutableStateOf<((WizardActivityState) -> Unit)?>(null)
 
+	// TODO remove below two
 	var flashes: HashMap<String, Pair<Uri, String?>> = HashMap()
-	var texts: HashMap<String, String> = HashMap()
+	var texts by mutableStateOf("")
+	val inetAvailable = HashMap<String/*id*/, Downloadable>()
+	val idNeeded = mutableStateListOf<String>()
+	val chosen = mutableStateMapOf<String, DledFile>()
+	class Downloadable(val url: String, val hash: String?, val desc: String)
 
 	fun navigate(next: String) {
 		prevText = null
@@ -160,6 +187,40 @@ class WizardActivityState(val mvm: MainActivityState) {
 	}
 }
 
+class DledFile(val safFile: Uri?, val netFile: File?) {
+	fun delete() {
+		netFile?.delete()
+	}
+
+	fun openInputStream(vm: WizardActivityState): InputStream {
+		netFile?.let {
+			return FileInputStream(it)
+		}
+		safFile?.let {
+			val istr = vm.activity.contentResolver.openInputStream(it)
+			if (istr != null) {
+				return istr
+			}
+		}
+		throw IllegalStateException("invalid DledFile OR failure")
+	}
+
+	fun toFile(vm: WizardActivityState): File {
+		netFile?.let { return it }
+		safFile?.let {
+			val istr = vm.activity.contentResolver.openInputStream(it)
+			if (istr != null) {
+				val f = File(vm.logic.cacheDir, System.currentTimeMillis().toString())
+				vm.copyUnpriv(istr, f)
+				istr.close()
+				return f
+			}
+		}
+		throw IllegalStateException("invalid DledFile OR safFile failure")
+	}
+}
+
+
 class NavButton(val text: String, val onClick: (WizardActivityState) -> Unit)
 class WizardPage(override val name: String, override val prev: NavButton,
                        override val next: NavButton, override val run: @Composable () -> Unit
@@ -185,6 +246,115 @@ fun BasicButtonRow(prev: String, onPrev: () -> Unit,
 			onNext()
 		}, modifier = Modifier.weight(1f, true)) {
 			Text(next)
+		}
+	}
+}
+
+@Composable
+fun WizardDownloader(vm: WizardActivityState) {
+	Column(Modifier.fillMaxSize()) {
+		Card {
+			Row(
+				Modifier
+					.fillMaxWidth()
+					.padding(20.dp)
+			) {
+				Icon(painterResource(id = R.drawable.ic_about), stringResource(id = R.string.icon_content_desc))
+				Text(stringResource(id = R.string.provide_images))
+			}
+		}
+		var cancelDownload by remember { mutableStateOf<(() -> Unit)?>(null) }
+		var progressText by remember { mutableStateOf(vm.activity.getString(R.string.connecting_text)) }
+		if (cancelDownload != null) {
+			AlertDialog(
+				onDismissRequest = {},
+				confirmButton = {
+					Button(onClick = { cancelDownload!!() }) {
+						Text(stringResource(id = R.string.cancel))
+					}
+				},
+				title = { Text(stringResource(R.string.downloading)) },
+				text = {
+					LoadingCircle(progressText, paddingBetween = 10.dp)
+				})
+		}
+		for (i in vm.idNeeded) {
+			Row(
+				verticalAlignment = Alignment.CenterVertically,
+				horizontalArrangement = Arrangement.SpaceBetween,
+				modifier = Modifier.fillMaxWidth()
+			) {
+				Column {
+					Text(i)
+					Text(
+						vm.inetAvailable[i]?.desc ?: stringResource(R.string.user_selected),
+						color = MaterialTheme.colorScheme.onSurfaceVariant
+					)
+				}
+				Column {
+					if (vm.chosen.containsKey(i)) {
+						Button(onClick = {
+							vm.chosen[i]!!.delete()
+							vm.chosen.remove(i)
+						}) {
+							Text(stringResource(R.string.undo))
+						}
+					} else {
+						if (vm.inetAvailable.containsKey(i)) {
+							Button(onClick = {
+								CoroutineScope(Dispatchers.Main).launch {
+									val url = vm.inetAvailable[i]!!.url
+									val downloadedFile = File(vm.logic.cacheDir, i)
+									val h = vm.inetAvailable[i]!!.hash
+									val client = AbmOkHttp(url, downloadedFile, h) { bytesRead, contentLength, _ ->
+										progressText = vm.activity.getString(R.string.download_progress,
+											SOUtils.humanReadableByteCountBin(bytesRead), SOUtils.humanReadableByteCountBin(contentLength))
+									}
+									try {
+										progressText = vm.activity.getString(R.string.connecting_text)
+										cancelDownload = {
+											client.cancel()
+											cancelDownload = null
+										}
+										if (client.run()) {
+											vm.chosen[i] = DledFile(null, downloadedFile)
+										}
+									} catch (e: Exception) {
+										Log.e("ABM", Log.getStackTraceString(e))
+										withContext(Dispatchers.Main) {
+											Toast.makeText(
+												vm.activity,
+												vm.activity.getString(R.string.dl_error),
+												Toast.LENGTH_LONG
+											).show()
+										}
+									}
+									cancelDownload = null
+								}
+							}) {
+								Text(stringResource(R.string.download))
+							}
+						}
+						Button(onClick = {
+							vm.activity.chooseFile("*/*") {
+								vm.chosen[i] = DledFile(it, null)
+							}
+						}) {
+							Text(stringResource(R.string.choose))
+						}
+					}
+				}
+			}
+		}
+		val isOk = vm.idNeeded.find { !vm.chosen.containsKey(it) } == null
+		LaunchedEffect(isOk) {
+			if (isOk) {
+				vm.onNext = { it.navigate("flash") }
+				vm.nextText = vm.activity.getString(R.string.install)
+			} else {
+				vm.onNext = {}
+				vm.nextText = ""
+			}
 		}
 	}
 }

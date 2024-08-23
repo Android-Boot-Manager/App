@@ -1,16 +1,41 @@
 package org.andbootmgr.app
 
-import android.net.Uri
 import android.util.Log
-import android.widget.Toast
 import androidx.collection.ArrayMap
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RangeSlider
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
@@ -21,12 +46,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.*
-import okio.*
 import org.andbootmgr.app.CreatePartDataHolder.Part
 import org.andbootmgr.app.util.ConfigFile
 import org.andbootmgr.app.util.SDUtils
@@ -35,12 +56,9 @@ import org.andbootmgr.app.util.Terminal
 import org.json.JSONObject
 import org.json.JSONTokener
 import java.io.File
-import java.io.FileInputStream
 import java.io.FileNotFoundException
-import java.io.InputStream
 import java.math.BigDecimal
 import java.net.URL
-import java.util.concurrent.TimeUnit
 
 class CreatePartFlow(private val desiredStartSector: Long): WizardFlow() {
 	override fun get(vm: WizardActivityState): List<IWizardPage> {
@@ -64,7 +82,7 @@ class CreatePartFlow(private val desiredStartSector: Long): WizardFlow() {
 			NavButton(vm.activity.getString(R.string.cancel)) { it.finish() },
 			NavButton("") {}
 		) {
-			Download(c)
+			WizardDownloader(c.vm)
 		}, WizardPage("flash",
 			NavButton("") {},
 			NavButton("") {}
@@ -74,60 +92,12 @@ class CreatePartFlow(private val desiredStartSector: Long): WizardFlow() {
 	}
 }
 
-
-private class ProgressResponseBody(
-	private val responseBody: ResponseBody,
-	private val progressListener: ProgressListener
-) :
-	ResponseBody() {
-	private var bufferedSource: BufferedSource? = null
-	override fun contentType(): MediaType? {
-		return responseBody.contentType()
-	}
-
-	override fun contentLength(): Long {
-		return responseBody.contentLength()
-	}
-
-	override fun source(): BufferedSource {
-		if (bufferedSource == null) {
-			bufferedSource = source(responseBody.source()).buffer()
-		}
-		return bufferedSource!!
-	}
-
-	private fun source(source: Source): Source {
-		return object : ForwardingSource(source) {
-			var totalBytesRead = 0L
-
-			@Throws(IOException::class)
-			override fun read(sink: Buffer, byteCount: Long): Long {
-				val bytesRead = super.read(sink, byteCount)
-				// read() returns the number of bytes read, or -1 if this source is exhausted.
-				totalBytesRead += if (bytesRead != -1L) bytesRead else 0
-				progressListener.update(
-					totalBytesRead,
-					responseBody.contentLength(),
-					bytesRead == -1L
-				)
-				return bytesRead
-			}
-		}
-	}
-}
-
-internal interface ProgressListener {
-	fun update(bytesRead: Long, contentLength: Long, done: Boolean)
-}
-
-private class CreatePartDataHolder(val vm: WizardActivityState, val desiredStartSector: Long): ProgressListener {
+private class CreatePartDataHolder(val vm: WizardActivityState, val desiredStartSector: Long) {
 	var meta by mutableStateOf<SDUtils.SDPartitionMeta?>(null)
 	lateinit var p: SDUtils.Partition.FreeSpace
 	var startSectorRelative = 0L
 	var endSectorRelative = 0L
 	var partitionName: String? = null
-	var scriptInet: String? = null
-	var scriptShaInet: String? = null
 
 	var painter: @Composable (() -> Painter)? = null
 	var rtype = ""
@@ -148,23 +118,9 @@ private class CreatePartDataHolder(val vm: WizardActivityState, val desiredStart
 		}
 	}
 	val parts = mutableStateListOf<Part>()
-	val inetAvailable = HashMap<String, Pair<String, String>>()
-	val idNeeded = mutableStateListOf<String>()
 	val extraIdNeeded = mutableListOf<String>()
-	val chosen = mutableStateMapOf<String, DledFile>()
-	val client by lazy { OkHttpClient().newBuilder().readTimeout(1L, TimeUnit.HOURS).addNetworkInterceptor {
-		val originalResponse: Response = it.proceed(it.request())
-		return@addNetworkInterceptor originalResponse.newBuilder()
-			.body(ProgressResponseBody(originalResponse.body!!, this))
-			.build()
-	}.build() }
-	var pl: ProgressListener? = null
 	var romFolderName by mutableStateOf("")
 	var romDisplayName by mutableStateOf("")
-
-	override fun update(bytesRead: Long, contentLength: Long, done: Boolean) {
-		pl?.update(bytesRead, contentLength, done)
-	}
 
 	fun painterFromRtype(type: String): @Composable () -> Painter {
 		val id = when (type) {
@@ -374,9 +330,6 @@ private fun Shop(c: CreatePartDataHolder) {
 								dmaMeta["name"] =
 									o.getString("displayname")
 								dmaMeta["creator"] = o.getString("creator")
-								c.scriptInet = o.getString("scriptname")
-								if (o.has("scriptSha256"))
-									c.scriptShaInet = o.getString("scriptSha256")
 								dmaMeta["updateJson"] = o.getString("updateJson")
 								rtype = o.getString("rtype")
 								cmdline =
@@ -395,7 +348,7 @@ private fun Shop(c: CreatePartDataHolder) {
 									val id = extraIdNeeded.get(i) as String
 									if (idUnneeded.contains(id))
 										throw IllegalStateException("id in both blockIdNeeded and extraIdNeeded")
-									idNeeded.add(id)
+									vm.idNeeded.add(id)
 									this.extraIdNeeded.add(id)
 									i++
 								}
@@ -406,14 +359,14 @@ private fun Shop(c: CreatePartDataHolder) {
 									val id = l.getString("id")
 									if (parts.find { it.id == id } != null)
 										throw IllegalStateException("duplicate $id in partitions?")
-									if (idNeeded.contains(id))
+									if (vm.idNeeded.contains(id))
 										throw IllegalStateException("duplicate $id in idNeeded?")
 									parts.add(Part(l.getLong("size"),
 										l.getBoolean("isPercent"),
 										l.getString("type"),
 										id, l.getBoolean("needUnsparse")))
 									if (!idUnneeded.remove(id))
-										idNeeded.add(id)
+										vm.idNeeded.add(id)
 									i++
 								}
 								if (idUnneeded.isNotEmpty())
@@ -422,10 +375,21 @@ private fun Shop(c: CreatePartDataHolder) {
 								val inets = o.getJSONArray("inet")
 								while (i < inets.length()) {
 									val l = inets.getJSONObject(i)
-									inetAvailable[l.getString("id")] =
-										Pair(l.getString("url"), l.getString("desc"))
+									vm.inetAvailable[l.getString("id")] =
+										WizardActivityState.Downloadable(
+											l.getString("url"),
+											if (l.has("hash"))
+												l.getString("hash") else null,
+											l.getString("desc")
+										)
 									i++
 								}
+								vm.idNeeded.add("_install.sh_")
+								vm.inetAvailable["_install.sh_"] = WizardActivityState.Downloadable(
+									o.getString("scriptname"), if (o.has("scriptSha256"))
+										o.getString("scriptSha256") else null,
+									vm.activity.getString(R.string.installer_sh)
+								)
 
 								painter = painterFromRtype(rtype)
 							}
@@ -653,7 +617,7 @@ private fun Os(c: CreatePartDataHolder) {
 				}
 				Row(verticalAlignment = Alignment.CenterVertically) {
 					Button(onClick = { c.parts.add(
-						CreatePartDataHolder.Part(
+						Part(
 							100L,
 							true,
 							"8305",
@@ -686,171 +650,6 @@ private fun Os(c: CreatePartDataHolder) {
 	}
 }
 
-private class DledFile(val safFile: Uri?, val netFile: File?) {
-	fun delete() {
-		netFile?.delete()
-	}
-
-	fun openInputStream(vm: WizardActivityState): InputStream {
-		netFile?.let {
-			return FileInputStream(it)
-		}
-		safFile?.let {
-			val istr = vm.activity.contentResolver.openInputStream(it)
-			if (istr != null) {
-				return istr
-			}
-		}
-		throw IllegalStateException("invalid DledFile OR failure")
-	}
-
-	fun toFile(vm: WizardActivityState): File {
-		netFile?.let { return it }
-		safFile?.let {
-			val istr = vm.activity.contentResolver.openInputStream(it)
-			if (istr != null) {
-				val f = File(vm.logic.cacheDir, System.currentTimeMillis().toString())
-				vm.copyUnpriv(istr, f)
-				istr.close()
-				return f
-			}
-		}
-		throw IllegalStateException("invalid DledFile OR safFile failure")
-	}
-}
-
-@Composable
-private fun Download(c: CreatePartDataHolder) {
-	Column(Modifier.fillMaxSize()) {
-		Card {
-			Row(
-				Modifier
-					.fillMaxWidth()
-					.padding(20.dp)
-			) {
-				Icon(painterResource(id = R.drawable.ic_about), stringResource(id = R.string.icon_content_desc))
-				Text(stringResource(id = R.string.provide_images))
-			}
-		}
-		var cancelDownload by remember { mutableStateOf<(() -> Unit)?>(null) }
-		var progressText by remember { mutableStateOf(c.vm.activity.getString(R.string.connecting_text)) }
-		if (cancelDownload != null) {
-			AlertDialog(
-				onDismissRequest = {},
-				confirmButton = {
-					Button(onClick = { cancelDownload!!() }) {
-						Text(stringResource(id = R.string.cancel))
-					}
-				},
-				title = { Text(stringResource(R.string.downloading)) },
-				text = {
-					LoadingCircle(progressText, paddingBetween = 10.dp)
-				})
-		}
-		for (i in (c.idNeeded + listOf("_install.sh_"))) {
-			Row(
-				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.SpaceBetween,
-				modifier = Modifier.fillMaxWidth()
-			) {
-				Column {
-					Text(i)
-					Text(
-						c.inetAvailable[i]?.second ?: stringResource(
-							if (i == "_install.sh_") R.string.installer_sh else R.string.user_selected),
-						color = MaterialTheme.colorScheme.onSurfaceVariant
-					)
-				}
-				Column {
-					if (c.chosen.containsKey(i)) {
-						Button(onClick = {
-							c.chosen[i]!!.delete()
-							c.chosen.remove(i)
-						}) {
-							Text(stringResource(R.string.undo))
-						}
-					} else {
-						if (i == "_install.sh_" || c.inetAvailable.containsKey(i)) {
-							Button(onClick = {
-								CoroutineScope(Dispatchers.IO).launch {
-									try {
-										val downloadedFile = File(c.vm.logic.cacheDir, i)
-										val request =
-											Request.Builder().url(if (i == "_install.sh_")
-												c.scriptInet!! else c.inetAvailable[i]!!.first).build()
-										val call = c.client.newCall(request)
-										progressText = c.vm.activity.getString(R.string.connecting_text)
-										c.pl = object : ProgressListener {
-											override fun update(
-												bytesRead: Long,
-												contentLength: Long,
-												done: Boolean
-											) {
-												progressText = c.vm.activity.getString(R.string.download_progress,
-													SOUtils.humanReadableByteCountBin(bytesRead), SOUtils.humanReadableByteCountBin(contentLength))
-											}
-										}
-										cancelDownload = {
-											call.cancel()
-											downloadedFile.delete()
-											cancelDownload = null
-										}
-										val response = call.execute()
-										val desiredHash = if (i == "_install.sh_") c.scriptShaInet!! else null
-
-										val rawSink = downloadedFile.sink()
-										val sink = if (desiredHash != null) HashingSink.sha256(rawSink) else rawSink
-										val buffer = sink.buffer()
-										buffer.writeAll(response.body!!.source())
-										buffer.close()
-										val realHash = if (desiredHash != null)
-												(sink as HashingSink).hash.hex() else null
-										if (!call.isCanceled()) {
-											if (desiredHash != null && realHash != desiredHash)
-												throw IllegalStateException("hash $realHash does not match expected hash $desiredHash")
-											c.chosen[i] = DledFile(null, downloadedFile)
-										}
-									} catch (e: Exception) {
-										Log.e("ABM", Log.getStackTraceString(e))
-										withContext(Dispatchers.Main) {
-											Toast.makeText(
-												c.vm.activity,
-												c.vm.activity.getString(R.string.dl_error),
-												Toast.LENGTH_LONG
-											).show()
-										}
-									}
-									c.pl = null
-									cancelDownload = null
-								}
-							}) {
-								Text(stringResource(R.string.download))
-							}
-						}
-						Button(onClick = {
-							c.vm.activity.chooseFile("*/*") {
-								c.chosen[i] = DledFile(it, null)
-							}
-						}) {
-							Text(stringResource(R.string.choose))
-						}
-					}
-				}
-			}
-		}
-		val isOk = c.idNeeded.find { !c.chosen.containsKey(it) } == null && c.chosen.containsKey("_install.sh_")
-		LaunchedEffect(isOk) {
-			if (isOk) {
-				c.vm.onNext = { it.navigate("flash") }
-				c.vm.nextText = c.vm.activity.getString(R.string.install)
-			} else {
-				c.vm.onNext = {}
-				c.vm.nextText = ""
-			}
-		}
-	}
-}
-
 @Composable
 private fun Flash(c: CreatePartDataHolder) {
 	val vm = c.vm
@@ -861,7 +660,7 @@ private fun Flash(c: CreatePartDataHolder) {
 			val fn = c.romFolderName
 			terminal.add(vm.activity.getString(R.string.term_f_name, fn))
 			terminal.add(vm.activity.getString(R.string.term_g_name, c.romDisplayName))
-			val tmpFile = c.chosen["_install.sh_"]!!.toFile(vm)
+			val tmpFile = c.vm.chosen["_install.sh_"]!!.toFile(vm)
 			tmpFile.setExecutable(true)
 			terminal.add(vm.activity.getString(R.string.term_creating_pt))
 
@@ -928,9 +727,9 @@ private fun Flash(c: CreatePartDataHolder) {
 
 			terminal.add(vm.activity.getString(R.string.term_flashing_imgs))
 			for (part in c.parts) {
-				if (!c.idNeeded.contains(part.id)) continue
+				if (!c.vm.idNeeded.contains(part.id)) continue
 				terminal.add(vm.activity.getString(R.string.term_flashing_s, part.id))
-				val f = c.chosen[part.id]!!
+				val f = c.vm.chosen[part.id]!!
 				val tp = File(meta.dumpKernelPartition(createdParts[part]!!).path)
 				if (part.sparse) {
 					val f2 = f.toFile(c.vm)
@@ -955,7 +754,7 @@ private fun Flash(c: CreatePartDataHolder) {
 			terminal.add(vm.activity.getString(R.string.term_patching_os))
 			var cmd = "FORMATDATA=true " + tmpFile.absolutePath + " $fn"
 			for (i in c.extraIdNeeded) {
-				cmd += " " + c.chosen[i]!!.toFile(vm).absolutePath
+				cmd += " " + c.vm.chosen[i]!!.toFile(vm).absolutePath
 			}
 			for (i in c.parts) {
 				cmd += " " + createdParts[i]
