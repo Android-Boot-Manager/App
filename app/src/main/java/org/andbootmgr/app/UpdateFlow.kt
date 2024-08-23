@@ -3,13 +3,10 @@ package org.andbootmgr.app
 import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -19,10 +16,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
 import kotlinx.coroutines.Dispatchers
@@ -57,6 +52,7 @@ class UpdateFlow(private val entryName: String): WizardFlow() {
             NavButton(vm.activity.getString(R.string.online_update)) { vm.navigate("start") }
         ) {
             Local(c)
+            // TODO add dl
         }, WizardPage("flash",
             NavButton("") {},
             NavButton("") {}
@@ -117,17 +113,19 @@ private fun Start(u: UpdateFlowDataHolder) {
                         try {
                             u.run {
                                 val j = json!!
-                                if (j.has("boot") && j.has("script")) {
+                                if (j.has("extraIds") && j.has("script")) {
                                     val extraIdNeeded = j.getJSONArray("extraIds")
                                     var i = 0
                                     while (i < extraIdNeeded.length()) {
                                         extraParts.add(extraIdNeeded.get(i) as String)
                                         i++
                                     }
-                                    vm.flashes["InstallShFlashType"] = Pair(
-                                        Uri.parse(j.getString("script")),
-                                        if (j.has("scriptSha256")) j.getString("scriptSha256") else null
+                                    vm.inetAvailable["install"] = WizardActivityState.Downloadable(
+                                        j.getString("script"),
+                                        j.optString("scriptSha256"),
+                                        vm.activity.getString(R.string.installer_sh)
                                     )
+                                    vm.idNeeded.add("install")
                                 }
                                 if (j.has("parts")) {
                                     val sp = u.e!!["xpart"]!!.split(":")
@@ -175,16 +173,16 @@ private fun Local(u: UpdateFlowDataHolder) {
         }
         Column {
             Text(stringResource(R.string.script_name))
-            if (u.vm.flashes.containsKey("InstallShFlashType")) {
+            if (u.vm.chosen.containsKey("install")) {
                 Button(onClick = {
-                    u.vm.flashes.remove("InstallShFlashType")
+                    u.vm.chosen.remove("install")
                 }) {
                     Text(stringResource(id = R.string.undo))
                 }
             } else {
                 Button(onClick = {
                     u.vm.activity.chooseFile("*/*") {
-                        u.vm.flashes["InstallShFlashType"] = Pair(it, null)
+                        u.vm.chosen["install"] = DledFile(it, null)
                     }
                 }) {
                     Text(stringResource(id = R.string.choose_file))
@@ -200,11 +198,11 @@ private fun Local(u: UpdateFlowDataHolder) {
             }
             if (u.sbootfile.isNotEmpty()) {
                 Button(onClick = {
-                    if (u.vm.flashes.containsKey("InstallShFlashType")) {
+                    if (u.vm.chosen.containsKey("install")) {
                         u.hasUpdate = false
                         u.vm.navigate("flash")
                     }
-                }, enabled = u.vm.flashes.containsKey("InstallShFlashType")) {
+                }, enabled = u.vm.chosen.containsKey("install")) {
                     Text(stringResource(R.string.install_update))
                 }
             }
@@ -296,7 +294,7 @@ private fun Flash(u: UpdateFlowDataHolder) {
                     pmap[p.key] = f
                 }
                 val tmpFile = createTempFileSu("abm", ".sh", u.vm.logic.rootTmpDir)
-                u.vm.copyPriv(u.vm.flashStream("InstallShFlashType"), tmpFile)
+                u.vm.copyPriv(u.vm.chosen["install"]!!.openInputStream(u.vm), tmpFile)
                 tmpFile.setExecutable(true)
                 u.vm.nextText = ""
                 u.vm.onNext = {}
@@ -346,7 +344,7 @@ private fun Flash(u: UpdateFlowDataHolder) {
         } else if (u.sbootfile.isNotEmpty()) {
             val bootfile = ArrayList<File>()
             val tmpFile = createTempFileSu("abm", ".sh", u.vm.logic.rootTmpDir)
-            u.vm.copyPriv(u.vm.flashStream("InstallShFlashType"), tmpFile)
+            u.vm.copyPriv(u.vm.chosen["flashes"]!!.openInputStream(u.vm), tmpFile)
             tmpFile.setExecutable(true)
             terminal.add(u.vm.activity.getString(R.string.term_patch_update))
             u.sbootfile.forEach {

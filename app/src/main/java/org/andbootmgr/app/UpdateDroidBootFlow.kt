@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -16,23 +17,18 @@ import org.andbootmgr.app.util.Terminal
 import java.io.File
 import java.io.IOException
 
-class UpdateDroidBootFlow(): WizardFlow() {
+class UpdateDroidBootFlow: WizardFlow() {
 	override fun get(vm: WizardActivityState): List<IWizardPage> {
 		return listOf(WizardPage("start",
 			NavButton(vm.activity.getString(R.string.cancel)) { it.finish() },
-			NavButton(vm.activity.getString(R.string.next)) { it.navigate(if (vm.deviceInfo.postInstallScript) "shSel" else "select") })
+			NavButton("") {})
 		{
-			Start()
-		}, WizardPage("shSel",
-			NavButton(vm.activity.getString(R.string.prev)) { it.navigate("start") },
+			Start(vm)
+		}, WizardPage("dload",
+			NavButton(vm.activity.getString(R.string.cancel)) { it.finish() },
 			NavButton("") {}
 		) {
-			SelectInstallSh(vm, update = true)
-		},WizardPage("select",
-			NavButton(vm.activity.getString(R.string.prev)) { it.navigate(if (vm.deviceInfo.postInstallScript) "shSel" else "start") },
-			NavButton("") {}
-		) {
-			SelectDroidBoot(vm)
+			WizardDownloader(vm)
 		}, WizardPage("flash",
 			NavButton("") {},
 			NavButton("") {}
@@ -43,12 +39,20 @@ class UpdateDroidBootFlow(): WizardFlow() {
 }
 
 @Composable
-private fun Start() {
-	Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
-		modifier = Modifier.fillMaxSize()
-	) {
-		Text(stringResource(id = R.string.welcome_text))
-		Text(stringResource(R.string.update_droidboot_text))
+private fun Start(vm: WizardActivityState) {
+	LoadDroidBootJson(vm) {
+		LaunchedEffect(Unit) {
+			vm.nextText = vm.activity.getString(R.string.next)
+			vm.onNext = { it.navigate(if (vm.idNeeded.isNotEmpty()) "dload" else "flash") }
+		}
+		Column(
+			horizontalAlignment = Alignment.CenterHorizontally,
+			verticalArrangement = Arrangement.Center,
+			modifier = Modifier.fillMaxSize()
+		) {
+			Text(stringResource(id = R.string.welcome_text))
+			Text(stringResource(R.string.update_droidboot_text))
+		}
 	}
 }
 
@@ -58,7 +62,7 @@ private fun Flash(vm: WizardActivityState) {
 		vm.logic.extractToolkit(terminal)
 		val tmpFile = if (vm.deviceInfo.postInstallScript) {
 			val tmpFile = createTempFileSu("abm", ".sh", vm.logic.rootTmpDir)
-			vm.copyPriv(vm.flashStream("InstallShFlashType"), tmpFile)
+			vm.copyPriv(vm.chosen["install"]!!.openInputStream(vm), tmpFile)
 			tmpFile.setExecutable(true)
 			tmpFile
 		} else null
@@ -69,16 +73,10 @@ private fun Flash(vm: WizardActivityState) {
 			terminal.add(vm.activity.getString(R.string.term_cant_write_bl))
 		vm.copyPriv(SuFileInputStream.open(vm.deviceInfo.blBlock), backupLk)
 		try {
-			vm.copyPriv(vm.flashStream("DroidBootFlashType"), File(vm.deviceInfo.blBlock))
+			vm.copyPriv(vm.chosen["droidboot"]!!.openInputStream(vm), File(vm.deviceInfo.blBlock))
 		} catch (e: IOException) {
 			terminal.add(vm.activity.getString(R.string.term_bl_failed))
 			terminal.add(e.message ?: "(null)")
-			terminal.add(vm.activity.getString(R.string.term_consult_doc))
-			return@Terminal
-		} catch (e: HashMismatchException) {
-			terminal.add(e.message ?: "(null)")
-			terminal.add(vm.activity.getString(R.string.restoring_backup))
-			vm.copyPriv(SuFileInputStream.open(backupLk), File(vm.deviceInfo.blBlock))
 			terminal.add(vm.activity.getString(R.string.term_consult_doc))
 			return@Terminal
 		}

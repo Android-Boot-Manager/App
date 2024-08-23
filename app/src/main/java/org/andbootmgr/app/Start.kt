@@ -593,7 +593,7 @@ private fun PartTool(vm: MainActivityState) {
 					editEntryID = null
 				},
 				title = {
-					Text(text = if (e.has("title")) "\"${e["title"]}\"" else if (f != null) stringResource(id = R.string.invalid_entry2) else stringResource(id = R.string.new_entry2))
+					Text(text = if (e.has("title")) e["title"]!! else if (f != null) stringResource(id = R.string.invalid_entry2) else stringResource(id = R.string.new_entry2))
 				},
 				icon = {
 					Icon(painterResource(id = R.drawable.ic_roms), stringResource(R.string.icon_content_desc))

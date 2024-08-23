@@ -120,7 +120,7 @@ class WizardActivityState(val mvm: MainActivityState) {
 	var onPrev by mutableStateOf<((WizardActivityState) -> Unit)?>(null)
 	var onNext by mutableStateOf<((WizardActivityState) -> Unit)?>(null)
 
-	// TODO remove below two
+	// TODO remove flashes
 	var flashes: HashMap<String, Pair<Uri, String?>> = HashMap()
 	var texts by mutableStateOf("")
 	val inetAvailable = HashMap<String/*id*/, Downloadable>()

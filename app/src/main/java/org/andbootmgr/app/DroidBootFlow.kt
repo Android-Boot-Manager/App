@@ -54,8 +54,7 @@ class DroidBootFlow : WizardFlow() {
 			Start(vm)
 		}, WizardPage("input",
 			NavButton(vm.activity.getString(R.string.prev)) { it.navigate("start") },
-			NavButton(vm.activity.getString(R.string.next)) { it.navigate(if (vm.deviceInfo.postInstallScript || !booted)
-				"dload" else "flash") }
+			NavButton("") {}
 		) {
 			Input(vm)
 		}, WizardPage("dload",
@@ -92,9 +91,11 @@ private fun Start(vm: WizardActivityState) {
 	}
 }
 
+// shared across DroidBootFlow, UpdateDroidBootFlow, FixDroidBootFlow
 @Composable
-private fun Input(vm: WizardActivityState) {
+fun LoadDroidBootJson(vm: WizardActivityState, content: @Composable () -> Unit) {
 	var loading by remember { mutableStateOf(!vm.deviceInfo.isBooted(vm.logic) || vm.deviceInfo.postInstallScript) }
+	var error by remember { mutableStateOf(false) }
 	LaunchedEffect(Unit) {
 		if (!loading) return@LaunchedEffect
 		CoroutineScope(Dispatchers.IO).launch {
@@ -107,7 +108,7 @@ private fun Input(vm: WizardActivityState) {
 				if (!vm.deviceInfo.isBooted(vm.logic)) {
 					val bl = json.getJSONObject("bootloader")
 					val url = bl.getString("url")
-					val sha = if (bl.has("sha256")) bl.getString("sha256") else null
+					val sha = bl.optString("sha256")
 					vm.inetAvailable["droidboot"] = WizardActivityState.Downloadable(
 						url, sha, vm.activity.getString(R.string.droidboot_online)
 					)
@@ -116,7 +117,7 @@ private fun Input(vm: WizardActivityState) {
 				if (vm.deviceInfo.postInstallScript) {
 					val i = json.getJSONObject("installScript")
 					val url = i.getString("url")
-					val sha = if (i.has("sha256")) i.getString("sha256") else null
+					val sha = i.optString("sha256")
 					vm.inetAvailable["install"] = WizardActivityState.Downloadable(
 						url, sha, vm.activity.getString(R.string.installer_sh)
 					)
@@ -128,156 +129,59 @@ private fun Input(vm: WizardActivityState) {
 					Toast.makeText(vm.activity, R.string.dl_error, Toast.LENGTH_LONG).show()
 				}
 				Log.e("ABM droidboot json", Log.getStackTraceString(e))
+				error = true
 			}
 		}
 	}
 	if (loading) {
-		LoadingCircle(stringResource(R.string.loading), modifier = Modifier.fillMaxSize())
-		return
-	}
-	Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
-		modifier = Modifier.fillMaxSize()
-	) {
-		LaunchedEffect(Unit) { // TODO can't I do this better?
-			if (vm.texts.isBlank())
-				vm.texts = vm.activity.getString(R.string.android)
-		}
-		val e = vm.texts.isBlank() || !vm.texts.matches(Regex("[\\dA-Za-z]+"))
-
-		Text(stringResource(R.string.enter_name_for_current), textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 5.dp))
-		TextField(
-			value = vm.texts,
-			onValueChange = {
-				vm.texts = it
-			},
-			label = { Text(stringResource(R.string.os_name)) },
-			isError = e
-		)
-		if (e) {
-			Text(stringResource(R.string.invalid_in), color = MaterialTheme.colorScheme.error)
+		if (error) {
+			Text(stringResource(R.string.dl_error))
 		} else {
-			Text("") // Budget spacer
+			LoadingCircle(stringResource(R.string.loading), modifier = Modifier.fillMaxSize())
 		}
-		LaunchedEffect(e) {
+	} else content()
+}
+
+@Composable
+private fun Input(vm: WizardActivityState) {
+	LoadDroidBootJson(vm) {
+		Column(
+			horizontalAlignment = Alignment.CenterHorizontally,
+			verticalArrangement = Arrangement.Center,
+			modifier = Modifier.fillMaxSize()
+		) {
+			LaunchedEffect(Unit) { // TODO can't I do this better?
+				if (vm.texts.isBlank())
+					vm.texts = vm.activity.getString(R.string.android)
+			}
+			val e = vm.texts.isBlank() || !vm.texts.matches(Regex("[\\dA-Za-z]+"))
+
+			Text(
+				stringResource(R.string.enter_name_for_current),
+				textAlign = TextAlign.Center,
+				modifier = Modifier.padding(vertical = 5.dp)
+			)
+			TextField(
+				value = vm.texts,
+				onValueChange = {
+					vm.texts = it
+				},
+				label = { Text(stringResource(R.string.os_name)) },
+				isError = e
+			)
 			if (e) {
-				vm.nextText = ""
-				vm.onNext = {}
+				Text(stringResource(R.string.invalid_in), color = MaterialTheme.colorScheme.error)
 			} else {
-				vm.nextText = vm.activity.getString(R.string.next)
-				vm.onNext = { it.navigate("select") }
+				Text("") // Budget spacer
 			}
-		}
-	}
-}
-
-// shared across DroidBootFlow, UpdateDroidBootFlow, FixDroidBootFlow
-@Composable
-fun SelectDroidBoot(vm: WizardActivityState) {
-	var nextButtonAvailable by remember { mutableStateOf(false) }
-
-	Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
-		modifier = Modifier.fillMaxSize()
-	) {
-		Icon(
-			painterResource(R.drawable.ic_droidbooticon),
-			stringResource(R.string.droidboot_icon_content_desc),
-			Modifier.defaultMinSize(32.dp, 32.dp)
-		)
-
-		if (nextButtonAvailable) {
-			Text(stringResource(id = R.string.successfully_selected))
-		} else {
-			//Text(stringResource(R.string.choose_droidboot_online))
-			Button(onClick = {
-				vm.activity.chooseFile("*/*") {
-					vm.flashes["DroidBootFlashType"] = Pair(it, null)
-					nextButtonAvailable = true
+			LaunchedEffect(e) {
+				if (e) {
+					vm.nextText = ""
+					vm.onNext = {}
+				} else {
 					vm.nextText = vm.activity.getString(R.string.next)
-					vm.onNext = { n -> n.navigate("flash") }
+					vm.onNext = { it.navigate(if (vm.idNeeded.isNotEmpty()) "dload" else "flash") }
 				}
-			}) {
-				Text(stringResource(id = R.string.choose_file))
-			}
-			val ctx = LocalContext.current
-			Button(onClick = {
-				CoroutineScope(Dispatchers.IO).launch {
-					try {
-						val jsonText =
-							URL("https://raw.githubusercontent.com/Android-Boot-Manager/ABM-json/master/devices/" + vm.codename + ".json").readText()
-						val json = JSONTokener(jsonText).nextValue() as JSONObject
-						if (BuildConfig.VERSION_CODE < json.getInt("minAppVersion"))
-							throw IllegalStateException("please upgrade app")
-						val bl = json.getJSONObject("bootloader")
-						val url = bl.getString("url")
-						val sha = if (bl.has("sha256")) bl.getString("sha256") else null
-						vm.flashes["DroidBootFlashType"] = Pair(Uri.parse(url), sha)
-						nextButtonAvailable = true
-						vm.nextText = vm.activity.getString(R.string.next)
-						vm.onNext = { n -> n.navigate("flash") }
-					} catch (e: Exception) {
-						Handler(Looper.getMainLooper()).post {
-							Toast.makeText(ctx, R.string.dl_error, Toast.LENGTH_LONG).show()
-						}
-						Log.e("ABM droidboot json", Log.getStackTraceString(e))
-					}
-				}
-			}) {
-				Text(stringResource(id = R.string.download))
-			}
-		}
-	}
-}
-
-// shared across DroidBootFlow, UpdateDroidBootFlow, FixDroidBootFlow
-@Composable
-fun SelectInstallSh(vm: WizardActivityState, update: Boolean = false) {
-	var nextButtonAvailable by remember { mutableStateOf(false) }
-	val flashType = "InstallShFlashType"
-
-	Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
-		modifier = Modifier.fillMaxSize()
-	) {
-		if (nextButtonAvailable) {
-			Text(stringResource(id = R.string.successfully_selected))
-		} else {
-			//Text(stringResource(R.string.choose_install_s_online))
-			Button(onClick = {
-				vm.activity.chooseFile("*/*") {
-					vm.flashes[flashType] = Pair(it, null)
-					nextButtonAvailable = true
-					vm.nextText = vm.activity.getString(R.string.next)
-					vm.onNext = { n -> n.navigate(
-						if (!vm.deviceInfo.isBooted(vm.logic) || update) "select" else "flash") }
-				}
-			}) {
-				Text(stringResource(id = R.string.choose_file))
-			}
-			val ctx = LocalContext.current
-			Button(onClick = {
-				CoroutineScope(Dispatchers.IO).launch {
-					try {
-						val jsonText =
-							URL("https://raw.githubusercontent.com/Android-Boot-Manager/ABM-json/master/devices/" + vm.codename + ".json").readText()
-						val json = JSONTokener(jsonText).nextValue() as JSONObject
-						if (BuildConfig.VERSION_CODE < json.getInt("minAppVersion"))
-							throw IllegalStateException("please upgrade app")
-						val i = json.getJSONObject("installScript")
-						val url = i.getString("url")
-						val sha = if (i.has("sha256")) i.getString("sha256") else null
-						vm.flashes[flashType] = Pair(Uri.parse(url), sha)
-						nextButtonAvailable = true
-						vm.nextText = vm.activity.getString(R.string.next)
-						vm.onNext = { n -> n.navigate(
-							if (!vm.deviceInfo.isBooted(vm.logic) || update) "select" else "flash") }
-					} catch (e: Exception) {
-						Handler(Looper.getMainLooper()).post {
-							Toast.makeText(ctx, R.string.dl_error, Toast.LENGTH_LONG).show()
-						}
-						Log.e("ABM install json", Log.getStackTraceString(e))
-					}
-				}
-			}) {
-				Text(stringResource(id = R.string.download))
 			}
 		}
 	}
@@ -372,7 +276,7 @@ private fun Flash(vm: WizardActivityState) {
 		}
 		val tmpFile = if (vm.deviceInfo.postInstallScript) {
 			val tmpFile = createTempFileSu("abm", ".sh", vm.logic.rootTmpDir)
-			vm.copyPriv(vm.flashStream("InstallShFlashType"), tmpFile)
+			vm.copyPriv(vm.chosen["install"]!!.openInputStream(vm), tmpFile)
 			tmpFile.setExecutable(true)
 			tmpFile
 		} else null
@@ -401,16 +305,10 @@ private fun Flash(vm: WizardActivityState) {
 				terminal.add(vm.activity.getString(R.string.term_cant_write_bl))
 			vm.copyPriv(SuFileInputStream.open(vm.deviceInfo.blBlock), backupLk)
 			try {
-				vm.copyPriv(vm.flashStream(flashType), File(vm.deviceInfo.blBlock))
+				vm.copyPriv(vm.chosen["droidboot"]!!.openInputStream(vm), File(vm.deviceInfo.blBlock))
 			} catch (e: IOException) {
 				terminal.add(vm.activity.getString(R.string.term_bl_failed))
 				terminal.add(e.message ?: "(null)")
-				terminal.add(vm.activity.getString(R.string.term_consult_doc))
-				return@Terminal
-			} catch (e: HashMismatchException) {
-				terminal.add(e.message ?: "(null)")
-				terminal.add(vm.activity.getString(R.string.restoring_backup))
-				vm.copyPriv(SuFileInputStream.open(backupLk), File(vm.deviceInfo.blBlock))
 				terminal.add(vm.activity.getString(R.string.term_consult_doc))
 				return@Terminal
 			}

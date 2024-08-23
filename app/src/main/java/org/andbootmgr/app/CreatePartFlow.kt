@@ -378,16 +378,15 @@ private fun Shop(c: CreatePartDataHolder) {
 									vm.inetAvailable[l.getString("id")] =
 										WizardActivityState.Downloadable(
 											l.getString("url"),
-											if (l.has("hash"))
-												l.getString("hash") else null,
+											l.optString("hash"),
 											l.getString("desc")
 										)
 									i++
 								}
 								vm.idNeeded.add("_install.sh_")
 								vm.inetAvailable["_install.sh_"] = WizardActivityState.Downloadable(
-									o.getString("scriptname"), if (o.has("scriptSha256"))
-										o.getString("scriptSha256") else null,
+									o.getString("scriptname"),
+									o.optString("scriptSha256"),
 									vm.activity.getString(R.string.installer_sh)
 								)
 
