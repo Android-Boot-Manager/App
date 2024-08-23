@@ -39,7 +39,7 @@ import java.io.IOException
 import java.net.URL
 
 class DroidBootFlow : WizardFlow() {
-	override fun get(vm: WizardActivityState): List<IWizardPage> {
+	override fun get(vm: WizardState): List<IWizardPage> {
 		val d = DroidBootFlowDataHolder(vm)
 		return listOf(WizardPage("start",
 			NavButton(vm.activity.getString(R.string.cancel)) { it.finish() },
@@ -65,12 +65,12 @@ class DroidBootFlow : WizardFlow() {
 	}
 }
 
-class DroidBootFlowDataHolder(val vm: WizardActivityState) {
+class DroidBootFlowDataHolder(val vm: WizardState) {
 	var osName by mutableStateOf(vm.activity.getString(R.string.android))
 }
 
 @Composable
-private fun Start(vm: WizardActivityState) {
+private fun Start(vm: WizardState) {
 	Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
 		modifier = Modifier.fillMaxSize()
 	) {
@@ -91,7 +91,7 @@ private fun Start(vm: WizardActivityState) {
 
 // shared across DroidBootFlow, UpdateDroidBootFlow, FixDroidBootFlow
 @Composable
-fun LoadDroidBootJson(vm: WizardActivityState, content: @Composable () -> Unit) {
+fun LoadDroidBootJson(vm: WizardState, content: @Composable () -> Unit) {
 	var loading by remember { mutableStateOf(!vm.deviceInfo.isBooted(vm.logic) || vm.deviceInfo.postInstallScript) }
 	var error by remember { mutableStateOf(false) }
 	LaunchedEffect(Unit) {
@@ -106,8 +106,8 @@ fun LoadDroidBootJson(vm: WizardActivityState, content: @Composable () -> Unit) 
 				if (!vm.deviceInfo.isBooted(vm.logic)) {
 					val bl = json.getJSONObject("bootloader")
 					val url = bl.getString("url")
-					val sha = bl.optString("sha256")
-					vm.inetAvailable["droidboot"] = WizardActivityState.Downloadable(
+					val sha = bl.getStringOrNull("sha256")
+					vm.inetAvailable["droidboot"] = WizardState.Downloadable(
 						url, sha, vm.activity.getString(R.string.droidboot_online)
 					)
 					vm.idNeeded.add("droidboot")
@@ -115,8 +115,8 @@ fun LoadDroidBootJson(vm: WizardActivityState, content: @Composable () -> Unit) 
 				if (vm.deviceInfo.postInstallScript) {
 					val i = json.getJSONObject("installScript")
 					val url = i.getString("url")
-					val sha = i.optString("sha256")
-					vm.inetAvailable["_install.sh_"] = WizardActivityState.Downloadable(
+					val sha = i.getStringOrNull("sha256")
+					vm.inetAvailable["_install.sh_"] = WizardState.Downloadable(
 						url, sha, vm.activity.getString(R.string.installer_sh)
 					)
 					vm.idNeeded.add("_install.sh_")
@@ -269,10 +269,9 @@ private fun Flash(d: DroidBootFlowDataHolder) {
 			}
 		}
 		val tmpFile = if (vm.deviceInfo.postInstallScript) {
-			val tmpFile = createTempFileSu("abm", ".sh", vm.logic.rootTmpDir)
-			vm.copyPriv(vm.chosen["_install.sh_"]!!.openInputStream(vm), tmpFile)
-			tmpFile.setExecutable(true)
-			tmpFile
+			vm.chosen["_install.sh_"]!!.toFile(vm).also {
+				it.setExecutable(true)
+			}
 		} else null
 
 		terminal.add(vm.activity.getString(R.string.term_building_cfg))

@@ -18,7 +18,7 @@ import java.io.File
 import java.io.IOException
 
 class UpdateDroidBootFlow: WizardFlow() {
-	override fun get(vm: WizardActivityState): List<IWizardPage> {
+	override fun get(vm: WizardState): List<IWizardPage> {
 		return listOf(WizardPage("start",
 			NavButton(vm.activity.getString(R.string.cancel)) { it.finish() },
 			NavButton("") {})
@@ -39,7 +39,7 @@ class UpdateDroidBootFlow: WizardFlow() {
 }
 
 @Composable
-private fun Start(vm: WizardActivityState) {
+private fun Start(vm: WizardState) {
 	LoadDroidBootJson(vm) {
 		LaunchedEffect(Unit) {
 			vm.nextText = vm.activity.getString(R.string.next)
@@ -57,14 +57,13 @@ private fun Start(vm: WizardActivityState) {
 }
 
 @Composable
-private fun Flash(vm: WizardActivityState) {
+private fun Flash(vm: WizardState) {
 	Terminal(logFile = "blup_${System.currentTimeMillis()}.txt") { terminal ->
 		vm.logic.extractToolkit(terminal)
 		val tmpFile = if (vm.deviceInfo.postInstallScript) {
-			val tmpFile = createTempFileSu("abm", ".sh", vm.logic.rootTmpDir)
-			vm.copyPriv(vm.chosen["_install.sh_"]!!.openInputStream(vm), tmpFile)
-			tmpFile.setExecutable(true)
-			tmpFile
+			vm.chosen["_install.sh_"]!!.toFile(vm).also {
+				it.setExecutable(true)
+			}
 		} else null
 		terminal.add(vm.activity.getString(R.string.term_flashing_droidboot))
 		val backupLk = File(vm.logic.fileDir, "backup2_lk.img")

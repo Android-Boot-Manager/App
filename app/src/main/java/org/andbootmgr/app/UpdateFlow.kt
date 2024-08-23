@@ -1,34 +1,31 @@
 package org.andbootmgr.app
 
-import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import okhttp3.Call
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.internal.http2.StreamResetException
-import okio.buffer
-import okio.sink
 import org.andbootmgr.app.util.ConfigFile
 import org.andbootmgr.app.util.SDUtils
 import org.andbootmgr.app.util.Terminal
@@ -36,10 +33,9 @@ import org.json.JSONObject
 import org.json.JSONTokener
 import java.io.File
 import java.net.URL
-import java.util.concurrent.TimeUnit
 
 class UpdateFlow(private val entryName: String): WizardFlow() {
-    override fun get(vm: WizardActivityState): List<IWizardPage> {
+    override fun get(vm: WizardState): List<IWizardPage> {
         val c = UpdateFlowDataHolder(vm, entryName)
         return listOf(WizardPage("start",
             NavButton(vm.activity.getString(R.string.cancel)) {
@@ -54,7 +50,7 @@ class UpdateFlow(private val entryName: String): WizardFlow() {
         ) {
             Local(c)
         }, WizardPage("dload",
-            NavButton("") {},
+            NavButton(vm.activity.getString(R.string.cancel)) { it.finish() },
             NavButton("") {}
         ) {
             WizardDownloader(c.vm, "flash")
@@ -67,7 +63,7 @@ class UpdateFlow(private val entryName: String): WizardFlow() {
     }
 }
 
-private class UpdateFlowDataHolder(val vm: WizardActivityState, val entryFilename: String) {
+private class UpdateFlowDataHolder(val vm: WizardState, val entryFilename: String) {
     var json: JSONObject? = null
     var e: ConfigFile? = null
     var ef: File? = null
@@ -88,11 +84,15 @@ private fun Start(u: UpdateFlowDataHolder) {
                     u.entryFilename
                 )
             )
+            u.ef = u.vm.logic.abmEntries.resolve(u.entryFilename)
             try {
                 val jsonText =
                     URL(u.e!!["xupdate"]).readText()
                 u.json = JSONTokener(jsonText).nextValue() as JSONObject
             } catch (e: Exception) {
+                launch(Dispatchers.Main) {
+                    Toast.makeText(u.vm.activity, e.message, Toast.LENGTH_LONG).show()
+                }
                 Log.e("ABM", Log.getStackTraceString(e))
             }
             if (u.json != null) {
@@ -116,7 +116,7 @@ private fun Start(u: UpdateFlowDataHolder) {
                                     val extraIdNeeded = j.getJSONArray("extraIds")
                                     var i = 0
                                     while (i < extraIdNeeded.length()) {
-                                        vm.inetAvailable["boot$i"] = WizardActivityState.Downloadable(
+                                        vm.inetAvailable["boot$i"] = WizardState.Downloadable(
                                             extraIdNeeded.get(i) as String,
                                             null,
                                             ""
@@ -124,9 +124,9 @@ private fun Start(u: UpdateFlowDataHolder) {
                                         vm.idNeeded.add("boot$i")
                                         i++
                                     }
-                                    vm.inetAvailable["_install.sh_"] = WizardActivityState.Downloadable(
+                                    vm.inetAvailable["_install.sh_"] = WizardState.Downloadable(
                                         j.getString("script"),
-                                        j.optString("scriptSha256"),
+                                        j.getStringOrNull("scriptSha256"),
                                         vm.activity.getString(R.string.installer_sh)
                                     )
                                     vm.idNeeded.add("_install.sh_")
@@ -134,7 +134,7 @@ private fun Start(u: UpdateFlowDataHolder) {
                                 if (j.has("parts")) {
                                     val p = j.getJSONObject("parts")
                                     for (k in p.keys()) {
-                                        vm.inetAvailable["part$k"] = WizardActivityState.Downloadable(
+                                        vm.inetAvailable["part$k"] = WizardState.Downloadable(
                                             p.getString(k),
                                             null,
                                             ""
@@ -142,7 +142,7 @@ private fun Start(u: UpdateFlowDataHolder) {
                                         vm.idNeeded.add("part$k")
                                     }
                                 }
-                                updateJson = j.optString("updateJson")
+                                updateJson = j.getStringOrNull("updateJson")
                                 val a = j.optJSONArray("sparse")
                                 if (a != null) {
                                     for (i in 0 until a.length()) {
@@ -180,24 +180,26 @@ private fun Local(u: UpdateFlowDataHolder) {
             Text(stringResource(R.string.local_updater_3))
         }
         Column {
-            Text(stringResource(R.string.how_many_extras))
             var i by remember { mutableIntStateOf(0) }
+            Text(stringResource(R.string.how_many_extras, i))
             Row {
                 Button({ i++ }) {
                     Text("+")
                 }
+                Spacer(Modifier.width(5.dp))
                 Button({ i-- }) {
                     Text("-")
                 }
-                Button({
-                    u.vm.idNeeded.add("_install.sh_")
-                    for (j in 0..i) {
-                        u.vm.idNeeded.add("boot$j")
-                    }
-                    u.vm.navigate("dload")
-                }) {
-                    Text(stringResource(R.string.install_update))
+            }
+            Spacer(Modifier.height(5.dp))
+            Button({
+                u.vm.idNeeded.add("_install.sh_")
+                for (j in 1..i) {
+                    u.vm.idNeeded.add("boot${j - 1}")
                 }
+                u.vm.navigate("dload")
+            }) {
+                Text(stringResource(R.string.install_update))
             }
         }
     }
@@ -211,8 +213,7 @@ private fun Flash(u: UpdateFlowDataHolder) {
         val meta = SDUtils.generateMeta(u.vm.deviceInfo)!!
         Shell.cmd(SDUtils.umsd(meta)).exec()
         val tmpFile = if (u.vm.idNeeded.contains("_install.sh_")) {
-            createTempFileSu("abm", ".sh", u.vm.logic.rootTmpDir).also {
-                u.vm.copyPriv(u.vm.chosen["_install.sh_"]!!.openInputStream(u.vm), it)
+            u.vm.chosen["_install.sh_"]!!.toFile(u.vm).also {
                 it.setExecutable(true)
             }
         } else null

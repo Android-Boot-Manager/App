@@ -86,10 +86,8 @@ class MainActivityState(val activity: MainActivity?) {
 			val cfg = withContext(Dispatchers.IO) {
 				ConfigFile.importFromFile(logic!!.abmDbConf).toMap()
 			}
-			withContext(Dispatchers.Main) {
-				defaultCfg.clear()
-				defaultCfg.putAll(cfg)
-			}
+			defaultCfg.clear()
+			defaultCfg.putAll(cfg)
 		}
 	}
 

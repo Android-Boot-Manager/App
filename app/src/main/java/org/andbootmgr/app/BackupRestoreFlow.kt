@@ -24,7 +24,7 @@ import java.io.File
 import java.io.IOException
 
 class BackupRestoreFlow(private val partitionId: Int): WizardFlow() {
-    override fun get(vm: WizardActivityState): List<IWizardPage> {
+    override fun get(vm: WizardState): List<IWizardPage> {
         val c = CreateBackupDataHolder(vm, partitionId)
         return listOf(WizardPage("start",
             NavButton(vm.activity.getString(R.string.cancel)) { it.finish() },
@@ -45,7 +45,7 @@ class BackupRestoreFlow(private val partitionId: Int): WizardFlow() {
     }
 }
 
-private class CreateBackupDataHolder(val vm: WizardActivityState, val pi: Int) {
+private class CreateBackupDataHolder(val vm: WizardState, val pi: Int) {
     var action: Int = 0
     var path: Uri? = null
     var meta: SDUtils.SDPartitionMeta? = null
@@ -93,17 +93,22 @@ private fun SelectDroidBoot(c: CreateBackupDataHolder) {
                     else -> ""
                 }
             )
-            val next = { it: Uri ->
-                c.path = it
-                nextButtonAvailable = true
-                c.vm.nextText = c.vm.activity.getString(R.string.next)
-                c.vm.onNext = { i -> i.navigate("go") }
-            }
+            val next =
             Button(onClick = {
                 if (c.action != 1) {
-                    c.vm.activity.chooseFile("*/*", next)
+                    c.vm.activity.chooseFile("*/*") {
+                        c.vm.chosen["file"] = WizardState.DownloadedFile(it, null)
+                        nextButtonAvailable = true
+                        c.vm.nextText = c.vm.activity.getString(R.string.next)
+                        c.vm.onNext = { i -> i.navigate("go") }
+                    }
                 } else {
-                    c.vm.activity.createFile("${c.meta!!.dumpKernelPartition(c.pi).name}.img", next)
+                    c.vm.activity.createFile("${c.meta!!.dumpKernelPartition(c.pi).name}.img") {
+                        c.path = it
+                        nextButtonAvailable = true
+                        c.vm.nextText = c.vm.activity.getString(R.string.next)
+                        c.vm.onNext = { i -> i.navigate("go") }
+                    }
                 }
             }) {
                 Text(stringResource(if (c.action != 1) R.string.choose_file else R.string.create_file))
@@ -117,40 +122,32 @@ private fun Flash(c: CreateBackupDataHolder) {
     Terminal(logFile = "flash_${System.currentTimeMillis()}.txt") { terminal ->
         c.vm.logic.extractToolkit(terminal)
         terminal.add(c.vm.activity.getString(R.string.term_starting))
-        try {
-            val p = c.meta!!.dumpKernelPartition(c.pi)
-            if (!c.vm.logic.unmount(p).to(terminal).exec().isSuccess)
-                throw IOException(c.vm.activity.getString(R.string.term_cant_umount))
-            if (c.action == 1) {
-                c.vm.copy(
-                    SuFileInputStream.open(File(p.path)),
-                    c.vm.activity.contentResolver.openOutputStream(c.path!!)!!
-                )
-            } else if (c.action == 2) {
-                c.vm.copyPriv(
-                    c.vm.activity.contentResolver.openInputStream(c.path!!)!!,
-                    File(p.path)
-                )
-            } else if (c.action == 3) {
-                val f = File(c.vm.logic.cacheDir, System.currentTimeMillis().toString())
-                c.vm.copyUnpriv(c.vm.activity.contentResolver.openInputStream(c.path!!)!!, f)
-                val result2 = Shell.cmd(
-                    File(
-                        c.vm.logic.toolkitDir,
-                        "simg2img"
-                    ).absolutePath + " ${f.absolutePath} ${p.path}"
-                ).to(terminal).exec()
-                if (!result2.isSuccess) {
-                    terminal.add(c.vm.activity.getString(R.string.term_failure))
-                    return@Terminal
-                }
-            } else {
-                throw IOException(c.vm.activity.getString(R.string.term_invalid_action))
+        val p = c.meta!!.dumpKernelPartition(c.pi)
+        if (!c.vm.logic.unmount(p).to(terminal).exec().isSuccess)
+            throw IOException(c.vm.activity.getString(R.string.term_cant_umount))
+        if (c.action == 1) {
+            c.vm.copy(
+                SuFileInputStream.open(File(p.path)),
+                c.vm.activity.contentResolver.openOutputStream(c.path!!)!!
+            )
+        } else if (c.action == 2) {
+            c.vm.copyPriv(
+                c.vm.chosen["file"]!!.openInputStream(c.vm),
+                File(p.path)
+            )
+        } else if (c.action == 3) {
+            val result2 = Shell.cmd(
+                File(
+                    c.vm.logic.toolkitDir,
+                    "simg2img"
+                ).absolutePath + " ${c.vm.chosen["file"]!!.toFile(c.vm).absolutePath} ${p.path}"
+            ).to(terminal).exec()
+            if (!result2.isSuccess) {
+                terminal.add(c.vm.activity.getString(R.string.term_failure))
+                return@Terminal
             }
-        } catch (e: IOException) {
-            terminal.add(c.vm.activity.getString(R.string.term_backup_restore_fail))
-            terminal.add(if (e.message != null) e.message!! else "(null)")
-            terminal.add(c.vm.activity.getString(R.string.term_contact_support))
+        } else {
+            throw IOException(c.vm.activity.getString(R.string.term_invalid_action))
         }
         terminal.add(c.vm.activity.getString(R.string.term_success))
         c.vm.nextText = c.vm.activity.getString(R.string.finish)

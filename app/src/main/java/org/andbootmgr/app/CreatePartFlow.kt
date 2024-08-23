@@ -61,7 +61,7 @@ import java.math.BigDecimal
 import java.net.URL
 
 class CreatePartFlow(private val desiredStartSector: Long): WizardFlow() {
-	override fun get(vm: WizardActivityState): List<IWizardPage> {
+	override fun get(vm: WizardState): List<IWizardPage> {
 		val c = CreatePartDataHolder(vm, desiredStartSector)
 		return listOf(WizardPage("start",
 			NavButton(vm.activity.getString(R.string.cancel)) { it.finish() },
@@ -92,7 +92,7 @@ class CreatePartFlow(private val desiredStartSector: Long): WizardFlow() {
 	}
 }
 
-private class CreatePartDataHolder(val vm: WizardActivityState, val desiredStartSector: Long) {
+private class CreatePartDataHolder(val vm: WizardState, val desiredStartSector: Long) {
 	var meta by mutableStateOf<SDUtils.SDPartitionMeta?>(null)
 	lateinit var p: SDUtils.Partition.FreeSpace
 	var startSectorRelative = 0L
@@ -376,17 +376,17 @@ private fun Shop(c: CreatePartDataHolder) {
 								while (i < inets.length()) {
 									val l = inets.getJSONObject(i)
 									vm.inetAvailable[l.getString("id")] =
-										WizardActivityState.Downloadable(
+										WizardState.Downloadable(
 											l.getString("url"),
-											l.optString("hash"),
+											l.getStringOrNull("hash"),
 											l.getString("desc")
 										)
 									i++
 								}
 								vm.idNeeded.add("_install.sh_")
-								vm.inetAvailable["_install.sh_"] = WizardActivityState.Downloadable(
+								vm.inetAvailable["_install.sh_"] = WizardState.Downloadable(
 									o.getString("scriptname"),
-									o.optString("scriptSha256"),
+									o.getStringOrNull("scriptSha256"),
 									vm.activity.getString(R.string.installer_sh)
 								)
 
@@ -655,7 +655,7 @@ private fun Flash(c: CreatePartDataHolder) {
 	Terminal(logFile = "install_${System.currentTimeMillis()}.txt") { terminal ->
 		c.vm.logic.extractToolkit(terminal)
 		if (c.partitionName == null) { // OS install
-			val createdParts = ArrayMap<Part, Int>() // order is important
+			val createdParts = mutableListOf<Pair<Part, Int>>() // order is important
 			val fn = c.romFolderName
 			terminal.add(vm.activity.getString(R.string.term_f_name, fn))
 			terminal.add(vm.activity.getString(R.string.term_g_name, c.romDisplayName))
@@ -683,7 +683,7 @@ private fun Flash(c: CreatePartDataHolder) {
 				if (r.out.joinToString("\n").contains("kpartx")) {
 					terminal.add(vm.activity.getString(R.string.term_reboot_asap))
 				}
-				createdParts[part] = c.meta!!.nid
+				createdParts.add(Pair(part, c.meta!!.nid))
 				c.meta = SDUtils.generateMeta(c.vm.deviceInfo)
 				// do not assert there is leftover space if we just created the last partition we want to create
 				if (index < c.parts.size - 1) {
@@ -715,7 +715,7 @@ private fun Flash(c: CreatePartDataHolder) {
 				entry["dtbo"] = "$fn/dtbo.dtbo"
 			entry["options"] = c.cmdline
 			entry["xtype"] = c.rtype
-			entry["xpart"] = createdParts.values.joinToString(":")
+			entry["xpart"] = createdParts.map { it.second }.joinToString(":")
 			if (c.dmaMeta.contains("updateJson") && c.dmaMeta["updateJson"] != null)
 				entry["xupdate"] = c.dmaMeta["updateJson"]!!
 			entry.exportToFile(File(vm.logic.abmEntries, "$fn.conf"))
@@ -729,14 +729,13 @@ private fun Flash(c: CreatePartDataHolder) {
 				if (!c.vm.idNeeded.contains(part.id)) continue
 				terminal.add(vm.activity.getString(R.string.term_flashing_s, part.id))
 				val f = c.vm.chosen[part.id]!!
-				val tp = File(meta.dumpKernelPartition(createdParts[part]!!).path)
+				val tp = File(meta.dumpKernelPartition(createdParts.find { it.first == part }!!.second).path)
 				if (part.sparse) {
-					val f2 = f.toFile(c.vm)
 					val result2 = Shell.cmd(
 						File(
 							c.vm.logic.toolkitDir,
 							"simg2img"
-						).absolutePath + " ${f2.absolutePath} ${tp.absolutePath}"
+						).absolutePath + " ${f.toFile(c.vm).absolutePath} ${tp.absolutePath}"
 					).to(terminal).exec()
 					f.delete()
 					if (!result2.isSuccess) {
@@ -744,8 +743,7 @@ private fun Flash(c: CreatePartDataHolder) {
 						return@Terminal
 					}
 				} else {
-					val f2 = f.openInputStream(c.vm)
-					c.vm.copyPriv(f2, tp)
+					c.vm.copyPriv(f.openInputStream(c.vm), tp)
 				}
 				terminal.add(vm.activity.getString(R.string.term_done))
 			}
@@ -756,7 +754,7 @@ private fun Flash(c: CreatePartDataHolder) {
 				cmd += " " + c.vm.chosen[i]!!.toFile(vm).absolutePath
 			}
 			for (i in c.parts) {
-				cmd += " " + createdParts[i]
+				cmd += " " + createdParts.find { it.first == i }!!.second
 			}
 			val result = vm.logic.runShFileWithArgs(cmd).to(terminal).exec()
 			if (!result.isSuccess) {

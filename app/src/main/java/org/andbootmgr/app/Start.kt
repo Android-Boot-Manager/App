@@ -579,7 +579,7 @@ private fun PartTool(vm: MainActivityState) {
 			var initrdT by remember { mutableStateOf(e["initrd"] ?: "") }
 			val initrdE by remember { derivedStateOf { !initrdT.matches(asciiRegex) } }
 			var dtbT by remember { mutableStateOf(e["dtb"] ?: "") }
-			val dtbE by remember { derivedStateOf { dtbT.matches(asciiRegex) } }
+			val dtbE by remember { derivedStateOf { !dtbT.matches(asciiRegex) } }
 			var optionsT by remember { mutableStateOf(e["options"] ?: "") }
 			val optionsE by remember { derivedStateOf { !optionsT.matches(asciiRegex) } }
 			var xtypeT by remember { mutableStateOf(e["xtype"] ?: "") }

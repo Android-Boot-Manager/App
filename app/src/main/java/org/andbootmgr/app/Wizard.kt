@@ -52,7 +52,7 @@ import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
 abstract class WizardFlow {
-	abstract fun get(vm: WizardActivityState): List<IWizardPage>
+	abstract fun get(vm: WizardState): List<IWizardPage>
 }
 
 @Composable
@@ -61,7 +61,7 @@ fun WizardCompat(mvm: MainActivityState, flow: WizardFlow) {
 		mvm.activity!!.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 		onDispose { mvm.activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) }
 	}
-	val vm = remember { WizardActivityState(mvm) }
+	val vm = remember { WizardState(mvm) }
 	vm.navController = rememberNavController()
 	val wizardPages = remember(flow) { flow.get(vm) }
 		NavHost(
@@ -93,7 +93,7 @@ fun WizardCompat(mvm: MainActivityState, flow: WizardFlow) {
 
 class HashMismatchException(message: String) : Exception(message)
 
-class WizardActivityState(val mvm: MainActivityState) {
+class WizardState(val mvm: MainActivityState) {
 	val codename = mvm.deviceInfo!!.codename
 	val activity = mvm.activity!!
 	lateinit var navController: NavHostController
@@ -101,8 +101,8 @@ class WizardActivityState(val mvm: MainActivityState) {
 	val deviceInfo = mvm.deviceInfo!!
 	var prevText by mutableStateOf<String?>(null)
 	var nextText by mutableStateOf<String?>(null)
-	var onPrev by mutableStateOf<((WizardActivityState) -> Unit)?>(null)
-	var onNext by mutableStateOf<((WizardActivityState) -> Unit)?>(null)
+	var onPrev by mutableStateOf<((WizardState) -> Unit)?>(null)
+	var onNext by mutableStateOf<((WizardState) -> Unit)?>(null)
 
 	val inetAvailable = mutableStateMapOf<String, Downloadable>()
 	val idNeeded = mutableStateListOf<String>()
@@ -113,7 +113,7 @@ class WizardActivityState(val mvm: MainActivityState) {
 			netFile?.delete()
 		}
 
-		fun openInputStream(vm: WizardActivityState): InputStream {
+		fun openInputStream(vm: WizardState): InputStream {
 			netFile?.let {
 				return FileInputStream(it)
 			}
@@ -126,7 +126,7 @@ class WizardActivityState(val mvm: MainActivityState) {
 			throw IllegalStateException("invalid DledFile OR failure")
 		}
 
-		fun toFile(vm: WizardActivityState): File {
+		fun toFile(vm: WizardState): File {
 			netFile?.let { return it }
 			safFile?.let {
 				val istr = vm.activity.contentResolver.openInputStream(it)
@@ -140,6 +140,7 @@ class WizardActivityState(val mvm: MainActivityState) {
 			throw IllegalStateException("invalid DledFile OR safFile failure")
 		}
 	}
+	//suspend fun downloadRemainingFiles
 
 	fun navigate(next: String) {
 		prevText = null
@@ -181,7 +182,7 @@ class WizardActivityState(val mvm: MainActivityState) {
 }
 
 
-class NavButton(val text: String, val onClick: (WizardActivityState) -> Unit)
+class NavButton(val text: String, val onClick: (WizardState) -> Unit)
 class WizardPage(override val name: String, override val prev: NavButton,
                        override val next: NavButton, override val run: @Composable () -> Unit
 ) : IWizardPage
@@ -211,7 +212,7 @@ fun BasicButtonRow(prev: String, onPrev: () -> Unit,
 }
 
 @Composable
-fun WizardDownloader(vm: WizardActivityState, next: String) {
+fun WizardDownloader(vm: WizardState, next: String) {
 	Column(Modifier.fillMaxSize()) {
 		Card {
 			Row(
@@ -260,7 +261,7 @@ fun WizardDownloader(vm: WizardActivityState, next: String) {
 							Text(stringResource(R.string.undo))
 						}
 					} else {
-						if (vm.inetAvailable.containsKey(i)) {
+						/*if (vm.inetAvailable.containsKey(i)) {
 							Button(onClick = {
 								CoroutineScope(Dispatchers.Main).launch {
 									val url = vm.inetAvailable[i]!!.url
@@ -277,7 +278,7 @@ fun WizardDownloader(vm: WizardActivityState, next: String) {
 											cancelDownload = null
 										}
 										if (client.run()) {
-											vm.chosen[i] = WizardActivityState.DownloadedFile(null, downloadedFile)
+											vm.chosen[i] = WizardState.DownloadedFile(null, downloadedFile)
 										}
 									} catch (e: Exception) {
 										Log.e("ABM", Log.getStackTraceString(e))
@@ -294,10 +295,10 @@ fun WizardDownloader(vm: WizardActivityState, next: String) {
 							}) {
 								Text(stringResource(R.string.download))
 							}
-						}
+						}*/
 						Button(onClick = {
 							vm.activity.chooseFile("*/*") {
-								vm.chosen[i] = WizardActivityState.DownloadedFile(it, null)
+								vm.chosen[i] = WizardState.DownloadedFile(it, null)
 							}
 						}) {
 							Text(stringResource(R.string.choose))
@@ -306,7 +307,8 @@ fun WizardDownloader(vm: WizardActivityState, next: String) {
 				}
 			}
 		}
-		val isOk = vm.idNeeded.find { !vm.chosen.containsKey(it) } == null
+		val isOk = vm.idNeeded.find { !vm.chosen.containsKey(it) &&
+				!vm.inetAvailable.containsKey(it) } == null
 		LaunchedEffect(isOk) {
 			if (isOk) {
 				vm.onNext = { it.navigate(next) }
