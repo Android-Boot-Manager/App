@@ -139,10 +139,18 @@ private class CreatePartDataHolder(val vm: WizardActivityState, val desiredStart
 		var code by mutableStateOf(code)
 		var id by mutableStateOf(id)
 		var sparse by mutableStateOf(sparse)
+		fun resolveSectorSize(c: CreatePartDataHolder, remaining: Long): Long {
+			return if (!isPercent /*bytes*/) {
+				size / c.meta!!.logicalSectorSizeBytes
+			} else /*percent*/ {
+				(BigDecimal(remaining).multiply(BigDecimal(size).divide(BigDecimal(100)))).toLong()
+			}
+		}
 	}
 	val parts = mutableStateListOf<Part>()
 	val inetAvailable = HashMap<String, Pair<String, String>>()
 	val idNeeded = mutableStateListOf<String>()
+	val extraIdNeeded = mutableListOf<String>()
 	val chosen = mutableStateMapOf<String, DledFile>()
 	val client by lazy { OkHttpClient().newBuilder().readTimeout(1L, TimeUnit.HOURS).addNetworkInterceptor {
 		val originalResponse: Response = it.proceed(it.request())
@@ -263,7 +271,7 @@ private fun Start(c: CreatePartDataHolder) {
 				}
 				TextField(value = partitionName, onValueChange = {
 					partitionName = it
-				}, isError = partitionNameInvalid, label = {
+				}, isError = partitionNameInvalid && partitionName.isNotEmpty(), label = {
 					Text(stringResource(R.string.part_name))
 				})
 				Row(horizontalArrangement = Arrangement.End, modifier = Modifier
@@ -388,6 +396,7 @@ private fun Shop(c: CreatePartDataHolder) {
 									if (idUnneeded.contains(id))
 										throw IllegalStateException("id in both blockIdNeeded and extraIdNeeded")
 									idNeeded.add(id)
+									this.extraIdNeeded.add(id)
 									i++
 								}
 								i = 0
@@ -550,11 +559,7 @@ private fun Os(c: CreatePartDataHolder) {
 							var sizeInSectors: Long = -1
 							var remaining = c.endSectorRelative - c.startSectorRelative
 							for (iPart in c.parts.slice(0..i)) {
-								sizeInSectors = if (!iPart.isPercent /*bytes*/) {
-									iPart.size / c.meta!!.logicalSectorSizeBytes
-								} else /*percent*/ {
-									(BigDecimal(remaining).multiply(BigDecimal(iPart.size).divide(BigDecimal(100)))).toLong()
-								}
+								sizeInSectors = iPart.resolveSectorSize(c, remaining)
 								remaining -= sizeInSectors
 							}
 							remaining += sizeInSectors
@@ -663,13 +668,7 @@ private fun Os(c: CreatePartDataHolder) {
 					}
 					var remaining = c.endSectorRelative - c.startSectorRelative
 					for (part in c.parts) {
-						val sizeInSectors = if (!part.isPercent /*bytes*/) {
-							part.size / c.meta!!.logicalSectorSizeBytes
-						} else /*percent*/ {
-							// remaining * (part.int/100) -> part.int percent of remaining
-							(BigDecimal(remaining).multiply(BigDecimal(part.size).divide(BigDecimal(100)))).toLong()
-						}
-						remaining -= sizeInSectors
+						remaining -= part.resolveSectorSize(c, remaining)
 					}
 					Text(stringResource(R.string.remaining_sector, remaining, c.endSectorRelative - c.startSectorRelative))
 				}
@@ -867,24 +866,31 @@ private fun Flash(c: CreatePartDataHolder) {
 			terminal.add(vm.activity.getString(R.string.term_creating_pt))
 
 			vm.logic.unmountBootset()
+			val startSectorAbsolute = c.p.startSector + c.startSectorRelative
+			val endSectorAbsolute = c.p.startSector + c.endSectorRelative
+			if (endSectorAbsolute > c.p.endSector)
+				throw IllegalArgumentException("$endSectorAbsolute can't be bigger than ${c.p.endSector}")
 			c.parts.forEachIndexed { index, part ->
 				terminal.add(vm.activity.getString(R.string.term_create_part))
-				val k = if (!part.isPercent /*bytes*/) {
-					part.size / c.meta!!.logicalSectorSizeBytes
-				} else /*percent*/ {
-					(BigDecimal(c.p.size - (c.startSectorRelative + (c.p.size - c.endSectorRelative))).multiply(BigDecimal(part.size).divide(BigDecimal(100)))).toLong()
-				}
-
-				val r = vm.logic.create(c.p, c.startSectorRelative, c.startSectorRelative + k, part.code, "").to(terminal).exec()
+				val start = c.p.startSector.coerceAtLeast(startSectorAbsolute)
+				val end = c.p.endSector.coerceAtMost(endSectorAbsolute)
+				val k = part.resolveSectorSize(c, end - start)
+				if (start + k > end)
+					throw IllegalStateException("$start + $k = ${start + k} shouldn't be bigger than $end")
+				if (k < 0)
+					throw IllegalStateException("$k shouldn't be smaller than 0")
+				// create(start, end) values are relative to the free space area
+				val r = vm.logic.create(c.p, start - c.p.startSector,
+					(start + k) - c.p.startSector, part.code, "").to(terminal).exec()
 				if (r.out.joinToString("\n").contains("kpartx")) {
 					terminal.add(vm.activity.getString(R.string.term_reboot_asap))
 				}
 				createdParts[part] = c.meta!!.nid
 				c.meta = SDUtils.generateMeta(c.vm.deviceInfo)
 				// do not assert there is leftover space if we just created the last partition we want to create
-				if (index != c.parts.size - 1) {
+				if (index < c.parts.size - 1) {
 					c.p =
-						c.meta!!.s.find { it.type == SDUtils.PartitionType.FREE && (c.startSectorRelative + k) < it.startSector } as SDUtils.Partition.FreeSpace
+						c.meta!!.s.find { it.type == SDUtils.PartitionType.FREE && start + k < it.startSector } as SDUtils.Partition.FreeSpace
 				}
 				if (r.isSuccess) {
 					terminal.add(vm.activity.getString(R.string.term_created_part))
@@ -948,13 +954,11 @@ private fun Flash(c: CreatePartDataHolder) {
 
 			terminal.add(vm.activity.getString(R.string.term_patching_os))
 			var cmd = "FORMATDATA=true " + tmpFile.absolutePath + " $fn"
-			for (i in c.idNeeded) {
-				val j = c.parts.find { it.id == i }
-				if (j == null) {
-					cmd += " " + c.chosen[i]!!.toFile(vm).absolutePath
-				} else {
-					cmd += createdParts[j]
-				}
+			for (i in c.extraIdNeeded) {
+				cmd += " " + c.chosen[i]!!.toFile(vm).absolutePath
+			}
+			for (i in c.parts) {
+				cmd += " " + createdParts[i]
 			}
 			val result = vm.logic.runShFileWithArgs(cmd).to(terminal).exec()
 			if (!result.isSuccess) {

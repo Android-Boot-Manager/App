@@ -1,5 +1,6 @@
 package org.andbootmgr.app
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -147,7 +148,7 @@ class MainActivityState(val activity: MainActivity?) {
 class MainActivity : ComponentActivity() {
 	private lateinit var newFile: ActivityResultLauncher<String>
 	private var onFileCreated: ((Uri) -> Unit)? = null
-	private lateinit var chooseFile: ActivityResultLauncher<String>
+	private lateinit var chooseFile: ActivityResultLauncher<Array<String>>
 	private var onFileChosen: ((Uri) -> Unit)? = null
 
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -155,7 +156,7 @@ class MainActivity : ComponentActivity() {
 		installSplashScreen().setKeepOnScreenCondition { !ready.get() }
 		super.onCreate(savedInstanceState)
 		chooseFile =
-			registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+			registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
 				if (uri == null) {
 					Toast.makeText(
 						this,
@@ -165,6 +166,8 @@ class MainActivity : ComponentActivity() {
 					onFileChosen = null
 					return@registerForActivityResult
 				}
+				// need to persist, otherwise can't access from the background as StayAliveService
+				contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
 				if (onFileChosen != null) {
 					onFileChosen!!(uri)
 					onFileChosen = null
@@ -183,6 +186,9 @@ class MainActivity : ComponentActivity() {
 					onFileCreated = null
 					return@registerForActivityResult
 				}
+				// need to persist, otherwise can't access from the background as StayAliveService
+				contentResolver.takePersistableUriPermission(uri,
+					Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
 				if (onFileCreated != null) {
 					onFileCreated!!(uri)
 					onFileCreated = null
@@ -278,7 +284,7 @@ class MainActivity : ComponentActivity() {
 			throw IllegalStateException("expected onFileChosen to be null")
 		}
 		onFileChosen = callback
-		chooseFile.launch(mime)
+		chooseFile.launch(arrayOf(mime))
 	}
 
 	fun createFile(name: String, callback: (Uri) -> Unit) {
