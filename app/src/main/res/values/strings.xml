@@ -260,4 +260,5 @@
 	<string name="restoring_backup">Restoring backup…</string>
 	<string name="bytes">bytes</string>
 	<string name="percent">percent</string>
+	<string name="how_many_extras">How many extra IDs?</string>
 </resources>

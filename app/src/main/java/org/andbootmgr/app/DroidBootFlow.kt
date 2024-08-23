@@ -1,17 +1,13 @@
 package org.andbootmgr.app
 
-import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -23,8 +19,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -46,7 +40,7 @@ import java.net.URL
 
 class DroidBootFlow : WizardFlow() {
 	override fun get(vm: WizardActivityState): List<IWizardPage> {
-		val booted = vm.deviceInfo.isBooted(vm.logic)
+		val d = DroidBootFlowDataHolder(vm)
 		return listOf(WizardPage("start",
 			NavButton(vm.activity.getString(R.string.cancel)) { it.finish() },
 			NavButton(vm.activity.getString(R.string.next)) { it.navigate("input") })
@@ -56,19 +50,23 @@ class DroidBootFlow : WizardFlow() {
 			NavButton(vm.activity.getString(R.string.prev)) { it.navigate("start") },
 			NavButton("") {}
 		) {
-			Input(vm)
+			Input(d)
 		}, WizardPage("dload",
 			NavButton(vm.activity.getString(R.string.cancel)) { it.finish() },
 			NavButton("") {}
 		) {
-			WizardDownloader(vm)
+			WizardDownloader(vm, "flash")
 		}, WizardPage("flash",
 			NavButton("") {},
 			NavButton("") {}
 		) {
-			Flash(vm)
+			Flash(d)
 		})
 	}
+}
+
+class DroidBootFlowDataHolder(val vm: WizardActivityState) {
+	var osName by mutableStateOf(vm.activity.getString(R.string.android))
 }
 
 @Composable
@@ -118,10 +116,10 @@ fun LoadDroidBootJson(vm: WizardActivityState, content: @Composable () -> Unit) 
 					val i = json.getJSONObject("installScript")
 					val url = i.getString("url")
 					val sha = i.optString("sha256")
-					vm.inetAvailable["install"] = WizardActivityState.Downloadable(
+					vm.inetAvailable["_install.sh_"] = WizardActivityState.Downloadable(
 						url, sha, vm.activity.getString(R.string.installer_sh)
 					)
-					vm.idNeeded.add("install")
+					vm.idNeeded.add("_install.sh_")
 				}
 				loading = false
 			} catch (e: Exception) {
@@ -143,18 +141,14 @@ fun LoadDroidBootJson(vm: WizardActivityState, content: @Composable () -> Unit) 
 }
 
 @Composable
-private fun Input(vm: WizardActivityState) {
-	LoadDroidBootJson(vm) {
+private fun Input(d: DroidBootFlowDataHolder) {
+	LoadDroidBootJson(d.vm) {
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
 			verticalArrangement = Arrangement.Center,
 			modifier = Modifier.fillMaxSize()
 		) {
-			LaunchedEffect(Unit) { // TODO can't I do this better?
-				if (vm.texts.isBlank())
-					vm.texts = vm.activity.getString(R.string.android)
-			}
-			val e = vm.texts.isBlank() || !vm.texts.matches(Regex("[\\dA-Za-z]+"))
+			val e = d.osName.isBlank() || !d.osName.matches(Regex("[\\dA-Za-z]+"))
 
 			Text(
 				stringResource(R.string.enter_name_for_current),
@@ -162,9 +156,9 @@ private fun Input(vm: WizardActivityState) {
 				modifier = Modifier.padding(vertical = 5.dp)
 			)
 			TextField(
-				value = vm.texts,
+				value = d.osName,
 				onValueChange = {
-					vm.texts = it
+					d.osName = it
 				},
 				label = { Text(stringResource(R.string.os_name)) },
 				isError = e
@@ -176,11 +170,11 @@ private fun Input(vm: WizardActivityState) {
 			}
 			LaunchedEffect(e) {
 				if (e) {
-					vm.nextText = ""
-					vm.onNext = {}
+					d.vm.nextText = ""
+					d.vm.onNext = {}
 				} else {
-					vm.nextText = vm.activity.getString(R.string.next)
-					vm.onNext = { it.navigate(if (vm.idNeeded.isNotEmpty()) "dload" else "flash") }
+					d.vm.nextText = d.vm.activity.getString(R.string.next)
+					d.vm.onNext = { it.navigate(if (d.vm.idNeeded.isNotEmpty()) "dload" else "flash") }
 				}
 			}
 		}
@@ -188,8 +182,8 @@ private fun Input(vm: WizardActivityState) {
 }
 
 @Composable
-private fun Flash(vm: WizardActivityState) {
-	val flashType = "DroidBootFlashType"
+private fun Flash(d: DroidBootFlowDataHolder) {
+	val vm = d.vm
 	Terminal(logFile = "blflash_${System.currentTimeMillis()}.txt") { terminal ->
 		vm.logic.extractToolkit(terminal)
 		terminal.add(vm.activity.getString(R.string.term_preparing_fs))
@@ -276,7 +270,7 @@ private fun Flash(vm: WizardActivityState) {
 		}
 		val tmpFile = if (vm.deviceInfo.postInstallScript) {
 			val tmpFile = createTempFileSu("abm", ".sh", vm.logic.rootTmpDir)
-			vm.copyPriv(vm.chosen["install"]!!.openInputStream(vm), tmpFile)
+			vm.copyPriv(vm.chosen["_install.sh_"]!!.openInputStream(vm), tmpFile)
 			tmpFile.setExecutable(true)
 			tmpFile
 		} else null
@@ -287,7 +281,7 @@ private fun Flash(vm: WizardActivityState) {
 		db["timeout"] = "5"
 		db.exportToFile(File(vm.logic.abmDb, "db.conf"))
 		val entry = ConfigFile()
-		entry["title"] = vm.texts.trim()
+		entry["title"] = d.osName.trim()
 		entry["linux"] = "null"
 		entry["initrd"] = "null"
 		entry["dtb"] = "null"

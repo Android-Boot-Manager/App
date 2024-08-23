@@ -33,7 +33,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toFile
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -47,14 +46,10 @@ import org.andbootmgr.app.util.AbmOkHttp
 import org.andbootmgr.app.util.SOUtils
 import java.io.File
 import java.io.FileInputStream
-import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
-import java.net.URL
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
-import java.security.DigestInputStream
-import java.security.MessageDigest
 
 abstract class WizardFlow {
 	abstract fun get(vm: WizardActivityState): List<IWizardPage>
@@ -96,17 +91,6 @@ fun WizardCompat(mvm: MainActivityState, flow: WizardFlow) {
 		}
 }
 
-private class ExpectedDigestInputStream(stream: InputStream?,
-                                        digest: MessageDigest?,
-                                        private val expectedDigest: String
-) : DigestInputStream(stream, digest) {
-	@OptIn(ExperimentalStdlibApi::class)
-	fun doAssert() {
-		val hash = digest.digest().toHexString()
-		if (hash != expectedDigest)
-			throw HashMismatchException("digest $hash does not match expected hash $expectedDigest")
-	}
-}
 class HashMismatchException(message: String) : Exception(message)
 
 class WizardActivityState(val mvm: MainActivityState) {
@@ -120,13 +104,42 @@ class WizardActivityState(val mvm: MainActivityState) {
 	var onPrev by mutableStateOf<((WizardActivityState) -> Unit)?>(null)
 	var onNext by mutableStateOf<((WizardActivityState) -> Unit)?>(null)
 
-	// TODO remove flashes
-	var flashes: HashMap<String, Pair<Uri, String?>> = HashMap()
-	var texts by mutableStateOf("")
-	val inetAvailable = HashMap<String/*id*/, Downloadable>()
+	val inetAvailable = mutableStateMapOf<String, Downloadable>()
 	val idNeeded = mutableStateListOf<String>()
-	val chosen = mutableStateMapOf<String, DledFile>()
+	val chosen = mutableStateMapOf<String, DownloadedFile>()
 	class Downloadable(val url: String, val hash: String?, val desc: String)
+	class DownloadedFile(private val safFile: Uri?, private val netFile: File?) {
+		fun delete() {
+			netFile?.delete()
+		}
+
+		fun openInputStream(vm: WizardActivityState): InputStream {
+			netFile?.let {
+				return FileInputStream(it)
+			}
+			safFile?.let {
+				val istr = vm.activity.contentResolver.openInputStream(it)
+				if (istr != null) {
+					return istr
+				}
+			}
+			throw IllegalStateException("invalid DledFile OR failure")
+		}
+
+		fun toFile(vm: WizardActivityState): File {
+			netFile?.let { return it }
+			safFile?.let {
+				val istr = vm.activity.contentResolver.openInputStream(it)
+				if (istr != null) {
+					val f = File(vm.logic.cacheDir, System.currentTimeMillis().toString())
+					vm.copyUnpriv(istr, f)
+					istr.close()
+					return f
+				}
+			}
+			throw IllegalStateException("invalid DledFile OR safFile failure")
+		}
+	}
 
 	fun navigate(next: String) {
 		prevText = null
@@ -153,27 +166,7 @@ class WizardActivityState(val mvm: MainActivityState) {
 		inputStream.close()
 		outputStream.flush()
 		outputStream.close()
-		if (inputStream is ExpectedDigestInputStream)
-			inputStream.doAssert()
 		return nread
-	}
-
-	fun flashStream(flashType: String): InputStream {
-		return flashes[flashType]?.let {
-			val i = when (it.first.scheme) {
-				"content" ->
-					activity.contentResolver.openInputStream(it.first)
-						?: throw IOException("in == null")
-				"file" ->
-					FileInputStream(it.first.toFile())
-				"http", "https" ->
-					URL(it.first.toString()).openStream()
-				else -> null
-			}
-			if (it.second != null)
-				ExpectedDigestInputStream(i, MessageDigest.getInstance("SHA-256"), it.second!!)
-			else i
-		} ?: throw IllegalArgumentException()
 	}
 
 	fun copyUnpriv(inputStream: InputStream, output: File) {
@@ -184,39 +177,6 @@ class WizardActivityState(val mvm: MainActivityState) {
 	fun copyPriv(inputStream: InputStream, output: File) {
 		val outStream = SuFileOutputStream.open(output)
 		copy(inputStream, outStream)
-	}
-}
-
-class DledFile(val safFile: Uri?, val netFile: File?) {
-	fun delete() {
-		netFile?.delete()
-	}
-
-	fun openInputStream(vm: WizardActivityState): InputStream {
-		netFile?.let {
-			return FileInputStream(it)
-		}
-		safFile?.let {
-			val istr = vm.activity.contentResolver.openInputStream(it)
-			if (istr != null) {
-				return istr
-			}
-		}
-		throw IllegalStateException("invalid DledFile OR failure")
-	}
-
-	fun toFile(vm: WizardActivityState): File {
-		netFile?.let { return it }
-		safFile?.let {
-			val istr = vm.activity.contentResolver.openInputStream(it)
-			if (istr != null) {
-				val f = File(vm.logic.cacheDir, System.currentTimeMillis().toString())
-				vm.copyUnpriv(istr, f)
-				istr.close()
-				return f
-			}
-		}
-		throw IllegalStateException("invalid DledFile OR safFile failure")
 	}
 }
 
@@ -251,7 +211,7 @@ fun BasicButtonRow(prev: String, onPrev: () -> Unit,
 }
 
 @Composable
-fun WizardDownloader(vm: WizardActivityState) {
+fun WizardDownloader(vm: WizardActivityState, next: String) {
 	Column(Modifier.fillMaxSize()) {
 		Card {
 			Row(
@@ -317,7 +277,7 @@ fun WizardDownloader(vm: WizardActivityState) {
 											cancelDownload = null
 										}
 										if (client.run()) {
-											vm.chosen[i] = DledFile(null, downloadedFile)
+											vm.chosen[i] = WizardActivityState.DownloadedFile(null, downloadedFile)
 										}
 									} catch (e: Exception) {
 										Log.e("ABM", Log.getStackTraceString(e))
@@ -337,7 +297,7 @@ fun WizardDownloader(vm: WizardActivityState) {
 						}
 						Button(onClick = {
 							vm.activity.chooseFile("*/*") {
-								vm.chosen[i] = DledFile(it, null)
+								vm.chosen[i] = WizardActivityState.DownloadedFile(it, null)
 							}
 						}) {
 							Text(stringResource(R.string.choose))
@@ -349,7 +309,7 @@ fun WizardDownloader(vm: WizardActivityState) {
 		val isOk = vm.idNeeded.find { !vm.chosen.containsKey(it) } == null
 		LaunchedEffect(isOk) {
 			if (isOk) {
-				vm.onNext = { it.navigate("flash") }
+				vm.onNext = { it.navigate(next) }
 				vm.nextText = vm.activity.getString(R.string.install)
 			} else {
 				vm.onNext = {}

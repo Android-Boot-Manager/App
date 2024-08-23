@@ -62,6 +62,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.andbootmgr.app.themes.ThemeViewModel
 import org.andbootmgr.app.themes.Themes
@@ -81,8 +82,10 @@ class MainActivityState(val activity: MainActivity?) {
 	var logic: DeviceLogic? = null
 
 	private fun loadDefaultCfg() {
-		CoroutineScope(Dispatchers.IO).launch {
-			val cfg = ConfigFile.importFromFile(logic!!.abmDbConf).toMap()
+		runBlocking {
+			val cfg = withContext(Dispatchers.IO) {
+				ConfigFile.importFromFile(logic!!.abmDbConf).toMap()
+			}
 			withContext(Dispatchers.Main) {
 				defaultCfg.clear()
 				defaultCfg.putAll(cfg)

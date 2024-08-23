@@ -8,6 +8,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.ResponseBody
+import okhttp3.internal.http2.StreamResetException
 import okio.Buffer
 import okio.BufferedSource
 import okio.ForwardingSource
@@ -45,10 +46,18 @@ class AbmOkHttp(private val url: String, private val f: File, private val hash: 
 			val rawSink = f.sink()
 			val sink = if (hash != null) HashingSink.sha256(rawSink) else rawSink
 			val buffer = sink.buffer()
-			buffer.writeAll(response.body!!.source())
+			try {
+				buffer.writeAll(response.body!!.source())
+			} catch (e: StreamResetException) {
+				if (e.message != "stream was reset: CANCEL")
+					throw e
+				buffer.close()
+				f.delete()
+				return@withContext false
+			}
 			buffer.close()
-			val realHash = if (hash != null) (sink as HashingSink).hash.hex() else null
 			if (!call.isCanceled()) {
+				val realHash = if (hash != null) (sink as HashingSink).hash.hex() else null
 				if (hash != null && realHash != hash) {
 					try {
 						f.delete()

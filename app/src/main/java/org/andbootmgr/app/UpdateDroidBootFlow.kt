@@ -28,7 +28,7 @@ class UpdateDroidBootFlow: WizardFlow() {
 			NavButton(vm.activity.getString(R.string.cancel)) { it.finish() },
 			NavButton("") {}
 		) {
-			WizardDownloader(vm)
+			WizardDownloader(vm, "flash")
 		}, WizardPage("flash",
 			NavButton("") {},
 			NavButton("") {}
@@ -62,7 +62,7 @@ private fun Flash(vm: WizardActivityState) {
 		vm.logic.extractToolkit(terminal)
 		val tmpFile = if (vm.deviceInfo.postInstallScript) {
 			val tmpFile = createTempFileSu("abm", ".sh", vm.logic.rootTmpDir)
-			vm.copyPriv(vm.chosen["install"]!!.openInputStream(vm), tmpFile)
+			vm.copyPriv(vm.chosen["_install.sh_"]!!.openInputStream(vm), tmpFile)
 			tmpFile.setExecutable(true)
 			tmpFile
 		} else null

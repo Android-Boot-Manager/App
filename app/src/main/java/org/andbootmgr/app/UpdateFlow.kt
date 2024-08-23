@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,7 +53,11 @@ class UpdateFlow(private val entryName: String): WizardFlow() {
             NavButton(vm.activity.getString(R.string.online_update)) { vm.navigate("start") }
         ) {
             Local(c)
-            // TODO add dl
+        }, WizardPage("dload",
+            NavButton("") {},
+            NavButton("") {}
+        ) {
+            WizardDownloader(c.vm, "flash")
         }, WizardPage("flash",
             NavButton("") {},
             NavButton("") {}
@@ -63,16 +68,9 @@ class UpdateFlow(private val entryName: String): WizardFlow() {
 }
 
 private class UpdateFlowDataHolder(val vm: WizardActivityState, val entryFilename: String) {
-    val client = OkHttpClient().newBuilder().readTimeout(1L, TimeUnit.HOURS).build()
     var json: JSONObject? = null
-    var currentDl: Call? = null
-    var sbootfile = mutableStateListOf<Uri>()
-
     var e: ConfigFile? = null
     var ef: File? = null
-    var hasUpdate = false
-    val partMapping = HashMap<Int, String>()
-    var extraParts = ArrayList<String>()
     var updateJson: String? = null
     val sparse = ArrayList<Int>()
 }
@@ -80,6 +78,7 @@ private class UpdateFlowDataHolder(val vm: WizardActivityState, val entryFilenam
 @Composable
 private fun Start(u: UpdateFlowDataHolder) {
     var hasChecked by remember { mutableStateOf(false) }
+    var hasUpdate by remember { mutableStateOf(false) }
     val ioDispatcher = rememberCoroutineScope { Dispatchers.IO }
     LaunchedEffect(Unit) {
         ioDispatcher.launch {
@@ -97,7 +96,7 @@ private fun Start(u: UpdateFlowDataHolder) {
                 Log.e("ABM", Log.getStackTraceString(e))
             }
             if (u.json != null) {
-                u.hasUpdate = u.json!!.optBoolean("hasUpdate", false)
+                hasUpdate = u.json!!.optBoolean("hasUpdate", false)
             }
             hasChecked = true
         }
@@ -107,7 +106,7 @@ private fun Start(u: UpdateFlowDataHolder) {
             if (u.json == null) {
                 Text(stringResource(R.string.update_check_failed))
             } else {
-                if (u.hasUpdate) {
+                if (hasUpdate) {
                     Text(stringResource(id = R.string.found_update))
                     Button(onClick = {
                         try {
@@ -117,21 +116,30 @@ private fun Start(u: UpdateFlowDataHolder) {
                                     val extraIdNeeded = j.getJSONArray("extraIds")
                                     var i = 0
                                     while (i < extraIdNeeded.length()) {
-                                        extraParts.add(extraIdNeeded.get(i) as String)
+                                        vm.inetAvailable["boot$i"] = WizardActivityState.Downloadable(
+                                            extraIdNeeded.get(i) as String,
+                                            null,
+                                            ""
+                                        )
+                                        vm.idNeeded.add("boot$i")
                                         i++
                                     }
-                                    vm.inetAvailable["install"] = WizardActivityState.Downloadable(
+                                    vm.inetAvailable["_install.sh_"] = WizardActivityState.Downloadable(
                                         j.getString("script"),
                                         j.optString("scriptSha256"),
                                         vm.activity.getString(R.string.installer_sh)
                                     )
-                                    vm.idNeeded.add("install")
+                                    vm.idNeeded.add("_install.sh_")
                                 }
                                 if (j.has("parts")) {
-                                    val sp = u.e!!["xpart"]!!.split(":")
                                     val p = j.getJSONObject("parts")
                                     for (k in p.keys()) {
-                                        partMapping[sp[k.toInt()].toInt()] = p.getString(k)
+                                        vm.inetAvailable["part$k"] = WizardActivityState.Downloadable(
+                                            p.getString(k),
+                                            null,
+                                            ""
+                                        )
+                                        vm.idNeeded.add("part$k")
                                     }
                                 }
                                 updateJson = j.optString("updateJson")
@@ -143,7 +151,7 @@ private fun Start(u: UpdateFlowDataHolder) {
                                     }
                                 }
                             }
-                            u.vm.navigate("flash")
+                            u.vm.navigate("dload")
                         } catch (e: Exception) {
                             Log.e("ABM", u.json?.toString() ?: "(null json)")
                             Log.e("ABM", Log.getStackTraceString(e))
@@ -172,80 +180,26 @@ private fun Local(u: UpdateFlowDataHolder) {
             Text(stringResource(R.string.local_updater_3))
         }
         Column {
-            Text(stringResource(R.string.script_name))
-            if (u.vm.chosen.containsKey("install")) {
-                Button(onClick = {
-                    u.vm.chosen.remove("install")
+            Text(stringResource(R.string.how_many_extras))
+            var i by remember { mutableIntStateOf(0) }
+            Row {
+                Button({ i++ }) {
+                    Text("+")
+                }
+                Button({ i-- }) {
+                    Text("-")
+                }
+                Button({
+                    u.vm.idNeeded.add("_install.sh_")
+                    for (j in 0..i) {
+                        u.vm.idNeeded.add("boot$j")
+                    }
+                    u.vm.navigate("dload")
                 }) {
-                    Text(stringResource(id = R.string.undo))
-                }
-            } else {
-                Button(onClick = {
-                    u.vm.activity.chooseFile("*/*") {
-                        u.vm.chosen["install"] = DledFile(it, null)
-                    }
-                }) {
-                    Text(stringResource(id = R.string.choose_file))
-                }
-            }
-            for (i in u.sbootfile) {
-                Row {
-                    Text(stringResource(R.string.file_selected) + " " + (i.lastPathSegment ?: "(null)"))
-                    Button(onClick = { u.sbootfile.remove(i) }) {
-                        Text(stringResource(id = R.string.undo))
-                    }
-                }
-            }
-            if (u.sbootfile.isNotEmpty()) {
-                Button(onClick = {
-                    if (u.vm.chosen.containsKey("install")) {
-                        u.hasUpdate = false
-                        u.vm.navigate("flash")
-                    }
-                }, enabled = u.vm.chosen.containsKey("install")) {
                     Text(stringResource(R.string.install_update))
                 }
             }
-            Button(onClick = { u.vm.activity.chooseFile("*/*") {
-                u.sbootfile.add(it)
-            } }) {
-                Text(stringResource(id = R.string.choose_file))
-            }
         }
-    }
-}
-
-private fun dlFile(u: UpdateFlowDataHolder, l: String): File? {
-    val downloadedFile = File(u.vm.logic.cacheDir, System.currentTimeMillis().toString())
-    try {
-        val request =
-            Request.Builder().url(l).build()
-        u.currentDl = u.client.newCall(request)
-        val response = u.currentDl!!.execute()
-
-        val sink = downloadedFile.sink().buffer()
-        try {
-            sink.writeAll(response.body!!.source())
-        } catch (e: StreamResetException) {
-            if (e.message == "stream was reset: CANCEL")
-                throw ActionAbortedCleanlyError(Exception(u.vm.activity.getString(R.string.install_canceled)))
-            else
-                throw e
-        }
-        sink.close()
-
-        if (u.currentDl!!.isCanceled())
-            throw ActionAbortedCleanlyError(Exception(u.vm.activity.getString(R.string.install_canceled)))
-
-        u.currentDl = null
-        return downloadedFile
-    } catch (e: ActionAbortedCleanlyError) {
-        throw e
-    } catch (e: Exception) {
-        Log.e("ABM", Log.getStackTraceString(e))
-        downloadedFile.delete()
-        u.currentDl = null
-        return null
     }
 }
 
@@ -256,122 +210,52 @@ private fun Flash(u: UpdateFlowDataHolder) {
         val sp = u.e!!["xpart"]!!.split(":")
         val meta = SDUtils.generateMeta(u.vm.deviceInfo)!!
         Shell.cmd(SDUtils.umsd(meta)).exec()
-
-        if (u.hasUpdate) { // online
-            u.vm.nextText = u.vm.activity.getString(R.string.cancel)
-            u.vm.onNext = { u.currentDl?.cancel() }
-            try {
-                val bootfile = ArrayList<File>()
-                if (u.extraParts.isNotEmpty()) {
-                    for (boot in u.extraParts) {
-                        terminal.add(u.vm.activity.getString(R.string.term_dl_updated_bi))
-                        var bootf = dlFile(u, boot)
-                        if (bootf == null) {
-                            terminal.add(u.vm.activity.getString(R.string.term_dl_fail1))
-                            bootf = dlFile(u, boot)
-                            if (bootf == null) {
-                                terminal.add(u.vm.activity.getString(R.string.term_dl_fail2))
-                                throw ActionAbortedCleanlyError(Exception(u.vm.activity.getString(R.string.install_canceled)))
-                            }
-                        }
-                        bootfile.add(bootf)
-                    }
-                }
-                val pmap = HashMap<Int, File>()
-                for (p in u.partMapping.entries) {
-                    terminal.add(u.vm.activity.getString(R.string.term_dling_part_image))
-                    var f = dlFile(u, p.value)
-                    if (f == null) {
-                        terminal.add(u.vm.activity.getString(R.string.term_dl_fail1))
-                        f = dlFile(u, p.value)
-                        if (f == null) {
-                            terminal.add(u.vm.activity.getString(R.string.term_dl_fail2))
-                            bootfile.forEach { it.delete() }
-                            pmap.values.forEach { it.delete() }
-                            throw ActionAbortedCleanlyError(Exception(u.vm.activity.getString(R.string.install_canceled)))
-                        }
-                    }
-                    pmap[p.key] = f
-                }
-                val tmpFile = createTempFileSu("abm", ".sh", u.vm.logic.rootTmpDir)
-                u.vm.copyPriv(u.vm.chosen["install"]!!.openInputStream(u.vm), tmpFile)
-                tmpFile.setExecutable(true)
-                u.vm.nextText = ""
-                u.vm.onNext = {}
-
-                for (p in u.partMapping.entries) {
-                    val v = sp.find { p.key.toString() == it }
-                    terminal.add(u.vm.activity.getString(R.string.term_flashing_p, v))
-                    val f2 = pmap[p.key]!!
-                    val tp = File(meta.dumpKernelPartition(p.key).path)
-                    if (u.sparse.contains(p.key)) {
-                        val result2 = Shell.cmd(
-                            File(
-                                u.vm.logic.toolkitDir,
-                                "simg2img"
-                            ).absolutePath + " ${f2.absolutePath} ${tp.absolutePath}"
-                        ).to(terminal).exec()
-                        if (!result2.isSuccess) {
-                            throw IllegalStateException(u.vm.activity.getString(R.string.term_simg2img_fail))
-                        }
-                    } else {
-                        u.vm.copyPriv(f2.inputStream(), tp)
-                    }
-                    terminal.add(u.vm.activity.getString(R.string.term_done))
-                }
-                if (u.extraParts.isNotEmpty()) {
-                    terminal.add(u.vm.activity.getString(R.string.term_patch_update))
-                    var cmd = "FORMATDATA=false " + tmpFile.absolutePath + " ${u.ef!!.nameWithoutExtension}"
-                    for (i in bootfile) {
-                        cmd += " " + i.absolutePath
-                    }
-                    for (i in sp) {
-                        cmd += " $i"
-                    }
-                    val r = u.vm.logic.runShFileWithArgs(cmd).to(terminal).exec()
-                    tmpFile.delete()
-                    bootfile.forEach { it.delete() }
-                    if (!r.isSuccess) {
-                        throw IllegalStateException(u.vm.activity.getString(R.string.term_script_fail))
-                    }
-                }
-                u.e!!["xupdate"] = u.updateJson ?: ""
-                u.e!!.exportToFile(u.ef!!)
-                terminal.add(u.vm.activity.getString(R.string.term_success))
-            } catch (e: ActionAbortedCleanlyError) {
-                terminal.add("-- " + e.message)
+        val tmpFile = if (u.vm.idNeeded.contains("_install.sh_")) {
+            createTempFileSu("abm", ".sh", u.vm.logic.rootTmpDir).also {
+                u.vm.copyPriv(u.vm.chosen["_install.sh_"]!!.openInputStream(u.vm), it)
+                it.setExecutable(true)
             }
-        } else if (u.sbootfile.isNotEmpty()) {
-            val bootfile = ArrayList<File>()
-            val tmpFile = createTempFileSu("abm", ".sh", u.vm.logic.rootTmpDir)
-            u.vm.copyPriv(u.vm.chosen["flashes"]!!.openInputStream(u.vm), tmpFile)
-            tmpFile.setExecutable(true)
+        } else null
+        for (p in u.vm.idNeeded.filter { it.startsWith("part") }.map { it.substring(4) }) {
+            val physicalId = sp[p.toInt()].toInt()
+            terminal.add(u.vm.activity.getString(R.string.term_flashing_p, p))
+            val f2 = u.vm.chosen["part$p"]!!
+            val tp = File(meta.dumpKernelPartition(physicalId).path)
+            if (u.sparse.contains(p.toInt())) {
+                val result2 = Shell.cmd(
+                    File(
+                        u.vm.logic.toolkitDir,
+                        "simg2img"
+                    ).absolutePath + " ${f2.toFile(u.vm)} ${tp.absolutePath}"
+                ).to(terminal).exec()
+                if (!result2.isSuccess) {
+                    throw IllegalStateException(u.vm.activity.getString(R.string.term_simg2img_fail))
+                }
+            } else {
+                u.vm.copyPriv(f2.openInputStream(u.vm), tp)
+            }
+            terminal.add(u.vm.activity.getString(R.string.term_done))
+        }
+        val bootFiles = u.vm.idNeeded.filter { it.startsWith("boot") }
+        if (bootFiles.isNotEmpty()) {
             terminal.add(u.vm.activity.getString(R.string.term_patch_update))
-            u.sbootfile.forEach {
-                val bootf = File(u.vm.logic.cacheDir, System.currentTimeMillis().toString())
-                u.vm.copyUnpriv(
-                    u.vm.activity.contentResolver.openInputStream(it)!!,
-                    bootf
-                )
-                bootfile.add(bootf)
-            }
-            var cmd = "FORMATDATA=false " + tmpFile.absolutePath + " ${u.ef!!.nameWithoutExtension}"
-            for (i in bootfile) {
-                cmd += " " + i.absolutePath
+            var cmd =
+                "FORMATDATA=false " + tmpFile!!.absolutePath + " ${u.ef!!.nameWithoutExtension}"
+            for (i in bootFiles) {
+                cmd += " " + u.vm.chosen[i]!!.toFile(u.vm)
             }
             for (i in sp) {
                 cmd += " $i"
             }
             val r = u.vm.logic.runShFileWithArgs(cmd).to(terminal).exec()
-            tmpFile.delete()
-            bootfile.forEach { it.delete() }
             if (!r.isSuccess) {
                 throw IllegalStateException(u.vm.activity.getString(R.string.term_script_fail))
             }
-            terminal.add(u.vm.activity.getString(R.string.term_success))
-        } else {
-            terminal.add(u.vm.activity.getString(R.string.term_update_failed_prep))
         }
+        u.e!!["xupdate"] = u.updateJson ?: ""
+        u.e!!.exportToFile(u.ef!!)
+        terminal.add(u.vm.activity.getString(R.string.term_success))
+        tmpFile?.delete()
         u.vm.nextText = u.vm.activity.getString(R.string.finish)
         u.vm.onNext = { it.finish() }
     }

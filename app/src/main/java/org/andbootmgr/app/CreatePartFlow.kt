@@ -82,7 +82,7 @@ class CreatePartFlow(private val desiredStartSector: Long): WizardFlow() {
 			NavButton(vm.activity.getString(R.string.cancel)) { it.finish() },
 			NavButton("") {}
 		) {
-			WizardDownloader(c.vm)
+			WizardDownloader(c.vm, "flash")
 		}, WizardPage("flash",
 			NavButton("") {},
 			NavButton("") {}
