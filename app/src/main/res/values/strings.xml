@@ -54,6 +54,7 @@
 	<string name="install">Install</string>
 	<string name="connecting_text">(Connecting…)</string>
 	<string name="downloading">Downloading…</string>
+	<string name="downloading_s">Downloading %s…</string>
 	<string name="provide_images">Please now provide images for all required IDs. You can use the recommended ones using the \"Download\" button!</string>
 	<string name="user_selected">User-selected</string>
 	<string name="undo">Undo</string>

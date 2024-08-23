@@ -654,6 +654,7 @@ private fun Flash(c: CreatePartDataHolder) {
 	val vm = c.vm
 	Terminal(logFile = "install_${System.currentTimeMillis()}.txt") { terminal ->
 		c.vm.logic.extractToolkit(terminal)
+		c.vm.downloadRemainingFiles(terminal)
 		if (c.partitionName == null) { // OS install
 			val createdParts = mutableListOf<Pair<Part, Int>>() // order is important
 			val fn = c.romFolderName

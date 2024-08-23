@@ -60,6 +60,7 @@ private fun Start(vm: WizardState) {
 private fun Flash(vm: WizardState) {
 	Terminal(logFile = "blfix_${System.currentTimeMillis()}.txt") { terminal ->
 		vm.logic.extractToolkit(terminal)
+		vm.downloadRemainingFiles(terminal)
 		val tmpFile = if (vm.deviceInfo.postInstallScript) {
 			vm.chosen["_install.sh_"]!!.toFile(vm).also {
 				it.setExecutable(true)

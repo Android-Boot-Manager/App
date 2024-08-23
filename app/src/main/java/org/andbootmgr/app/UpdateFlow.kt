@@ -209,6 +209,7 @@ private fun Local(u: UpdateFlowDataHolder) {
 private fun Flash(u: UpdateFlowDataHolder) {
     Terminal(logFile = "update_${System.currentTimeMillis()}.txt") { terminal ->
         u.vm.logic.extractToolkit(terminal)
+        u.vm.downloadRemainingFiles(terminal)
         val sp = u.e!!["xpart"]!!.split(":")
         val meta = SDUtils.generateMeta(u.vm.deviceInfo)!!
         Shell.cmd(SDUtils.umsd(meta)).exec()

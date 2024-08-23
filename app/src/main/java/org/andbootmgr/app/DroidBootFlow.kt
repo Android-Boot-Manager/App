@@ -186,6 +186,7 @@ private fun Flash(d: DroidBootFlowDataHolder) {
 	val vm = d.vm
 	Terminal(logFile = "blflash_${System.currentTimeMillis()}.txt") { terminal ->
 		vm.logic.extractToolkit(terminal)
+		vm.downloadRemainingFiles(terminal)
 		terminal.add(vm.activity.getString(R.string.term_preparing_fs))
 		if (vm.logic.checkMounted()) {
 			terminal.add(vm.activity.getString(R.string.term_mount_state_bad))

@@ -93,7 +93,6 @@ private fun SelectDroidBoot(c: CreateBackupDataHolder) {
                     else -> ""
                 }
             )
-            val next =
             Button(onClick = {
                 if (c.action != 1) {
                     c.vm.activity.chooseFile("*/*") {

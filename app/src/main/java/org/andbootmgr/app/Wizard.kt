@@ -1,9 +1,8 @@
 package org.andbootmgr.app
 
 import android.net.Uri
-import android.util.Log
+import android.os.CancellationSignal
 import android.view.WindowManager
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
@@ -38,18 +36,18 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.topjohnwu.superuser.io.SuFileOutputStream
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.andbootmgr.app.util.AbmOkHttp
-import org.andbootmgr.app.util.SOUtils
+import org.andbootmgr.app.util.TerminalCancelException
+import org.andbootmgr.app.util.TerminalList
 import java.io.File
 import java.io.FileInputStream
+import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
+import java.util.concurrent.CancellationException
 
 abstract class WizardFlow {
 	abstract fun get(vm: WizardState): List<IWizardPage>
@@ -140,7 +138,42 @@ class WizardState(val mvm: MainActivityState) {
 			throw IllegalStateException("invalid DledFile OR safFile failure")
 		}
 	}
-	//suspend fun downloadRemainingFiles
+	suspend fun downloadRemainingFiles(terminal: TerminalList) {
+		terminal.isCancelled.value = false
+		for (id in idNeeded.filter { !chosen.containsKey(it) }) {
+			if (!inetAvailable.containsKey(id))
+				throw IllegalStateException("$id not chosen and not available from inet")
+			terminal.add(activity.getString(R.string.downloading_s, id))
+			val inet = inetAvailable[id]!!
+			val f = File(logic.cacheDir, System.currentTimeMillis().toString())
+			terminal.add(activity.getString(R.string.connecting_text))
+			val client = AbmOkHttp(inet.url, f, inet.hash) { readBytes, total, done ->
+				terminal[terminal.size - 1] = if (done) activity.getString(R.string.done) else
+					activity.getString(
+						R.string.download_progress,
+						"${readBytes / (1024 * 1024)} MiB", "${total / (1024 * 1024)} MiB"
+					)
+			}
+			terminal.cancel = { terminal.isCancelled.value = true; client.cancel() }
+			try {
+				client.run()
+			} catch (e: IOException) {
+				if (terminal.isCancelled.value == true) {
+					throw TerminalCancelException()
+				}
+				throw e
+			}
+			if (terminal.isCancelled.value == true) {
+				throw TerminalCancelException()
+			}
+			chosen[id] = DownloadedFile(null, f)
+		}
+		if (terminal.isCancelled.value == true) {
+			throw TerminalCancelException()
+		} else {
+			terminal.isCancelled.value = null
+		}
+	}
 
 	fun navigate(next: String) {
 		prevText = null
@@ -224,21 +257,6 @@ fun WizardDownloader(vm: WizardState, next: String) {
 				Text(stringResource(id = R.string.provide_images))
 			}
 		}
-		var cancelDownload by remember { mutableStateOf<(() -> Unit)?>(null) }
-		var progressText by remember { mutableStateOf(vm.activity.getString(R.string.connecting_text)) }
-		if (cancelDownload != null) {
-			AlertDialog(
-				onDismissRequest = {},
-				confirmButton = {
-					Button(onClick = { cancelDownload!!() }) {
-						Text(stringResource(id = R.string.cancel))
-					}
-				},
-				title = { Text(stringResource(R.string.downloading)) },
-				text = {
-					LoadingCircle(progressText, paddingBetween = 10.dp)
-				})
-		}
 		for (i in vm.idNeeded) {
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
@@ -261,41 +279,6 @@ fun WizardDownloader(vm: WizardState, next: String) {
 							Text(stringResource(R.string.undo))
 						}
 					} else {
-						/*if (vm.inetAvailable.containsKey(i)) {
-							Button(onClick = {
-								CoroutineScope(Dispatchers.Main).launch {
-									val url = vm.inetAvailable[i]!!.url
-									val downloadedFile = File(vm.logic.cacheDir, i)
-									val h = vm.inetAvailable[i]!!.hash
-									val client = AbmOkHttp(url, downloadedFile, h) { bytesRead, contentLength, _ ->
-										progressText = vm.activity.getString(R.string.download_progress,
-											SOUtils.humanReadableByteCountBin(bytesRead), SOUtils.humanReadableByteCountBin(contentLength))
-									}
-									try {
-										progressText = vm.activity.getString(R.string.connecting_text)
-										cancelDownload = {
-											client.cancel()
-											cancelDownload = null
-										}
-										if (client.run()) {
-											vm.chosen[i] = WizardState.DownloadedFile(null, downloadedFile)
-										}
-									} catch (e: Exception) {
-										Log.e("ABM", Log.getStackTraceString(e))
-										withContext(Dispatchers.Main) {
-											Toast.makeText(
-												vm.activity,
-												vm.activity.getString(R.string.dl_error),
-												Toast.LENGTH_LONG
-											).show()
-										}
-									}
-									cancelDownload = null
-								}
-							}) {
-								Text(stringResource(R.string.download))
-							}
-						}*/
 						Button(onClick = {
 							vm.activity.chooseFile("*/*") {
 								vm.chosen[i] = WizardState.DownloadedFile(it, null)
