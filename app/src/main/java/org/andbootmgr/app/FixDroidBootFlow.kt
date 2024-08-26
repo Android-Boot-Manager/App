@@ -11,8 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.topjohnwu.superuser.io.SuFile
 import com.topjohnwu.superuser.io.SuFileInputStream
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
 
@@ -39,7 +37,11 @@ class FixDroidBootFlow: WizardFlow() {
 
 @Composable
 private fun Start(vm: WizardState) {
-	LoadDroidBootJson(vm) {
+	LoadDroidBootJson(vm, false) {
+		if (!vm.deviceInfo.isBooted(vm.logic) && !vm.idNeeded.contains("droidboot")) {
+			Text(stringResource(R.string.install_bl_first))
+			return@LoadDroidBootJson
+		}
 		LaunchedEffect(Unit) {
 			vm.nextText = vm.activity.getString(R.string.next)
 			vm.onNext = { it.navigate(if (vm.idNeeded.isNotEmpty()) "dload" else "flash") }

@@ -89,8 +89,8 @@ private fun Start(vm: WizardState) {
 
 // shared across DroidBootFlow, UpdateDroidBootFlow, FixDroidBootFlow
 @Composable
-fun LoadDroidBootJson(vm: WizardState, content: @Composable () -> Unit) {
-	var loading by remember { mutableStateOf(!vm.deviceInfo.isBooted(vm.logic) || vm.deviceInfo.postInstallScript) }
+fun LoadDroidBootJson(vm: WizardState, update: Boolean, content: @Composable () -> Unit) {
+	var loading by remember { mutableStateOf(!vm.deviceInfo.isBooted(vm.logic) || vm.deviceInfo.postInstallScript || update) }
 	var error by remember { mutableStateOf(false) }
 	LaunchedEffect(Unit) {
 		if (!loading) return@LaunchedEffect
@@ -101,14 +101,16 @@ fun LoadDroidBootJson(vm: WizardState, content: @Composable () -> Unit) {
 				val json = JSONTokener(jsonText).nextValue() as JSONObject
 				if (BuildConfig.VERSION_CODE < json.getInt("minAppVersion"))
 					throw IllegalStateException("please upgrade app")
-				if (!vm.deviceInfo.isBooted(vm.logic)) {
+				if ((!vm.deviceInfo.isBooted(vm.logic) || update) && json.has("bootloader")) {
 					val bl = json.getJSONObject("bootloader")
-					val url = bl.getString("url")
-					val sha = bl.getStringOrNull("sha256")
-					vm.inetAvailable["droidboot"] = WizardState.Downloadable(
-						url, sha, vm.activity.getString(R.string.droidboot_online)
-					)
-					vm.idNeeded.add("droidboot")
+					if (!bl.optBoolean("updateOnly", false) || update) {
+						val url = bl.getString("url")
+						val sha = bl.getStringOrNull("sha256")
+						vm.inetAvailable["droidboot"] = WizardState.Downloadable(
+							url, sha, vm.activity.getString(R.string.droidboot_online)
+						)
+						vm.idNeeded.add("droidboot")
+					}
 				}
 				if (vm.deviceInfo.postInstallScript) {
 					val i = json.getJSONObject("installScript")
@@ -140,7 +142,11 @@ fun LoadDroidBootJson(vm: WizardState, content: @Composable () -> Unit) {
 
 @Composable
 private fun Input(d: DroidBootFlowDataHolder) {
-	LoadDroidBootJson(d.vm) {
+	LoadDroidBootJson(d.vm, false) {
+		if (!d.vm.deviceInfo.isBooted(d.vm.logic) && !d.vm.idNeeded.contains("droidboot")) {
+			Text(stringResource(R.string.install_bl_first))
+			return@LoadDroidBootJson
+		}
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
 			verticalArrangement = Arrangement.Center,
@@ -241,7 +247,43 @@ private fun Flash(d: DroidBootFlowDataHolder) {
 				return@WizardTerminalWork
 			}
 		} else {
-			// TODO provision for sdless
+			if (!SuFile.open(vm.logic.abmSdLessBootset.toURI()).exists()) {
+				if (!SuFile.open(vm.logic.abmSdLessBootset.toURI()).mkdir()) {
+					terminal.add(vm.activity.getString(R.string.term_cant_create_bootset))
+					return@WizardTerminalWork
+				}
+			}
+			val bytes = 4L * 1024L * 1024L * 1024L // 4 GB for now
+			if (!Shell.cmd("fallocate -l $bytes" +
+						vm.logic.abmSdLessBootsetImg.absolutePath).to(terminal).exec().isSuccess) {
+				terminal.add(vm.activity.getString(R.string.term_failed_fallocate))
+				return@WizardTerminalWork
+			}
+			if (!Shell.cmd("uncrypt ${vm.logic.abmSdLessBootsetImg.absolutePath} " +
+				vm.logic.metadataMap.absolutePath).to(terminal).exec().isSuccess) {
+				terminal.add(vm.activity.getString(R.string.term_failed_uncrypt))
+				return@WizardTerminalWork
+			}
+			val tempFile = File(vm.logic.cacheDir, "${System.currentTimeMillis()}.txt")
+			if (!Shell.cmd(File(vm.logic.toolkitDir, "droidboot_map_to_dm")
+				.absolutePath + " " + vm.logic.metadataMap.absolutePath + " " + tempFile.absolutePath
+			).to(terminal).exec().isSuccess) {
+				terminal.add(vm.activity.getString(R.string.term_failed_mapconv))
+				return@WizardTerminalWork
+			}
+			if (SuFile.open(vm.logic.dmPath.toURI()).exists()) {
+				if (!Shell.cmd("dmsetup remove --retry ${vm.logic.dmName}")
+						.to(terminal).exec().isSuccess
+				) {
+					terminal.add(vm.activity.getString(R.string.term_failed_unmap))
+					return@WizardTerminalWork
+				}
+			}
+			if (!Shell.cmd("dmsetup create ${vm.logic.dmName} ${tempFile.absolutePath}")
+				.to(terminal).exec().isSuccess) {
+				terminal.add(vm.activity.getString(R.string.term_failed_map))
+				return@WizardTerminalWork
+			}
 		}
 
 		if (!vm.logic.mountBootset(vm.deviceInfo)) {
@@ -256,14 +298,14 @@ private fun Flash(d: DroidBootFlowDataHolder) {
 		if (!SuFile.open(vm.logic.abmDb.toURI()).exists()) {
 			if (!SuFile.open(vm.logic.abmDb.toURI()).mkdir()) {
 				terminal.add(vm.activity.getString(R.string.term_failed_create_db_dir))
-				vm.logic.unmountBootset()
+				vm.logic.unmountBootset(vm.deviceInfo)
 				return@WizardTerminalWork
 			}
 		}
 		if (!SuFile.open(vm.logic.abmEntries.toURI()).exists()) {
 			if (!SuFile.open(vm.logic.abmEntries.toURI()).mkdir()) {
 				terminal.add(vm.activity.getString(R.string.term_failed_create_entries_dir))
-				vm.logic.unmountBootset()
+				vm.logic.unmountBootset(vm.deviceInfo)
 				return@WizardTerminalWork
 			}
 		}
@@ -314,7 +356,7 @@ private fun Flash(d: DroidBootFlowDataHolder) {
 			tmpFile.delete()
 		}
 		terminal.add(vm.activity.getString(R.string.term_success))
-		vm.logic.unmountBootset()
+		vm.logic.unmountBootset(vm.deviceInfo)
 		// TODO prompt user to reboot?
 	}
 }

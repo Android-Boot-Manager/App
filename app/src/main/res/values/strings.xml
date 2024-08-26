@@ -262,4 +262,11 @@
 	<string name="bytes">bytes</string>
 	<string name="percent">percent</string>
 	<string name="how_many_extras">How many extra IDs? Currently: %d</string>
+	<string name="term_cant_create_bootset">-- failed to create bootset dir</string>
+	<string name="term_failed_fallocate">-- failed to create bootset.img</string>
+	<string name="term_failed_uncrypt">-- failed to decrypt bootset.img</string>
+	<string name="term_failed_mapconv">-- failed to convert bootset.img map</string>
+	<string name="term_failed_map">-- failed to map bootset.img</string>
+	<string name="term_failed_unmap">-- failed to unmap bootset.img</string>
+	<string name="install_bl_first">You need to install the bootloader manually first. Please check the ABM wiki for more infos.</string>
 </resources>

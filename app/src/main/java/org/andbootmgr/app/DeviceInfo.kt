@@ -59,6 +59,19 @@ abstract class MetaOnSdDeviceInfo : DeviceInfo {
 		return !SuFile.open(logic.abmDb, "db.conf").exists()
 	}
 	override fun getAbmSettings(logic: DeviceLogic): String? {
+		return logic.dmPath.absolutePath
+	}
+}
+
+abstract class SdLessDeviceInfo : DeviceInfo {
+	override val metaonsd = false
+	override fun isInstalled(logic: DeviceLogic): Boolean {
+		return SuFile.open(logic.abmSdLessBootsetImg.toURI()).exists()
+	}
+	override fun isCorrupt(logic: DeviceLogic): Boolean {
+		return !SuFile.open(logic.abmDb, "db.conf").exists()
+	}
+	override fun getAbmSettings(logic: DeviceLogic): String? {
 		if (SuFile.open(bdev).exists())
 			SDUtils.generateMeta(this)?.let { meta ->
 				if (meta.p.isNotEmpty()) {

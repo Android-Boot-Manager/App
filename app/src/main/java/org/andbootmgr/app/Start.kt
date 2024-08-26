@@ -166,7 +166,11 @@ fun Start(vm: MainActivityState) {
 		} else if (!mounted) {
 			Text(stringResource(R.string.cannot_mount), textAlign = TextAlign.Center)
 		} else if (vm.isOk) {
-			PartTool(vm)
+			if (vm.deviceInfo!!.metaonsd) {
+				PartTool(vm)
+			} else {
+				BootsetTool(vm)
+			}
 		} else {
 			Text(stringResource(R.string.invalid), textAlign = TextAlign.Center)
 			Text("metaOnSd:$metaOnSd isOk:${vm.isOk}")
@@ -466,7 +470,7 @@ private fun PartTool(vm: MainActivityState) {
 								}
 							}
 							Button(onClick = {
-								vm.currentWizardFlow = BackupRestoreFlow(p.id)
+								vm.currentWizardFlow = BackupRestoreFlow(p.id, null) // TODO !metaonsd
 							}) {
 								Text(stringResource(R.string.backupnrestore))
 							}
@@ -830,4 +834,9 @@ private fun PartTool(vm: MainActivityState) {
 			)
 		}
 	}
+}
+
+@Composable
+private fun BootsetTool(vm: MainActivityState) {
+	Text("insert code here") // TODO !metaonsd
 }

@@ -16,6 +16,13 @@ class DeviceLogic(private val ctx: Context) {
 	val toolkitDir = File(toolkit.targetPath, "Toolkit") // will occasionally be pruned by OS, but it's fine
 	private val rootTmpDir = File("/data/local/tmp")
 	val abmBootset = File(rootTmpDir, ".abm_bootset")
+	val abmSdLessBootset = File("/data/abm")
+	val abmSdLessBootsetImg = File(abmSdLessBootset, "bootset.img")
+	private val metadata = File("/metadata")
+	val metadataMap = File(metadata, "bootset.map")
+	val dmBase = File("/dev/block/mapper")
+	val dmName = "abmbootset"
+	val dmPath = File(dmBase, dmName)
 	val abmDb = File(abmBootset, "db")
 	val abmEntries = File(abmDb, "entries")
 	val abmDbConf = File(abmDb, "db.conf")
@@ -25,6 +32,7 @@ class DeviceLogic(private val ctx: Context) {
 		val ast = d.getAbmSettings(this) ?: return false
 		val bootsetSu = SuFile.open(abmBootset.toURI())
 		if (!bootsetSu.exists()) bootsetSu.mkdir()
+		if (!d.metaonsd && !mapBootset()) return false
 		val result = Shell
 			.cmd("mount $ast ${abmBootset.absolutePath}")
 			.exec()
@@ -42,7 +50,7 @@ class DeviceLogic(private val ctx: Context) {
 		mounted = true
 		return true
 	}
-	fun unmountBootset(): Boolean {
+	fun unmountBootset(d: DeviceInfo): Boolean {
 		if (!checkMounted()) return true
 		val result = Shell.cmd("umount ${abmBootset.absolutePath}").exec()
 		if (!result.isSuccess) {
@@ -56,6 +64,7 @@ class DeviceLogic(private val ctx: Context) {
 			Log.e("ABM_UMOUNT", out)
 			return !mounted
 		}
+		if (!d.metaonsd) unmapBootset()
 		mounted = false
 		return true
 	}
@@ -66,6 +75,21 @@ class DeviceLogic(private val ctx: Context) {
 			else -> throw IllegalStateException("mountpoint returned exit code $code, expected 0 or 1")
 		}
 		return mounted
+	}
+	private fun mapBootset(): Boolean {
+		if (SuFile.open(dmPath.toURI()).exists())
+			return true
+		val tempFile = File(cacheDir, "${System.currentTimeMillis()}.txt")
+		if (!Shell.cmd(File(toolkitDir, "droidboot_map_to_dm")
+				.absolutePath + " " + metadataMap.absolutePath + " " + tempFile.absolutePath
+			).exec().isSuccess) {
+			return false
+		}
+		return Shell.cmd("dmsetup create $dmName ${tempFile.absolutePath}").exec().isSuccess
+	}
+	private fun unmapBootset() {
+		if (SuFile.open(dmPath.toURI()).exists())
+			Shell.cmd("dmsetup remove -f --retry $dmName").exec()
 	}
 	fun mount(p: SDUtils.Partition): Shell.Job {
 		return Shell.cmd(p.mount())

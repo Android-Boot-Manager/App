@@ -210,7 +210,7 @@ private fun Flash(u: UpdateFlowDataHolder) {
         u.vm.logic.extractToolkit(terminal)
         u.vm.downloadRemainingFiles(terminal)
         val sp = u.e!!["xpart"]!!.split(":")
-        val meta = SDUtils.generateMeta(u.vm.deviceInfo)!!
+        val meta = SDUtils.generateMeta(u.vm.deviceInfo)!! // TODO !metaonsd
         Shell.cmd(SDUtils.umsd(meta)).exec()
         val tmpFile = if (u.vm.idNeeded.contains("_install.sh_")) {
             u.vm.chosen["_install.sh_"]!!.toFile(u.vm).also {

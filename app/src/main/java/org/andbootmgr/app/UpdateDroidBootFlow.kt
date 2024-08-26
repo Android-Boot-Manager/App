@@ -37,7 +37,7 @@ class UpdateDroidBootFlow: WizardFlow() {
 
 @Composable
 private fun Start(vm: WizardState) {
-	LoadDroidBootJson(vm) {
+	LoadDroidBootJson(vm, true) {
 		LaunchedEffect(Unit) {
 			vm.nextText = vm.activity.getString(R.string.next)
 			vm.onNext = { it.navigate(if (vm.idNeeded.isNotEmpty()) "dload" else "flash") }

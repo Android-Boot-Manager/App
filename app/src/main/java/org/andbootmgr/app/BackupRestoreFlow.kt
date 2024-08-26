@@ -22,9 +22,9 @@ import org.andbootmgr.app.util.SDUtils
 import java.io.File
 import java.io.IOException
 
-class BackupRestoreFlow(private val partitionId: Int): WizardFlow() {
+class BackupRestoreFlow(private val partitionId: Int, private val partFile: File?): WizardFlow() {
     override fun get(vm: WizardState): List<IWizardPage> {
-        val c = CreateBackupDataHolder(vm, partitionId)
+        val c = CreateBackupDataHolder(vm, partitionId, partFile)
         return listOf(WizardPage("start",
             NavButton(vm.activity.getString(R.string.cancel)) { it.finish() },
             NavButton("") {})
@@ -44,7 +44,7 @@ class BackupRestoreFlow(private val partitionId: Int): WizardFlow() {
     }
 }
 
-private class CreateBackupDataHolder(val vm: WizardState, val pi: Int) {
+private class CreateBackupDataHolder(val vm: WizardState, val pi: Int?, val partFile: File?) {
     var action: Int = 0
     var path: Uri? = null
     var meta: SDUtils.SDPartitionMeta? = null
@@ -52,14 +52,18 @@ private class CreateBackupDataHolder(val vm: WizardState, val pi: Int) {
 
 @Composable
 private fun ChooseAction(c: CreateBackupDataHolder) {
-    LaunchedEffect(Unit) {
-        c.meta = SDUtils.generateMeta(c.vm.deviceInfo)
+    if (c.vm.deviceInfo.metaonsd) {
+        LaunchedEffect(Unit) {
+            c.meta = SDUtils.generateMeta(c.vm.deviceInfo)
+        }
     }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxSize()
     ) {
-        Text(stringResource(id = R.string.backup_msg, c.meta!!.dumpKernelPartition(c.pi).name), textAlign = TextAlign.Center)
+        val name = if (c.vm.deviceInfo.metaonsd)
+            c.meta!!.dumpKernelPartition(c.pi!!).name else c.partFile!!.name
+        Text(stringResource(id = R.string.backup_msg, name), textAlign = TextAlign.Center)
         Button(onClick = { c.action=1; c.vm.navigate("select") }) {
             Text(stringResource(R.string.backup))
         }
@@ -93,6 +97,8 @@ private fun SelectDroidBoot(c: CreateBackupDataHolder) {
                 }
             )
             Button(onClick = {
+                val name = if (c.vm.deviceInfo.metaonsd)
+                    c.meta!!.dumpKernelPartition(c.pi!!).name else c.partFile!!.nameWithoutExtension
                 if (c.action != 1) {
                     c.vm.activity.chooseFile("*/*") {
                         c.vm.chosen["file"] = WizardState.DownloadedFile(it, null)
@@ -101,7 +107,7 @@ private fun SelectDroidBoot(c: CreateBackupDataHolder) {
                         c.vm.onNext = { i -> i.navigate("go") }
                     }
                 } else {
-                    c.vm.activity.createFile("${c.meta!!.dumpKernelPartition(c.pi).name}.img") {
+                    c.vm.activity.createFile("${name}.img") {
                         c.path = it
                         nextButtonAvailable = true
                         c.vm.nextText = c.vm.activity.getString(R.string.next)
@@ -120,25 +126,28 @@ private fun Flash(c: CreateBackupDataHolder) {
     WizardTerminalWork(c.vm, logFile = "flash_${System.currentTimeMillis()}.txt") { terminal ->
         c.vm.logic.extractToolkit(terminal)
         terminal.add(c.vm.activity.getString(R.string.term_starting))
-        val p = c.meta!!.dumpKernelPartition(c.pi)
-        if (!c.vm.logic.unmount(p).to(terminal).exec().isSuccess)
-            throw IOException(c.vm.activity.getString(R.string.term_cant_umount))
+        val path = if (c.vm.deviceInfo.metaonsd) {
+            val p = c.meta!!.dumpKernelPartition(c.pi!!)
+            if (!c.vm.logic.unmount(p).to(terminal).exec().isSuccess)
+                throw IOException(c.vm.activity.getString(R.string.term_cant_umount))
+            p.path
+        } else c.partFile!!.absolutePath
         if (c.action == 1) {
             c.vm.copy(
-                SuFileInputStream.open(File(p.path)),
+                SuFileInputStream.open(path),
                 c.vm.activity.contentResolver.openOutputStream(c.path!!)!!
             )
         } else if (c.action == 2) {
             c.vm.copyPriv(
                 c.vm.chosen["file"]!!.openInputStream(c.vm),
-                File(p.path)
+                File(path)
             )
         } else if (c.action == 3) {
             val result2 = Shell.cmd(
                 File(
                     c.vm.logic.toolkitDir,
                     "simg2img"
-                ).absolutePath + " ${c.vm.chosen["file"]!!.toFile(c.vm).absolutePath} ${p.path}"
+                ).absolutePath + " ${c.vm.chosen["file"]!!.toFile(c.vm).absolutePath} $path"
             ).to(terminal).exec()
             if (!result2.isSuccess) {
                 terminal.add(c.vm.activity.getString(R.string.term_failure))

@@ -18,6 +18,7 @@ object SDUtils {
 	}
 
 	fun generateMeta(deviceInfo: DeviceInfo): SDPartitionMeta? {
+		if (!deviceInfo.metaonsd) return null
 		val meta: SDPartitionMeta
 		val r =
 			Shell.cmd("printf \"mm:%d:%d\\n\" `stat -c '0x%t 0x%T' ${deviceInfo.bdev}` && sgdisk ${deviceInfo.bdev} --print")
@@ -200,7 +201,7 @@ object SDUtils {
 				PartitionType.ADOPTED -> "sm unmount private:${this.major},${this.minor}"
 				PartitionType.RESERVED -> {
 					if (name == "abm_settings") {
-						// TODO unmount bootset
+						// Unmounting bootset is handled by DeviceLogic, don't forget to do that
 						"true"
 					} else {
 						"echo 'Warning: Unsure on how to unmount this partition.'"
@@ -208,6 +209,7 @@ object SDUtils {
 				}
 				PartitionType.SYSTEM, PartitionType.DATA -> {
 					// TODO rework this when dual android is supported by looking at current os' xpart
+					// but for that we need to know the current os entry :D
 					"true"
 				}
 				else -> "echo 'Warning: Unsure on how to unmount this partition.'"

@@ -137,11 +137,11 @@ class MainActivityState(val activity: MainActivity?) {
 
 	fun unmountBootset() {
 		defaultCfg.clear()
-		logic!!.unmountBootset()
+		logic!!.unmountBootset(deviceInfo!!)
 	}
 
 	fun remountBootset() {
-		logic!!.unmountBootset()
+		logic!!.unmountBootset(deviceInfo!!)
 		logic!!.mountBootset(deviceInfo!!)
 	}
 }
@@ -233,10 +233,6 @@ class MainActivity : ComponentActivity() {
 					if (Shell.cmd("mountpoint -q /data/abm/bootset").exec().isSuccess) {
 						Shell.cmd("umount /data/abm/bootset").exec()
 					}
-					SuFile.open("/data/abm").let {
-						if (it.exists())
-							Shell.cmd("rm -rf /data/abm").exec()
-					}
 					SuFile.open(filesDir.parentFile!!, "assets").let {
 						if (it.exists())
 							Shell.cmd("rm -rf ${filesDir.parentFile!!.resolve("assets").absolutePath}")
@@ -246,6 +242,14 @@ class MainActivity : ComponentActivity() {
 				// == temp migration code end ==
 			}
 			vm.deviceInfo = di.await() // blocking
+			// == temp migration code 2 start ==
+			if (vm.deviceInfo!!.metaonsd) launch {
+				SuFile.open("/data/abm").let {
+					if (it.exists())
+						Shell.cmd("rm -rf /data/abm").exec()
+				}
+			}
+			// == temp migration code 2 end ==
 			if (StayAliveService.instance == null) {
 				vm.init()
 			}

@@ -137,7 +137,7 @@ private fun Start(c: CreatePartDataHolder) {
 	LaunchedEffect(Unit) {
 		if (c.meta == null) {
 			withContext(Dispatchers.IO) {
-				val meta = SDUtils.generateMeta(c.vm.deviceInfo)!!
+				val meta = SDUtils.generateMeta(c.vm.deviceInfo)!! // TODO !metaonsd
 				c.p =
 					meta.s.find { c.desiredStartSector == it.startSector } as SDUtils.Partition.FreeSpace
 				c.meta = meta
@@ -663,12 +663,12 @@ private fun Flash(c: CreatePartDataHolder) {
 			tmpFile.setExecutable(true)
 			terminal.add(vm.activity.getString(R.string.term_creating_pt))
 
-			vm.logic.unmountBootset()
+			vm.logic.unmountBootset(vm.deviceInfo)
 			val startSectorAbsolute = c.p.startSector + c.startSectorRelative
 			val endSectorAbsolute = c.p.startSector + c.endSectorRelative
 			if (endSectorAbsolute > c.p.endSector)
 				throw IllegalArgumentException("$endSectorAbsolute can't be bigger than ${c.p.endSector}")
-			c.parts.forEachIndexed { index, part ->
+			c.parts.forEachIndexed { index, part -> // TODO !metaonsd
 				terminal.add(vm.activity.getString(R.string.term_create_part))
 				val start = c.p.startSector.coerceAtLeast(startSectorAbsolute)
 				val end = c.p.endSector.coerceAtMost(endSectorAbsolute)
@@ -765,7 +765,7 @@ private fun Flash(c: CreatePartDataHolder) {
 			terminal.add(vm.activity.getString(R.string.term_success))
 		} else { // Portable partition
 			terminal.add(vm.activity.getString(R.string.term_create_part))
-			vm.logic.unmountBootset()
+			vm.logic.unmountBootset(vm.deviceInfo)
 			val r = vm.logic.create(c.p,
 					c.startSectorRelative,
 					c.endSectorRelative,
