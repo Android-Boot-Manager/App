@@ -72,6 +72,7 @@ import org.andbootmgr.app.util.AbmTheme
 import org.andbootmgr.app.util.ConfigFile
 import org.andbootmgr.app.util.StayAliveService
 import org.andbootmgr.app.util.Terminal
+import org.andbootmgr.app.util.TerminalList
 import java.util.concurrent.atomic.AtomicBoolean
 
 class MainActivityState(val activity: MainActivity?) {
@@ -80,7 +81,7 @@ class MainActivityState(val activity: MainActivity?) {
 	var deviceInfo: DeviceInfo? = null
 	val theme = ThemeViewModel(this)
 	var defaultCfg = mutableStateMapOf<String, String>()
-	var isOk = false
+	var isOk by mutableStateOf(false)
 	var logic: DeviceLogic? = null
 
 	private fun loadDefaultCfg() {
@@ -117,17 +118,15 @@ class MainActivityState(val activity: MainActivity?) {
 
 	// This will be called on startup, and after StayAlive work completes.
 	fun init() {
-		if (!StayAliveService.isRunning) {
-			val installed = deviceInfo?.isInstalled(logic!!)
-			if (installed == true) {
-				mountBootset()
-			} else {
-				Log.i("ABM", "not installed, not trying to mount")
-			}
-			if (deviceInfo != null) {
-				isOk = installed!! && deviceInfo!!.isBooted(logic!!) &&
-						!(!logic!!.mounted || deviceInfo!!.isCorrupt(logic!!))
-			}
+		val installed = deviceInfo?.isInstalled(logic!!)
+		if (installed == true) {
+			mountBootset()
+		} else {
+			Log.i("ABM", "not installed, not trying to mount")
+		}
+		if (deviceInfo != null) {
+			isOk = installed!! && deviceInfo!!.isBooted(logic!!) &&
+					!(!logic!!.mounted || deviceInfo!!.isCorrupt(logic!!))
 		}
 	}
 
@@ -247,14 +246,16 @@ class MainActivity : ComponentActivity() {
 				// == temp migration code end ==
 			}
 			vm.deviceInfo = di.await() // blocking
-			vm.init()
+			if (StayAliveService.instance == null) {
+				vm.init()
+			}
 			withContext(Dispatchers.Main) {
 				setContent {
-					// TODO allow rotating device while viewing logs without loosing logs (will require rememberSavable)
 					AbmTheme {
-						var showTerminal by remember { mutableStateOf(StayAliveService.isRunning) }
-						if (showTerminal) {
-							var canFinish by remember { mutableStateOf(false) }
+						if (StayAliveService.instance != null &&
+							StayAliveService.instance!!.workExtra is TerminalList) {
+							val i = StayAliveService.instance!!
+							val we = i.workExtra as TerminalList
 							DisposableEffect(Unit) {
 								window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 								onDispose { window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) }
@@ -262,16 +263,24 @@ class MainActivity : ComponentActivity() {
 							BackHandler {}
 							Column(modifier = Modifier.fillMaxSize()) {
 								Box(modifier = Modifier.fillMaxWidth().weight(1.0f)) {
-									Terminal(null, { canFinish = true }, null)
+									Terminal(we)
 								}
 								Box(modifier = Modifier.fillMaxWidth()) {
-									BasicButtonRow("", {}, if (canFinish)
-										stringResource(R.string.finish) else "") {
-										if (canFinish)
-											CoroutineScope(Dispatchers.IO).launch {
-												vm.init()
-												showTerminal = false
-											}
+									if (we.isCancelled == false || i.isWorkDone) {
+										BasicButtonRow(
+											if (we.isCancelled == false)
+												stringResource(R.string.cancel) else "", {
+												if (we.isCancelled == false)
+													we.cancel?.invoke()
+											}, if (i.isWorkDone)
+												stringResource(R.string.finish) else ""
+										) {
+											if (i.isWorkDone)
+												CoroutineScope(Dispatchers.IO).launch {
+													vm.init()
+													StayAliveService.instance!!.stopSelf()
+												}
+										}
 									}
 								}
 							}

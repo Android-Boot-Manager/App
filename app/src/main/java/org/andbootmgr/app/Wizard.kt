@@ -1,7 +1,6 @@
 package org.andbootmgr.app
 
 import android.net.Uri
-import android.os.CancellationSignal
 import android.view.WindowManager
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
@@ -39,6 +38,7 @@ import com.topjohnwu.superuser.io.SuFileOutputStream
 import org.andbootmgr.app.util.AbmOkHttp
 import org.andbootmgr.app.util.TerminalCancelException
 import org.andbootmgr.app.util.TerminalList
+import org.andbootmgr.app.util.TerminalWork
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
@@ -137,7 +137,7 @@ class WizardState(val mvm: MainActivityState) {
 		}
 	}
 	suspend fun downloadRemainingFiles(terminal: TerminalList) {
-		terminal.isCancelled.value = false
+		terminal.isCancelled = false
 		for (id in idNeeded.filter { !chosen.containsKey(it) }) {
 			if (!inetAvailable.containsKey(id))
 				throw IllegalStateException("$id not chosen and not available from inet")
@@ -152,24 +152,24 @@ class WizardState(val mvm: MainActivityState) {
 						"${readBytes / (1024 * 1024)} MiB", "${total / (1024 * 1024)} MiB"
 					)
 			}
-			terminal.cancel = { terminal.isCancelled.value = true; client.cancel() }
+			terminal.cancel = { terminal.isCancelled = true; client.cancel() }
 			try {
 				client.run()
 			} catch (e: IOException) {
-				if (terminal.isCancelled.value == true) {
+				if (terminal.isCancelled == true) {
 					throw TerminalCancelException()
 				}
 				throw e
 			}
-			if (terminal.isCancelled.value == true) {
+			if (terminal.isCancelled == true) {
 				throw TerminalCancelException()
 			}
 			chosen[id] = DownloadedFile(null, f)
 		}
-		if (terminal.isCancelled.value == true) {
+		if (terminal.isCancelled == true) {
 			throw TerminalCancelException()
 		} else {
-			terminal.isCancelled.value = null
+			terminal.isCancelled = null
 		}
 	}
 
@@ -299,5 +299,14 @@ fun WizardDownloader(vm: WizardState, next: String) {
 				vm.nextText = ""
 			}
 		}
+	}
+}
+
+@Composable
+fun WizardTerminalWork(vm: WizardState, logFile: String? = null,
+                       action: suspend (TerminalList) -> Unit) {
+	TerminalWork(logFile) {
+		vm.mvm.currentWizardFlow = null
+		action(it)
 	}
 }

@@ -169,6 +169,7 @@ fun Start(vm: MainActivityState) {
 			PartTool(vm)
 		} else {
 			Text(stringResource(R.string.invalid), textAlign = TextAlign.Center)
+			Text("metaOnSd:$metaOnSd isOk:${vm.isOk}")
 		}
 	}
 }

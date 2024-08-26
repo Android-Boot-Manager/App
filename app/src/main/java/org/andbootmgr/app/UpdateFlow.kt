@@ -28,7 +28,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.andbootmgr.app.util.ConfigFile
 import org.andbootmgr.app.util.SDUtils
-import org.andbootmgr.app.util.Terminal
 import org.json.JSONObject
 import org.json.JSONTokener
 import java.io.File
@@ -207,7 +206,7 @@ private fun Local(u: UpdateFlowDataHolder) {
 
 @Composable
 private fun Flash(u: UpdateFlowDataHolder) {
-    Terminal(logFile = "update_${System.currentTimeMillis()}.txt") { terminal ->
+    WizardTerminalWork(u.vm, logFile = "update_${System.currentTimeMillis()}.txt") { terminal ->
         u.vm.logic.extractToolkit(terminal)
         u.vm.downloadRemainingFiles(terminal)
         val sp = u.e!!["xpart"]!!.split(":")
@@ -258,7 +257,5 @@ private fun Flash(u: UpdateFlowDataHolder) {
         u.e!!.exportToFile(u.ef!!)
         terminal.add(u.vm.activity.getString(R.string.term_success))
         tmpFile?.delete()
-        u.vm.nextText = u.vm.activity.getString(R.string.finish)
-        u.vm.onNext = { it.finish() }
     }
 }

@@ -28,10 +28,8 @@ import com.topjohnwu.superuser.io.SuFileInputStream
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.andbootmgr.app.util.ConfigFile
 import org.andbootmgr.app.util.SDUtils
-import org.andbootmgr.app.util.Terminal
 import org.json.JSONObject
 import org.json.JSONTokener
 import java.io.File
@@ -184,24 +182,24 @@ private fun Input(d: DroidBootFlowDataHolder) {
 @Composable
 private fun Flash(d: DroidBootFlowDataHolder) {
 	val vm = d.vm
-	Terminal(logFile = "blflash_${System.currentTimeMillis()}.txt") { terminal ->
+	WizardTerminalWork(d.vm, logFile = "blflash_${System.currentTimeMillis()}.txt") { terminal ->
 		vm.logic.extractToolkit(terminal)
 		vm.downloadRemainingFiles(terminal)
 		terminal.add(vm.activity.getString(R.string.term_preparing_fs))
 		if (vm.logic.checkMounted()) {
 			terminal.add(vm.activity.getString(R.string.term_mount_state_bad))
-			return@Terminal
+			return@WizardTerminalWork
 		}
 		if (!SuFile.open(vm.logic.abmBootset.toURI()).exists()) {
 			if (!SuFile.open(vm.logic.abmBootset.toURI()).mkdir()) {
 				terminal.add(vm.activity.getString(R.string.term_cant_create_mount_point))
-				return@Terminal
+				return@WizardTerminalWork
 			}
 		}
 		if (!SuFile.open(File(vm.logic.abmBootset, ".NOT_MOUNTED").toURI()).exists()) {
 			if (!SuFile.open(File(vm.logic.abmBootset, ".NOT_MOUNTED").toURI()).createNewFile()) {
 				terminal.add(vm.activity.getString(R.string.term_cant_create_placeholder))
-				return@Terminal
+				return@WizardTerminalWork
 			}
 		}
 
@@ -209,7 +207,7 @@ private fun Flash(d: DroidBootFlowDataHolder) {
 			var meta = SDUtils.generateMeta(vm.deviceInfo)
 			if (meta == null) {
 				terminal.add(vm.activity.getString(R.string.term_cant_get_meta))
-				return@Terminal
+				return@WizardTerminalWork
 			}
 			if (!Shell.cmd(SDUtils.umsd(meta)).to(terminal).exec().isSuccess) {
 				terminal.add(vm.activity.getString(R.string.term_failed_umount_drive))
@@ -218,12 +216,12 @@ private fun Flash(d: DroidBootFlowDataHolder) {
 					.exec().isSuccess
 			) {
 				terminal.add(vm.activity.getString(R.string.term_failed_create_pt))
-				return@Terminal
+				return@WizardTerminalWork
 			}
 			meta = SDUtils.generateMeta(vm.deviceInfo)
 			if (meta == null) {
 				terminal.add(vm.activity.getString(R.string.term_cant_get_meta))
-				return@Terminal
+				return@WizardTerminalWork
 			}
 			val r = vm.logic.create(meta.s[0] as SDUtils.Partition.FreeSpace,
 						0,
@@ -240,7 +238,7 @@ private fun Flash(d: DroidBootFlowDataHolder) {
 				terminal.add(vm.activity.getString(R.string.term_done))
 			} else {
 				terminal.add(vm.activity.getString(R.string.term_failed_create_meta))
-				return@Terminal
+				return@WizardTerminalWork
 			}
 		} else {
 			// TODO provision for sdless
@@ -248,25 +246,25 @@ private fun Flash(d: DroidBootFlowDataHolder) {
 
 		if (!vm.logic.mountBootset(vm.deviceInfo)) {
 			terminal.add(vm.activity.getString(R.string.term_failed_mount))
-			return@Terminal
+			return@WizardTerminalWork
 		}
 		if (SuFile.open(File(vm.logic.abmBootset, ".NOT_MOUNTED").toURI()).exists()) {
 			terminal.add(vm.activity.getString(R.string.term_mount_failure_inconsist))
-			return@Terminal
+			return@WizardTerminalWork
 		}
 
 		if (!SuFile.open(vm.logic.abmDb.toURI()).exists()) {
 			if (!SuFile.open(vm.logic.abmDb.toURI()).mkdir()) {
 				terminal.add(vm.activity.getString(R.string.term_failed_create_db_dir))
 				vm.logic.unmountBootset()
-				return@Terminal
+				return@WizardTerminalWork
 			}
 		}
 		if (!SuFile.open(vm.logic.abmEntries.toURI()).exists()) {
 			if (!SuFile.open(vm.logic.abmEntries.toURI()).mkdir()) {
 				terminal.add(vm.activity.getString(R.string.term_failed_create_entries_dir))
 				vm.logic.unmountBootset()
-				return@Terminal
+				return@WizardTerminalWork
 			}
 		}
 		val tmpFile = if (vm.deviceInfo.postInstallScript) {
@@ -304,7 +302,7 @@ private fun Flash(d: DroidBootFlowDataHolder) {
 				terminal.add(vm.activity.getString(R.string.term_bl_failed))
 				terminal.add(e.message ?: "(null)")
 				terminal.add(vm.activity.getString(R.string.term_consult_doc))
-				return@Terminal
+				return@WizardTerminalWork
 			}
 		}
 		if (vm.deviceInfo.postInstallScript) {
@@ -317,16 +315,6 @@ private fun Flash(d: DroidBootFlowDataHolder) {
 		}
 		terminal.add(vm.activity.getString(R.string.term_success))
 		vm.logic.unmountBootset()
-		withContext(Dispatchers.Main) {
-			vm.nextText = vm.activity.getString(R.string.finish)
-			vm.onNext = {
-				if (vm.deviceInfo.isBooted(vm.logic)) {
-					it.finish()
-				} else {
-					// TODO prompt user to reboot?
-					it.finish()
-				}
-			}
-		}
+		// TODO prompt user to reboot?
 	}
 }

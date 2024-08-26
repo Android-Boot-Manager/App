@@ -7,21 +7,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
@@ -37,10 +30,12 @@ import java.io.FileOutputStream
 private class BudgetCallbackList(private val scope: CoroutineScope,
                                  private val log: FileOutputStream?)
 	: MutableList<String>, TerminalList {
-	override val isCancelled = mutableStateOf<Boolean?>(null)
+	override var isCancelled by mutableStateOf<Boolean?>(null)
 	override var cancel: (() -> Unit)? = null
-	val internalList = ArrayList<String>()
-	var cb: (() -> Unit)? = null
+	private val internalList = ArrayList<String>()
+	private var textMinusLastLine = ""
+	override var text by mutableStateOf("")
+		private set
 	override val size: Int
 		get() = internalList.size
 
@@ -126,7 +121,7 @@ private class BudgetCallbackList(private val scope: CoroutineScope,
 
 	override fun set(index: Int, element: String): String {
 		return internalList.set(index, element).also {
-			cb?.invoke()
+			text = textMinusLastLine + element + "\n"
 		}
 	}
 
@@ -135,109 +130,64 @@ private class BudgetCallbackList(private val scope: CoroutineScope,
 	}
 
 	fun onAdd(element: String) {
+		textMinusLastLine = text
+		text += element + "\n"
 		scope.launch {
 			log?.write((element + "\n").encodeToByteArray())
 		}
-		cb?.invoke()
 	}
 }
 
 interface TerminalList : MutableList<String> {
-	val isCancelled: MutableState<Boolean?>
+	val text: String
+	var isCancelled: Boolean?
 	var cancel: (() -> Unit)?
 }
 class TerminalCancelException : RuntimeException()
 
-/* Monospace auto-scrolling text view, fed using MutableList<String>, catching exceptions and running logic on a different thread */
-@OptIn(ExperimentalCoroutinesApi::class)
 @Composable
-fun Terminal(logFile: String? = null, doWhenDone: (() -> Unit)? = null,
-             action: (suspend (TerminalList) -> Unit)?) {
+fun Terminal(list: TerminalList) {
 	val scrollH = rememberScrollState()
 	val scrollV = rememberScrollState()
-	val scope = rememberCoroutineScope { Dispatchers.Main }
-	var isCancelledState by remember { mutableStateOf(mutableStateOf<Boolean?>(null)) }
-	var doCancelState by remember { mutableStateOf<(() -> Unit)?>(null) }
-	var didConnectAndFinish by rememberSaveable { mutableStateOf(false) }
-	var text by rememberSaveable { mutableStateOf("") }
-	val ctx = LocalContext.current.applicationContext
-	val lo = LocalLifecycleOwner.current
-	LaunchedEffect(Unit) {
-		if (action == null && logFile != null) {
-			throw IllegalArgumentException("logFile must be null if action is null")
-		}
-		if (action != null && doWhenDone != null) {
-			throw IllegalArgumentException("Don't use both action and doWhenDone")
-		}
-		if (!didConnectAndFinish) {
-			StayAliveConnection(
-				ctx,
-				lo,
-				{ didConnectAndFinish = true; doWhenDone?.invoke() }) { service ->
-				if (action != null) {
-					val logDispatcher = Dispatchers.IO.limitedParallelism(1)
-					val log = logFile?.let { FileOutputStream(File(ctx.externalCacheDir, it)) }
-					val s = BudgetCallbackList(CoroutineScope(logDispatcher), log)
-					isCancelledState = s.isCancelled
-					doCancelState = { s.cancel!!() }
-					s.cb = {
-						val l = s.toList()
-						scope.launch {
-							text = l.joinToString("\n").let { if (s.isNotEmpty()) it + "\n" else it }
-							delay(200) // Give it time to re-measure
-							scrollV.animateScrollTo(scrollV.maxValue)
-							scrollH.animateScrollTo(0)
-						}
-					}
-					service.startWork({
-						withContext(Dispatchers.Default) {
-							try {
-								action(s)
-							} catch (e: TerminalCancelException) {
-								s.add(ctx.getString(R.string.install_canceled))
-							} catch (e: Throwable) {
-								s.add(ctx.getString(R.string.term_failure))
-								s.add(ctx.getString(R.string.dev_details))
-								s.add(Log.getStackTraceString(e))
-							}
-							withContext(logDispatcher) {
-								log?.close()
-							}
-						}
-					}, s)
-				} else {
-					val s = service.workExtra as BudgetCallbackList
-					isCancelledState = s.isCancelled
-					doCancelState = { s.cancel!!() }
-					text = s.joinToString("\n").let { if (s.isNotEmpty()) it + "\n" else it }
-					s.cb = {
-						val l = s.toList()
-						scope.launch {
-							text = l.joinToString("\n").let { if (s.isNotEmpty()) it + "\n" else it }
-							delay(200) // Give it time to re-measure
-							scrollV.animateScrollTo(scrollV.maxValue)
-							scrollH.animateScrollTo(0)
-						}
-					}
-
-				}
-			}
-		}
+	LaunchedEffect(list.text) {
+		delay(200) // Give it time to re-measure
+		scrollV.animateScrollTo(scrollV.maxValue)
+		scrollH.animateScrollTo(0)
 	}
 	Column(modifier = Modifier.fillMaxSize()) {
-		Text(text, modifier = Modifier
+		Text(list.text, modifier = Modifier
 				.fillMaxSize()
 				.weight(1f)
 				.horizontalScroll(scrollH)
 				.verticalScroll(scrollV)
 				.padding(10.dp), fontFamily = FontFamily.Monospace
 		)
-		if (isCancelledState.value == false) {
-			Button({
-				doCancelState?.invoke()
-			}) {
-				Text(stringResource(R.string.cancel))
+	}
+}
+
+@OptIn(ExperimentalCoroutinesApi::class)
+@Composable
+fun TerminalWork(logFile: String? = null, action: suspend (TerminalList) -> Unit) {
+	val ctx = LocalContext.current.applicationContext
+	LaunchedEffect(Unit) {
+		val logDispatcher = Dispatchers.IO.limitedParallelism(1)
+		val log = logFile?.let { FileOutputStream(File(ctx.externalCacheDir, it)) }
+		val s = BudgetCallbackList(CoroutineScope(logDispatcher), log)
+		StayAliveConnection(ctx, {
+			withContext(Dispatchers.Default) {
+				try {
+					action(s)
+				} catch (e: TerminalCancelException) {
+					s.add(ctx.getString(R.string.install_canceled))
+				} catch (e: Throwable) {
+					s.add(ctx.getString(R.string.term_failure))
+					s.add(ctx.getString(R.string.dev_details))
+					s.add(Log.getStackTraceString(e))
+				}
+				withContext(logDispatcher) {
+					log?.close()
+				}
 			}
-		}
+		}, s)
 	}
 }

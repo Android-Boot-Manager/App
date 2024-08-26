@@ -14,7 +14,7 @@ class DeviceLogic(private val ctx: Context) {
 	val fileDir = File(rootDir, "files")
 	val cacheDir = File(rootDir, "cache")
 	val toolkitDir = File(toolkit.targetPath, "Toolkit") // will occasionally be pruned by OS, but it's fine
-	val rootTmpDir = File("/data/local/tmp")
+	private val rootTmpDir = File("/data/local/tmp")
 	val abmBootset = File(rootTmpDir, ".abm_bootset")
 	val abmDb = File(abmBootset, "db")
 	val abmEntries = File(abmDb, "entries")

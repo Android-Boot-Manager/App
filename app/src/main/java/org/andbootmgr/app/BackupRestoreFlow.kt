@@ -19,7 +19,6 @@ import androidx.compose.ui.text.style.TextAlign
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFileInputStream
 import org.andbootmgr.app.util.SDUtils
-import org.andbootmgr.app.util.Terminal
 import java.io.File
 import java.io.IOException
 
@@ -118,7 +117,7 @@ private fun SelectDroidBoot(c: CreateBackupDataHolder) {
 
 @Composable
 private fun Flash(c: CreateBackupDataHolder) {
-    Terminal(logFile = "flash_${System.currentTimeMillis()}.txt") { terminal ->
+    WizardTerminalWork(c.vm, logFile = "flash_${System.currentTimeMillis()}.txt") { terminal ->
         c.vm.logic.extractToolkit(terminal)
         terminal.add(c.vm.activity.getString(R.string.term_starting))
         val p = c.meta!!.dumpKernelPartition(c.pi)
@@ -143,13 +142,11 @@ private fun Flash(c: CreateBackupDataHolder) {
             ).to(terminal).exec()
             if (!result2.isSuccess) {
                 terminal.add(c.vm.activity.getString(R.string.term_failure))
-                return@Terminal
+                return@WizardTerminalWork
             }
         } else {
             throw IOException(c.vm.activity.getString(R.string.term_invalid_action))
         }
         terminal.add(c.vm.activity.getString(R.string.term_success))
-        c.vm.nextText = c.vm.activity.getString(R.string.finish)
-        c.vm.onNext = { it.finish() }
     }
 }

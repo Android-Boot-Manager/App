@@ -13,11 +13,10 @@ import com.topjohnwu.superuser.io.SuFile
 import com.topjohnwu.superuser.io.SuFileInputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.andbootmgr.app.util.Terminal
 import java.io.File
 import java.io.IOException
 
-class FixDroidBootFlow(): WizardFlow() {
+class FixDroidBootFlow: WizardFlow() {
 	override fun get(vm: WizardState): List<IWizardPage> {
 		return listOf(WizardPage("start",
 			NavButton(vm.activity.getString(R.string.cancel)) { it.finish() },
@@ -58,7 +57,7 @@ private fun Start(vm: WizardState) {
 
 @Composable
 private fun Flash(vm: WizardState) {
-	Terminal(logFile = "blfix_${System.currentTimeMillis()}.txt") { terminal ->
+	WizardTerminalWork(vm, logFile = "blfix_${System.currentTimeMillis()}.txt") { terminal ->
 		vm.logic.extractToolkit(terminal)
 		vm.downloadRemainingFiles(terminal)
 		val tmpFile = if (vm.deviceInfo.postInstallScript) {
@@ -78,7 +77,7 @@ private fun Flash(vm: WizardState) {
 			terminal.add(vm.activity.getString(R.string.term_bl_failed))
 			terminal.add(e.message ?: "(null)")
 			terminal.add(vm.activity.getString(R.string.term_consult_doc))
-			return@Terminal
+			return@WizardTerminalWork
 		}
 		if (vm.deviceInfo.postInstallScript) {
 			terminal.add(vm.activity.getString(R.string.term_device_setup))
@@ -89,11 +88,5 @@ private fun Flash(vm: WizardState) {
 			tmpFile.delete()
 		}
 		terminal.add(vm.activity.getString(R.string.term_success))
-		withContext(Dispatchers.Main) {
-			vm.nextText = vm.activity.getString(R.string.finish)
-			vm.onNext = {
-				it.finish()
-			}
-		}
 	}
 }

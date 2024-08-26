@@ -10,36 +10,33 @@ import android.os.IBinder
 import android.os.PowerManager
 import android.os.PowerManager.WakeLock
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.LifecycleOwner
+import androidx.core.util.Supplier
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.andbootmgr.app.R
 
-interface IStayAlive {
-	fun startWork(work: suspend (Context) -> Unit, extra: Any)
-	val workExtra: Any
-}
-
-class StayAliveService : LifecycleService(), IStayAlive {
+class StayAliveService : LifecycleService() {
+	companion object {
+		private const val TAG = "ABM_StayAlive"
+		private const val SERVICE_CHANNEL = "service"
+		private const val FG_SERVICE_ID = 1001
+		var instance by mutableStateOf<StayAliveService?>(null)
+			private set
+	}
 	private lateinit var wakeLock: WakeLock
 	private var work: (suspend (Context) -> Unit)? = null
-	var isWorkDone = false
-		get() {
-			if (destroyed) {
-				throw IllegalStateException("This StayAliveService was leaked. It is already destroyed.")
-			}
-			return field
-		}
+	var isWorkDone by mutableStateOf(false)
+		private set
 	private var extra: Any? = null
-	override val workExtra: Any
+	val workExtra: Any
 		get() {
 			if (destroyed) {
 				throw IllegalStateException("This StayAliveService was leaked. It is already destroyed.")
@@ -52,7 +49,7 @@ class StayAliveService : LifecycleService(), IStayAlive {
 	private var destroyed = false
 	private var onDone: (() -> Unit)? = null
 	@SuppressLint("WakelockTimeout")
-	override fun startWork(work: suspend (Context) -> Unit, extra: Any) {
+	fun startWork(work: suspend (Context) -> Unit, extra: Any) {
 		if (destroyed) {
 			throw IllegalStateException("This StayAliveService was leaked. It is already destroyed.")
 		}
@@ -63,6 +60,10 @@ class StayAliveService : LifecycleService(), IStayAlive {
 		startService(Intent(this, this::class.java))
 		this.work = work
 		this.extra = extra
+		if (instance != null) {
+			throw IllegalStateException("expected instance to be null for non-running service")
+		}
+		instance = this
 		lifecycleScope.launch {
 			wakeLock.acquire()
 			try {
@@ -76,24 +77,9 @@ class StayAliveService : LifecycleService(), IStayAlive {
 			}
 		}
 	}
-	fun finish() {
-		if (!isWorkDone) {
-			Log.e(TAG, "Warning: finishing StayAliveService before work is done.")
-		}
-		if (!destroyed) {
-			if (!isRunning) throw IllegalStateException("excepted isRunning to be true for non-destroyed service")
-			isRunning = false
-			destroyed = true
-		}
-		stopSelf()
-	}
 
 	override fun onCreate() {
 		super.onCreate()
-		if (isRunning) {
-			throw IllegalStateException("expected isRunning=false for new service")
-		}
-		isRunning = true
 		NotificationManagerCompat.from(this).createNotificationChannel(
 			NotificationChannelCompat.Builder(SERVICE_CHANNEL,
 				NotificationManagerCompat.IMPORTANCE_HIGH)
@@ -104,14 +90,6 @@ class StayAliveService : LifecycleService(), IStayAlive {
 				.setSound(null, null)
 				.build()
 		)
-		startForeground(FG_SERVICE_ID, NotificationCompat.Builder(this, SERVICE_CHANNEL)
-			.setSmallIcon(R.drawable.abm_notif)
-			.setContentTitle(getString(R.string.abm_processing_title))
-			.setContentText(getString(R.string.abm_processing_text))
-			.setOngoing(true)
-			.setOnlyAlertOnce(true)
-			.setLocalOnly(true)
-			.build())
 		wakeLock = getSystemService(PowerManager::class.java)
 			.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "ABM::StayAlive(user_task)")
 		lifecycleScope.launch {
@@ -125,6 +103,14 @@ class StayAliveService : LifecycleService(), IStayAlive {
 
 	override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 		super.onStartCommand(intent, flags, startId)
+		startForeground(FG_SERVICE_ID, NotificationCompat.Builder(this, SERVICE_CHANNEL)
+			.setSmallIcon(R.drawable.abm_notif)
+			.setContentTitle(getString(R.string.abm_processing_title))
+			.setContentText(getString(R.string.abm_processing_text))
+			.setOngoing(true)
+			.setOnlyAlertOnce(true)
+			.setLocalOnly(true)
+			.build())
 		return START_NOT_STICKY
 	}
 
@@ -133,94 +119,49 @@ class StayAliveService : LifecycleService(), IStayAlive {
 		if (work != null) {
 			throw IllegalStateException("Work was already set on this StayAliveService.")
 		}
-		return object : Binder(), Provider {
-			override var service = this@StayAliveService
-			override var onDone
-				get() = this@StayAliveService.onDone
-				set(value) { this@StayAliveService.onDone = value }
-			override val isWorkDone: Boolean
-				get() = this@StayAliveService.isWorkDone
-			override fun finish() {
-				this@StayAliveService.finish()
+		return object : Binder(), Supplier<StayAliveService> {
+			override fun get(): StayAliveService {
+				return this@StayAliveService
 			}
 		}
 	}
 
 	override fun onDestroy() {
 		Log.i(TAG, "Goodbye!")
+		if (!isWorkDone)
+			throw IllegalStateException("work isn't done but destroying?")
 		super.onDestroy()
 		if (!destroyed) {
-			if (!isRunning) throw IllegalStateException("excepted isRunning to be true for non-destroyed service")
-			isRunning = false
+			if (instance != this)
+				throw IllegalStateException("excepted instance to be this for non-destroyed service")
+			instance = null
 			destroyed = true
 		}
 	}
-
-	companion object {
-		private const val TAG = "ABM_StayAlive"
-		private const val SERVICE_CHANNEL = "service"
-		private const val FG_SERVICE_ID = 1001
-		var isRunning = false
-			private set
-	}
-}
-
-private interface Provider {
-	val service: IStayAlive
-	var onDone: (() -> Unit)?
-	val isWorkDone: Boolean
-	fun finish()
 }
 
 class StayAliveConnection(inContext: Context,
-                          lifecycleOwner: LifecycleOwner,
-                          private val doWhenDone: (() -> Unit)?,
-                          private val onConnected: (IStayAlive) -> Unit)
-	: ServiceConnection, DefaultLifecycleObserver {
-	companion object {
-		@SuppressLint("StaticFieldLeak") // application context
-		private var currentConn: StayAliveConnection? = null
-	}
+                          private val work: suspend (Context) -> Unit,
+                          private val extra: Any)
+	: ServiceConnection {
 	private val context = inContext.applicationContext
-	private var provider: Provider? = null
 
 	init {
-		if (currentConn != null) {
-			throw IllegalStateException("There should only be one StayAliveConnection at a time.")
-		}
-		currentConn = this
 		context.bindService(
 			Intent(context, StayAliveService::class.java),
 			this,
 			Context.BIND_IMPORTANT or Context.BIND_AUTO_CREATE
 		)
-		lifecycleOwner.lifecycle.addObserver(this)
 	}
 
 	override fun onServiceConnected(name: ComponentName?, inService: IBinder?) {
-		val provider = inService as Provider
-		this.provider = provider
-		val service = provider.service
-		val onDone = {
-			onServiceDisconnected(null)
-			provider.finish()
-			doWhenDone?.invoke(); Unit
-		}
-		onConnected(service)
-		if (provider.isWorkDone) {
-			onDone()
-		} else {
-			provider.onDone = onDone
-		}
+		val provider = inService as Supplier<*>
+		val service = provider.get() as StayAliveService
+		service.startWork(work, extra)
+		context.unbindService(this)
 	}
 
 	override fun onServiceDisconnected(name: ComponentName?) {
-		context.unbindService(this)
-		provider?.onDone = null
-		currentConn = null
-	}
-
-	override fun onDestroy(owner: LifecycleOwner) {
-		onServiceDisconnected(null)
+		// do nothing
 	}
 }

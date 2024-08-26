@@ -52,7 +52,6 @@ import org.andbootmgr.app.CreatePartDataHolder.Part
 import org.andbootmgr.app.util.ConfigFile
 import org.andbootmgr.app.util.SDUtils
 import org.andbootmgr.app.util.SOUtils
-import org.andbootmgr.app.util.Terminal
 import org.json.JSONObject
 import org.json.JSONTokener
 import java.io.File
@@ -652,7 +651,7 @@ private fun Os(c: CreatePartDataHolder) {
 @Composable
 private fun Flash(c: CreatePartDataHolder) {
 	val vm = c.vm
-	Terminal(logFile = "install_${System.currentTimeMillis()}.txt") { terminal ->
+	WizardTerminalWork(vm, logFile = "install_${System.currentTimeMillis()}.txt") { terminal ->
 		c.vm.logic.extractToolkit(terminal)
 		c.vm.downloadRemainingFiles(terminal)
 		if (c.partitionName == null) { // OS install
@@ -695,7 +694,7 @@ private fun Flash(c: CreatePartDataHolder) {
 					terminal.add(vm.activity.getString(R.string.term_created_part))
 				} else {
 					terminal.add(vm.activity.getString(R.string.term_failure))
-					return@Terminal
+					return@WizardTerminalWork
 				}
 			}
 			terminal.add(vm.activity.getString(R.string.term_created_pt))
@@ -703,7 +702,7 @@ private fun Flash(c: CreatePartDataHolder) {
 			val meta = SDUtils.generateMeta(vm.deviceInfo)
 			if (meta == null) {
 				terminal.add(vm.activity.getString(R.string.term_cant_get_meta))
-				return@Terminal
+				return@WizardTerminalWork
 			}
 			terminal.add(vm.activity.getString(R.string.term_building_cfg))
 
@@ -722,7 +721,7 @@ private fun Flash(c: CreatePartDataHolder) {
 			entry.exportToFile(File(vm.logic.abmEntries, "$fn.conf"))
 			if (!SuFile.open(File(vm.logic.abmBootset, fn).toURI()).mkdir()) {
 				terminal.add(vm.activity.getString(R.string.term_mkdir_failed))
-				return@Terminal
+				return@WizardTerminalWork
 			}
 
 			terminal.add(vm.activity.getString(R.string.term_flashing_imgs))
@@ -741,7 +740,7 @@ private fun Flash(c: CreatePartDataHolder) {
 					f.delete()
 					if (!result2.isSuccess) {
 						terminal.add(vm.activity.getString(R.string.term_failure))
-						return@Terminal
+						return@WizardTerminalWork
 					}
 				} else {
 					c.vm.copyPriv(f.openInputStream(c.vm), tp)
@@ -760,12 +759,10 @@ private fun Flash(c: CreatePartDataHolder) {
 			val result = vm.logic.runShFileWithArgs(cmd).to(terminal).exec()
 			if (!result.isSuccess) {
 				terminal.add(vm.activity.getString(R.string.term_failure))
-				return@Terminal
+				return@WizardTerminalWork
 			}
 
 			terminal.add(vm.activity.getString(R.string.term_success))
-			vm.nextText = vm.activity.getString(R.string.finish)
-			vm.onNext = { it.finish() }
 		} else { // Portable partition
 			terminal.add(vm.activity.getString(R.string.term_create_part))
 			vm.logic.unmountBootset()
@@ -779,8 +776,6 @@ private fun Flash(c: CreatePartDataHolder) {
 				terminal.add(vm.activity.getString(R.string.term_reboot_asap))
 			}
 			if (r.isSuccess) {
-				vm.nextText = c.vm.activity.getString(R.string.finish)
-				vm.onNext = { it.finish() }
 				terminal.add(vm.activity.getString(R.string.term_success))
 			} else {
 				terminal.add(vm.activity.getString(R.string.term_failure))
