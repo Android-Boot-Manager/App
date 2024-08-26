@@ -59,7 +59,15 @@ abstract class MetaOnSdDeviceInfo : DeviceInfo {
 		return !SuFile.open(logic.abmDb, "db.conf").exists()
 	}
 	override fun getAbmSettings(logic: DeviceLogic): String? {
-		return logic.dmPath.absolutePath
+		if (SuFile.open(bdev).exists())
+			SDUtils.generateMeta(this)?.let { meta ->
+				if (meta.p.isNotEmpty()) {
+					val part = meta.dumpKernelPartition(1)
+					if (part.type == SDUtils.PartitionType.RESERVED)
+						return part.path
+				}
+			}
+		return null
 	}
 }
 
@@ -72,15 +80,7 @@ abstract class SdLessDeviceInfo : DeviceInfo {
 		return !SuFile.open(logic.abmDb, "db.conf").exists()
 	}
 	override fun getAbmSettings(logic: DeviceLogic): String? {
-		if (SuFile.open(bdev).exists())
-			SDUtils.generateMeta(this)?.let { meta ->
-				if (meta.p.isNotEmpty()) {
-					val part = meta.dumpKernelPartition(1)
-					if (part.type == SDUtils.PartitionType.RESERVED)
-						return part.path
-				}
-			}
-		return null
+		return logic.dmPath.absolutePath
 	}
 }
 
