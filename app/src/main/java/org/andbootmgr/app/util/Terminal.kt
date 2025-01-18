@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import com.topjohnwu.superuser.io.SuFile
 import com.topjohnwu.superuser.io.SuFileOutputStream
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -175,7 +176,7 @@ fun TerminalWork(logFile: String? = null, action: suspend (TerminalList) -> Unit
 		val logDispatcher = Dispatchers.IO.limitedParallelism(1)
 		val log = logFile?.let {
 			val logDir = ctx.externalCacheDirs.firstOrNull() ?: run {
-				File(Environment.getExternalStorageDirectory(), "AbmLogs").also { it.mkdir() }
+				SuFile.open(Environment.getExternalStorageDirectory(), "AbmLogs").also { it.mkdir() }
 			}
 			SuFileOutputStream.open(File(logDir, it))
 		}
