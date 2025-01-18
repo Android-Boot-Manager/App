@@ -1,7 +1,6 @@
 package org.andbootmgr.app
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -204,14 +203,7 @@ private fun PartTool(vm: MainActivityState) {
 	LaunchedEffect(Unit) {
 		withContext(Dispatchers.IO) {
 			val outList = mutableStateMapOf<ConfigFile, File>()
-			val list = SuFile.open(vm.logic!!.abmEntries.absolutePath).listFiles()
-			for (i in list!!) {
-				try {
-					outList[ConfigFile.importFromFile(i)] = i
-				} catch (e: ActionAbortedCleanlyError) {
-					Log.e("ABM", Log.getStackTraceString(e))
-				}
-			}
+			outList.putAll(ConfigFile.importFromFolder(vm.logic!!.abmEntries))
 			entries = outList
 		}
 	}
@@ -320,12 +312,11 @@ private fun PartTool(vm: MainActivityState) {
 					)
 				}
 			}
-			val e = ConfigFile()
 			Row(horizontalArrangement = Arrangement.SpaceEvenly,
 				verticalAlignment = Alignment.CenterVertically,
 				modifier = Modifier
 					.fillMaxWidth()
-					.clickable { editEntryID = e }) {
+					.clickable { editEntryID = ConfigFile() }) {
 				Text(stringResource(R.string.new_entry))
 			}
 		}
@@ -352,7 +343,7 @@ private fun PartTool(vm: MainActivityState) {
 				}
 			)
 		} else if (editEntryID != null) {
-			OsEditor(vm, editEntryID!!, entries!![editEntryID!!]!!, onClose = {
+			OsEditor(vm, parts, editEntryID!!, entries!![editEntryID!!]!!, onClose = {
 				if (it) {
 					entries!!.remove(editEntryID!!.also { editEntryID = null })
 					// TODO don't call generateMeta on main thread
@@ -368,7 +359,7 @@ private fun PartTool(vm: MainActivityState) {
 }
 
 @Composable
-private fun OsEditor(vm: MainActivityState, e: ConfigFile, f: File,
+private fun OsEditor(vm: MainActivityState, parts: SDUtils.SDPartitionMeta?, e: ConfigFile, f: File,
                      onClose: (newPt: Boolean) -> Unit, onOpenUpdater: () -> Unit) {
 	var processing by remember { mutableStateOf(false) }
 	var delete by remember { mutableStateOf(false) }
@@ -389,6 +380,8 @@ private fun OsEditor(vm: MainActivityState, e: ConfigFile, f: File,
 					enabled = e.has("xupdate") && !e["xupdate"].isNullOrBlank()) {
 					Text(stringResource(R.string.update))
 				}
+				// TODO add button to open backup & restore tool (by asking which partition should
+				//  be backed up / restored)
 				Button(
 					onClick = {
 						delete = true
@@ -429,8 +422,8 @@ private fun OsEditor(vm: MainActivityState, e: ConfigFile, f: File,
 					delete = false
 					CoroutineScope(Dispatchers.Default).launch {
 						var tresult = ""
-						if (e.has("xpart") && !e["xpart"].isNullOrBlank()) {
-							var parts = SDUtils.generateMeta(vm.deviceInfo!!)
+						if (e.has("xpart") && !e["xpart"].isNullOrBlank() && vm.deviceInfo!!.metaonsd) {
+							var parts = parts
 							val allp = e["xpart"]!!.split(":")
 								.map { parts!!.dumpKernelPartition(Integer.valueOf(it)) }
 							vm.unmountBootset()
@@ -441,6 +434,10 @@ private fun OsEditor(vm: MainActivityState, e: ConfigFile, f: File,
 								tresult += r.out.joinToString("\n") + r.err.joinToString("\n") + "\n"
 							}
 							vm.mountBootset()
+						} else if (!vm.deviceInfo!!.metaonsd) {
+							val f3 = SuFile(vm.logic!!.abmSdLessBootset, f.nameWithoutExtension)
+							if (!f3.deleteRecursive())
+								tresult += vm.activity!!.getString(R.string.cannot_delete, f3.absolutePath)
 						}
 						val f2 = SuFile(vm.logic!!.abmBootset, f.nameWithoutExtension)
 						if (!f2.deleteRecursive())
@@ -577,7 +574,7 @@ private fun PartitionEditor(vm: MainActivityState, p: SDUtils.Partition, simplif
 						}
 					}
 					Button(onClick = {
-						vm.currentWizardFlow = BackupRestoreFlow(p.id, null) // TODO !metaonsd
+						vm.currentWizardFlow = BackupRestoreFlow(p.id, null)
 					}) {
 						Text(stringResource(R.string.backupnrestore))
 					}
@@ -852,5 +849,104 @@ private fun EntryEditor(vm: MainActivityState, e: ConfigFile, f: File?, onClose:
 
 @Composable
 private fun BootsetTool(vm: MainActivityState) {
-	Text("insert code here") // TODO !metaonsd
+	var filterEntryView by remember { mutableStateOf(false) }
+	if (!vm.noobMode)
+		MyFilterChipBar(
+			if (filterEntryView) 1 else 0,
+			listOf(
+				stringResource(R.string.unified),
+				stringResource(R.string.entries)
+			)
+		) { filterEntryView = it == 1 }
+
+	@SuppressLint("MutableCollectionMutableState") // lol
+	var entries by remember { mutableStateOf<SnapshotStateMap<ConfigFile, File>?>(null) }
+	LaunchedEffect(Unit) {
+		withContext(Dispatchers.IO) {
+			val outList = mutableStateMapOf<ConfigFile, File>()
+			outList.putAll(ConfigFile.importFromFolder(vm.logic!!.abmEntries))
+			entries = outList
+		}
+	}
+	var editEntryID by remember { mutableStateOf<ConfigFile?>(null) }
+	Column(
+		Modifier
+			.verticalScroll(rememberScrollState())
+			.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
+	) {
+		if (vm.noobMode)
+			MyInfoCard(stringResource(R.string.click2inspect), padding = 5.dp)
+		if (entries != null) {
+			for (e in entries!!.keys) {
+				val spaceUsage = null // TODO compute space usage of installed OS
+				Row(horizontalArrangement = Arrangement.SpaceEvenly,
+					verticalAlignment = Alignment.CenterVertically,
+					modifier = Modifier
+						.fillMaxWidth()
+						.clickable { editEntryID = e }) {
+					/* format:
+					entry["title"] = str
+					entry["linux"] = path(str)
+					entry["initrd"] = path(str)
+					entry["dtb"] = path(str)
+					entry["options"] = str
+					entry["xtype"] = str
+					entry["xpart"] = array (str.split(":"))
+					entry["xupdate"] = uri(str)
+					 */
+					Text(
+						(if (e.has("title")) {
+							stringResource(R.string.entry_title, e["title"]!!)
+						} else {
+							stringResource(R.string.invalid_entry)
+						}).let {
+							if (spaceUsage != null)
+								stringResource(R.string.entry_space_usage, spaceUsage, it)
+							else it
+						}
+					)
+				}
+			}
+			if (filterEntryView) {
+				Row(horizontalArrangement = Arrangement.SpaceEvenly,
+					verticalAlignment = Alignment.CenterVertically,
+					modifier = Modifier
+						.fillMaxWidth()
+						.clickable { editEntryID = ConfigFile() }) {
+					Text(stringResource(R.string.new_entry))
+				}
+			} else {
+				Row(horizontalArrangement = Arrangement.SpaceEvenly,
+					verticalAlignment = Alignment.CenterVertically,
+					modifier = Modifier
+						.fillMaxWidth()
+						.clickable { vm.currentWizardFlow = CreatePartFlow(null) }) {
+					Text(stringResource(R.string.install_os))
+				}
+			}
+		}
+		// TODO we eventually want portable partitions for !metaonsd, but not supported yet
+		if (editEntryID != null && filterEntryView) {
+			EntryEditor(
+				vm, editEntryID!!, entries!![editEntryID!!],
+				onClose = { editEntryID = null },
+				onDeleted = {
+					entries!!.remove(editEntryID!!.also { editEntryID = null })
+				},
+				onEdited = {
+					entries!![editEntryID!!.also { editEntryID = null }] = it
+				}
+			)
+		} else if (editEntryID != null) {
+			OsEditor(vm, null, editEntryID!!, entries!![editEntryID!!]!!, onClose = {
+				if (it) {
+					entries!!.remove(editEntryID!!.also { editEntryID = null })
+				} else
+					editEntryID = null
+			}, onOpenUpdater = {
+				vm.currentWizardFlow = UpdateFlow(entries!![editEntryID!!]!!.name)
+				editEntryID = null
+			})
+		}
+	}
 }

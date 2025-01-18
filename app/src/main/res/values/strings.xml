@@ -131,6 +131,7 @@
 	<string name="invalid_entry2">Invalid entry</string>
 	<string name="entry_title">Entry \"%s\"</string>
 	<string name="free_space_item">Free space (%s)</string>
+	<string name="entry_space_usage">%s (%s)</string>
 	<string name="part_item">Partition %d \"%s\"</string>
 	<string name="new_entry">(Create new entry)</string>
 	<string name="new_entry2">New entry</string>

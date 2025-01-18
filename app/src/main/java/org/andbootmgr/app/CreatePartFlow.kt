@@ -59,7 +59,7 @@ import java.io.FileNotFoundException
 import java.math.BigDecimal
 import java.net.URL
 
-class CreatePartFlow(private val desiredStartSector: Long): WizardFlow() {
+class CreatePartFlow(private val desiredStartSector: Long?): WizardFlow() {
 	override fun get(vm: WizardState): List<IWizardPage> {
 		val c = CreatePartDataHolder(vm, desiredStartSector)
 		return listOf(WizardPage("start",
@@ -91,7 +91,7 @@ class CreatePartFlow(private val desiredStartSector: Long): WizardFlow() {
 	}
 }
 
-private class CreatePartDataHolder(val vm: WizardState, val desiredStartSector: Long) {
+private class CreatePartDataHolder(val vm: WizardState, val desiredStartSector: Long?) {
 	var meta by mutableStateOf<SDUtils.SDPartitionMeta?>(null)
 	lateinit var p: SDUtils.Partition.FreeSpace
 	var startSectorRelative = 0L

@@ -1,10 +1,14 @@
 package org.andbootmgr.app.util
 
+import android.util.Log
+import androidx.compose.runtime.mutableStateMapOf
+import com.topjohnwu.superuser.io.SuFile
 import com.topjohnwu.superuser.io.SuFileInputStream
 import com.topjohnwu.superuser.io.SuFileOutputStream
 import org.andbootmgr.app.ActionAbortedCleanlyError
 import org.andbootmgr.app.ActionAbortedError
 import java.io.*
+import kotlin.collections.set
 
 
 class ConfigFile(private val data: MutableMap<String, String> = HashMap()) {
@@ -76,6 +80,18 @@ class ConfigFile(private val data: MutableMap<String, String> = HashMap()) {
 				}
 			}
 			return importFromString(s.toString())
+		}
+
+		fun importFromFolder(f: File): Map<ConfigFile, File> {
+			val out = hashMapOf<ConfigFile, File>()
+			for (i in SuFile.open(f.absolutePath).listFiles()!!) {
+				try {
+					out[importFromFile(i)] = i
+				} catch (e: ActionAbortedCleanlyError) {
+					Log.e("ABM", Log.getStackTraceString(e))
+				}
+			}
+			return out
 		}
 	}
 }
