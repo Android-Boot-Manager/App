@@ -21,6 +21,7 @@ interface DeviceInfo {
 	val codename: String
 	val blBlock: String
 	val metaonsd: Boolean
+	val realEntryHasKernel: Boolean
 	/* Environment variables:
 	 * - BOOTED=true SETUP=false BL_BACKUP=<unset> for droidboot update
 	 * - BOOTED=false SETUP=false BL_BACKUP=<path> for droidboot fix
@@ -99,14 +100,16 @@ class JsonMetaOnSdDeviceInfo(
 	override val bdev: String,
 	override val pbdev: String,
 	override val postInstallScript: Boolean,
-	override val havedtbo: Boolean
+	override val havedtbo: Boolean,
+	override val realEntryHasKernel: Boolean
 ) : MetaOnSdDeviceInfo()
 
 class JsonSdLessDeviceInfo(
 	override val codename: String,
 	override val blBlock: String,
 	override val postInstallScript: Boolean,
-	override val havedtbo: Boolean
+	override val havedtbo: Boolean,
+	override val realEntryHasKernel: Boolean
 ) : SdLessDeviceInfo()
 
 class JsonDeviceInfoFactory(private val ctx: Context) {
@@ -147,14 +150,16 @@ class JsonDeviceInfoFactory(private val ctx: Context) {
 						json.getString("sdBlock"),
 						json.getString("sdBlockP"),
 						json.getBoolean("postInstallScript"),
-						json.getBoolean("haveDtbo")
+						json.getBoolean("haveDtbo"),
+						json.optBoolean("realEntryHasKernel", false)
 					)
 				} else {
 					JsonSdLessDeviceInfo(
 						json.getString("codename"),
 						json.getString("blBlock"),
 						json.getBoolean("postInstallScript"),
-						json.getBoolean("haveDtbo")
+						json.getBoolean("haveDtbo"),
+						json.optBoolean("realEntryHasKernel", false)
 					)
 				}
 			}

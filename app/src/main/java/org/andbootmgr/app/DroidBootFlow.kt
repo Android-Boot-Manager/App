@@ -326,12 +326,21 @@ private fun Flash(d: DroidBootFlowDataHolder) {
 		db.exportToFile(File(vm.logic.abmDb, "db.conf"))
 		val entry = ConfigFile()
 		entry["title"] = d.osName.trim()
-		entry["linux"] = "null"
-		entry["initrd"] = "null"
-		entry["dtb"] = "null"
-		if (vm.deviceInfo.havedtbo)
-			entry["dtbo"] = "null"
-		entry["options"] = "null"
+		if (vm.deviceInfo.realEntryHasKernel) {
+			entry["linux"] = "real/kernel"
+			entry["initrd"] = "real/initrd.cpio.gz"
+			entry["dtb"] = "real/dtb.dtb"
+			if (vm.deviceInfo.havedtbo)
+				entry["dtbo"] = "real/dtbo.dtbo"
+			entry["options"] = "REPLACECMDLINE"
+		} else {
+			entry["linux"] = "null"
+			entry["initrd"] = "null"
+			entry["dtb"] = "null"
+			if (vm.deviceInfo.havedtbo)
+				entry["dtbo"] = "null"
+			entry["options"] = "null"
+		}
 		entry["xtype"] = "droid"
 		entry["xpart"] = "real"
 		entry.exportToFile(File(vm.logic.abmEntries, "real.conf"))
