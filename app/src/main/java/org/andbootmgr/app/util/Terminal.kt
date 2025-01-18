@@ -174,7 +174,7 @@ fun TerminalWork(logFile: String? = null, action: suspend (TerminalList) -> Unit
 	LaunchedEffect(Unit) {
 		val logDispatcher = Dispatchers.IO.limitedParallelism(1)
 		val log = logFile?.let {
-			val logDir = ctx.externalCacheDirs.filterNotNull().firstOrNull() ?: run {
+			val logDir = ctx.externalCacheDirs.firstOrNull() ?: run {
 				File(Environment.getExternalStorageDirectory(), "AbmLogs").also { it.mkdir() }
 			}
 			SuFileOutputStream.open(File(logDir, it))
