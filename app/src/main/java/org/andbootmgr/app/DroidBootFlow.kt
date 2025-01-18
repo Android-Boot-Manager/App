@@ -354,7 +354,8 @@ private fun Flash(d: DroidBootFlowDataHolder) {
 			terminal.add(vm.activity.getString(R.string.term_device_setup))
 			vm.logic.runShFileWithArgs(
 				"BOOTED=${vm.deviceInfo.isBooted(vm.logic)} SETUP=true " +
-						"BL_BACKUP=${vm.logic.lkBackupPrimary.absolutePath} " +
+						(if (vm.deviceInfo.isBooted(vm.logic)) "" else
+						"BL_BACKUP=${vm.logic.lkBackupPrimary.absolutePath} ") +
 						"${tmpFile!!.absolutePath} real"
 			).to(terminal).exec()
 			tmpFile.delete()

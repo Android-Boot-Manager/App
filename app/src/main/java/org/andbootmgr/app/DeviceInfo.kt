@@ -21,6 +21,12 @@ interface DeviceInfo {
 	val codename: String
 	val blBlock: String
 	val metaonsd: Boolean
+	/* Environment variables:
+	 * - BOOTED=true SETUP=false BL_BACKUP=<unset> for droidboot update
+	 * - BOOTED=false SETUP=false BL_BACKUP=<path> for droidboot fix
+	 * - BOOTED=false SETUP=true BL_BACKUP=<path> for droidboot install + sd creation
+	 * - BOOTED=true SETUP=true BL_BACKUP=<unset> for sd creation with already installed droidboot
+	 */
 	val postInstallScript: Boolean
 	val havedtbo: Boolean
 	fun isInstalled(logic: DeviceLogic): Boolean
