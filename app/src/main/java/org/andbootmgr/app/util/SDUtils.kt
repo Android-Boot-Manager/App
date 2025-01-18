@@ -18,7 +18,8 @@ object SDUtils {
 	}
 
 	fun generateMeta(deviceInfo: DeviceInfo): SDPartitionMeta? {
-		if (!deviceInfo.metaonsd) return null
+		if (!deviceInfo.metaonsd)
+			throw IllegalStateException("App bug: generateMeta should _never_ be called on sd-less ports")
 		val meta: SDPartitionMeta
 		val r =
 			Shell.cmd("printf \"mm:%d:%d\\n\" `stat -c '0x%t 0x%T' ${deviceInfo.bdev}` && sgdisk ${deviceInfo.bdev} --print")

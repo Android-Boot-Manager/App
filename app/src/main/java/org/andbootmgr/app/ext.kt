@@ -2,22 +2,25 @@ package org.andbootmgr.app
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.topjohnwu.superuser.io.SuFile
-import com.topjohnwu.superuser.nio.ExtendedFile
 import org.json.JSONObject
-import java.io.File
-import java.io.IOException
-import kotlin.math.abs
 
 open class ActionAbortedError(e: Exception?) : Exception(e)
 class ActionAbortedCleanlyError(e: Exception?) : ActionAbortedError(e)
@@ -31,6 +34,54 @@ fun LoadingCircle(text: String, modifier: Modifier = Modifier, paddingBetween: D
 	) {
 		CircularProgressIndicator(Modifier.padding(end = paddingBetween))
 		Text(text)
+	}
+}
+
+@Composable
+fun MyFilterChipBar(selected: Int, values: List<String>, onSelectionChanged: (Int) -> Unit) {
+	Row {
+		values.forEachIndexed { i, text ->
+			FilterChip(
+				selected = selected == i,
+				onClick = {
+					onSelectionChanged(i)
+				},
+				label = { Text(text) },
+				Modifier.padding(start = 5.dp),
+				leadingIcon = if (selected == i) {
+					{
+						Icon(
+							imageVector = Icons.Filled.Done,
+							contentDescription = stringResource(id = R.string.enabled_content_desc),
+							modifier = Modifier.size(FilterChipDefaults.IconSize)
+						)
+					}
+				} else {
+					null
+				}
+			)
+		}
+	}
+}
+
+@Composable
+fun MyInfoCard(text: String, padding: Dp = 0.dp) {
+	Card(
+		modifier = Modifier
+			.fillMaxWidth()
+			.padding(padding)
+	) {
+		Row(
+			Modifier
+				.fillMaxWidth()
+				.padding(20.dp)
+		) {
+			Icon(
+				painterResource(id = R.drawable.ic_about),
+				stringResource(id = R.string.icon_content_desc)
+			)
+			Text(text)
+		}
 	}
 }
 

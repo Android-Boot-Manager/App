@@ -197,22 +197,8 @@ private fun Start(c: CreatePartDataHolder) {
 			}
 		}
 
-		if (c.vm.mvm.noobMode) {
-			Card(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(10.dp)
-			) {
-				Row(
-					Modifier
-						.fillMaxWidth()
-						.padding(20.dp)
-				) {
-					Icon(painterResource(id = R.drawable.ic_about), "Icon")
-					Text(stringResource(R.string.option_select))
-				}
-			}
-		}
+		if (c.vm.mvm.noobMode)
+			MyInfoCard(stringResource(R.string.option_select), padding = 10.dp)
 
 		Card(modifier = Modifier
 			.fillMaxWidth()
@@ -281,7 +267,7 @@ private fun Shop(c: CreatePartDataHolder) {
 				try {
 					val jsonText = try {
 						ctx.assets.open("abm.json").readBytes().toString(Charsets.UTF_8)
-					} catch (e: FileNotFoundException) {
+					} catch (_: FileNotFoundException) {
 						URL("https://raw.githubusercontent.com/Android-Boot-Manager/ABM-json/master/devices/" + c.vm.codename + ".json").readText()
 					}
 					val jjson = JSONTokener(jsonText).nextValue() as JSONObject
@@ -302,17 +288,7 @@ private fun Shop(c: CreatePartDataHolder) {
 	}
 	if (json != null) {
 		Column {
-			Card {
-				Row(
-					Modifier
-						.fillMaxWidth()
-						.padding(20.dp)
-				) {
-					Icon(painterResource(id = R.drawable.ic_about), stringResource(R.string.icon_content_desc))
-					Text(stringResource(R.string.select_os))
-				}
-			}
-			//Log.i("ABM shop:", "Found: ${json!!.getJSONArray("oses").length()} oses")
+			MyInfoCard(stringResource(R.string.select_os))
 			var i = 0
 			while(i < json!!.getJSONArray("oses").length()) {
 				val index = i
@@ -321,7 +297,6 @@ private fun Shop(c: CreatePartDataHolder) {
 					modifier = Modifier
 						.fillMaxWidth()
 						.clickable {
-							//Log.i("ABM shop:", "Selected OS: $index")
 							c.run {
 								val o = json!!
 									.getJSONArray("oses")
@@ -444,16 +419,7 @@ private fun Os(c: CreatePartDataHolder) {
 				Icon(c.painter!!(), contentDescription = stringResource(R.string.rom_logo_content_desc), modifier = Modifier.size(256.dp))
 				Text(c.dmaMeta["name"]!!)
 				Text(c.dmaMeta["creator"]!!, color = MaterialTheme.colorScheme.onSurfaceVariant)
-				Card {
-					Row(
-						Modifier
-							.fillMaxWidth()
-							.padding(20.dp)
-					) {
-						Icon(painterResource(id = R.drawable.ic_about), "Icon")
-						Text(stringResource(R.string.almost_installed_rom))
-					}
-				}
+				MyInfoCard(stringResource(R.string.almost_installed_rom))
 			}
 		}
 		if (!c.vm.mvm.noobMode)
@@ -625,7 +591,7 @@ private fun Os(c: CreatePartDataHolder) {
 					) }) {
 						Text("+")
 					}
-					Button(onClick = { c.parts.removeLast() }, enabled = (c.parts.size > 1)) {
+					Button(onClick = { c.parts.removeAt(c.parts.lastIndex) }, enabled = (c.parts.size > 1)) {
 						Text("-")
 					}
 					var remaining = c.endSectorRelative - c.startSectorRelative

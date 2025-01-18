@@ -245,16 +245,7 @@ fun BasicButtonRow(prev: String, onPrev: () -> Unit,
 @Composable
 fun WizardDownloader(vm: WizardState, next: String) {
 	Column(Modifier.fillMaxSize()) {
-		Card {
-			Row(
-				Modifier
-					.fillMaxWidth()
-					.padding(20.dp)
-			) {
-				Icon(painterResource(id = R.drawable.ic_about), stringResource(id = R.string.icon_content_desc))
-				Text(stringResource(id = R.string.provide_images))
-			}
-		}
+		MyInfoCard(stringResource(id = R.string.provide_images))
 		for (i in vm.idNeeded) {
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
