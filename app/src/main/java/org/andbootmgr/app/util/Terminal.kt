@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import com.topjohnwu.superuser.io.SuFileOutputStream
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -25,10 +26,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.andbootmgr.app.R
 import java.io.File
-import java.io.FileOutputStream
+import java.io.OutputStream
 
 private class BudgetCallbackList(private val scope: CoroutineScope,
-                                 private val log: FileOutputStream?)
+                                 private val log: OutputStream?)
 	: MutableList<String>, TerminalList {
 	override var isCancelled by mutableStateOf<Boolean?>(null)
 	override var cancel: (() -> Unit)? = null
@@ -171,13 +172,13 @@ fun TerminalWork(logFile: String? = null, action: suspend (TerminalList) -> Unit
 	val ctx = LocalContext.current.applicationContext
 	LaunchedEffect(Unit) {
 		val logDispatcher = Dispatchers.IO.limitedParallelism(1)
-		val log = logFile?.let { FileOutputStream(File(ctx.externalCacheDir, it)) }
+		val log = logFile?.let { SuFileOutputStream.open(File(ctx.externalCacheDir, it)) }
 		val s = BudgetCallbackList(CoroutineScope(logDispatcher), log)
 		StayAliveConnection(ctx, {
 			withContext(Dispatchers.Default) {
 				try {
 					action(s)
-				} catch (e: TerminalCancelException) {
+				} catch (_: TerminalCancelException) {
 					s.add(ctx.getString(R.string.install_canceled))
 				} catch (e: Throwable) {
 					s.add(ctx.getString(R.string.term_failure))

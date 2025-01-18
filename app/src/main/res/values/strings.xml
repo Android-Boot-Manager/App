@@ -55,7 +55,7 @@
 	<string name="connecting_text">(Connecting…)</string>
 	<string name="downloading">Downloading…</string>
 	<string name="downloading_s">Downloading %s…</string>
-	<string name="provide_images">Please now provide images for all required IDs. You can use the recommended ones using the \"Download\" button!</string>
+	<string name="provide_images">If you have already downloaded some files, you can select to use them here. Otherwise, the app will download all files it requires for you when you press \"Install\".</string>
 	<string name="user_selected">User-selected</string>
 	<string name="undo">Undo</string>
 	<string name="download_progress">%s of %s downloaded</string>
