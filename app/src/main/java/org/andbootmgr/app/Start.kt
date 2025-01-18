@@ -72,7 +72,7 @@ fun Start(vm: MainActivityState) {
 		corrupt = remember { vm.deviceInfo!!.isCorrupt(vm.logic!!) }
 		mounted = vm.logic!!.mounted
 		metaOnSd = vm.deviceInfo!!.metaonsd
-		sdPresent = if (metaOnSd) remember { SuFile.open(vm.deviceInfo!!.bdev).exists() } else false
+		sdPresent = if (metaOnSd) remember { SuFile.open(vm.deviceInfo!!.asMetaOnSdDeviceInfo().bdev).exists() } else false
 	} else {
 		installed = false
 		booted = false
@@ -193,7 +193,7 @@ private fun PartTool(vm: MainActivityState) {
 			)
 		) { filter = it }
 
-	var parts by remember { mutableStateOf(SDUtils.generateMeta(vm.deviceInfo!!)) }
+	var parts by remember { mutableStateOf(SDUtils.generateMeta(vm.deviceInfo!!.asMetaOnSdDeviceInfo())) }
 	if (parts == null) {
 		Text(stringResource(R.string.part_wizard_err))
 		return
@@ -325,7 +325,7 @@ private fun PartTool(vm: MainActivityState) {
 				vm, editPartID!!, simplified = filterUnifiedView,
 				onClose = { editPartID = null }, onPtChanged = {
 					// TODO don't call generateMeta on main thread
-					parts = SDUtils.generateMeta(vm.deviceInfo!!)
+					parts = SDUtils.generateMeta(vm.deviceInfo!!.asMetaOnSdDeviceInfo())
 					editPartID = if (it) null else
 						parts?.s!!.findLast { it.id == editPartID!!.id }
 				}
@@ -347,7 +347,7 @@ private fun PartTool(vm: MainActivityState) {
 				if (it) {
 					entries!!.remove(editEntryID!!.also { editEntryID = null })
 					// TODO don't call generateMeta on main thread
-					parts = SDUtils.generateMeta(vm.deviceInfo!!)
+					parts = SDUtils.generateMeta(vm.deviceInfo!!.asMetaOnSdDeviceInfo())
 				} else
 					editEntryID = null
 			}, onOpenUpdater = {
@@ -429,7 +429,7 @@ private fun OsEditor(vm: MainActivityState, parts: SDUtils.SDPartitionMeta?, e: 
 							vm.unmountBootset()
 							for (p in allp) { // Do not chain, but regenerate meta and unmount every time. Thanks vold
 								p.meta = if (parts != null) parts.also { parts = null }
-								else SDUtils.generateMeta(vm.deviceInfo!!)!!
+								else SDUtils.generateMeta(vm.deviceInfo!!.asMetaOnSdDeviceInfo())!!
 								val r = vm.logic!!.delete(p).exec()
 								tresult += r.out.joinToString("\n") + r.err.joinToString("\n") + "\n"
 							}

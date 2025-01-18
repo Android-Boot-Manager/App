@@ -210,7 +210,7 @@ private fun Flash(d: DroidBootFlowDataHolder) {
 		}
 
 		if (vm.deviceInfo.metaonsd) {
-			var meta = SDUtils.generateMeta(vm.deviceInfo)
+			var meta = SDUtils.generateMeta(vm.deviceInfo.asMetaOnSdDeviceInfo())
 			if (meta == null) {
 				terminal.add(vm.activity.getString(R.string.term_cant_get_meta))
 				return@WizardTerminalWork
@@ -218,13 +218,13 @@ private fun Flash(d: DroidBootFlowDataHolder) {
 			if (!Shell.cmd(SDUtils.umsd(meta)).to(terminal).exec().isSuccess) {
 				terminal.add(vm.activity.getString(R.string.term_failed_umount_drive))
 			}
-			if (!Shell.cmd("sgdisk --mbrtogpt --clear ${vm.deviceInfo.bdev}").to(terminal)
+			if (!Shell.cmd("sgdisk --mbrtogpt --clear ${vm.deviceInfo.asMetaOnSdDeviceInfo().bdev}").to(terminal)
 					.exec().isSuccess
 			) {
 				terminal.add(vm.activity.getString(R.string.term_failed_create_pt))
 				return@WizardTerminalWork
 			}
-			meta = SDUtils.generateMeta(vm.deviceInfo)
+			meta = SDUtils.generateMeta(vm.deviceInfo.asMetaOnSdDeviceInfo())
 			if (meta == null) {
 				terminal.add(vm.activity.getString(R.string.term_cant_get_meta))
 				return@WizardTerminalWork

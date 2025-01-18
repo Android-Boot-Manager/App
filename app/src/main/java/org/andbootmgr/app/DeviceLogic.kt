@@ -19,7 +19,7 @@ class DeviceLogic(private val ctx: Context) {
 	val abmSdLessBootset = File("/data/abm")
 	val abmSdLessBootsetImg = File(abmSdLessBootset, "bootset.img")
 	private val metadata = File("/metadata")
-	val metadataMap = File(metadata, "bootset.map")
+	val metadataMap = File(metadata, "abm_settings.map")
 	val dmBase = File("/dev/block/mapper")
 	val dmName = "abmbootset"
 	val dmPath = File(dmBase, dmName)

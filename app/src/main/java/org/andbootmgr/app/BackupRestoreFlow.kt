@@ -54,7 +54,7 @@ private class CreateBackupDataHolder(val vm: WizardState, val pi: Int?, val part
 private fun ChooseAction(c: CreateBackupDataHolder) {
     if (c.vm.deviceInfo.metaonsd) {
         LaunchedEffect(Unit) {
-            c.meta = SDUtils.generateMeta(c.vm.deviceInfo)
+            c.meta = SDUtils.generateMeta(c.vm.deviceInfo.asMetaOnSdDeviceInfo())
         }
     }
 

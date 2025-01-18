@@ -20,14 +20,13 @@ import java.net.URL
 interface DeviceInfo {
 	val codename: String
 	val blBlock: String
-	val bdev: String
-	val pbdev: String
 	val metaonsd: Boolean
 	val postInstallScript: Boolean
 	val havedtbo: Boolean
 	fun isInstalled(logic: DeviceLogic): Boolean
 	@SuppressLint("PrivateApi")
 	fun isBooted(logic: DeviceLogic): Boolean {
+		// TODO migrate all modern BL to one of these three variants
 		try {
 			val c = Class.forName("android.os.SystemProperties")
 			val getBoolean: Method = c.getMethod(
@@ -48,7 +47,11 @@ interface DeviceInfo {
 	fun getAbmSettings(logic: DeviceLogic): String?
 }
 
+fun DeviceInfo.asMetaOnSdDeviceInfo() = this as MetaOnSdDeviceInfo
+
 abstract class MetaOnSdDeviceInfo : DeviceInfo {
+	abstract val bdev: String
+	abstract val pbdev: String
 	override val metaonsd = true
 	override fun isInstalled(logic: DeviceLogic): Boolean {
 		return SuFile.open(bdev).exists() && SDUtils.generateMeta(this)?.let { meta ->
@@ -84,7 +87,7 @@ abstract class SdLessDeviceInfo : DeviceInfo {
 	}
 }
 
-class JsonDeviceInfo(
+class JsonMetaOnSdDeviceInfo(
 	override val codename: String,
 	override val blBlock: String,
 	override val bdev: String,
@@ -92,6 +95,13 @@ class JsonDeviceInfo(
 	override val postInstallScript: Boolean,
 	override val havedtbo: Boolean
 ) : MetaOnSdDeviceInfo()
+
+class JsonSdLessDeviceInfo(
+	override val codename: String,
+	override val blBlock: String,
+	override val postInstallScript: Boolean,
+	override val havedtbo: Boolean
+) : SdLessDeviceInfo()
 
 class JsonDeviceInfoFactory(private val ctx: Context) {
 	suspend fun get(codename: String): DeviceInfo? {
@@ -124,16 +134,23 @@ class JsonDeviceInfoFactory(private val ctx: Context) {
 						File(ctx.filesDir, "abm_dd_cache.json").writeText(newRoot.toString())
 					}
 				}
-				if (!json.getBoolean("metaOnSd"))
-					throw IllegalArgumentException("sd less currently not implemented")
-				JsonDeviceInfo(
-					json.getString("codename"),
-					json.getString("blBlock"),
-					json.getString("sdBlock"),
-					json.getString("sdBlockP"),
-					json.getBoolean("postInstallScript"),
-					json.getBoolean("haveDtbo")
-				)
+				if (json.getBoolean("metaOnSd")) {
+					JsonMetaOnSdDeviceInfo(
+						json.getString("codename"),
+						json.getString("blBlock"),
+						json.getString("sdBlock"),
+						json.getString("sdBlockP"),
+						json.getBoolean("postInstallScript"),
+						json.getBoolean("haveDtbo")
+					)
+				} else {
+					JsonSdLessDeviceInfo(
+						json.getString("codename"),
+						json.getString("blBlock"),
+						json.getBoolean("postInstallScript"),
+						json.getBoolean("haveDtbo")
+					)
+				}
 			}
 		} catch (e: Exception) {
 			Log.e("ABM device info", Log.getStackTraceString(e))

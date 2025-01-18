@@ -47,7 +47,7 @@ class Simulator : AppCompatActivity() {
 				stop()
 			}
 		})
-		f = File(intent.getStringExtra("sdCardBlock")!!)
+		f = File(intent.getStringExtra("sdCardBlock")!!) // TODO support sd-less with "bootsetBlock"
 		val l = LinearLayout(this)
 		v = object : View(this) {
 			private var firstTime = true

@@ -53,6 +53,7 @@ import kotlinx.coroutines.launch
 import org.andbootmgr.app.AppContent
 import org.andbootmgr.app.MainActivityState
 import org.andbootmgr.app.R
+import org.andbootmgr.app.asMetaOnSdDeviceInfo
 import org.andbootmgr.app.util.AbmTheme
 
 /*
@@ -130,7 +131,11 @@ fun Themes(vm: ThemeViewModel) {
 								vm.mvm.activity,
 								Simulator::class.java
 							).apply {
-								putExtra("sdCardBlock", vm.mvm.deviceInfo!!.bdev)
+								if (vm.mvm.deviceInfo!!.metaonsd)
+									putExtra("sdCardBlock",
+										vm.mvm.deviceInfo!!.asMetaOnSdDeviceInfo().bdev)
+								else
+									putExtra("bootsetBlock", vm.mvm.logic!!.abmSdLessBootsetImg)
 							}
 						)
 					}

@@ -137,7 +137,7 @@ private fun Start(c: CreatePartDataHolder) {
 	LaunchedEffect(Unit) {
 		if (c.meta == null) {
 			withContext(Dispatchers.IO) {
-				val meta = SDUtils.generateMeta(c.vm.deviceInfo)!! // TODO !metaonsd
+				val meta = SDUtils.generateMeta(c.vm.deviceInfo.asMetaOnSdDeviceInfo())!! // TODO !metaonsd
 				c.p =
 					meta.s.find { c.desiredStartSector == it.startSector } as SDUtils.Partition.FreeSpace
 				c.meta = meta
@@ -650,7 +650,7 @@ private fun Flash(c: CreatePartDataHolder) {
 					terminal.add(vm.activity.getString(R.string.term_reboot_asap))
 				}
 				createdParts.add(Pair(part, c.meta!!.nid))
-				c.meta = SDUtils.generateMeta(c.vm.deviceInfo)
+				c.meta = SDUtils.generateMeta(c.vm.deviceInfo.asMetaOnSdDeviceInfo())
 				// do not assert there is leftover space if we just created the last partition we want to create
 				if (index < c.parts.size - 1) {
 					c.p =
@@ -665,7 +665,7 @@ private fun Flash(c: CreatePartDataHolder) {
 			}
 			terminal.add(vm.activity.getString(R.string.term_created_pt))
 			vm.logic.mountBootset(vm.deviceInfo)
-			val meta = SDUtils.generateMeta(vm.deviceInfo)
+			val meta = SDUtils.generateMeta(vm.deviceInfo.asMetaOnSdDeviceInfo())
 			if (meta == null) {
 				terminal.add(vm.activity.getString(R.string.term_cant_get_meta))
 				return@WizardTerminalWork

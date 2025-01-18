@@ -2,7 +2,7 @@ package org.andbootmgr.app.util
 
 import android.util.Log
 import com.topjohnwu.superuser.Shell
-import org.andbootmgr.app.DeviceInfo
+import org.andbootmgr.app.MetaOnSdDeviceInfo
 import java.util.*
 import java.util.stream.Collectors
 import kotlin.jvm.optionals.getOrElse
@@ -17,9 +17,7 @@ object SDUtils {
 		return if (e.isEmpty()) "true" else e.substring(0, e.length - 4)
 	}
 
-	fun generateMeta(deviceInfo: DeviceInfo): SDPartitionMeta? {
-		if (!deviceInfo.metaonsd)
-			throw IllegalStateException("App bug: generateMeta should _never_ be called on sd-less ports")
+	fun generateMeta(deviceInfo: MetaOnSdDeviceInfo): SDPartitionMeta? {
 		val meta: SDPartitionMeta
 		val r =
 			Shell.cmd("printf \"mm:%d:%d\\n\" `stat -c '0x%t 0x%T' ${deviceInfo.bdev}` && sgdisk ${deviceInfo.bdev} --print")
