@@ -173,8 +173,12 @@ fun TerminalWork(logFile: String? = null, action: suspend (TerminalList) -> Unit
 	val ctx = LocalContext.current.applicationContext
 	LaunchedEffect(Unit) {
 		val logDispatcher = Dispatchers.IO.limitedParallelism(1)
-		val log = logFile?.let { SuFileOutputStream.open(File(ctx.externalCacheDirs
-			.filterNotNull().firstOrNull() ?: File(Environment.getExternalStorageDirectory(), "AbmLogs"), it)) }
+		val log = logFile?.let {
+			val logDir = ctx.externalCacheDirs.filterNotNull().firstOrNull() ?: run {
+				File(Environment.getExternalStorageDirectory(), "AbmLogs").also { it.mkdir() }
+			}
+			SuFileOutputStream.open(File(logDir, it))
+		}
 		val s = BudgetCallbackList(CoroutineScope(logDispatcher), log)
 		StayAliveConnection(ctx, {
 			withContext(Dispatchers.Default) {
