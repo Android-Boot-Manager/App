@@ -337,11 +337,10 @@ private fun Flash(d: DroidBootFlowDataHolder) {
 		entry.exportToFile(File(vm.logic.abmEntries, "real.conf"))
 		if (!vm.deviceInfo.isBooted(vm.logic)) {
 			terminal.add(vm.activity.getString(R.string.term_flashing_droidboot))
-			val backupLk = File(vm.logic.fileDir, "backup_lk1.img")
 			val f = SuFile.open(vm.deviceInfo.blBlock)
 			if (!f.canWrite())
 				terminal.add(vm.activity.getString(R.string.term_cant_write_bl))
-			vm.copyPriv(SuFileInputStream.open(vm.deviceInfo.blBlock), backupLk)
+			vm.copyPriv(SuFileInputStream.open(vm.deviceInfo.blBlock), vm.logic.lkBackupPrimary)
 			try {
 				vm.copyPriv(vm.chosen["droidboot"]!!.openInputStream(vm), File(vm.deviceInfo.blBlock))
 			} catch (e: IOException) {
@@ -355,6 +354,7 @@ private fun Flash(d: DroidBootFlowDataHolder) {
 			terminal.add(vm.activity.getString(R.string.term_device_setup))
 			vm.logic.runShFileWithArgs(
 				"BOOTED=${vm.deviceInfo.isBooted(vm.logic)} SETUP=true " +
+						"BL_BACKUP=${vm.logic.lkBackupPrimary.absolutePath} " +
 						"${tmpFile!!.absolutePath} real"
 			).to(terminal).exec()
 			tmpFile.delete()

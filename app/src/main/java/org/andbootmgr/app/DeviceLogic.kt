@@ -26,6 +26,8 @@ class DeviceLogic(private val ctx: Context) {
 	val abmDb = File(abmBootset, "db")
 	val abmEntries = File(abmDb, "entries")
 	val abmDbConf = File(abmDb, "db.conf")
+	val lkBackupPrimary = File(fileDir, "backup_lk1.img")
+	val lkBackupSecondary = File(fileDir, "backup_lk.img")
 	var mounted = false
 	fun mountBootset(d: DeviceInfo): Boolean {
 		if (checkMounted()) return true

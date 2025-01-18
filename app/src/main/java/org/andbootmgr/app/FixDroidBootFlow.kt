@@ -68,11 +68,10 @@ private fun Flash(vm: WizardState) {
 			}
 		} else null
 		terminal.add(vm.activity.getString(R.string.term_flashing_droidboot))
-		val backupLk = File(vm.logic.fileDir, "backup_lk.img")
 		val f = SuFile.open(vm.deviceInfo.blBlock)
 		if (!f.canWrite())
 			terminal.add(vm.activity.getString(R.string.term_cant_write_bl))
-		vm.copyPriv(SuFileInputStream.open(vm.deviceInfo.blBlock), backupLk)
+		vm.copyPriv(SuFileInputStream.open(vm.deviceInfo.blBlock), vm.logic.lkBackupSecondary)
 		try {
 			vm.copyPriv(vm.chosen["droidboot"]!!.openInputStream(vm), File(vm.deviceInfo.blBlock))
 		} catch (e: IOException) {
@@ -84,7 +83,8 @@ private fun Flash(vm: WizardState) {
 		if (vm.deviceInfo.postInstallScript) {
 			terminal.add(vm.activity.getString(R.string.term_device_setup))
 			vm.logic.runShFileWithArgs(
-				"BOOTED=${vm.deviceInfo.isBooted(vm.logic)} SETUP=true " +
+				"BOOTED=${vm.deviceInfo.isBooted(vm.logic)} SETUP=false " +
+						"BL_BACKUP=${vm.logic.lkBackupSecondary.absolutePath} " +
 						"${tmpFile!!.absolutePath} real"
 			).to(terminal).exec()
 			tmpFile.delete()
