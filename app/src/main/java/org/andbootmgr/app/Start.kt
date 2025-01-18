@@ -731,6 +731,7 @@ private fun EntryEditor(vm: MainActivityState, e: ConfigFile, f: File?, onClose:
 	var xpartT by remember { mutableStateOf(e["xpart"] ?: "") }
 	val xpartE by remember { derivedStateOf { !xpartT.matches(xpartValidValues) } }
 	var xupdateT by remember { mutableStateOf(e["xupdate"] ?: "") }
+	// TODO dtbo editing if havedtbo
 	val isOk = !(newFileNameErr || titleE || linuxE || initrdE || dtbE || optionsE || xtypeE || xpartE)
 	AlertDialog(
 		onDismissRequest = {
