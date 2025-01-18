@@ -1,5 +1,6 @@
 package org.andbootmgr.app.util
 
+import android.os.Environment
 import android.util.Log
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
@@ -172,7 +173,8 @@ fun TerminalWork(logFile: String? = null, action: suspend (TerminalList) -> Unit
 	val ctx = LocalContext.current.applicationContext
 	LaunchedEffect(Unit) {
 		val logDispatcher = Dispatchers.IO.limitedParallelism(1)
-		val log = logFile?.let { SuFileOutputStream.open(File(ctx.externalCacheDirs.first(), it)) }
+		val log = logFile?.let { SuFileOutputStream.open(File(ctx.externalCacheDirs
+			.filterNotNull().firstOrNull() ?: File(Environment.getExternalStorageDirectory(), "AbmLogs"), it)) }
 		val s = BudgetCallbackList(CoroutineScope(logDispatcher), log)
 		StayAliveConnection(ctx, {
 			withContext(Dispatchers.Default) {
