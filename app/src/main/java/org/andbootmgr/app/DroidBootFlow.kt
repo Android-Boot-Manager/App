@@ -276,9 +276,11 @@ private fun Flash(d: DroidBootFlowDataHolder) {
 				terminal.add(vm.activity.getString(R.string.term_failed_prepare_map))
 				return@WizardTerminalWork
 			}
+
 			if (!SDLessUtils.unmap(vm.logic, vm.logic.dmName, false, terminal)) {
 				terminal.add(vm.activity.getString(R.string.term_failed_unmap))
 				return@WizardTerminalWork
+
 			}
 			if (!vm.logic.mapBootset(terminal)) {
 				terminal.add(vm.activity.getString(R.string.term_failed_map))
