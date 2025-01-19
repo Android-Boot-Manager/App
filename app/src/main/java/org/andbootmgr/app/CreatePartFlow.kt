@@ -273,7 +273,7 @@ private fun StartSdLess(c: CreatePartDataHolder) {
 	if (c.freeSpace == null) {
 		LaunchedEffect(Unit) {
 			withContext(Dispatchers.IO) {
-				c.freeSpace = SDLessUtils.getFreeSpaceBytes()
+				c.freeSpace = SDLessUtils.getFreeSpaceBytes(c.vm.logic)
 			}
 		}
 		LoadingCircle(stringResource(R.string.loading), modifier = Modifier.fillMaxSize())

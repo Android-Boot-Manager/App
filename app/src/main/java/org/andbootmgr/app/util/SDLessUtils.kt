@@ -4,10 +4,12 @@ import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
 import org.andbootmgr.app.DeviceLogic
 import java.io.File
+import kotlin.math.max
 
 object SDLessUtils {
-	fun getFreeSpaceBytes(): Long {
-		return 4L * 1024L * 1024L * 1024L // TODO
+	fun getFreeSpaceBytes(logic: DeviceLogic): Long {
+		val raw = Shell.cmd("stat -f ${logic.abmSdLessBootset} -c '%f:%S'").exec().out.joinToString("\n").split(":").map { it.trim().toLong() }
+		return max(raw[0] * raw[1] - 1024L * 1024L * 1024L, 0)
 	}
 
 	fun getSpaceUsageBytes(logic: DeviceLogic, fn: String): Long? {
