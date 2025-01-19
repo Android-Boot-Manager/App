@@ -42,14 +42,14 @@ object SDLessUtils {
 	fun unmap(logic: DeviceLogic, name: String, force: Boolean, terminal: MutableList<String>? = null): Boolean {
 		val dmPath = File(logic.dmBase, name)
 		if (SuFile.open(dmPath.toURI()).exists())
-			return !Shell.cmd(
+			return Shell.cmd(
 				"dmsetup remove " + (if (force) "-f " else "") +
 						"--retry $name"
 			).let {
 				if (terminal != null)
 					it.to(terminal)
 				else it
-			}.exec().isSuccess || SuFile.open(dmPath.toURI()).exists()
+			}.exec().isSuccess && !SuFile.open(dmPath.toURI()).exists()
 		return true
 	}
 }
