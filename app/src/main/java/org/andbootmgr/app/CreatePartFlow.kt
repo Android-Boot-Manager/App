@@ -459,7 +459,7 @@ private fun Shop(c: CreatePartDataHolder) {
 										throw IllegalStateException("duplicate $id in idNeeded?")
 									parts.add(Part(l.getLong("size"),
 										l.getBoolean("isPercent"),
-										l.getString("type"),
+										l.optString("type", "8305"),
 										id, l.getBoolean("needUnsparse")))
 									if (!idUnneeded.remove(id))
 										vm.idNeeded.add(id)
@@ -606,16 +606,47 @@ private fun Os(c: CreatePartDataHolder) {
 								.fillMaxWidth()
 								.padding(10.dp)
 						) {
-							var sizeInSectors: Long = -1
-							var remaining = c.endSectorRelative - c.startSectorRelative
-							for (iPart in c.parts.slice(0..i)) {
-								sizeInSectors = iPart.resolveSectorSize(c, remaining)
-								remaining -= sizeInSectors
-							}
-							remaining += sizeInSectors
+							if (c.vm.deviceInfo.metaonsd) {
+								var sizeInSectors: Long = -1
+								var remaining = c.endSectorRelative - c.startSectorRelative
+								for (iPart in c.parts.slice(0..i)) {
+									sizeInSectors = iPart.resolveSectorSize(c, remaining)
+									remaining -= sizeInSectors
+								}
+								remaining += sizeInSectors
 
-							val selUnit = stringResource(if (part.isPercent) R.string.percent else R.string.bytes)
-							Text(text = stringResource(R.string.sector_used, part.size, selUnit, sizeInSectors, remaining))
+								val selUnit =
+									stringResource(if (part.isPercent) R.string.percent else R.string.bytes)
+								Text(
+									text = stringResource(
+										R.string.sector_used,
+										part.size,
+										selUnit,
+										sizeInSectors,
+										remaining
+									)
+								)
+							} else {
+								var sizeInBytes: Long = -1
+								var remaining = c.desiredSize
+								for (iPart in c.parts.slice(0..i)) {
+									sizeInBytes = iPart.resolveBytesSize(c, remaining)
+									remaining -= sizeInBytes
+								}
+								remaining += sizeInBytes
+
+								val selUnit =
+									stringResource(if (part.isPercent) R.string.percent else R.string.bytes)
+								Text(
+									text = stringResource(
+										R.string.bytes_used,
+										part.size,
+										selUnit,
+										sizeInBytes,
+										remaining
+									)
+								)
+							}
 							TextField(value = part.size.toString(), onValueChange = {
 								if (it.matches(Regex("\\d+"))) {
 									part.size = it.toLong()
@@ -657,34 +688,38 @@ private fun Os(c: CreatePartDataHolder) {
 									Text(text = stringResource(R.string.percent))
 								}
 							}
-							ExposedDropdownMenuBox(expanded = d, onExpandedChange = { d = it }) {
-								TextField(
-									readOnly = true,
-									value = stringResource(partitionTypeCodes.find { it.first == part.code }!!.second),
-									onValueChange = { },
-									label = { Text(stringResource(R.string.type)) },
-									trailingIcon = {
-										ExposedDropdownMenuDefaults.TrailingIcon(
-											expanded = d
-										)
-									},
-									colors = ExposedDropdownMenuDefaults.textFieldColors()
-								)
-								ExposedDropdownMenu(
+							if (c.vm.deviceInfo.metaonsd) {
+								ExposedDropdownMenuBox(
 									expanded = d,
-									onDismissRequest = {
-										d = false
-									}
-								) {
-									for (g in partitionTypeCodes) {
-										DropdownMenuItem(
-											onClick = {
-												part.code = g.first
-												d = false
-											}, text = {
-												Text(text = stringResource(g.second))
-											}
-										)
+									onExpandedChange = { d = it }) {
+									TextField(
+										readOnly = true,
+										value = stringResource(partitionTypeCodes.find { it.first == part.code }!!.second),
+										onValueChange = { },
+										label = { Text(stringResource(R.string.type)) },
+										trailingIcon = {
+											ExposedDropdownMenuDefaults.TrailingIcon(
+												expanded = d
+											)
+										},
+										colors = ExposedDropdownMenuDefaults.textFieldColors()
+									)
+									ExposedDropdownMenu(
+										expanded = d,
+										onDismissRequest = {
+											d = false
+										}
+									) {
+										for (g in partitionTypeCodes) {
+											DropdownMenuItem(
+												onClick = {
+													part.code = g.first
+													d = false
+												}, text = {
+													Text(text = stringResource(g.second))
+												}
+											)
+										}
 									}
 								}
 							}

@@ -47,6 +47,7 @@
 	<string name="os_userdata">OS userdata</string>
 	<string name="os_system">OS system data</string>
 	<string name="sector_used">Selected value: %d %s (using %d from %d sectors)</string>
+	<string name="bytes_used">Selected value: %d %s (using %d from %d bytes)</string>
 	<string name="size">Size</string>
 	<string name="type">Type</string>
 	<string name="id">ID</string>
