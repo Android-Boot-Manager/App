@@ -27,6 +27,7 @@ import com.topjohnwu.superuser.io.SuFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.andbootmgr.app.util.ConfigFile
+import org.andbootmgr.app.util.SDLessUtils
 import org.andbootmgr.app.util.SDUtils
 import org.json.JSONObject
 import org.json.JSONTokener
@@ -210,8 +211,9 @@ private fun Flash(u: UpdateFlowDataHolder) {
         u.vm.logic.extractToolkit(terminal)
         u.vm.downloadRemainingFiles(terminal)
         val sp = u.e!!["xpart"]!!.split(":")
-        val meta = SDUtils.generateMeta(u.vm.deviceInfo.asMetaOnSdDeviceInfo())!! // TODO !metaonsd
-        Shell.cmd(SDUtils.umsd(meta)).exec()
+        val meta = if (u.vm.deviceInfo.metaonsd)
+            SDUtils.generateMeta(u.vm.deviceInfo.asMetaOnSdDeviceInfo())!! else null
+        meta?.let { Shell.cmd(SDUtils.umsd(it)).exec() }
         val tmpFile = if (u.vm.idNeeded.contains("_install.sh_")) {
             u.vm.chosen["_install.sh_"]!!.toFile(u.vm).also {
                 it.setExecutable(true)
@@ -221,7 +223,13 @@ private fun Flash(u: UpdateFlowDataHolder) {
             val physicalId = sp[p.toInt()].toInt()
             terminal.add(u.vm.activity.getString(R.string.term_flashing_p, p))
             val f2 = u.vm.chosen["part$p"]!!
-            val tp = File(meta.dumpKernelPartition(physicalId).path)
+            val tp = if (u.vm.deviceInfo.metaonsd)
+                File(meta!!.dumpKernelPartition(physicalId).path)
+            else {
+                if (!u.vm.logic.map(u.ef!!.nameWithoutExtension, physicalId, terminal))
+                    throw IllegalStateException("failed to map $physicalId")
+                u.vm.logic.getDmFile(u.ef!!.nameWithoutExtension, physicalId)
+            }
             if (u.sparse.contains(p.toInt())) {
                 val result2 = Shell.cmd(
                     File(

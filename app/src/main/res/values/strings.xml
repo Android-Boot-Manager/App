@@ -273,4 +273,6 @@
 	<string name="term_failed_bootset_mkfs">-- failed to create file system in bootset</string>
 	<string name="term_failed_unmap">-- failed to unmap bootset.img</string>
 	<string name="install_bl_first">You need to install the bootloader manually first. Please check the ABM wiki for more infos.</string>
+	<string name="dtbo">Dtbo</string>
+	<string name="choose_part_to_backup">Choose partition to backup</string>
 </resources>

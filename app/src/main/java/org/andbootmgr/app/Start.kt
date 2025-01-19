@@ -17,6 +17,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -45,7 +46,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.andbootmgr.app.util.ConfigFile
+import org.andbootmgr.app.util.SDLessUtils
 import org.andbootmgr.app.util.SDUtils
+import org.andbootmgr.app.util.SOUtils
 import java.io.File
 import kotlin.collections.set
 import kotlin.io.nameWithoutExtension
@@ -363,6 +366,7 @@ private fun OsEditor(vm: MainActivityState, parts: SDUtils.SDPartitionMeta?, e: 
                      onClose: (newPt: Boolean) -> Unit, onOpenUpdater: () -> Unit) {
 	var processing by remember { mutableStateOf(false) }
 	var delete by remember { mutableStateOf(false) }
+	var backupAskPart by remember { mutableStateOf(false) }
 	var result by remember { mutableStateOf<Pair<String, (() -> Unit)?>?>(null) }
 	AlertDialog(
 		onDismissRequest = {
@@ -380,8 +384,11 @@ private fun OsEditor(vm: MainActivityState, parts: SDUtils.SDPartitionMeta?, e: 
 					enabled = e.has("xupdate") && !e["xupdate"].isNullOrBlank()) {
 					Text(stringResource(R.string.update))
 				}
-				// TODO add button to open backup & restore tool (by asking which partition should
-				//  be backed up / restored)
+				Button(onClick = {
+					backupAskPart = true
+				}, enabled = e.has("xparts") && !e["xparts"].isNullOrBlank() && e["xparts"] != "real") {
+					Text(stringResource(R.string.backupnrestore))
+				}
 				Button(
 					onClick = {
 						delete = true
@@ -399,6 +406,45 @@ private fun OsEditor(vm: MainActivityState, parts: SDUtils.SDPartitionMeta?, e: 
 			}
 		}
 	)
+
+	if (backupAskPart) {
+		AlertDialog(
+			onDismissRequest = {
+				backupAskPart = false
+			},
+			title = {
+				Text(stringResource(R.string.choose_part_to_backup))
+			},
+			text = {
+				for (i in e["xparts"]!!.split(":")) {
+					val part = parts?.dumpKernelPartition(i.toInt())
+					val file = if (!vm.deviceInfo!!.metaonsd)
+						File(File(vm.logic!!.abmSdLessBootset, f.nameWithoutExtension), i) else null
+					val size = part?.let { it.size * it.meta.logicalSectorSizeBytes }
+						?: SuFile.open(file!!.toURI()).length()
+					ListItem(headlineContent = {
+						Text(stringResource(R.string.entry_space_usage,
+							if (part != null)
+								stringResource(R.string.part_item, i, part.name)
+							else
+								stringResource(R.string.part_title, i),
+							SOUtils.humanReadableByteCountBin(size)
+						))
+					}, modifier = Modifier.clickable {
+						vm.currentWizardFlow = if (file != null)
+							BackupRestoreFlow(null, file)
+						else
+							BackupRestoreFlow(i.toInt(), null)
+					})
+				}
+			},
+			confirmButton = {
+				Button(onClick = { backupAskPart = false }) {
+					Text(stringResource(id = R.string.cancel))
+				}
+			}
+		)
+	}
 
 	if (delete) {
 		AlertDialog(
@@ -724,6 +770,9 @@ private fun EntryEditor(vm: MainActivityState, e: ConfigFile, f: File?, onClose:
 	val initrdE by remember { derivedStateOf { !initrdT.matches(asciiRegex) } }
 	var dtbT by remember { mutableStateOf(e["dtb"] ?: "") }
 	val dtbE by remember { derivedStateOf { !dtbT.matches(asciiRegex) } }
+	var dtboT by remember { mutableStateOf(e["dtbo"] ?: "") }
+	val dtboE by remember { derivedStateOf { if (vm.deviceInfo!!.havedtbo)
+		!dtboT.matches(asciiRegex) else false } }
 	var optionsT by remember { mutableStateOf(e["options"] ?: "") }
 	val optionsE by remember { derivedStateOf { !optionsT.matches(asciiRegex) } }
 	var xtypeT by remember { mutableStateOf(e["xtype"] ?: "") }
@@ -731,8 +780,7 @@ private fun EntryEditor(vm: MainActivityState, e: ConfigFile, f: File?, onClose:
 	var xpartT by remember { mutableStateOf(e["xpart"] ?: "") }
 	val xpartE by remember { derivedStateOf { !xpartT.matches(xpartValidValues) } }
 	var xupdateT by remember { mutableStateOf(e["xupdate"] ?: "") }
-	// TODO dtbo editing if havedtbo
-	val isOk = !(newFileNameErr || titleE || linuxE || initrdE || dtbE || optionsE || xtypeE || xpartE)
+	val isOk = !(newFileNameErr || titleE || linuxE || initrdE || dtbE || dtboE || optionsE || xtypeE || xpartE)
 	AlertDialog(
 		onDismissRequest = {
 			onClose()
@@ -775,6 +823,13 @@ private fun EntryEditor(vm: MainActivityState, e: ConfigFile, f: File?, onClose:
 				}, isError = dtbE, label = {
 					Text(stringResource(R.string.dtb))
 				})
+
+				if (vm.deviceInfo!!.havedtbo)
+					TextField(value = dtbT, onValueChange = {
+						dtbT = it
+					}, isError = dtbE, label = {
+						Text(stringResource(R.string.dtbo))
+					})
 
 				TextField(value = optionsT, onValueChange = {
 					optionsT = it
@@ -828,6 +883,8 @@ private fun EntryEditor(vm: MainActivityState, e: ConfigFile, f: File?, onClose:
 					e["linux"] = linuxT
 					e["initrd"] = initrdT
 					e["dtb"] = dtbT
+					if (vm.deviceInfo!!.havedtbo)
+						e["dtbo"] = dtboT
 					e["options"] = optionsT
 					e["xtype"] = xtypeT
 					e["xpart"] = xpartT
@@ -879,7 +936,8 @@ private fun BootsetTool(vm: MainActivityState) {
 			MyInfoCard(stringResource(R.string.click2inspect), padding = 5.dp)
 		if (entries != null) {
 			for (e in entries!!.keys) {
-				val spaceUsage = null // TODO compute space usage of installed OS
+				val spaceUsage = SDLessUtils.getSpaceUsageBytes(vm.logic!!,
+					entries!![e]!!.nameWithoutExtension)
 				Row(horizontalArrangement = Arrangement.SpaceEvenly,
 					verticalAlignment = Alignment.CenterVertically,
 					modifier = Modifier
@@ -926,7 +984,6 @@ private fun BootsetTool(vm: MainActivityState) {
 				}
 			}
 		}
-		// TODO we eventually want portable partitions for !metaonsd, but not supported yet
 		if (editEntryID != null && filterEntryView) {
 			EntryEditor(
 				vm, editEntryID!!, entries!![editEntryID!!],

@@ -77,11 +77,22 @@ class DeviceLogic(private val ctx: Context) {
 		}
 		return mounted
 	}
-	fun mapBootset(): Boolean {
-		return SDLessUtils.map(this, dmName, metadataMap)
+	fun mapBootset(terminal: MutableList<String>? = null): Boolean {
+		return SDLessUtils.map(this, dmName, metadataMap, terminal)
 	}
 	private fun unmapBootset(): Boolean {
 		return SDLessUtils.unmap(this, dmName, true)
+	}
+	fun getDmName(fn: String, id: Int) = "abm_${fn}_$id"
+	fun getDmFile(fn: String, id: Int) = File(dmBase, getDmName(fn, id))
+	fun map(fn: String, id: Int, terminal: MutableList<String>? = null): Boolean {
+		if (!unmap(fn, id, terminal))
+			throw IllegalStateException("failed to unmap part which shouldn't even exist?")
+		val map = File(File(abmBootset, fn), "$id.map")
+		return SDLessUtils.map(this, getDmName(fn, id), map, terminal)
+	}
+	fun unmap(fn: String, id: Int, terminal: MutableList<String>? = null): Boolean {
+		return SDLessUtils.unmap(this, getDmName(fn, id), false, terminal)
 	}
 	fun mount(p: SDUtils.Partition): Shell.Job {
 		return Shell.cmd(p.mount())

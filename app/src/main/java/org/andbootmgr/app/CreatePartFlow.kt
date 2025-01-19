@@ -812,7 +812,6 @@ private fun Flash(c: CreatePartDataHolder) {
 					val id = i++
 					val img = File(imgFolder, id.toString())
 					val map = File(entryFolder, "$id.map")
-					val mappedName = "abm_${fn}_$id"
 					val bytes = part.resolveBytesSize(c, space)
 					space -= bytes
 					if (space < 0)
@@ -825,14 +824,11 @@ private fun Flash(c: CreatePartDataHolder) {
 						terminal.add(vm.activity.getString(R.string.term_failed_uncrypt))
 						return@WizardTerminalWork
 					}
-					if (!SDLessUtils.unmap(vm.logic, mappedName, false, terminal))
-						throw IllegalStateException("failed to unmap $mappedName which shouldn't even exist?")
-					if (!SDLessUtils.map(vm.logic, mappedName, map, terminal)) {
+					if (!vm.logic.map(fn, id, terminal)) {
 						terminal.add(vm.activity.getString(R.string.term_failed_map_other))
 						return@WizardTerminalWork
 					}
-					val mapped = File(vm.logic.dmBase, mappedName)
-					createdParts.add(part to (i to mapped))
+					createdParts.add(part to (i to vm.logic.getDmFile(fn, id)))
 					terminal.add(vm.activity.getString(R.string.term_created_part))
 				}
 			}

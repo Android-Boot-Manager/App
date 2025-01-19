@@ -22,7 +22,7 @@ import org.andbootmgr.app.util.SDUtils
 import java.io.File
 import java.io.IOException
 
-class BackupRestoreFlow(private val partitionId: Int, private val partFile: File?): WizardFlow() {
+class BackupRestoreFlow(private val partitionId: Int?, private val partFile: File?): WizardFlow() {
     override fun get(vm: WizardState): List<IWizardPage> {
         val c = CreateBackupDataHolder(vm, partitionId, partFile)
         return listOf(WizardPage("start",

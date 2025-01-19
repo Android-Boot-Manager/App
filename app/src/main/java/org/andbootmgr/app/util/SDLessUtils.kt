@@ -10,6 +10,12 @@ object SDLessUtils {
 		return 4L * 1024L * 1024L * 1024L // TODO
 	}
 
+	fun getSpaceUsageBytes(logic: DeviceLogic, fn: String): Long? {
+		return SuFile.open(logic.abmSdLessBootset, fn).listFiles()?.let {
+			it.sumOf { it.length() }
+		}
+	}
+
 	fun map(logic: DeviceLogic, name: String, mapFile: File, terminal: MutableList<String>? = null): Boolean {
 		val dmPath = File(logic.dmBase, name)
 		if (SuFile.open(dmPath.toURI()).exists())
