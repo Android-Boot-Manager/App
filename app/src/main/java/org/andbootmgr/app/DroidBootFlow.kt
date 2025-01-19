@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -34,6 +35,7 @@ import org.andbootmgr.app.util.SDUtils
 import org.json.JSONObject
 import org.json.JSONTokener
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.IOException
 import java.net.URL
 
@@ -93,12 +95,17 @@ private fun Start(vm: WizardState) {
 fun LoadDroidBootJson(vm: WizardState, update: Boolean, content: @Composable () -> Unit) {
 	var loading by remember { mutableStateOf(!vm.deviceInfo.isBooted(vm.logic) || vm.deviceInfo.postInstallScript || update) }
 	var error by remember { mutableStateOf(false) }
+	val ctx = LocalContext.current
 	LaunchedEffect(Unit) {
 		if (!loading) return@LaunchedEffect
 		CoroutineScope(Dispatchers.IO).launch {
 			try {
-				val jsonText =
-					URL("https://raw.githubusercontent.com/Android-Boot-Manager/ABM-json/master/devices/" + vm.codename + ".json").readText()
+				val jsonText = try {
+						ctx.assets.open("abm.json").readBytes().toString(Charsets.UTF_8)
+					} catch (e: FileNotFoundException) {
+						URL("https://raw.githubusercontent.com/Android-Boot-Manager/ABM-json/master/devices/" + vm.codename + ".json").readText()
+					}
+
 				val json = JSONTokener(jsonText).nextValue() as JSONObject
 				if (BuildConfig.VERSION_CODE < json.getInt("minAppVersion"))
 					throw IllegalStateException("please upgrade app")
