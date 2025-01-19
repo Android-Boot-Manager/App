@@ -261,9 +261,8 @@ private fun Flash(d: DroidBootFlowDataHolder) {
 					return@WizardTerminalWork
 				}
 			}
-			val bytes = 4L * 1024L * 1024L * 1024L // 4 GB for now
-			if (!Shell.cmd("fallocate -l $bytes" +
-						vm.logic.abmSdLessBootsetImg.absolutePath).to(terminal).exec().isSuccess) {
+			val kilobytes = 4L * 1024L * 1024L // 4 GB for now
+			if (!Shell.cmd("dd if=/dev/zero bs=1024 count=$kilobytes of=${vm.logic.abmSdLessBootsetImg.absolutePath}").to(terminal).exec().isSuccess) {
 				terminal.add(vm.activity.getString(R.string.term_failed_fallocate))
 				return@WizardTerminalWork
 			}
