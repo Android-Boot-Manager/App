@@ -286,6 +286,7 @@ private fun Flash(d: DroidBootFlowDataHolder) {
 				terminal.add(vm.activity.getString(R.string.term_failed_map))
 				return@WizardTerminalWork
 			}
+
 			if (!Shell.cmd("mkfs.ext4 $ast").to(terminal).exec().isSuccess) {
 				terminal.add(vm.activity.getString(R.string.term_failed_bootset_mkfs))
 				return@WizardTerminalWork
