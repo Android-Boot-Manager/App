@@ -24,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RangeSlider
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -50,6 +51,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.andbootmgr.app.CreatePartDataHolder.Part
 import org.andbootmgr.app.util.ConfigFile
+import org.andbootmgr.app.util.SDLessUtils
 import org.andbootmgr.app.util.SDUtils
 import org.andbootmgr.app.util.SOUtils
 import org.json.JSONObject
@@ -66,7 +68,10 @@ class CreatePartFlow(private val desiredStartSector: Long?): WizardFlow() {
 			NavButton(vm.activity.getString(R.string.cancel)) { it.finish() },
 			NavButton("") {}
 		) {
-			Start(c)
+			if (c.vm.deviceInfo.metaonsd)
+				Start(c)
+			else
+				StartSdLess(c)
 		}, WizardPage("shop",
 			NavButton(vm.activity.getString(R.string.prev)) { it.navigate("start") },
 			NavButton("") {}
@@ -92,10 +97,12 @@ class CreatePartFlow(private val desiredStartSector: Long?): WizardFlow() {
 }
 
 private class CreatePartDataHolder(val vm: WizardState, val desiredStartSector: Long?) {
-	var meta by mutableStateOf<SDUtils.SDPartitionMeta?>(null)
-	lateinit var p: SDUtils.Partition.FreeSpace
-	var startSectorRelative = 0L
-	var endSectorRelative = 0L
+	var meta by mutableStateOf<SDUtils.SDPartitionMeta?>(null) // metaonsd only
+	lateinit var p: SDUtils.Partition.FreeSpace // metaonsd only
+	var freeSpace: Long? = null // !metaonsd only
+	var startSectorRelative = 0L // metaonsd only
+	var endSectorRelative = 0L // metaonsd only
+	var desiredSize = 0L // !metaonsd only
 	var partitionName: String? = null
 
 	var painter: @Composable (() -> Painter)? = null
@@ -108,9 +115,16 @@ private class CreatePartDataHolder(val vm: WizardState, val desiredStartSector: 
 		var code by mutableStateOf(code)
 		var id by mutableStateOf(id)
 		var sparse by mutableStateOf(sparse)
-		fun resolveSectorSize(c: CreatePartDataHolder, remaining: Long): Long {
+		fun resolveSectorSize(c: CreatePartDataHolder, remaining: Long): Long { // metaonsd only
 			return if (!isPercent /*bytes*/) {
 				size / c.meta!!.logicalSectorSizeBytes
+			} else /*percent*/ {
+				(BigDecimal(remaining).multiply(BigDecimal(size).divide(BigDecimal(100)))).toLong()
+			}
+		}
+		fun resolveBytesSize(c: CreatePartDataHolder, remaining: Long): Long { // !metaonsd only
+			return if (!isPercent /*bytes*/) {
+				size
 			} else /*percent*/ {
 				(BigDecimal(remaining).multiply(BigDecimal(size).divide(BigDecimal(100)))).toLong()
 			}
@@ -134,17 +148,15 @@ private class CreatePartDataHolder(val vm: WizardState, val desiredStartSector: 
 
 @Composable
 private fun Start(c: CreatePartDataHolder) {
-	LaunchedEffect(Unit) {
-		if (c.meta == null) {
+	if (c.meta == null) {
+		LaunchedEffect(Unit) {
 			withContext(Dispatchers.IO) {
-				val meta = SDUtils.generateMeta(c.vm.deviceInfo.asMetaOnSdDeviceInfo())!! // TODO !metaonsd
+				val meta = SDUtils.generateMeta(c.vm.deviceInfo.asMetaOnSdDeviceInfo())!!
 				c.p =
 					meta.s.find { c.desiredStartSector == it.startSector } as SDUtils.Partition.FreeSpace
 				c.meta = meta
 			}
 		}
-	}
-	if (c.meta == null) {
 		LoadingCircle(stringResource(R.string.loading), modifier = Modifier.fillMaxSize())
 		return
 	}
@@ -245,6 +257,116 @@ private fun Start(c: CreatePartDataHolder) {
 					Button(enabled = !sectorsInvalid, onClick = {
 						c.startSectorRelative = startSectorRelative.toLong()
 						c.endSectorRelative = endSectorRelative.toLong()
+						c.partitionName = null
+						c.vm.navigate("shop")
+					}) {
+						Text(stringResource(R.string.cont))
+					}
+				}
+			}
+		}
+	}
+}
+
+@Composable
+private fun StartSdLess(c: CreatePartDataHolder) {
+	if (c.freeSpace == null) {
+		LaunchedEffect(Unit) {
+			withContext(Dispatchers.IO) {
+				c.freeSpace = SDLessUtils.getFreeSpaceBytes()
+			}
+		}
+		LoadingCircle(stringResource(R.string.loading), modifier = Modifier.fillMaxSize())
+		return
+	}
+
+	val verticalScrollState = rememberScrollState()
+	var size by remember { mutableStateOf("0") }
+	val sizeInvalid by remember { derivedStateOf { !size.matches(numberRegex) } }
+	//var partitionName by remember { mutableStateOf("") }
+	//val partitionNameInvalid by remember { derivedStateOf { !partitionName.matches(asciiNonEmptyRegex) } }
+	Column(
+		Modifier
+			.fillMaxWidth()
+			.verticalScroll(verticalScrollState)) {
+		Card(modifier = Modifier
+			.fillMaxWidth()
+			.padding(10.dp)) {
+			Column(modifier = Modifier
+				.fillMaxWidth()
+				.padding(10.dp)) {
+				Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(10.dp)) {
+					Icon(painterResource(id = R.drawable.ic_settings), stringResource(R.string.icon_content_desc), Modifier.padding(end = 10.dp))
+					Text(stringResource(R.string.general_settings))
+				}
+				Column(
+					Modifier
+						.fillMaxWidth()
+						.padding(5.dp)) {
+					TextField(modifier = Modifier.fillMaxWidth(), value = size, onValueChange = {
+						size = it
+					}, isError = sizeInvalid, label = {
+						Text(stringResource(R.string.size))
+					})
+					Slider(modifier = Modifier.fillMaxWidth(),
+						value = size.toLongOrNull()?.toFloat() ?: c.freeSpace!!.toFloat(), onValueChange = {
+						size = it.toLong().toString()
+					}, valueRange = 0F..c.freeSpace!!.toFloat())
+
+					Text(stringResource(R.string.approx_size, if (!sizeInvalid)
+						SOUtils.humanReadableByteCountBin(size.toLong()) else stringResource(R.string.invalid_input)))
+					Text(stringResource(R.string.available_space_bytes,
+						SOUtils.humanReadableByteCountBin(c.freeSpace!!), c.freeSpace!!))
+				}
+			}
+		}
+
+		/*if (c.vm.mvm.noobMode) TODO support portable partition for sd-less
+			MyInfoCard(stringResource(R.string.option_select), padding = 10.dp)
+
+		Card(modifier = Modifier
+			.fillMaxWidth()
+			.padding(10.dp)) {
+			Column(modifier = Modifier
+				.fillMaxWidth()
+				.padding(10.dp)) {
+				Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(10.dp)) {
+					Icon(painterResource(id = R.drawable.ic_sd), stringResource(R.string.icon_content_desc), Modifier.padding(end = 10.dp))
+					Text(stringResource(R.string.portable_part))
+				}
+				TextField(value = partitionName, onValueChange = {
+					partitionName = it
+				}, isError = partitionNameInvalid && partitionName.isNotEmpty(), label = {
+					Text(stringResource(R.string.part_name))
+				})
+				Row(horizontalArrangement = Arrangement.End, modifier = Modifier
+					.fillMaxWidth()
+					.padding(5.dp)) {
+					Button(enabled = !(sizeInvalid || partitionNameInvalid), onClick = {
+						c.desiredSize = size.toLong()
+						c.partitionName = partitionName
+						c.vm.navigate("flash")
+					}) {
+						Text(stringResource(id = R.string.create))
+					}
+				}
+			}
+		}*/
+		Card(modifier = Modifier
+			.fillMaxWidth()
+			.padding(10.dp)) {
+			Column(modifier = Modifier
+				.fillMaxWidth()
+				.padding(10.dp)) {
+				Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(10.dp)) {
+					Icon(painterResource(id = R.drawable.ic_droidbooticon), stringResource(R.string.icon_content_desc), Modifier.padding(end = 10.dp))
+					Text(stringResource(R.string.install_os))
+				}
+				Row(horizontalArrangement = Arrangement.End, modifier = Modifier
+					.fillMaxWidth()
+					.padding(5.dp)) {
+					Button(enabled = !sizeInvalid, onClick = {
+						c.desiredSize = size.toLong()
 						c.partitionName = null
 						c.vm.navigate("shop")
 					}) {
@@ -621,55 +743,100 @@ private fun Flash(c: CreatePartDataHolder) {
 		c.vm.logic.extractToolkit(terminal)
 		c.vm.downloadRemainingFiles(terminal)
 		if (c.partitionName == null) { // OS install
-			val createdParts = mutableListOf<Pair<Part, Int>>() // order is important
+			val createdParts = mutableListOf<Pair<Part, Pair<Int, File>>>() // order is important
 			val fn = c.romFolderName
 			terminal.add(vm.activity.getString(R.string.term_f_name, fn))
 			terminal.add(vm.activity.getString(R.string.term_g_name, c.romDisplayName))
 			val tmpFile = c.vm.chosen["_install.sh_"]!!.toFile(vm)
 			tmpFile.setExecutable(true)
+			val entryFolder = File(vm.logic.abmBootset, fn)
+			if (!SuFile.open(entryFolder.toURI()).mkdir()) {
+				terminal.add(vm.activity.getString(R.string.term_mkdir_failed))
+				return@WizardTerminalWork
+			}
 			terminal.add(vm.activity.getString(R.string.term_creating_pt))
 
-			vm.logic.unmountBootset(vm.deviceInfo)
-			val startSectorAbsolute = c.p.startSector + c.startSectorRelative
-			val endSectorAbsolute = c.p.startSector + c.endSectorRelative
-			if (endSectorAbsolute > c.p.endSector)
-				throw IllegalArgumentException("$endSectorAbsolute can't be bigger than ${c.p.endSector}")
-			c.parts.forEachIndexed { index, part -> // TODO !metaonsd
-				terminal.add(vm.activity.getString(R.string.term_create_part))
-				val start = c.p.startSector.coerceAtLeast(startSectorAbsolute)
-				val end = c.p.endSector.coerceAtMost(endSectorAbsolute)
-				val k = part.resolveSectorSize(c, end - start)
-				if (start + k > end)
-					throw IllegalStateException("$start + $k = ${start + k} shouldn't be bigger than $end")
-				if (k < 0)
-					throw IllegalStateException("$k shouldn't be smaller than 0")
-				// create(start, end) values are relative to the free space area
-				val r = vm.logic.create(c.p, start - c.p.startSector,
-					(start + k) - c.p.startSector, part.code, "").to(terminal).exec()
-				if (r.out.joinToString("\n").contains("kpartx")) {
-					terminal.add(vm.activity.getString(R.string.term_reboot_asap))
+			if (vm.deviceInfo.metaonsd) {
+				vm.logic.unmountBootset(vm.deviceInfo)
+				val startSectorAbsolute = c.p.startSector + c.startSectorRelative
+				val endSectorAbsolute = c.p.startSector + c.endSectorRelative
+				if (endSectorAbsolute > c.p.endSector)
+					throw IllegalArgumentException("$endSectorAbsolute can't be bigger than ${c.p.endSector}")
+				c.parts.forEachIndexed { index, part ->
+					terminal.add(vm.activity.getString(R.string.term_create_part))
+					val start = c.p.startSector.coerceAtLeast(startSectorAbsolute)
+					val end = c.p.endSector.coerceAtMost(endSectorAbsolute)
+					val k = part.resolveSectorSize(c, end - start)
+					if (start + k > end)
+						throw IllegalStateException("$start + $k = ${start + k} shouldn't be bigger than $end")
+					if (k < 0)
+						throw IllegalStateException("$k shouldn't be smaller than 0")
+					// create(start, end) values are relative to the free space area
+					val r = vm.logic.create(
+						c.p, start - c.p.startSector,
+						(start + k) - c.p.startSector, part.code, ""
+					).to(terminal).exec()
+					if (r.out.joinToString("\n").contains("kpartx")) {
+						terminal.add(vm.activity.getString(R.string.term_reboot_asap))
+					}
+					val nid = c.meta!!.nid
+					c.meta = SDUtils.generateMeta(c.vm.deviceInfo.asMetaOnSdDeviceInfo())!!
+					createdParts.add(part to (nid to File(c.meta!!.dumpKernelPartition(nid).path)))
+					// do not assert there is leftover space if we just created the last partition we want to create
+					if (index < c.parts.size - 1) {
+						c.p =
+							c.meta!!.s.find { it.type == SDUtils.PartitionType.FREE && start + k < it.startSector } as SDUtils.Partition.FreeSpace
+					}
+					if (r.isSuccess) {
+						terminal.add(vm.activity.getString(R.string.term_created_part))
+					} else {
+						terminal.add(vm.activity.getString(R.string.term_failure))
+						return@WizardTerminalWork
+					}
 				}
-				createdParts.add(Pair(part, c.meta!!.nid))
-				c.meta = SDUtils.generateMeta(c.vm.deviceInfo.asMetaOnSdDeviceInfo())
-				// do not assert there is leftover space if we just created the last partition we want to create
-				if (index < c.parts.size - 1) {
-					c.p =
-						c.meta!!.s.find { it.type == SDUtils.PartitionType.FREE && start + k < it.startSector } as SDUtils.Partition.FreeSpace
-				}
-				if (r.isSuccess) {
-					terminal.add(vm.activity.getString(R.string.term_created_part))
-				} else {
-					terminal.add(vm.activity.getString(R.string.term_failure))
+				if (c.meta == null) {
+					terminal.add(vm.activity.getString(R.string.term_cant_get_meta))
 					return@WizardTerminalWork
+				}
+				vm.logic.mountBootset(vm.deviceInfo)
+			} else {
+				var space = c.desiredSize
+				val imgFolder = File(c.vm.logic.abmSdLessBootset, fn)
+				var i = 0
+				if (imgFolder.exists())
+					throw IllegalStateException("image folder ${imgFolder.absolutePath} already exists")
+				if (!imgFolder.mkdir())
+					throw IllegalStateException("image folder ${imgFolder.absolutePath} could not be created")
+				c.parts.forEachIndexed { index, part ->
+					terminal.add(vm.activity.getString(R.string.term_create_part))
+					val id = i++
+					val img = File(imgFolder, id.toString())
+					val map = File(entryFolder, "$id.map")
+					val mappedName = "abm_${fn}_$id"
+					val bytes = part.resolveBytesSize(c, space)
+					space -= bytes
+					if (space < 0)
+						throw IllegalStateException("remaining space $space shouldn't be smaller than 0")
+					if (!Shell.cmd("fallocate -l $bytes" + img.absolutePath).to(terminal).exec().isSuccess) {
+						terminal.add(vm.activity.getString(R.string.term_failed_fallocate))
+						return@WizardTerminalWork
+					}
+					if (!Shell.cmd("uncrypt ${img.absolutePath} " + map.absolutePath).to(terminal).exec().isSuccess) {
+						terminal.add(vm.activity.getString(R.string.term_failed_uncrypt))
+						return@WizardTerminalWork
+					}
+					if (!SDLessUtils.unmap(vm.logic, mappedName, false, terminal))
+						throw IllegalStateException("failed to unmap $mappedName which shouldn't even exist?")
+					if (!SDLessUtils.map(vm.logic, mappedName, map, terminal)) {
+						terminal.add(vm.activity.getString(R.string.term_failed_map_other))
+						return@WizardTerminalWork
+					}
+					val mapped = File(vm.logic.dmBase, mappedName)
+					createdParts.add(part to (i to mapped))
+					terminal.add(vm.activity.getString(R.string.term_created_part))
 				}
 			}
 			terminal.add(vm.activity.getString(R.string.term_created_pt))
-			vm.logic.mountBootset(vm.deviceInfo)
-			val meta = SDUtils.generateMeta(vm.deviceInfo.asMetaOnSdDeviceInfo())
-			if (meta == null) {
-				terminal.add(vm.activity.getString(R.string.term_cant_get_meta))
-				return@WizardTerminalWork
-			}
 			terminal.add(vm.activity.getString(R.string.term_building_cfg))
 
 			val entry = ConfigFile()
@@ -681,21 +848,17 @@ private fun Flash(c: CreatePartDataHolder) {
 				entry["dtbo"] = "$fn/dtbo.dtbo"
 			entry["options"] = c.cmdline
 			entry["xtype"] = c.rtype
-			entry["xpart"] = createdParts.map { it.second }.joinToString(":")
+			entry["xpart"] = createdParts.map { it.second.first }.joinToString(":")
 			if (c.dmaMeta.contains("updateJson") && c.dmaMeta["updateJson"] != null)
 				entry["xupdate"] = c.dmaMeta["updateJson"]!!
 			entry.exportToFile(File(vm.logic.abmEntries, "$fn.conf"))
-			if (!SuFile.open(File(vm.logic.abmBootset, fn).toURI()).mkdir()) {
-				terminal.add(vm.activity.getString(R.string.term_mkdir_failed))
-				return@WizardTerminalWork
-			}
 
 			terminal.add(vm.activity.getString(R.string.term_flashing_imgs))
 			for (part in c.parts) {
 				if (!c.vm.idNeeded.contains(part.id)) continue
 				terminal.add(vm.activity.getString(R.string.term_flashing_s, part.id))
 				val f = c.vm.chosen[part.id]!!
-				val tp = File(meta.dumpKernelPartition(createdParts.find { it.first == part }!!.second).path)
+				val tp = createdParts.first { it.first == part }.second.second
 				if (part.sparse) {
 					val result2 = Shell.cmd(
 						File(
@@ -720,7 +883,12 @@ private fun Flash(c: CreatePartDataHolder) {
 				cmd += " " + c.vm.chosen[i]!!.toFile(vm).absolutePath
 			}
 			for (i in c.parts) {
-				cmd += " " + createdParts.find { it.first == i }!!.second
+				cmd += " " + createdParts.first { it.first == i }.second.let {
+					if (vm.deviceInfo.metaonsd)
+						it.first // partition number
+					else
+						it.second.absolutePath // path to .img file
+				}
 			}
 			val result = vm.logic.runShFileWithArgs(cmd).to(terminal).exec()
 			if (!result.isSuccess) {

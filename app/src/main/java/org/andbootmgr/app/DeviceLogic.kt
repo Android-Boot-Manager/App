@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
+import org.andbootmgr.app.util.SDLessUtils
 import org.andbootmgr.app.util.SDUtils
 import org.andbootmgr.app.util.Toolkit
 import java.io.File
@@ -22,7 +23,6 @@ class DeviceLogic(private val ctx: Context) {
 	val metadataMap = File(metadata, "abm_settings.map")
 	val dmBase = File("/dev/block/mapper")
 	val dmName = "abmbootset"
-	val dmPath = File(dmBase, dmName)
 	val abmDb = File(abmBootset, "db")
 	val abmEntries = File(abmDb, "entries")
 	val abmDbConf = File(abmDb, "db.conf")
@@ -59,15 +59,14 @@ class DeviceLogic(private val ctx: Context) {
 			val out = result.out.joinToString("\n") + result.err.joinToString("\n")
 			if (out.contains("Device or resource busy")) {
 				mounted = true
-			}
-			if (out.contains("Invalid argument")) {
+			} else if (out.contains("Invalid argument")) {
 				mounted = false
 			}
 			Log.e("ABM_UMOUNT", out)
 			return !mounted
 		}
-		if (!d.metaonsd) unmapBootset()
 		mounted = false
+		if (!d.metaonsd && !unmapBootset()) return false
 		return true
 	}
 	fun checkMounted(): Boolean {
@@ -78,20 +77,11 @@ class DeviceLogic(private val ctx: Context) {
 		}
 		return mounted
 	}
-	private fun mapBootset(): Boolean {
-		if (SuFile.open(dmPath.toURI()).exists())
-			return true
-		val tempFile = File(cacheDir, "${System.currentTimeMillis()}.txt")
-		if (!Shell.cmd(File(toolkitDir, "droidboot_map_to_dm")
-				.absolutePath + " " + metadataMap.absolutePath + " " + tempFile.absolutePath
-			).exec().isSuccess) {
-			return false
-		}
-		return Shell.cmd("dmsetup create $dmName ${tempFile.absolutePath}").exec().isSuccess
+	fun mapBootset(): Boolean {
+		return SDLessUtils.map(this, dmName, metadataMap)
 	}
-	private fun unmapBootset() {
-		if (SuFile.open(dmPath.toURI()).exists())
-			Shell.cmd("dmsetup remove -f --retry $dmName").exec()
+	private fun unmapBootset(): Boolean {
+		return SDLessUtils.unmap(this, dmName, true)
 	}
 	fun mount(p: SDUtils.Partition): Shell.Job {
 		return Shell.cmd(p.mount())

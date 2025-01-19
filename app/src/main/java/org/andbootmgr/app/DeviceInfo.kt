@@ -90,7 +90,7 @@ abstract class SdLessDeviceInfo : DeviceInfo {
 		return !SuFile.open(logic.abmDb, "db.conf").exists()
 	}
 	override fun getAbmSettings(logic: DeviceLogic): String? {
-		return logic.dmPath.absolutePath
+		return File(logic.dmBase, logic.dmName).absolutePath
 	}
 }
 
@@ -120,7 +120,7 @@ class JsonDeviceInfoFactory(private val ctx: Context) {
 				val jsonText = try {
 					try {
 						ctx.assets.open("abm.json").readBytes().toString(Charsets.UTF_8)
-					} catch (e: FileNotFoundException) {
+					} catch (_: FileNotFoundException) {
 						URL("https://raw.githubusercontent.com/Android-Boot-Manager/ABM-json/master/devices/$codename.json").readText()
 					}
 				} catch (e: Exception) {

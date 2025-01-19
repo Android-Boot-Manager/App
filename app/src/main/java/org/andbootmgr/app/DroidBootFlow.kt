@@ -29,6 +29,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.andbootmgr.app.util.ConfigFile
+import org.andbootmgr.app.util.SDLessUtils
 import org.andbootmgr.app.util.SDUtils
 import org.json.JSONObject
 import org.json.JSONTokener
@@ -264,23 +265,16 @@ private fun Flash(d: DroidBootFlowDataHolder) {
 				terminal.add(vm.activity.getString(R.string.term_failed_uncrypt))
 				return@WizardTerminalWork
 			}
-			val tempFile = File(vm.logic.cacheDir, "${System.currentTimeMillis()}.txt")
-			if (!Shell.cmd(File(vm.logic.toolkitDir, "droidboot_map_to_dm")
-				.absolutePath + " " + vm.logic.metadataMap.absolutePath + " " + tempFile.absolutePath
-			).to(terminal).exec().isSuccess) {
-				terminal.add(vm.activity.getString(R.string.term_failed_mapconv))
+			val ast = vm.deviceInfo.getAbmSettings(vm.logic)
+			if (ast == null) {
+				terminal.add(vm.activity.getString(R.string.term_failed_prepare_map))
 				return@WizardTerminalWork
 			}
-			if (SuFile.open(vm.logic.dmPath.toURI()).exists()) {
-				if (!Shell.cmd("dmsetup remove --retry ${vm.logic.dmName}")
-						.to(terminal).exec().isSuccess
-				) {
-					terminal.add(vm.activity.getString(R.string.term_failed_unmap))
-					return@WizardTerminalWork
-				}
+			if (!SDLessUtils.unmap(vm.logic, vm.logic.dmName, false, terminal)) {
+				terminal.add(vm.activity.getString(R.string.term_failed_unmap))
+				return@WizardTerminalWork
 			}
-			if (!Shell.cmd("dmsetup create ${vm.logic.dmName} ${tempFile.absolutePath}")
-				.to(terminal).exec().isSuccess) {
+			if (!SDLessUtils.map(vm.logic, vm.logic.dmName, vm.logic.metadataMap, terminal)) {
 				terminal.add(vm.activity.getString(R.string.term_failed_map))
 				return@WizardTerminalWork
 			}

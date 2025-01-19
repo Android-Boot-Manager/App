@@ -24,6 +24,7 @@
 	<string name="start_sector">Start sector (relative)</string>
 	<string name="end_sector">End sector (relative)</string>
 	<string name="available_space">Available space: %s (%d sectors)</string>
+	<string name="available_space_bytes">Available space: %s (%d bytes)</string>
 	<string name="approx_size">Approximate size: %s</string>
 	<string name="invalid_input">(invalid input)</string>
 	<string name="option_select">Please select one of the below options.</string>
@@ -266,8 +267,9 @@
 	<string name="term_cant_create_bootset">-- failed to create bootset dir</string>
 	<string name="term_failed_fallocate">-- failed to create bootset.img</string>
 	<string name="term_failed_uncrypt">-- failed to decrypt bootset.img</string>
-	<string name="term_failed_mapconv">-- failed to convert bootset.img map</string>
 	<string name="term_failed_map">-- failed to map bootset.img</string>
+	<string name="term_failed_map_other">-- failed to map image</string>
+	<string name="term_failed_prepare_map">-- failed to prepare to map bootset.img</string>
 	<string name="term_failed_bootset_mkfs">-- failed to create file system in bootset</string>
 	<string name="term_failed_unmap">-- failed to unmap bootset.img</string>
 	<string name="install_bl_first">You need to install the bootloader manually first. Please check the ABM wiki for more infos.</string>
