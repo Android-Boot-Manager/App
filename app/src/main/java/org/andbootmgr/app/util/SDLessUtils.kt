@@ -43,8 +43,7 @@ object SDLessUtils {
 		val dmPath = File(logic.dmBase, name)
 		if (SuFile.open(dmPath.toURI()).exists())
 			return Shell.cmd(
-				"dmsetup remove " + (if (force) "-f " else "") +
-						"--retry $name"
+				"dmsetup remove " + (if (force) "-f " else "") + name
 			).let {
 				if (terminal != null)
 					it.to(terminal)
