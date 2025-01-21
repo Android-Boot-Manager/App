@@ -751,11 +751,31 @@ private fun Os(c: CreatePartDataHolder) {
 					Button(onClick = { c.parts.removeAt(c.parts.lastIndex) }, enabled = (c.parts.size > 1)) {
 						Text("-")
 					}
-					var remaining = c.endSectorRelative - c.startSectorRelative
-					for (part in c.parts) {
-						remaining -= part.resolveSectorSize(c, remaining)
+					if (c.vm.deviceInfo.metaonsd) {
+						var remaining = c.endSectorRelative - c.startSectorRelative
+						for (part in c.parts) {
+							remaining -= part.resolveSectorSize(c, remaining)
+						}
+						Text(
+							stringResource(
+								R.string.remaining_sector,
+								remaining,
+								c.endSectorRelative - c.startSectorRelative
+							)
+						)
+					} else {
+						var remaining = c.desiredSize
+						for (part in c.parts) {
+							remaining -= part.resolveBytesSize(c, remaining)
+						}
+						Text(
+							stringResource(
+								R.string.remaining_sector,
+								remaining,
+								c.desiredSize
+							)
+						)
 					}
-					Text(stringResource(R.string.remaining_sector, remaining, c.endSectorRelative - c.startSectorRelative))
 				}
 			}
 		}
@@ -836,7 +856,7 @@ private fun Flash(c: CreatePartDataHolder) {
 				vm.logic.mountBootset(vm.deviceInfo)
 			} else {
 				var space = c.desiredSize
-				val imgFolder = File(c.vm.logic.abmSdLessBootset, fn)
+				val imgFolder = SuFile.open(c.vm.logic.abmSdLessBootset, fn)
 				var i = 0
 				if (imgFolder.exists())
 					throw IllegalStateException("image folder ${imgFolder.absolutePath} already exists")
@@ -851,7 +871,7 @@ private fun Flash(c: CreatePartDataHolder) {
 					space -= bytes
 					if (space < 0)
 						throw IllegalStateException("remaining space $space shouldn't be smaller than 0")
-					if (!Shell.cmd("fallocate -l $bytes" + img.absolutePath).to(terminal).exec().isSuccess) {
+					if (!Shell.cmd("dd if=/dev/zero bs=1024 count=${bytes/1024} " + img.absolutePath).to(terminal).exec().isSuccess) {
 						terminal.add(vm.activity.getString(R.string.term_failed_fallocate))
 						return@WizardTerminalWork
 					}
