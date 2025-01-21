@@ -468,19 +468,27 @@ private fun OsEditor(vm: MainActivityState, parts: SDUtils.SDPartitionMeta?, e: 
 					delete = false
 					CoroutineScope(Dispatchers.Default).launch {
 						var tresult = ""
-						if (e.has("xpart") && !e["xpart"].isNullOrBlank() && vm.deviceInfo!!.metaonsd) {
-							var parts = parts
+						if (e.has("xpart") && !e["xpart"].isNullOrBlank()) {
 							val allp = e["xpart"]!!.split(":")
-								.map { parts!!.dumpKernelPartition(Integer.valueOf(it)) }
-							vm.unmountBootset()
-							for (p in allp) { // Do not chain, but regenerate meta and unmount every time. Thanks vold
-								p.meta = if (parts != null) parts.also { parts = null }
-								else SDUtils.generateMeta(vm.deviceInfo!!.asMetaOnSdDeviceInfo())!!
-								val r = vm.logic!!.delete(p).exec()
-								tresult += r.out.joinToString("\n") + r.err.joinToString("\n") + "\n"
+							if (vm.deviceInfo!!.metaonsd) {
+								val allParts = allp.map { parts!!.dumpKernelPartition(Integer.valueOf(it)) }
+								vm.unmountBootset()
+								var parts = parts
+								for (p in allParts) { // Do not chain, but regenerate meta and unmount every time. Thanks vold
+									p.meta = if (parts != null) parts.also { parts = null }
+									else SDUtils.generateMeta(vm.deviceInfo!!.asMetaOnSdDeviceInfo())!!
+									val r = vm.logic!!.delete(p).exec()
+									tresult += r.out.joinToString("\n") + r.err.joinToString("\n") + "\n"
+								}
+								vm.mountBootset()
+							} else {
+								for (p in allp) {
+									if (!vm.logic!!.unmap(f.nameWithoutExtension, p.toInt()))
+										tresult += vm.activity!!.getString(R.string.cannot_delete, vm.logic!!.getDmFile(f.nameWithoutExtension, p.toInt()))
+								}
 							}
-							vm.mountBootset()
-						} else if (!vm.deviceInfo!!.metaonsd) {
+						}
+						if (!vm.deviceInfo!!.metaonsd) {
 							val f3 = SuFile(vm.logic!!.abmSdLessBootset, f.nameWithoutExtension)
 							if (!f3.deleteRecursive())
 								tresult += vm.activity!!.getString(R.string.cannot_delete, f3.absolutePath)
