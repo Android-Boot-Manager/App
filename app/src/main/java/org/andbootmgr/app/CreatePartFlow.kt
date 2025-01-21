@@ -99,7 +99,7 @@ class CreatePartFlow(private val desiredStartSector: Long?): WizardFlow() {
 private class CreatePartDataHolder(val vm: WizardState, val desiredStartSector: Long?) {
 	var meta by mutableStateOf<SDUtils.SDPartitionMeta?>(null) // metaonsd only
 	lateinit var p: SDUtils.Partition.FreeSpace // metaonsd only
-	var freeSpace: Long? = null // !metaonsd only
+	var freeSpace by mutableLongStateOf(null) // !metaonsd only
 	var startSectorRelative = 0L // metaonsd only
 	var endSectorRelative = 0L // metaonsd only
 	var desiredSize = 0L // !metaonsd only
