@@ -871,7 +871,7 @@ private fun Flash(c: CreatePartDataHolder) {
 					space -= bytes
 					if (space < 0)
 						throw IllegalStateException("remaining space $space shouldn't be smaller than 0")
-					if (!Shell.cmd("dd if=/dev/zero bs=1024 count=${bytes/1024} " + img.absolutePath).to(terminal).exec().isSuccess) {
+					if (!Shell.cmd("dd if=/dev/zero bs=1024 count=${bytes/1024} of=" + img.absolutePath).to(terminal).exec().isSuccess) {
 						terminal.add(vm.activity.getString(R.string.term_failed_fallocate))
 						return@WizardTerminalWork
 					}
