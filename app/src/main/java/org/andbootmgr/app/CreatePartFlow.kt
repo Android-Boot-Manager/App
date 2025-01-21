@@ -857,16 +857,14 @@ private fun Flash(c: CreatePartDataHolder) {
 			} else {
 				var space = c.desiredSize
 				val imgFolder = SuFile.open(c.vm.logic.abmSdLessBootset, fn)
-				var i = 0
 				if (imgFolder.exists())
 					throw IllegalStateException("image folder ${imgFolder.absolutePath} already exists")
 				if (!imgFolder.mkdir())
 					throw IllegalStateException("image folder ${imgFolder.absolutePath} could not be created")
 				c.parts.forEachIndexed { index, part ->
 					terminal.add(vm.activity.getString(R.string.term_create_part))
-					val id = i++
-					val img = File(imgFolder, id.toString())
-					val map = File(entryFolder, "$id.map")
+					val img = File(imgFolder, index.toString())
+					val map = File(entryFolder, "$index.map")
 					val bytes = part.resolveBytesSize(c, space)
 					space -= bytes
 					if (space < 0)
@@ -879,11 +877,11 @@ private fun Flash(c: CreatePartDataHolder) {
 						terminal.add(vm.activity.getString(R.string.term_failed_uncrypt))
 						return@WizardTerminalWork
 					}
-					if (!vm.logic.map(fn, id, terminal)) {
+					if (!vm.logic.map(fn, index, terminal)) {
 						terminal.add(vm.activity.getString(R.string.term_failed_map_other))
 						return@WizardTerminalWork
 					}
-					createdParts.add(part to (i to vm.logic.getDmFile(fn, id)))
+					createdParts.add(part to (index to vm.logic.getDmFile(fn, index)))
 					terminal.add(vm.activity.getString(R.string.term_created_part))
 				}
 			}
